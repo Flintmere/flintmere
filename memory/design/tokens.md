@@ -1,119 +1,176 @@
 # tokens.md
 
-Token summary for the unified Ledger canon. Canonical values live in `tailwind.config.js` + `src/app/globals.css`. This file is the reminder + council's floors, not the source of truth.
+Canon name: **Neutral-bold with the legibility bracket.**
 
-## Ledger canon (every AllowanceGuard surface)
+Apple-bold structure — stark type, near-white paper, near-black ink, generous whitespace, one demoted accent — carrying one Flintmere-specific signature: **the legibility bracket**. See the Signature section below; it is the rule everything else supports.
 
-**Use where:** every surface. Homepage, blog, pricing, docs, dashboard, account, auth flows, modals, toasts. Post-ADR 0007 there is no "app-only" or "marketing-only" — one canon covers the whole product.
+Canonical source of truth is `apps/*/globals.css` + `tailwind.config.js` (once built). Until then, `/wireframes/styles.css` is the reference sketch and this file is the authoritative text. When the source ships, update this file — never the other way around.
 
-### Surface tokens
+## Palette
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `bg-paper` | `#F7F5F0` | Default page surface |
-| `bg-paper-sub` | `#EFECE3` | Subtle divider / secondary section / table alternate row |
-| `bg-paper-deep` | `#E6E2D5` | Tertiary section / embedded card / code block background |
-| `bg-oxblood` | `#2D0A0A` | Inverse moments — homepage CTABand, destructive confirms, critical error modals |
-| `bg-cream` | `#F7F5F0` | Type colour on oxblood |
+### Ink (text + dark surfaces)
 
-### Text tokens
+| Token | Hex | Primary use |
+|---|---|---|
+| `--ink` | `#0A0A0B` | Default text on paper. Dark-section / hero / email-gate background. |
+| `--ink-2` | `#141518` | Secondary ink on paper — body after lede, card body text when elevated. |
+| `--ink-3` | `#26272B` | Tertiary ink on dark surfaces — inactive tab background, disabled state on dark. |
+| `--line` | `#0A0A0B` | The 1px hairline divider on paper surfaces. Same hex as `--ink`. |
+| `--line-dark` | `#26272B` | 1px divider on dark surfaces. |
 
-| Token | Contrast on paper | Usage |
-|-------|-------------------|-------|
-| `text-ink` | 17:1 | Body default, headings |
-| `text-ink-soft` | ~12:1 | Secondary body, lede text |
-| `text-ink-muted` | ~7.4:1 | Tertiary copy, captions, quiet supporting text |
-| `text-ink-whisper` | 5.18:1 on paper-deep | Metadata only — **Noor's floor** |
+### Paper (light surfaces)
 
-### Accents (all AA on paper)
+| Token | Hex | Primary use |
+|---|---|---|
+| `--paper` | `#F7F7F4` | **Default body background.** Warmer than pure white (~1.5% amber cast) — distinguishes Flintmere from the pure-white Linear/Vercel default. |
+| `--paper-2` | `#EDECE6` | Secondary surface — embedded card, alternate pricing row, footer block. |
+| `--line-soft` | `#D5D2C8` | Secondary dividers inside cards, table row rules, placeholder dashed borders. |
 
-| Token | Hex | Where |
-|-------|-----|-------|
-| `text-amber-deep` | `#854F08` | Display emphasis, inline signature, link base colour, list-marker signature |
-| `text-crimson-paper` | `#B3151F` | **Protected** — the word "approved." on the homepage and equivalent headline accents. Also: inline error text, destructive-action labels. |
-| `text-ink-blue` | `#0B2545` | Strong citations, data-table emphasis |
+### Mute
 
-### Rules + hairlines
+| Token | Hex | Contrast on `--paper` | Floor |
+|---|---|---|---|
+| `--mute` | `#5A5C64` | ≈ 6.3:1 | Body-safe muted text (lede, meta captions). Passes AA on paper. |
+| `--mute-2` | `#8B8D95` | ≈ 3.5:1 | **Metadata only.** Eyebrows, monoclabels, timestamps. Never body. Noor's floor. |
+| `--mute-inv` | `#A8AAB2` | — | The inverted mute for dark surfaces. Contrast on ink ≈ 7.4:1. |
 
-- `border-ink-rule` = `rgba(15,17,21,0.14)` — default hairline on any Ledger surface.
-- `.ledger-rule` — strong ink hairline + amber hairline (signature divider). Use sparingly — the signature move earns its place.
-- `.ledger-rule-short` — short variant for section intros.
-- `.dotted-leader` — "label ………… value" editorial row. Works on marketing stat rows and app-side metadata rows equally.
+### Accent (demoted)
 
-### Type
+| Token | Hex | Where it is allowed |
+|---|---|---|
+| `--accent` (sulphur) | `#D9E05A` | **Scanner surfaces only.** Score-ring fill, progress bars on pillar cards, severity-high dot, terminal `warn` rows. **Not** used on marketing or Shopify app surfaces. |
+| `--accent-ink` | `#0A0A0B` | The only colour on top of sulphur. Never white on sulphur; always ink. |
 
-| Token | Family | Usage |
-|-------|--------|-------|
-| `font-fraunces` | Fraunces (italic) | Display — signature move is oversized italic numerals / roman numerals |
-| `font-plex` | IBM Plex Sans | Body, UI chrome, form labels, button text |
-| `font-mono` | JetBrains Mono | Metadata, code, addresses, tx hashes |
+The sulphur-everywhere rule from the original wireframes is **demoted** by the hybrid: sulphur now reads as "diagnostic state" rather than "brand colour". The brand carrier is the bracket, not the accent.
 
-### Utilities (`src/app/globals.css`)
+### Semantic
 
-- `.paper` / `.paper-sub` / `.paper-deep` — section surfaces.
-- `.paper-card` — light card with letterpress drop shadow, no blur. Use on every surface — including authenticated dashboards.
-- `.paper-card-raised` — elevated variant for featured content.
-- `.paper-pill` / `.paper-button` — chips and secondary CTAs.
-- `.grain` — inline SVG noise overlay (printed-paper texture).
-- `.deckle-top` / `.deckle-bottom` — torn-paper transitions.
-- `.font-display-tight` / `.font-display-black` — Plex display tuning.
-- `.rule-amber-vert` — vertical amber column rule.
-- `.prose.prose-ink` — editorial prose theme for long-form HTML content (blog, docs). Theme defined in `tailwind.config.js` §`theme.extend.typography.ink`.
+| Token | Hex | Use |
+|---|---|---|
+| `--alert` | `#E54A2A` | True critical only. P0 severity dots, destructive confirm fill. Never decorative. |
+| `--ok` | `#3F8F57` | Success on paper (terminal `ok` row, resolved issues). Not a celebration — completion is the default. |
 
-### Protected moments (never change without Council + operator approval)
+## Typography
 
-- The word **"approved."** (or an equivalent headline accent) in `text-crimson-paper`. Everything else is ink on paper.
-- **Inverse moments are purpose-scoped.** Homepage CTABand uses oxblood. Authenticated surfaces may use oxblood for destructive confirms / critical error modals / fatal interstitials. Each surface gets at most one inverse moment per purpose.
-- **The signature move.** Oversized Fraunces italic numerals / Roman numerals as margin notation paired with `.ledger-rule`. One per major section. Earning it is the point.
+### Faces
 
-### State ramps (canon-agnostic utility palettes)
+| Family | Class | Where |
+|---|---|---|
+| Geist Sans | `.sans` / default | Body (14-16px), display (44-280px), every heading, stat numbers, score numerals, pricing prices. Weights 400 / 500 / 700. Letter-spacing −0.02em (headings) to −0.045em (giant display). |
+| Geist Mono | `.mono` | **Bracket tokens** (the signature), eyebrows, micro-labels, chip / pill text, breadcrumb, frame-bar labels, code. Weights 400 / 500. |
 
-Tune state colour; they are not a second surface system. Use freely on Ledger surfaces.
+Geist is Vercel's open-source typeface family — SIL OFL license, self-hostable. No Caveat. No Space Grotesk. No Fraunces. If a display moment needs emphasis Geist Sans can't deliver, the first answer is "make it bigger or bolder," not "change typeface."
 
-- `semantic-success-*` — success affirmations. Prefer `semantic-success-500` on paper for text, `-400` for icons, `-50` for tinted backgrounds with a `500` border.
-- `semantic-warning-*` — yellow/amber warnings. The tints overlap with Ledger's amber-deep accent — prefer `text-amber-deep` when the signal is "attention" rather than "caution," and reserve `semantic-warning-*` for operational states (past-due, trial-ending).
-- `semantic-error-*` — red error states. Prefer `text-crimson-paper` for inline error text inside editorial body copy; use `semantic-error-*` tints for destructive icons + form-field error chrome.
-- `semantic-info-*` — blue informational tint. Use sparingly; prefer `text-ink-blue` for inline citations.
-- `crimson-*`, `amber-*`, `sky-*` — utility ramps. Free to use when a semantic ramp doesn't fit exactly.
+### Scale (Apple-bold)
 
-## Retired: Glass / Midnight Amber (ADR 0007, 2026-04-17)
+| Role | Size | Weight | Letter-spacing | Line |
+|---|---|---|---|---|
+| Giant display | `clamp(88px, 14vw, 220px)` | 500 | −0.045em | 0.92 |
+| h1 | 72px desktop / 44px mobile | 500 | −0.035em | 1.0 |
+| h2 | 44px / 32px | 500 | −0.03em | 1.05 |
+| h3 | 28px / 22px | 500 | −0.025em | 1.1 |
+| Lede | 18px | 400 | −0.01em | 1.5 (max-width 56ch) |
+| Body | 15px / 14px mobile | 400 | 0 | 1.55 |
+| Eyebrow mono | 11px uppercase | 500 | 0.14em | — |
+| Micro mono | 10px uppercase | 500 | 0.16em | — |
 
-The following tokens, utilities, and scales are **retired**. Do not use on new work. Existing consumers are being migrated per ADR 0007 Phases B–E.
+Display weights lean on 500 (medium) not 700 (bold) — the same move Apple's marketing site makes. True bold (700) is reserved for the bracketed word inside a display line, so the bracket reads with emphasis against the medium-weight ambient type.
 
-- **Deleted utilities** (Phase C): `.glass-card`, `.glass-pill`, `.glass-button`, `.glass-drift` and their reduced-motion branches.
-- **Deleted file** (Phase C): `src/design/tokens.ts` (Midnight Amber palette).
-- **Retired legacy scales** in `tailwind.config.js` (Phase E, after consumer migration): `primary-*`, `secondary-*`, `neutral-*`, `background-*`, `text-*` keys (the nested `text.primary/secondary/tertiary/inverse/muted` ones — not `text-ink` etc.), `border-*` keys (the nested `border.primary/secondary/tertiary` ones — not `border-ink-rule`), `surface-*`.
-- **`dark:` variants** — no job on a single-canon product. Strip when encountered.
-- **`bg-white`, `bg-slate-*`, `bg-gray-*`, `bg-neutral-*`** — never appropriate on a Ledger surface.
+## Signature — the legibility bracket
 
-If you encounter any of these in code, that code predates ADR 0007 and needs migrating to Ledger.
+Every Flintmere surface carries at least one moment where a key word is set inside 1px-ink hairline brackets in Geist Mono, as if extracted and held up for inspection by an agent.
 
-## Contrast + accessibility floors (Noor)
+### Spec
 
-- Body copy on `paper`, `paper-sub`: `text-ink-muted` or darker (≥ AA).
-- Body copy on `paper-deep`: `text-ink-whisper` is the minimum (5.18:1). Metadata only at that level.
-- Interactive elements: AA for focus ring, AA for text, AAA preferred on primary CTAs.
-- Error text: `text-crimson-paper` or `text-semantic-error-700+` (verify AA on the container surface).
-- No text on image without a scrim that brings contrast to AA.
-- No colour-only meaning. Every colour-coded signal has a second cue (icon, label, pattern).
+- **Brackets**: `[` and `]` in Geist Mono, same weight and size as the bracketed word.
+- **Bracketed word**: Geist Mono, weight 700 (the only place 700 appears on paper surfaces).
+- **Ambient text**: Geist Sans, weight 500 for display, 400 for body.
+- **Spacing**: `0.25em` space inside the brackets on each side. No space outside.
+- **Colour**: `--ink` on `--paper`, `--paper` on `--ink`. The bracket never carries the accent.
+- **Underline tick** (optional, display scale only): a 1px `--accent` sulphur hairline under the bracketed word, 2px long, centred. Used once per page max, scanner surface only.
 
-## Performance floors (Thane)
+### Examples across surfaces
 
-Full budget in `performance-budget.md`. Token-level notes:
+```
+Marketing hero    Your product catalog is [ invisible ] to ChatGPT.
 
-- Icons inline as SVG. Import from a file only if reused in ≥3 components.
-- Fonts: three families only (Fraunces, IBM Plex Sans, JetBrains Mono). Subset where possible.
-- `.grain` is an inline SVG, not a raster. Do not swap for a PNG.
-- No WebGL / heavy canvas on any surface.
+Marketing pillars [ 01 ] Identifier completeness
+                  [ 02 ] Attribute completeness
+                  [ 03 ] Title and description quality
+
+Scanner input     [ https://your-store.com ]
+
+Scanner score     [ 64 ] / 100
+
+App issue         Missing [ GTIN ] on 412 products
+
+Wordmark (dark)   Flint[ mere ]
+
+Email report      [ Flintmere Report · Jun 2026 ]
+```
+
+### Rules (Noor's veto, #8)
+
+- Brackets must be **structural markup**, not decoration. Every bracketed word must correspond to a meaningful extractable token: a noun, a number, an identifier, a URL, a score.
+- **Never** bracket verbs, articles, or filler words.
+- **One bracket moment per section. Two per page maximum.** More than two and the signature becomes decoration.
+- Screen readers announce `[` and `]` as "left bracket" / "right bracket". On headings that's acceptable (the bracket is part of the sentence). On interactive elements (buttons, links), hide brackets from AT with `aria-hidden="true"` wrappers and pass the clean text via `aria-label`.
+- The bracketed word must be readable **without** the brackets. If removing the brackets breaks comprehension, the sentence is wrong, not the bracket.
+
+### What the bracket is NOT
+
+- Not a chip, pill, or tag. Those still exist as primitives — bracket tokens are typographic, not UI chrome.
+- Not a code block. Code uses `<code>` with mono face; brackets use a typographic rhythm around a highlighted noun.
+- Not a frame decoration. Do not bracket headings purely to "add visual interest."
+
+## Corners, surfaces, motion floors
+
+- **Corners sharp.** No `border-radius` except on circular gauges (score-ring), avatars (if introduced), toggle handles.
+- **No shadows.** Separation via 1px `--line` hairline. Apple-bold does not use drop shadows.
+- **No gradients** except the conic-gradient that renders score rings.
+- **No blur, no glass.** Opaque surfaces only.
+- **Motion:** opacity + transform only. Never animate `width/height/top/left`. Every animation has a `prefers-reduced-motion` branch that disables movement and preserves meaning.
+
+## Inversion
+
+Paper → ink token swap for dark sections (email gate, hero over-inverted moments, Shopify-app sidebar):
+
+| Paper | → Ink |
+|---|---|
+| `--paper` (bg) | `--ink` |
+| `--ink` (body text) | `--paper` |
+| `--mute` (meta, paper) | `--mute-inv` |
+| `--line` | `--line-dark` |
+| `--accent` sulphur | unchanged (demoted — only on scanner, both canvases) |
+
+## Surface-specific notes
+
+- **Marketing (flintmere.com)** — paper `--paper`, type-led, zero sulphur, one bracket per section. Brackets carry the emphasis that sulphur carried in the original wireframes.
+- **Scanner (audit.flintmere.com)** — paper default, but sulphur *is* allowed here (score ring, progress bars, severity high). The scanner is the diagnostic surface — sulphur reads as "live data." Still one bracket per section minimum.
+- **Shopify app (app.flintmere.com)** — Polaris is the host chrome; Flintmere's score card, pillar cells, and Channel Health widget render as **a Flintmere island inside a Polaris sea**. Brackets appear on issue titles and the score header. Sulphur is OK on the score-ring only; everywhere else inside the app uses Polaris greens/yellows.
 
 ## Proposing a new token
 
-Every new token goes through `design-token`. The proposal carries:
-- Name + proposed value
-- Surface(s) + use case
-- Contrast check at all sizes
-- Canon fit (Ledger; there is no other canon)
-- Replaces what (if anything)
-- Migration plan for existing usage
+Every new token goes through the `design-token` skill. Proposal carries:
 
-Council review: Maren (visual), Kael (systems), Noor (AA VETO). If approved, the token ships in `tailwind.config.js` / `src/app/globals.css` and this file is updated to name it. Ad-hoc hex values do not ship.
+- Name + hex + surface
+- Contrast check at every size it appears
+- Canon fit (hybrid-Apple-bold; there is no other canon)
+- Replaces what (if anything)
+- Migration plan
+
+Council review: Maren (visual), Kael (systems), **Noor (AA, veto)**. Ad-hoc hex does not ship.
+
+## Retired (do not use)
+
+Everything from the inherited allowanceguard Ledger canon is **retired**. Do not reference in code, skill copy, or new memory:
+
+- `bg-paper-deep`, `bg-oxblood`, `bg-cream`, `text-amber-deep`, `text-crimson-paper`, `text-ink-blue`
+- `font-fraunces`, `font-plex`, `font-space-grotesk` (yes, Space Grotesk from the first Flintmere draft is retired too)
+- `.ledger-rule`, `.deckle-top`, `.deckle-bottom`, `.grain`, `.paper-card`, `.dotted-leader`, `.glass-*`
+- The word "approved." as a protected moment
+- Caveat / margin-note aesthetic (was in the wireframes; dropped in the hybrid)
+
+## Changelog
+
+- 2026-04-19: Canon selected — **neutral-bold (Apple-bold structure) with the legibility-bracket signature**. Palette: warm near-white + near-black, sulphur demoted to scanner-only. Fonts: Geist Sans + Geist Mono. Council decision: Maren/Kael/Noor approved signature; #12 Ecosystem endorsed neutral-bold over sulphur-everywhere for Shopify Plus buyer context; #22 Conversion cross-referenced bracket-as-emphasis A/B data. First authoritative statement.
