@@ -1,0 +1,190 @@
+// Flintmere Shopify app database schema.
+// Canonical per `projects/flintmere/ARCHITECTURE.md` §Database schema.
+// This schema owns the `app_*` namespace; scanner owns `scanner_*` in its own schema.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---- Shopify OAuth session store (required by @shopify/shopify-app-session-storage-prisma) ----
+
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+
+  @@map("app_sessions")
+}
+
+// ---- Shops (our canonical record, encrypted token) ----
+
+model Shop {
+  shopDomain             String    @id @map("shop_domain")
+  encryptedAccessToken   String    @map("encrypted_access_token")
+  scopes                 String
+  planTier               String    @default("free") @map("plan_tier")
+  installedAt            DateTime  @default(now()) @map("installed_at")
+  uninstalledAt          DateTime? @map("uninstalled_at")
+  lastSyncAt             DateTime? @map("last_sync_at")
+  lastScoreAt            DateTime? @map("last_score_at")
+  lastScoreComposite     Int?      @map("last_score_composite")
+  countryCode            String?   @map("country_code")
+  primaryDomain          String?   @map("primary_domain")
+
+  products  Product[]
+  scores    Score[]
+  fixes     Fix[]
+  webhooks  WebhookEvent[]
+
+  @@index([planTier])
+  @@index([installedAt])
+  @@map("app_shops")
+}
+
+// ---- Catalog snapshot (populated by bulk sync) ----
+
+model Product {
+  id               String    @id @default(cuid())
+  shopDomain       String    @map("shop_domain")
+  shop             Shop      @relation(fields: [shopDomain], references: [shopDomain], onDelete: Cascade)
+  shopifyProductId String    @map("shopify_product_id")
+  handle           String
+  title            String
+  vendor           String?
+  productType      String?   @map("product_type")
+  status           String
+  publishedAt      DateTime? @map("published_at")
+  rawPayload       Json      @map("raw_payload")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  variants         Variant[]
+
+  @@unique([shopDomain, shopifyProductId])
+  @@index([shopDomain])
+  @@map("app_products")
+}
+
+model Variant {
+  id                String  @id @default(cuid())
+  productId         String  @map("product_id")
+  product           Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  shopifyVariantId  String  @map("shopify_variant_id")
+  sku               String?
+  barcode           String?
+  price             String
+  inventoryQuantity Int?    @map("inventory_quantity")
+  rawPayload        Json    @map("raw_payload")
+
+  @@unique([productId, shopifyVariantId])
+  @@map("app_variants")
+}
+
+// ---- Scoring + issues ----
+
+model Score {
+  id                 String   @id @default(cuid())
+  shopDomain         String   @map("shop_domain")
+  shop               Shop     @relation(fields: [shopDomain], references: [shopDomain], onDelete: Cascade)
+  scoredAt           DateTime @default(now()) @map("scored_at")
+  composite          Int
+  grade              String
+  gtinlessCeiling    Int      @map("gtinless_ceiling")
+  pillars            Json
+  productCount       Int      @map("product_count")
+  variantCount       Int      @map("variant_count")
+
+  issues Issue[]
+
+  @@index([shopDomain])
+  @@index([scoredAt])
+  @@map("app_scores")
+}
+
+model Issue {
+  id                String @id @default(cuid())
+  scoreId           String @map("score_id")
+  score             Score  @relation(fields: [scoreId], references: [id], onDelete: Cascade)
+  pillar            String
+  code              String
+  severity          String
+  title             String
+  description       String
+  affectedCount     Int     @map("affected_count")
+  revenueImpactScore Int    @map("revenue_impact_score")
+
+  @@index([scoreId])
+  @@map("app_issues")
+}
+
+// ---- Fix engine ----
+
+model Fix {
+  id           String    @id @default(cuid())
+  shopDomain   String    @map("shop_domain")
+  shop         Shop      @relation(fields: [shopDomain], references: [shopDomain], onDelete: Cascade)
+  tier         Int
+  status       String
+  fixType      String    @map("fix_type")
+  confidence   Float?
+  productCount Int       @map("product_count")
+  beforeState  Json      @map("before_state")
+  afterState   Json      @map("after_state")
+  appliedAt    DateTime  @default(now()) @map("applied_at")
+  revertableUntil DateTime @map("revertable_until")
+  revertedAt   DateTime? @map("reverted_at")
+
+  @@index([shopDomain])
+  @@index([revertableUntil])
+  @@map("app_fixes")
+}
+
+// ---- Webhooks (idempotency) ----
+
+model WebhookEvent {
+  id             String   @id
+  shopifyEventId String   @unique @map("shopify_event_id")
+  shopDomain     String   @map("shop_domain")
+  shop           Shop     @relation(fields: [shopDomain], references: [shopDomain], onDelete: Cascade)
+  topic          String
+  receivedAt     DateTime @default(now()) @map("received_at")
+  processedAt    DateTime? @map("processed_at")
+  payload        Json?
+
+  @@index([shopDomain])
+  @@index([topic])
+  @@index([receivedAt])
+  @@map("app_webhook_events")
+}
+
+// ---- Channel Health (AI-attribution layer) ----
+
+model ChannelHealth {
+  id                     String   @id @default(cuid())
+  shopDomain             String   @map("shop_domain")
+  date                   DateTime
+  aiClicks               Int      @default(0) @map("ai_clicks")
+  aiOrders               Int      @default(0) @map("ai_orders")
+  aiRevenuePence         Int      @default(0) @map("ai_revenue_pence")
+  googleShoppingApprovals Int     @default(0) @map("google_shopping_approvals")
+  aiOverviewsCitations   Int      @default(0) @map("ai_overviews_citations")
+
+  @@unique([shopDomain, date])
+  @@index([date])
+  @@map("app_channel_health")
+}
