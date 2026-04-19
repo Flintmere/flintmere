@@ -1,4 +1,4 @@
-# Flint Shop — Status
+# Flintmere — Status
 
 Current phase, what's shipped, what's next. Update as state changes so Claude's advice stays grounded in the real timeline.
 

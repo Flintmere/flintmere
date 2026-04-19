@@ -1,4 +1,4 @@
-# Flint Shop — Architecture
+# Flintmere — Architecture
 
 API routes, DB schema, feature gates, integrations. Claude reads this when building / debugging / migrating any surface.
 

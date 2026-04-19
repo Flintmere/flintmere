@@ -1,4 +1,4 @@
-# Flint Shop — Business Truth
+# Flintmere — Business Truth
 
 Pricing, tiers, positioning. Claude reads this on pricing-page edits, marketing copy, claim review.
 

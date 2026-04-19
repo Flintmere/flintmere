@@ -1,4 +1,4 @@
-# Flint Shop — Design System
+# Flintmere — Design System
 
 Visual canon. Claude reads this when touching UI surfaces.
 

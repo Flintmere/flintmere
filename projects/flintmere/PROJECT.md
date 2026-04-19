@@ -1,4 +1,4 @@
-# Flint Shop — Project Map
+# Flintmere — Project Map
 
 High-level facts about this product. Claude reads this on tasks that need repo layout, stack, env vars, or commands.
 
