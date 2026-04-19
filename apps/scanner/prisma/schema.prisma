@@ -1,0 +1,74 @@
+// Flintmere scanner database schema.
+// Canonical per `projects/flintmere/ARCHITECTURE.md` §Database schema.
+// Scanner-only tables; the Shopify app owns `app_*` tables in its own schema.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ScanStatus {
+  pending
+  running
+  complete
+  failed
+}
+
+model Scan {
+  id          String     @id @default(cuid())
+  shopUrl     String     @map("shop_url")
+  normalisedDomain String @map("normalised_domain")
+  status      ScanStatus @default(pending)
+  score       Int?
+  grade       String?
+  scoreJson   Json?      @map("score_json")
+  productCount Int?      @map("product_count")
+  variantCount Int?      @map("variant_count")
+  errorCode   String?    @map("error_code")
+  errorMessage String?   @map("error_message")
+  ipHash      String?    @map("ip_hash")
+  userAgent   String?    @map("user_agent")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  startedAt   DateTime?  @map("started_at")
+  completedAt DateTime?  @map("completed_at")
+  leads       Lead[]
+
+  @@index([normalisedDomain])
+  @@index([createdAt])
+  @@index([status])
+  @@map("scanner_scans")
+}
+
+model Lead {
+  id             String    @id @default(cuid())
+  email          String
+  scanId         String    @map("scan_id")
+  scan           Scan      @relation(fields: [scanId], references: [id])
+  consentedAt    DateTime  @default(now()) @map("consented_at")
+  unsubscribedAt DateTime? @map("unsubscribed_at")
+  reportSentAt   DateTime? @map("report_sent_at")
+  reportOpenedAt DateTime? @map("report_opened_at")
+
+  @@index([email])
+  @@index([scanId])
+  @@map("scanner_leads")
+}
+
+model ConciergeAudit {
+  id             String    @id @default(cuid())
+  email          String
+  shopUrl        String    @map("shop_url")
+  stripePaymentIntentId String @unique @map("stripe_payment_intent_id")
+  status         String    @default("paid")
+  calendlyUrl    String?   @map("calendly_url")
+  deliveredAt    DateTime? @map("delivered_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  @@index([email])
+  @@index([status])
+  @@map("scanner_concierge_audits")
+}
