@@ -1,74 +1,83 @@
 # performance-budget.md
 
-Design's perf budget. Thane owns this file; it overlaps with `memory/product-engineering/performance-budget.md` (which owns the Core Web Vitals targets). This file is about **design decisions that affect perf**.
+Design's perf budget. **Thane (#17 Performance)** owns this file; it overlaps with `memory/product-engineering/performance-budget.md` (which owns the Core Web Vitals targets). This file is about **design decisions that affect perf**.
 
 ## The context
 
-Vanta NET was removed from the homepage in the Ledger redesign. −180KB bundle. That savings is permanent unless re-argued via ADR with Thane's review.
+Flintmere's three surfaces (marketing, scanner, Shopify app) each have distinct budgets. The Shopify app iframe is already heavy with Polaris; we add Flintmere islands on top. The scanner is public + must load fast to honour the 60-second scan promise. The marketing site is Apple-bold in spirit — which means typography carries the work imagery would carry elsewhere, and the bundle stays lean as a consequence.
 
 This budget exists so every new design choice pays for itself or is paid for elsewhere.
 
 ## Per-surface bundle expectations
 
-| Surface | JS budget (gzipped) | Image budget | Fonts |
-|---------|---------------------|--------------|-------|
-| Homepage | No net growth from current | Hero SVG inline; no raster above fold | Fraunces + Plex (subset) + Mono (small) |
-| Marketing (blog, pricing, docs landing) | ≤ homepage | Hero WebP max; lazy below fold | Same families |
-| Dashboard | Domain-specific; measured against app UX | Application-driven | Same families |
-| Docs (content) | Lean — content should not ship heavy JS | Inline SVG preferred | Same families |
+| Surface | JS budget (gzipped per route) | Image budget | Fonts |
+|---|---|---|---|
+| Marketing (`flintmere.com` inside scanner app) | ≤ 100KB | Inline SVG only; no raster above fold | Geist Sans (400/500/700) + Geist Mono (400/500), self-hosted, Latin subset |
+| Scanner (`audit.flintmere.com`) | ≤ 100KB | Inline SVG for score ring + pillar marks; line-art SVG < 18KB if used | Same |
+| Shopify app (`app.flintmere.com` — Flintmere-island-only) | ≤ 60KB on top of Polaris | Inline SVG; no image-based icons | Same |
+| Shopify app (Polaris baseline, shared budget ceiling) | ≤ 200KB (including Polaris itself) | — | — |
 
-Measure with `pnpm build` and inspect per-route sizes. If a PR grows a route, the PR either pays with a removal or carries an ADR.
+Measure with `pnpm build` + inspect per-route output. If a PR grows a route, the PR either pays with a removal or carries an ADR.
 
 ## Design moves that usually cost bundle
 
-- Heavy animation libraries (Framer Motion, GSAP). Prefer CSS + minimal JS.
+- Heavy animation libraries (Framer Motion, GSAP). Prefer CSS + minimal JS for Flintmere's restrained motion vocabulary.
 - Icon libraries (`lucide`, `heroicons`). Prefer inline SVG for surfaces using ≤ 5 icons.
-- Font weight sprawl. Each added weight = one more font file. Prefer 2–3 weights per family.
+- Font weight sprawl. Flintmere uses 400 / 500 / 700 Sans + 400 / 500 Mono — five files total. Adding a sixth requires an ADR.
 - Raster imagery where SVG works.
+- Chart libraries on the Channel Health widget (use CSS + mono-Geist numerals where possible).
 - Scrollytelling / scroll-driven shaders.
 
 ## Design moves that usually pay for themselves
 
 - Inline SVG icons in JSX (no library, no runtime cost).
-- System fonts fallback before webfonts load (FOUT acceptable; FOIT is not).
-- `.grain` as SVG noise (tiny, infinitely reusable).
-- Letterpress shadows via CSS, no image.
-- Paper textures via CSS gradient + SVG noise, no raster.
+- System fonts fallback before Geist loads (FOUT acceptable; FOIT is not).
+- Self-hosted Geist — one HTTP hop, cached, no third-party CDN dependency.
+- Conic-gradient for the score ring (no image, no canvas).
+- Typography-as-image — giant Geist display replaces the hero imagery cost entirely.
+- Dashed `repeating-linear-gradient` placeholders for "locked" states (no image).
 
 ## Anti-patterns (banned unless individually approved)
 
-- WebGL backgrounds on marketing surfaces.
-- Vanta / Three.js / any canvas-heavy effect on homepage.
+- WebGL backgrounds on any surface.
+- Vanta / Three.js / any canvas-heavy effect.
 - Auto-advancing carousels on mobile (battery + perf + UX).
 - Parallax on mobile.
 - Hero video that autoplays.
-- Custom scrollbars via JS (use CSS or accept the native scrollbar).
+- Custom scrollbars via JS.
 - Large SVG sprite sheets on first paint.
+- Google Fonts CDN at runtime (self-hosted Geist only).
+- Polaris "wrappers" that duplicate Polaris's primitive styles inside the Shopify app.
 
 ## When a design move wants to break the budget
 
 Legitimate reasons exist. Process:
 
 1. `design-*` skill proposes the move in a spec.
-2. Spec includes: measured impact (pnpm build before/after), UX justification, alternative considered.
+2. Spec includes: measured impact (`pnpm build` before / after), UX justification, alternative considered.
 3. Thane reviews. Either approves with a removal pair, or rejects.
-4. If rejected: the spec is revised with a lower-cost alternative.
+4. If rejected: spec revised with lower-cost alternative.
 
 ## Interaction with motion
 
-Motion is a perf cost too. See `motion.md` for rules. Short version: if an animation costs >2ms per frame on marketing, it's too expensive.
+Motion is a perf cost too. See `motion.md` for rules. Short version: if an animation costs >2ms per frame on marketing, it's too expensive. Flintmere motion is deliberately quiet, which keeps the bundle + frame budget healthy.
 
 ## When the budget needs to change
 
 The budget is a forcing function, not a sacred number. Re-argue via ADR:
 
-- `projects/allowanceguard/decisions/YYYY-MM-DD-design-budget-<change>.md`
+- `projects/flintmere/decisions/NNNN-design-budget-<change>.md`
 - States the new budget, what buys it, what it buys.
 - Thane review required.
-- User approval required.
+- Operator approval required.
 
 ## Canonical measurement
 
-- `pnpm build` per-route output = authoritative bundle size.
-- Vercel Analytics real-user data = authoritative Core Web Vitals.
+- `pnpm -F scanner build` / `pnpm -F shopify-app build` per-route output = authoritative bundle size.
+- PostHog + BetterStack real-user metrics = authoritative Core Web Vitals.
 - Lighthouse local = directional signal, not authoritative.
+- LLM-driven enrichment does not affect bundle; see `memory/product-engineering/performance-budget.md` for runtime (worker) cost tracking.
+
+## Changelog
+
+- 2026-04-19: Rewritten for Flintmere. Replaced allowanceguard font list (Fraunces + Plex + Mono) with Geist Sans + Geist Mono (five weight files total). Three-surface bundle table (marketing / scanner / Shopify app) replacing the two-canon (homepage / docs) allowanceguard split. Noted Polaris as the shared Shopify-app budget baseline.
