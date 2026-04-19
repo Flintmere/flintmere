@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Bracket } from '@/components/Bracket';
+import { EmailGate } from '@/components/EmailGate';
 import { ScanForm } from '@/components/ScanForm';
 import { ScoreRing } from '@/components/ScoreRing';
 
@@ -106,7 +107,15 @@ export default function ScanPage() {
 
       {state.phase === 'error' ? <ErrorBlock message={state.message} /> : null}
 
-      {state.phase === 'complete' ? <Results result={state.result} /> : null}
+      {state.phase === 'complete' ? (
+        <>
+          <Results result={state.result} />
+          <EmailGate
+            scanId={state.result.id}
+            shopDomain={state.result.shopDomain}
+          />
+        </>
+      ) : null}
     </main>
   );
 }
