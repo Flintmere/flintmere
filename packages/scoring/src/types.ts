@@ -1,0 +1,107 @@
+import { z } from 'zod';
+
+// ---- Input shapes ----
+
+export const VariantInputSchema = z.object({
+  id: z.string(),
+  sku: z.string().nullable().optional(),
+  barcode: z.string().nullable().optional(),
+  price: z.string(),
+  compareAtPrice: z.string().nullable().optional(),
+  inventoryQuantity: z.number().int().nullable().optional(),
+  inventoryPolicy: z.enum(['deny', 'continue']).optional(),
+  available: z.boolean().optional(),
+});
+
+export const ProductImageSchema = z.object({
+  id: z.string().optional(),
+  src: z.string().url(),
+  altText: z.string().nullable().optional(),
+  width: z.number().int().nullable().optional(),
+  height: z.number().int().nullable().optional(),
+});
+
+export const ProductInputSchema = z.object({
+  id: z.string(),
+  handle: z.string(),
+  title: z.string(),
+  bodyHtml: z.string().nullable().optional(),
+  vendor: z.string().nullable().optional(),
+  productType: z.string().nullable().optional(),
+  tags: z.array(z.string()).default([]),
+  status: z.enum(['active', 'draft', 'archived']).optional(),
+  publishedAt: z.string().nullable().optional(),
+  variants: z.array(VariantInputSchema).min(1),
+  images: z.array(ProductImageSchema).default([]),
+  brandMetafield: z.string().nullable().optional(),
+  mpnMetafield: z.string().nullable().optional(),
+});
+
+export const CatalogInputSchema = z.object({
+  shopDomain: z.string(),
+  products: z.array(ProductInputSchema),
+  scoredAt: z.string().optional(),
+});
+
+export type VariantInput = z.infer<typeof VariantInputSchema>;
+export type ProductInput = z.infer<typeof ProductInputSchema>;
+export type CatalogInput = z.infer<typeof CatalogInputSchema>;
+
+// ---- Result shapes ----
+
+export type PillarId =
+  | 'identifiers'
+  | 'attributes'
+  | 'titles'
+  | 'mapping'
+  | 'consistency'
+  | 'checkout-eligibility';
+
+export const PILLAR_WEIGHTS: Readonly<Record<PillarId, number>> = Object.freeze({
+  identifiers: 20,
+  attributes: 25,
+  titles: 15,
+  mapping: 15,
+  consistency: 15,
+  'checkout-eligibility': 10,
+});
+
+export type Severity = 'critical' | 'high' | 'medium' | 'low';
+
+export interface Issue {
+  pillar: PillarId;
+  code: string;
+  severity: Severity;
+  title: string;
+  description: string;
+  affectedCount: number;
+  affectedProductIds: string[];
+  revenueImpactScore: number;
+}
+
+export interface PillarResult {
+  pillar: PillarId;
+  weight: number;
+  score: number;
+  maxScore: number;
+  locked: boolean;
+  lockedReason?: string;
+  issues: Issue[];
+}
+
+export interface CompositeScore {
+  shopDomain: string;
+  scoredAt: string;
+  productCount: number;
+  variantCount: number;
+  score: number;
+  gtinlessCeiling: number;
+  fullCeiling: number;
+  grade: 'A' | 'B' | 'C' | 'D' | 'F';
+  pillars: PillarResult[];
+  issues: Issue[];
+}
+
+export interface ScoreOptions {
+  locked?: readonly PillarId[];
+}
