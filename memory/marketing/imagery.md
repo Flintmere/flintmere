@@ -1,87 +1,122 @@
-# imagery.md — Line-art canon + photoreal canon + prompt library
+# imagery.md — Type-as-image canon + prompt library
 
-Allowance Guard's marketing imagery has two active modes. Line-art is the default for icons, diagrams, and editorial motifs. Photoreal is used for blog headers only.
+Flintmere's default imagery mode is **type-as-image**: large Geist display carries the visual weight. Photography and illustration are rare, deliberate exceptions. No stock photography, no AI-gradient heroes, no decorative illustration.
 
-Council gates live at `memory/PROCESS.md` — #25 AI image director, #26 Visual brand photographer, #27 photorealism, #28 brand systems, #29 Art Director (effective veto on set cohesion), #8 Accessibility (VETO), Design Council (Maren / Noor / Thane).
+Council gates at `memory/PROCESS.md` — #25 AI image director, #26 Visual brand photographer, #27 photorealism, #28 brand systems, #29 Art Director (veto on set cohesion), #8 Accessibility (veto on alt text + contrast), Design Council (Maren / Noor / Thane).
 
 ## Standing rules
 
-1. **Editorial, not stock.** Bold cropping. No filler. `DESIGN.md:35`.
-2. **Hairline strokes only for line-art.** 1.5px, `strokeLinecap="round"`, `strokeLinejoin="round"`, `fill="none"` unless filling a paper surface.
-3. **Palette is closed.** Do not introduce new hues. See palette block below.
-4. **Every asset has alt text.** No meaning conveyed by colour alone. #8 Accessibility veto.
-5. **Set cohesion beats per-image cleverness.** #29 Art Director rejects any asset that breaks the set's background, materiality, lighting direction, or colour grade.
+1. **Type is the image.** Hero visuals are typography first. Photography only where a merchant-facing moment genuinely requires it (testimonial portraits, very occasionally).
+2. **No stock.** Flintmere does not use stock photography. Ever.
+3. **No AI-gradient heroes.** No "liquid" abstract gradient backgrounds; no "glass" / frosted product shots.
+4. **Palette is closed.** See tokens in `memory/design/tokens.md`. No new hues without `design-token` proposal.
+5. **Every asset has alt text.** No meaning conveyed by colour alone. **#8 Accessibility veto.**
+6. **Set cohesion beats per-image cleverness.** #29 Art Director rejects any asset that breaks the set's temperature, materiality, lighting direction, or colour grade.
 
-## Line-art canon
+## Type-as-image canon (primary mode)
 
-### Stroke convention (match existing exemplars)
+### When type is the image
 
-- `stroke="currentColor"` — the icon inherits ink colour from its container.
-- `strokeWidth="1.5"` for primary strokes; `strokeWidth="2"` for protected accents (scan-line, bracket, warning bar).
-- `strokeLinecap="round"` and `strokeLinejoin="round"` everywhere.
-- `fill="none"` unless filling a paper-surface interior.
+- Marketing hero — giant Geist display with one bracket word. No illustration. Optional hairline line-art background.
+- Scanner hero — same. The type does the work; no product photography.
+- Pillar numbers, stat numbers, pricing prices — massive Geist numerals.
+- Manifesto sections — full-bleed ink with oversized Geist quote.
 
-### Palette (all hex values AA on paper `#F7F5F0`)
+### The legibility-bracket visual
 
-- Paper surface — `#F7F5F0`
-- Paper sub — `#EFECE3`
-- Paper deep — `#E6E2D5`
-- Ink body — `#141210`
-- Oxblood (single inverse beat only) — `#2D0A0A`
-- Amber accent — `#F59E0B`
-- Amber deep (AA on paper) — `#854F08`
-- Red accent — `#DC2626`
-- Crimson paper (AA, protected headline word) — `#B3151F`
-- Ink blue — `#0B2545`
-- Hairline rule — `rgba(15, 17, 21, 0.14)`
+The signature from `tokens.md` §Signature. Renders as `[ word ]` in Geist Mono inside 1px ink hairline brackets. When used at display scale on a hero, it becomes the primary visual anchor of the composition.
+
+Rules for imagery that surrounds a bracket moment:
+
+- Keep the rest of the composition quiet — the bracket is the punctuation.
+- Do not place decorative illustration adjacent to a bracket.
+- If a hero has both a bracket and a supporting illustration, the illustration is subordinate.
+
+## Line-art canon (secondary — process diagrams only)
+
+Used sparingly for process / flow diagrams (the "Audit → Fix → Monitor" three-step, the pillar enumeration). Never for decoration.
+
+### Stroke convention
+
+- `stroke="currentColor"` — icon inherits ink colour.
+- `strokeWidth="1"` for all strokes. (Thinner than allowanceguard's 1.5 — Flintmere runs more restrained.)
+- `strokeLinecap="round"`, `strokeLinejoin="round"`.
+- `fill="none"` unless filling a paper interior.
+
+### Palette (from `tokens.md`)
+
+- Paper — `#F7F7F4`
+- Paper-2 — `#EDECE6`
+- Ink — `#0A0A0B`
+- Ink-2 — `#141518`
+- Mute — `#5A5C64` (body-safe)
+- Mute-2 — `#8B8D95` (metadata only)
+- Accent (sulphur) — `#D9E05A` (scanner only)
+- Alert — `#E54A2A`
+- Ok — `#3F8F57`
+
+All AA on `--paper`; see `accessibility.md`.
 
 ### Size grid
 
 | Use | viewBox | Rendered size |
 |---|---|---|
-| Compact icon | 72×72 | 56×56 |
-| Featured icon | 72×72 | 72×72 |
-| Featured diagram | 200×200 | 120×120 |
-| Hero watermark | 400×400 | 400×400 at opacity 0.14 |
+| Inline icon | 24×24 | 16–24px |
+| Three-step diagram | 80×80 | 56–80px |
+| Feature diagram | 200×200 | 120–200px |
+| Hero ambient SVG | 1200×600 | Full-width, opacity 0.25 (decorative) |
 
 ### Bundle budget (enforced by Thane)
 
-- Icon SVG < 6KB gzipped.
-- Hero illustration SVG < 20KB gzipped.
-- Inline the SVG in JSX — do not add separate `.svg` asset files unless reused across three or more components.
+- Inline icon SVG < 2KB gzipped.
+- Process diagram SVG < 6KB gzipped.
+- Hero ambient SVG < 18KB gzipped.
+- Inline SVG in JSX — do not add separate `.svg` asset files unless reused across three or more components.
 
 ### Motion
 
-- Respect `prefers-reduced-motion`. No autoplaying animation on imagery.
-- The `.ledger-rule::after` amber glow is already reduced-motion safe — do not re-introduce motion that bypasses it.
+- Respect `prefers-reduced-motion`. No auto-play animation on imagery.
+- No parallax. No scroll-driven SVG morphing. Static or reveal-on-mount only.
 
-### Canonical exemplars (read these before drafting anything)
+## Photography (rare exception)
 
-- Icons — `src/components/HowItWorks.tsx:149-193` (`ScanIcon`, `RiskIcon`, `RevokeIcon`).
-- Diagrams — `src/components/FeaturesPreview.tsx` (`NonCustodialDiagram`, `DashboardDiagram`, `RiskDiagram`, `BatchDiagram`).
-- Watermark — `src/app/page.tsx:72-87` (compass, opacity 0.14).
+Used for: testimonial portraits only (when a named merchant provides their photo). Not for heroes, not for product imagery, not for decoration.
 
-## Photoreal canon
+If a testimonial photo is used:
 
-Used for blog header images only. Pipeline already exists.
+- Square crop, minimum 480×480.
+- Black-and-white treatment to match the neutral-bold canon (colour photography clashes with the palette).
+- Always paired with the person's name + role + company below.
+- Permission + quote approval documented before use.
 
-- **Tooling**: `scripts/generate-blog-images.py`.
-- **Model**: Runware API, `google:2@1` (Nano Banana 2).
-- **Dimensions**: 1408×768, `.webp`.
-- **Prompt rules** (enforced by #27 + #28):
-  - Concrete subject. Name the material, the lighting, the background.
-  - Warm amber + cream tones. Cream or ivory surface.
-  - Max 30 words.
-  - Editorial product photography, not stock.
-  - Shallow depth of field, soft studio light unless the subject calls for directional.
-- **Negative prompts** (append to every call): `no hands, no faces, no text, no logos, no reflections of cameras, no neon, no cyberpunk, no meme`.
+## No-photography heroes — how to replace a stock hero with type
 
-Skills do not call Runware directly. They append entries to the prompt library below; the user runs the script to render.
+When a brief calls for a hero and the instinct is "grab a merchant-at-laptop photo":
 
-## Prompt library
+1. Write the headline first. Find the one-word anchor for the bracket.
+2. Let the typography do what the photo would do. Geist at `clamp(88px, 14vw, 220px)` is more attention-grabbing than a stock smile.
+3. Add a hairline ambient SVG behind the type only if the composition feels empty (rare).
+4. If you still want a photo, question the whole approach. Flintmere's look is specifically different from other SaaS landing pages.
 
-Columns: `Date | Asset | Mode | Subject | Prompt | Negative | Rendered path | Alt text`.
+## Prompt library (photography pipeline — for testimonial portraits only)
 
-| Date | Asset | Mode | Subject | Prompt | Negative | Rendered path | Alt text |
-|------|-------|------|---------|--------|----------|---------------|----------|
-| <!-- seeded empty; image-direction skill appends --> | | | | | | | |
+Columns: `Date | Asset | Subject | Treatment | Rendered path | Alt text`.
+
+| Date | Asset | Subject | Treatment | Rendered path | Alt text |
+|---|---|---|---|---|---|
+| <!-- seeded empty; add entries only for testimonial portraits --> | | | | | |
+
+## What NOT to do
+
+- No stock photography of merchants smiling at laptops.
+- No AI-generated photorealistic product shots.
+- No gradient mesh backgrounds.
+- No frosted-glass overlays.
+- No "3D rendered abstract shapes" (popular in SaaS, wrong for Flintmere).
+- No emojis in imagery (unless the user explicitly requests).
+- No decorative line-art when type would do the same work.
+- No photorealistic hero imagery at all (testimonials excepted).
+
+## Changelog
+
+- 2026-04-19: Rewritten for Flintmere. Replaced allowanceguard canon (Ledger line-art with 1.5px strokes, compass watermark, amber/crimson accents, Runware photoreal pipeline for blog headers) with Flintmere canon (type-as-image primary, restrained 1px line-art for process diagrams, no photography except testimonials, neutral-bold palette).

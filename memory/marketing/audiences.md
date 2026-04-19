@@ -2,57 +2,62 @@
 
 Four primary segments. Each row is a writable prompt: what they feel, what they object to, what they want, where they live.
 
-## 1. Retail wallet user (self-custody, moderate DeFi exposure)
+## 1. SMB Shopify merchant (100–500 SKUs, £500K–£2M revenue)
 
-- **Profile**: holds a MetaMask or Rabby wallet with 5–50 token approvals across 2–4 chains. Has heard of "infinite approvals" but isn't sure which ones are theirs.
-- **Pain**: doesn't know what's exposed. Saw a Twitter thread about a drainer and got spooked. Doesn't want to re-sign every approval but doesn't want to get drained either.
-- **Objection**: "Do I have to connect my wallet? Is this safe? What happens to my keys?"
-- **Desired outcome**: paste address, see risk, understand the top three things to revoke right now, do it with minimal friction.
-- **Register**: plain English, no jargon. Define terms the first time (approval, allowance, permit). Show, don't tell.
-- **Channels**: X search, Reddit (r/ethereum, r/defi, r/metamask), Google ("how to revoke token approvals"), crypto Twitter threads.
-- **Headline hook**: "Paste an address. See what's approved. Revoke what shouldn't be."
+- **Profile**: founder-operator or small team. Runs a Shopify store doing £500K–£2M/year, 100–500 SKUs. Often single-founder or a 2–5 person team. Usually also the person running marketing.
+- **Pain**: has heard of "AI shopping" and ChatGPT but doesn't know if their store is in or out. Seen a competitor get cited in a ChatGPT answer and wondered why it wasn't them. Doesn't want another SEO tool; wants to know what's wrong and how to fix it.
+- **Objection**: "Do I need to install another app? How much work is this? Will it break my store? Are these fixes reversible?"
+- **Desired outcome**: run a free scan, see a score, understand the top three issues, install the app if it looks legit, apply safe fixes with preview + revert.
+- **Register**: plain English. Define terms first time (metafield, GTIN, Catalog Mapping). Show, don't tell. Screenshot-heavy in marketing.
+- **Channels**: Google ("AI shopping Shopify", "ChatGPT Shopify visibility"), Reddit (r/shopify, r/ecommerce), Shopify Community forum, Twitter (Shopify dev relations).
+- **Headline hook**: `Your product catalog is [ invisible ] to ChatGPT.`
 
-## 2. Advanced DeFi user / power user
+## 2. Mid-market Shopify merchant (500–5,000 SKUs, £2M–£20M revenue)
 
-- **Profile**: runs 3+ wallets across Ethereum, Base, Arbitrum, Optimism, maybe more. Uses Uniswap, Aave, Pendle, 1inch. Uses Permit2. Knows what `setApprovalForAll` means.
-- **Pain**: too many approvals to track by hand. Wants continuous monitoring, not one-time audits. Wants batch revocation to save gas.
-- **Objection**: "Revoke.cash already does this. Why pay?" "How is this different from Etherscan's approval tab?"
-- **Desired outcome**: central dashboard across all their wallets, alerts on changes, batch revoke, historical risk timeline.
-- **Register**: precise technical language. Permit vs Permit2, ERC-20 vs ERC-721, approve vs increaseAllowance — get the details right or lose them.
-- **Channels**: X, Farcaster, DeFi-specific newsletters (The Defiant, Bankless), specialist Discords.
-- **Headline hook**: "Multi-wallet monitoring across 27 chains. Batch revoke. Timeline view."
+- **Profile**: 5–30-person team. Has a head of ecom, maybe a dev partner, definitely a PIM or catalog ops lead. Uses Klaviyo, Yotpo, maybe a headless front-end. 500–5,000 SKUs across multiple lines.
+- **Pain**: catalog hygiene has drifted as SKU count grew. Suspects their data is a mess but can't quantify it. Already pays for SEO and PIM tools; doesn't want overlapping capabilities.
+- **Objection**: "How is this different from our PIM? From Schema Plus? From our SEO app? What's the integration cost?"
+- **Desired outcome**: central dashboard with score + pillar breakdown + Channel Health across the full catalog, bulk enrichment with dry-run preview, reporting they can show the CMO.
+- **Register**: precise language. Talk about metafield types, Catalog Mapping, JSON-LD, agentic storefronts. Show the architecture + integration points clearly.
+- **Channels**: LinkedIn (founder + ops leads), Shopify Plus Partner directory, ecom-ops newsletters, specialist Slack / Discord communities.
+- **Headline hook**: `Scale catalog readiness. [ Six ] pillars. One score. Every SKU.`
 
-## 3. Security-conscious operator / team (treasuries, DAOs, funds)
+## 3. Shopify agency / Plus Partner (managing 5–50 client stores)
 
-- **Profile**: manages a multi-sig or treasury wallet with significant exposure. Has compliance obligations. Needs audit trails.
-- **Pain**: one bad approval on a shared wallet = existential risk. Current tooling doesn't produce audit-grade output.
-- **Objection**: "Can I trust this with a treasury address? What's the audit log format? Do you retain data?"
-- **Desired outcome**: monitor up to 50 wallets, role-based team access, webhook integrations into internal alerting, compliance-ready export.
-- **Register**: operational. Evidence, SLAs, data handling. No hype.
-- **Channels**: direct outreach, security research newsletters (Dedaub, Trail of Bits public posts), DAO ops forums (Discourse, Commonwealth).
-- **Headline hook**: "Audit-ready monitoring for treasuries and DAOs."
+- **Profile**: 3–20 person Shopify agency. Often a Plus Partner. Runs an ongoing retainer with each client. Has technical capability to implement but needs tools to sell + measure.
+- **Pain**: hard to differentiate on SEO. AI visibility is the new pitch — but no honest tool exists. Can't keep 25 catalogs clean manually. Needs white-label reporting to use in QBRs.
+- **Objection**: "Does this have an API? White-label? Can I manage 25 clients from one place? What's the reseller margin?"
+- **Desired outcome**: Agency tier (£399/mo, 25 client seats), white-label reports, API access, cross-client dashboard, per-client benchmarking. Turn Flintmere into a productised service line.
+- **Register**: operational. Evidence, SLAs, data handling, reseller economics. Deep respect for their expertise — we're a tool, not a teacher.
+- **Channels**: direct outreach (LinkedIn + agency principal DMs), Shopify Plus Partner Slack, ShopTalk / IRCE conferences, agency owner communities.
+- **Headline hook**: `Give your clients a score they can improve.`
 
-## 4. Ecosystem / grant reviewer / wallet product team
+## 4. Shopify Plus enterprise (10,000+ SKUs, £20M+ revenue)
 
-- **Profile**: works at a wallet (MetaMask, Rabby, Rainbow, Trust, OKX), an L2 (Base, Arbitrum, Optimism), or a grant programme. Evaluating Allowance Guard for integration, listing, or funding.
-- **Pain**: inbox full of projects. Wants to know in 60 seconds whether this is credible, maintained, open source, and aligned with their ecosystem.
-- **Objection**: "Team credibility? Funding runway? Open source for real? Chain coverage?"
-- **Desired outcome**: clear one-pager. Proof of traction. Clean code base. Open source licence visible. Contact route for integration.
-- **Register**: operational, evidence-heavy, low-ego. No marketing fluff. Link to the repo, link to metrics, link to the team.
-- **Channels**: grant programme forms, ecosystem Telegram/Discord DMs, introductions via mutual partners.
-- **Headline hook**: "Open-source approval security for 27 chains. Integrations welcome."
+- **Profile**: multi-brand ecom org. Has a catalog ops team, a PIM / DAM / MDM stack, compliance obligations, legal review process. 10,000+ SKUs.
+- **Pain**: scale + governance. Their PIM is messy; their catalog mapping is inconsistent across brands; they can't measure AI agent traffic. Procurement demands SOC 2 or equivalent.
+- **Objection**: "Data residency? SLA? SOC 2? DPA? Will you sign a custom MSA? Can we scope to one brand for pilot?"
+- **Desired outcome**: Enterprise tier with custom attribute templates, dedicated Slack support, monthly strategy call, per-contract SLA, EU data residency, compliance evidence for their procurement team.
+- **Register**: enterprise procurement language. Evidence-heavy, low-ego, operational. Links to security posture, DPA, uptime history. No marketing fluff.
+- **Channels**: direct sales via LinkedIn + ShopTalk, Shopify Plus merchant success referrals, post-audit upsell from concierge engagements.
+- **Headline hook**: `Catalog readiness at Plus scale. Custom templates, dedicated support.`
 
-## Mapping table (segment → surface → metric)
+## Mapping table (segment → primary surface → primary metric)
 
 | Segment | Primary surface | Primary metric |
 |---|---|---|
-| Retail | Homepage scanner (`/#scan`) | Scans per day, extension installs |
-| Power user | Pricing page, Pro signup | Pro conversion rate |
-| Operator / team | Sentinel page, sales page | Sentinel signups, demo requests |
-| Ecosystem / grants | GitHub README, one-pager | Partnership conversations opened |
+| SMB merchant | Public scanner (`audit.flintmere.com`) | Scans per day, Growth tier conversion |
+| Mid-market | Pricing page + Shopify app listing | Scale tier conversion, 60-day retention |
+| Agency | Agency tier landing + direct outreach | Agency tier signups, client-seat utilisation |
+| Enterprise | Custom sales + Plus Partner referrals | Enterprise deals booked, ACV |
 
 ## Do not confuse
 
-- "Retail" is not "degen." Retail wants safety, not yield.
-- "Advanced" is not "institutional." Power users self-serve. Institutions want contracts.
-- Grant reviewers are not investors. Different asks, different materials.
+- **SMB** is not "hobbyist." SMB has 100+ SKUs and takes their store seriously. Hobbyist (<50 SKUs, <£100K revenue) is **not our buyer** — they churn fast and lack catalog maturity.
+- **Mid-market** is not "enterprise." Mid-market self-serves and signs monthly contracts. Enterprise wants procurement, contracts, bespoke handling.
+- **Agency** is not "freelancer." Agencies manage 5+ client stores under retainer. Freelancers are typically Growth tier personal users, not Agency tier.
+- **Plus** is not just "big". Shopify Plus has specific platform fees, custom requirements, and procurement expectations. Plus-tier merchants may still be mid-market-shaped or Enterprise-shaped.
+
+## Changelog
+
+- 2026-04-19: Rewritten for Flintmere. Replaced Web3 segments (retail self-custody, advanced DeFi, treasury/DAO, ecosystem reviewer) with Shopify segments (SMB merchant, mid-market, agency, Plus enterprise).
