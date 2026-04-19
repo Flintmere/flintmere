@@ -1,21 +1,21 @@
 # metric-catalog.md — Every metric, defined once
 
-The canonical definition of every metric AG measures. One row per metric. New metrics enter via the `define-metric` skill and an ADR-style sign-off from #35.
+Canonical definition of every metric Flintmere measures. One row per metric. New metrics enter via `define-metric` and an ADR-style sign-off from #35.
 
-Format:
+## Format
 
 ```
 ### <metric name>
 - Definition: <plain-English; one sentence>
 - Formula: <numerator / denominator / window>
-- Source: <data source from `data-sources.md`>
+- Source: <data source from data-sources.md>
 - Refresh cadence: <real-time | hourly | daily | weekly | on-demand>
-- Owner: <council member by number>
+- Owner: <council #>
 - Decision informed: <one sentence>
 - Target / threshold: <if any>
 - Aggregation level: <surface / cohort / global>
 - PII risk: <none | low — verify aggregation | high — VETO without #24 sign-off>
-- Cross-references: <links to dashboards, related metrics>
+- Cross-references:
 - Defined: YYYY-MM-DD
 - Last reviewed: YYYY-MM-DD
 ```
@@ -24,217 +24,286 @@ Format:
 
 ## Acquisition
 
-### organic_sessions_weekly
-- Definition: Weekly count of unique sessions arriving from organic search.
-- Formula: count(distinct session_id where source = 'organic' and timestamp in [week_start, week_end))
-- Source: Vercel Analytics export (CSV)
-- Refresh cadence: weekly
+### scanner_submissions_weekly
+- Definition: Public scanner URL submissions completed per week.
+- Formula: `count(scanner_scans where status='complete' and created_at in week)`
+- Source: scanner Postgres export (aggregated weekly)
+- Refresh: weekly (Mondays)
 - Owner: #35
-- Decision informed: SEO + content investment allocation
-- Target / threshold: trend up week-over-week; quarterly +20%
-- Aggregation level: global
-- PII risk: none (no IP, no device fingerprint)
-- Defined: 2026-04-17
-- Last reviewed: 2026-04-17
+- Decision informed: scanner distribution + SEO + social effectiveness
+- Target: ≥50 in Week 1 validation (SPEC §2.2)
+- PII risk: none (URL + timestamp only, no email)
+- Defined: 2026-04-19
 
-### direct_branded_sessions_weekly
-- Definition: Weekly sessions arriving direct or via a branded search query (e.g. "allowance guard").
-- Formula: count(distinct session_id where source in ('direct', 'branded'))
-- Source: Vercel Analytics export
-- Refresh cadence: weekly
+### marketing_sessions_weekly
+- Definition: Weekly unique sessions to flintmere.com marketing surfaces.
+- Formula: `count(distinct session_id where path matches '/(?:|pricing|research|blog.*|audit).*' and timestamp in week)`
+- Source: PostHog aggregated weekly export
+- Refresh: weekly
 - Owner: #35
-- Decision informed: brand health; PR / outreach effectiveness
-- PII risk: none
-- Defined: 2026-04-17
+- Decision informed: content + SEO investment allocation
+- PII risk: none (PostHog self-hosted, no cross-site tracking)
+- Defined: 2026-04-19
+
+### email_optin_rate_weekly
+- Definition: Fraction of completed scanner submissions that submit email for full report.
+- Formula: `count(leads_created) / count(scans_complete) per week`
+- Source: scanner Postgres export
+- Refresh: weekly
+- Owner: #35 + conversion
+- Decision informed: email gate copy + position
+- Target: ≥40% (SPEC §2.2)
+- PII risk: low — counts only, no email values
+- Defined: 2026-04-19
+
+### concierge_audits_paid_weekly
+- Definition: £97 concierge audits paid per week.
+- Formula: `count(stripe_payments where product='concierge' and status='succeeded' and created_at in week)`
+- Source: Stripe export
+- Refresh: weekly
+- Owner: #35 + #11
+- Decision informed: validation of paid audit appetite (SPEC §2.2)
+- Target: ≥5 in Week 1
+- PII risk: low — counts only
+- Defined: 2026-04-19
 
 ## Activation
 
-### scan_rate_weekly
-- Definition: Fraction of homepage sessions that complete a scan.
-- Formula: scans_completed / homepage_sessions per week
-- Source: Vercel Analytics + scan logs (aggregated)
-- Refresh cadence: weekly
+### install_rate_weekly
+- Definition: Shopify App Store installs per week from listing views.
+- Formula: `count(installs) / count(listing_views) per week`
+- Source: Shopify Partner Dashboard export
+- Refresh: weekly
+- Owner: #35 + #5
+- Decision informed: Shopify listing copy, screenshots, pricing display
+- PII risk: none (aggregates from Shopify)
+- Defined: 2026-04-19
+
+### first_scorecard_rate
+- Definition: Of new installs in week W, fraction that see their first scorecard within 24h of install.
+- Formula: `count(scorecards_rendered) / count(installs) in 24h-post-install window`
+- Source: shopify-app Postgres export
+- Refresh: weekly
+- Owner: #35 + #7
+- Decision informed: onboarding flow health; bulk sync reliability
+- Target: ≥95%
+- PII risk: none (counts only)
+- Defined: 2026-04-19
+
+### first_fix_applied_rate_d7
+- Definition: Of installs at day 0, fraction that have applied at least one Tier 1 fix within 7 days.
+- Formula: `count(shops with ≥1 tier1 fix applied in 7d) / count(installs at d0)`
+- Source: shopify-app Postgres export
+- Refresh: weekly
 - Owner: #35 + conversion
-- Decision informed: hero copy + CTA placement; Turnstile friction
-- Target: ≥35% (baseline tuned per kpi-tree)
-- PII risk: low — verify aggregation by route, not by wallet
-- Defined: 2026-04-17
-
-### connect_rate_weekly
-- Definition: Fraction of completed scans where the user connected a wallet.
-- Formula: wallet_connects / scans_completed per week
-- Source: aggregated scan logs
-- Refresh cadence: weekly
-- Owner: #35 + #7
-- Decision informed: connect UX + trust signals
-- PII risk: low — never join wallet address to session
-- Defined: 2026-04-17
-
-### first_revoke_rate_weekly
-- Definition: Of scans surfacing a risky approval, the fraction that resulted in at least one revoke action in the same session.
-- Formula: scans_with_revoke / scans_with_risky_approval per week
-- Source: aggregated scan logs
-- Refresh cadence: weekly
-- Owner: #35 + #7
-- Decision informed: risk-flag clarity + revoke CTA placement
-- PII risk: low — bucket by risk type, not by address
-- Defined: 2026-04-17
+- Decision informed: fix-apply UX + pillar prioritisation
+- PII risk: none
+- Defined: 2026-04-19
 
 ## Conversion
 
-### pro_signup_rate_weekly
-- Definition: Pro signups divided by `/pricing` views.
-- Formula: pro_signups / pricing_page_views per week
-- Source: Stripe export + Vercel Analytics
-- Refresh cadence: weekly
-- Owner: #35 + conversion + #5
-- Decision informed: pricing page persuasion
+### growth_tier_signup_rate
+- Definition: Growth tier subscriptions divided by pricing page views.
+- Formula: `count(growth_subscriptions_created) / count(pricing_views) per week`
+- Source: Shopify Managed Pricing + PostHog
+- Refresh: weekly
+- Owner: #35 + conversion
+- Decision informed: pricing page persuasion; first-month £29 promo effect
 - PII risk: low — counts only
-- Defined: 2026-04-17
+- Defined: 2026-04-19
 
-### sentinel_signups_weekly
-- Definition: New Sentinel subscriptions per week.
-- Formula: count(subscriptions where plan in ('sentinel_monthly','sentinel_annual') and created in week)
-- Source: Stripe export
-- Refresh cadence: weekly
+### scale_upgrade_rate_monthly
+- Definition: Monthly Growth → Scale tier upgrades.
+- Formula: `count(upgrades where from='growth' and to='scale' in month)`
+- Source: Shopify Managed Pricing export
+- Refresh: monthly
 - Owner: #35 + #5
-- Decision informed: Sentinel page persuasion + sales pipeline
-- PII risk: low — counts; never customer email tied to behaviour
-- Defined: 2026-04-17
+- Decision informed: value ladder — measures whether value grows with usage
+- PII risk: none
+- Defined: 2026-04-19
 
-### api_tier_signups_monthly
-- Definition: API key activations split by tier (Developer / Growth) per month.
-- Formula: count(api_keys where tier in ('developer','growth') and activated in month)
-- Source: API key issuance log (aggregated)
-- Refresh cadence: monthly
-- Owner: #35 + #6
-- Decision informed: API tier positioning + developer funnel
-- PII risk: low — counts by tier
-- Defined: 2026-04-17
+### agency_signups_weekly
+- Definition: New Agency tier subscriptions per week.
+- Formula: `count(stripe_subscriptions where plan='agency' and status='active' and created_at in week)`
+- Source: Stripe export
+- Refresh: weekly
+- Owner: #35 + #12
+- Decision informed: Agency acquisition channel effectiveness (SPEC §8.2 economic engine)
+- PII risk: none
+- Defined: 2026-04-19
+
+### enterprise_deals_closed_monthly
+- Definition: Enterprise contracts signed per month.
+- Formula: `count(stripe_subscriptions where plan='enterprise' and created_at in month)`
+- Source: Stripe export + operator-maintained pipeline log
+- Refresh: monthly
+- Owner: #35 + #11
+- Defined: 2026-04-19
 
 ## Retention
 
-### pro_d30_retention
-- Definition: Of Pro signups in cohort month M, the fraction still subscribed at day 30.
-- Formula: pro_active_at_d30(M) / pro_signups(M)
-- Source: Stripe export
-- Refresh cadence: monthly (cohort closes at month-end + 30 days)
+### growth_d30_retention
+- Definition: Of Growth tier signups in cohort month M, fraction still subscribed at day 30.
+- Formula: `growth_active_at_d30(M) / growth_signups(M)`
+- Source: Shopify Managed Pricing export
+- Refresh: monthly (cohort closes at month-end + 30 days)
 - Owner: #35 + #5
-- Decision informed: pricing fit + Pro feature value
-- Target: ≥70% (initial target; refine after 3 cohorts)
+- Target: ≥70%
 - PII risk: low — cohort counts only
-- Defined: 2026-04-17
+- Defined: 2026-04-19
 
-### pro_d90_retention
-- Definition: Of Pro signups in cohort month M, the fraction still subscribed at day 90.
-- Formula: pro_active_at_d90(M) / pro_signups(M)
-- Source: Stripe export
-- Refresh cadence: monthly
+### growth_d90_retention
+- Definition: Of Growth tier signups in cohort month M, fraction still subscribed at day 90.
+- Formula: `growth_active_at_d90(M) / growth_signups(M)`
+- Source: Shopify Managed Pricing export
+- Refresh: monthly
 - Owner: #35 + #5
-- Decision informed: long-term Pro fit
-- Defined: 2026-04-17
+- Defined: 2026-04-19
 
-### sentinel_renewal_rate
-- Definition: Renewal rate at billing cycle end for Sentinel subscriptions.
-- Formula: renewed / due_for_renewal per cycle
-- Source: Stripe export
-- Refresh cadence: monthly
-- Owner: #35 + #5
-- Defined: 2026-04-17
-
-### api_key_active_7d
-- Definition: Fraction of API keys with ≥1 successful call in the last 7 days.
-- Formula: keys_with_call_7d / total_active_keys
-- Source: API access log (aggregated)
-- Refresh cadence: weekly
-- Owner: #35 + #6
-- Decision informed: developer activation health
-- Defined: 2026-04-17
-
-### scan_return_30d
-- Definition: Fraction of scanning addresses (hashed bucket) that scan again within 30 days.
-- Formula: returning_buckets / new_buckets in cohort
-- Source: aggregated scan logs (bucket = hashed address mod N — never the address itself)
-- Refresh cadence: monthly
+### scale_renewal_rate
+- Definition: Renewal rate at billing cycle end for Scale tier.
+- Formula: `renewed / due_for_renewal per cycle`
+- Source: Shopify Managed Pricing export
+- Refresh: monthly
 - Owner: #35
-- Decision informed: free-tier stickiness
-- PII risk: **medium** — requires bucketing; verify with #19 before any change to bucket scheme
-- Defined: 2026-04-17
+- Defined: 2026-04-19
+
+### agency_renewal_rate
+- Definition: Renewal rate at billing cycle end for Agency tier direct Stripe subscriptions.
+- Formula: `renewed / due_for_renewal per cycle`
+- Source: Stripe export
+- Refresh: monthly
+- Owner: #35 + #12
+- Defined: 2026-04-19
+
+### seat_utilisation_agency
+- Definition: For Agency subscribers, mean active client seats / 25 max per agency.
+- Formula: `mean(active_client_seats_per_agency)` at snapshot
+- Source: shopify-app Postgres export (aggregated)
+- Refresh: weekly
+- Owner: #35 + #12
+- Decision informed: Agency tier value realisation; candidate for larger-agency tier if utilisation tops out
+- PII risk: low — per-agency counts; agencies not named
+- Defined: 2026-04-19
 
 ## Revenue
 
 ### mrr
-- Definition: Monthly recurring revenue across Pro + Sentinel + API tiers.
-- Formula: sum(active_subscription.monthly_value) at snapshot
-- Source: Stripe export
-- Refresh cadence: weekly snapshot, month-end canonical
+- Definition: Monthly recurring revenue across all tiers (Shopify Managed + Stripe direct).
+- Formula: `sum(active_subscription.monthly_value)` at snapshot
+- Source: Shopify Managed Pricing + Stripe
+- Refresh: weekly snapshot, month-end canonical
 - Owner: #35 + #11
-- Defined: 2026-04-17
+- Defined: 2026-04-19
 
 ### arr
 - Definition: MRR × 12 at snapshot.
-- Formula: mrr × 12
+- Formula: `mrr × 12`
 - Source: derived
-- Refresh cadence: weekly
+- Refresh: weekly
 - Owner: #35 + #11
-- Defined: 2026-04-17
+- Defined: 2026-04-19
+
+### shopify_lifetime_gross
+- Definition: Cumulative gross revenue through Shopify Managed Pricing, for 15% revenue share crossover tracking.
+- Formula: `sum(shopify_managed_gross) from install to now`
+- Source: Shopify Partner Dashboard
+- Refresh: weekly
+- Owner: #35 + #11
+- Threshold: approaching **$1M** → prepare for 15% cut
+- Defined: 2026-04-19
 
 ### nrr_quarterly
-- Definition: Net revenue retention for Pro + API cohorts at quarterly close.
-- Formula: (cohort_revenue_q_end - new_in_quarter + churn) / cohort_revenue_q_start
-- Source: Stripe export
-- Refresh cadence: quarterly
+- Definition: Net revenue retention for Growth + Scale cohorts at quarterly close.
+- Formula: `(cohort_revenue_q_end - new_in_quarter + expansion - contraction - churn) / cohort_revenue_q_start`
+- Source: Shopify Managed Pricing + Stripe exports
+- Refresh: quarterly
 - Owner: #35
-- Defined: 2026-04-17
+- Defined: 2026-04-19
+
+### agency_merchant_ratio
+- Definition: Share of MRR derived from Agency tier (inc. agency-referred stores counted as contributing to the agency's MRR).
+- Formula: `agency_mrr / total_mrr` at snapshot
+- Source: Stripe + Shopify Managed Pricing
+- Refresh: weekly
+- Owner: #35 + #12
+- Decision informed: SPEC §8.2 economic engine progression. Target progression: >10% (M3), >25% (M6), >40% (M12).
+- PII risk: none
+- Defined: 2026-04-19
 
 ## Reliability
 
 ### scan_success_rate_24h
-- Definition: Fraction of scan attempts in last 24h that returned data without an error code.
-- Formula: scans_ok / scans_attempted (rolling 24h)
-- Source: scan logs (aggregated)
-- Refresh cadence: real-time (alerting); reported in weekly brief
+- Definition: Fraction of scanner submissions in last 24h that return a valid score.
+- Formula: `scans_ok / scans_attempted (rolling 24h)`
+- Source: scanner Postgres (real-time)
+- Refresh: real-time alert; weekly brief
 - Owner: #35 + #34
-- Threshold (red line): >2% error rate triggers alert
-- Defined: 2026-04-17
+- Threshold: >2% error → alert
+- Defined: 2026-04-19
 
 ### webhook_delivery_success_rate
-- Definition: Fraction of incoming Stripe + Coinbase webhooks processed successfully.
-- Formula: webhooks_processed_ok / webhooks_received
-- Source: webhook log (aggregated)
-- Refresh cadence: hourly aggregation
-- Owner: #35 + #30 + #31
-- Threshold: >1% failure triggers investigation
-- Defined: 2026-04-17
+- Definition: Fraction of incoming Shopify + Stripe webhooks processed successfully within 5s budget.
+- Formula: `webhooks_200_within_5s / webhooks_received`
+- Source: webhook_events table (aggregated)
+- Refresh: hourly
+- Owner: #35 + #33 + #4
+- Threshold: >1% failure → investigate; Shopify deregisters subscribers that trend low
+- Defined: 2026-04-19
+
+### bulk_sync_sla_adherence
+- Definition: Fraction of bulk enrichment jobs completed within tier SLA.
+- Formula: `jobs_on_time / jobs_completed`
+- Source: BullMQ metrics export
+- Refresh: daily
+- Owner: #35 + #17 + #33
+- Target: ≥95% for Scale; ≥99% for Enterprise
+- Defined: 2026-04-19
 
 ### mttr_p0_90d
 - Definition: Mean time to resolution on P0 incidents over rolling 90 days.
-- Formula: mean(resolved_at - opened_at) for P0 incidents in window
-- Source: incident log (`memory/product-engineering/incident-history.md`)
-- Refresh cadence: monthly
+- Formula: `mean(resolved_at - opened_at)` for P0 in window
+- Source: `memory/product-engineering/incident-history.md`
+- Refresh: monthly
 - Owner: #35 + #10
-- Defined: 2026-04-17
+- Defined: 2026-04-19
+
+## Channel Health (the measured-impact layer)
+
+### ai_agent_clicks_per_shop_monthly
+- Definition: Monthly AI-agent-attributed clicks to merchant store (from UTM on external-URL metafield).
+- Formula: `sum(sessions where utm_source='flintmere' and utm_medium='ai_agent') per month per shop`
+- Source: shopify-app Postgres (merchant self-reports GA4/Shopify-analytics via export); aggregated cross-merchant
+- Refresh: monthly
+- Owner: #35
+- Decision informed: Channel Health widget value; subscription retention narrative (SPEC §11.2)
+- PII risk: low — aggregated; per-shop reported only to that shop
+- Defined: 2026-04-19
+
+### google_shopping_approvals_delta
+- Definition: Change in Google Shopping approvals month-over-month for merchants who ran fixes.
+- Formula: `shop_level: approvals_post - approvals_pre`; aggregated as median across shops
+- Source: merchant-provided Google Merchant Center exports (aggregated)
+- Refresh: monthly
+- Owner: #35
+- Defined: 2026-04-19
 
 ## Distribution
 
-### grant_pipeline_value
-- Definition: Sum across open grant applications of (amount requested × estimated probability of award).
-- Formula: sum(amount × p_award) over status='open'
-- Source: `memory/growth/grants-history.md`
-- Refresh cadence: weekly
+### partnership_attributed_installs
+- Definition: Installs attributed to a Shopify ecosystem or PIM-vendor integration announcement.
+- Formula: `count(installs where referrer matches partnership window and source)`
+- Source: Shopify Partner Dashboard + PostHog
+- Refresh: per-campaign, with 28-day window
 - Owner: #35 + #12
-- Defined: 2026-04-17
-
-### listing_referral_sessions_28d
-- Definition: Sessions attributed to a listing in the 28 days after submission go-live.
-- Formula: count(sessions where source matches listing referrer in [go_live, go_live+28d])
-- Source: Vercel Analytics
-- Refresh cadence: per-listing on a 28-day window
-- Owner: #35 + #12
-- Defined: 2026-04-17
+- Defined: 2026-04-19
 
 ---
 
-## Removed metrics (kept for audit trail)
+## Removed / replaced metrics
 
-_None yet._
+- `connect_rate_weekly`, `first_revoke_rate_weekly`, `scan_return_30d`, `api_key_active_7d`, `sentinel_renewal_rate`, `grant_pipeline_value`, `listing_referral_sessions_28d` — all allowanceguard-specific metrics, retired 2026-04-19. Replaced by Flintmere equivalents above where applicable.
+
+## Changelog
+
+- 2026-04-19: Rewritten for Flintmere. Replaced wallet-scanner/Pro/Sentinel/API metrics with Flintmere metrics (scanner submissions, concierge audits, install rate, tier signups, agency_merchant_ratio, Channel Health). Added `shopify_lifetime_gross` for revenue-share crossover tracking.
