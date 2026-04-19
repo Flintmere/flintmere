@@ -18,6 +18,7 @@
     "deploy": "shopify app deploy"
   },
   "dependencies": {
+    "@flintmere/llm": "workspace:*",
     "@flintmere/scoring": "workspace:*",
     "@prisma/client": "^5.22.0",
     "@remix-run/node": "^2.15.0",
