@@ -1,6 +1,7 @@
 import type { ActionFunctionArgs } from '@remix-run/node';
 import { authenticate } from '../../shopify.server';
 import { prisma } from '../../db.server';
+import { enqueueDriftRescore } from '../../queue/queues.server';
 
 /**
  * Product drift webhook handler.
@@ -9,7 +10,7 @@ import { prisma } from '../../db.server';
  * Per memory/product-engineering/shopify-api-rules.md §5-second rule:
  * 1. HMAC verify (@shopify/shopify-app-remix handles this)
  * 2. Idempotency check via shopify_event_id
- * 3. Enqueue re-score job (not implemented yet — BullMQ wiring is a follow-up)
+ * 3. Enqueue drift re-score job (debounced 30s per shop+product)
  * 4. Return 200 within 5s
  */
 export async function action({ request }: ActionFunctionArgs) {
@@ -35,7 +36,24 @@ export async function action({ request }: ActionFunctionArgs) {
     },
   });
 
-  // TODO(queue): enqueue re-score job keyed on (shop, productId). Debounce 30s.
+  const productId =
+    typeof (payload as { id?: unknown }).id === 'string'
+      ? (payload as { id: string }).id
+      : typeof (payload as { admin_graphql_api_id?: unknown }).admin_graphql_api_id === 'string'
+        ? (payload as { admin_graphql_api_id: string }).admin_graphql_api_id
+        : 'unknown';
+
+  await enqueueDriftRescore({
+    shopDomain: shop,
+    productId,
+    topic: topic as 'products/create' | 'products/update' | 'products/delete',
+    webhookId,
+  });
+
+  await prisma.webhookEvent.update({
+    where: { shopifyEventId: webhookId },
+    data: { processedAt: new Date() },
+  });
 
   return new Response();
 }
