@@ -1,6 +1,6 @@
 # claims-register.md
 
-Append-only log of Allowance Guard's public claims + their source of truth. Every claim that appears in marketing, UI, docs, legal pages, outreach, or API responses should be traceable here.
+Append-only log of Flintmere's public claims + their source of truth. Every claim that appears in marketing, UI, docs, legal pages, outreach, or API responses should be traceable here.
 
 If a claim isn't in this register, it either needs adding or it shouldn't be shipping.
 
@@ -23,76 +23,114 @@ If a claim isn't in this register, it either needs adding or it shouldn't be shi
 - Append-only. Never edit a past entry to change a claim's history; add a follow-up entry marking the old one retired.
 - Every claim shipped via any skill (`writer`, `conversion`, `legal-page-draft`, etc.) gets a register entry before or at ship time.
 - `claim-review` and `security-claim-audit` operate against this register — any public claim not here is a P0 finding.
-- Re-verify quarterly. `compliance-risk` runs a claim sweep; stale "last verified" dates flag for re-check.
+- Re-verify quarterly. `regulatory-change-response` and `security-claim-audit` run sweeps; stale "last verified" dates flag for re-check.
 
 ## Claim classifications
 
-- **factual** — product facts (chain count, tier prices, feature availability). Source: BUSINESS.md / ARCHITECTURE.md.
-- **security** — what AG does / does not protect against. Source: ARCHITECTURE.md + `memory/product-engineering/security-posture.md`. Highest scrutiny — #4 + #9.
-- **regulatory** — GDPR, PECR, UK / EU regulatory posture. Source: legal page + regulatory citation. #24 VETO.
-- **commercial** — tier, pricing, non-custodial, open-source status, funding model. #11 gatekeeper.
-- **performance** — scan speed, chain count, uptime. Source: metrics + BUSINESS.md.
+- **factual** — product facts (pillar count, tier prices, feature availability, SKU limits). Source: `BUSINESS.md` / `ARCHITECTURE.md` / `SPEC.md`.
+- **security** — what Flintmere does / does not protect against (token encryption, HMAC verification, data-scrubbing on uninstall). Source: `memory/product-engineering/security-posture.md`. Highest scrutiny — #4 + #9.
+- **regulatory** — GDPR, UK ICO, EU AI Act posture, Shopify Partner obligations. Source: legal pages + `regulatory-matrix.md`. **#24 veto.**
+- **commercial** — tier, pricing, Agency-seat count, Shopify Managed Pricing terms. **#11 gatekeeper.**
+- **performance** — scan time, AI-readiness lift percentages, bulk sync SLAs, uptime. Source: `metric-catalog.md` + `performance-budget.md`.
+- **AI-outcome** — any claim about AI-agent behaviour (ChatGPT / Gemini / Copilot recommending the store). **Highest scrutiny. #21 Technical + #23 Regulatory must both sign off.** Never guarantee; always qualify as "estimated based on comparable stores."
 
 ## Banned claim patterns (enforce across every entry)
 
-- "Protects your wallet from hackers" → reject. Use "reduces exposure to malicious approvals".
-- "GDPR compliant" → reject. Use "designed to comply with UK GDPR; see our Privacy Policy".
-- "Bank-level security" → reject. Meaningless marketing phrase with regulatory exposure.
-- "Guaranteed" (anything) → reject.
-- "Free Forever" (as a blanket) → reject. Use "Core tool: free and open source. Always."
+- "Will appear in ChatGPT" / "Will be recommended by AI agents" → reject. Use: "catalog made legible to AI agents."
+- "Guaranteed visibility lift" → reject. Use: "estimated ~N% visibility lift based on comparable stores in your vertical."
+- "Generate valid barcodes" / "Issue GTINs for you" → reject. Flintmere does not issue GTINs.
+- "GDPR compliant" → reject. Use: "designed to comply with UK GDPR; see our Privacy Policy."
+- "Bank-level security" / "Military-grade encryption" → reject. Meaningless marketing phrases with regulatory exposure.
 - "100% safe" / "100% secure" / "100% anything" → reject.
-- Any claim that could be read as a securities offering → reject + #23 review.
+- "Trusted by thousands" without evidence → reject.
+- "Free forever" as a blanket → reject. Use "Free scanner; paid tiers from £49/mo."
+- Any claim that implies GS1 affiliation → reject + disclaimer required.
+- Any claim implying outcomes about Shopify's own ranking / search surfaces → reject + #23 review.
 
-## Known claims (current)
+## Known claims (seed — backfill as copy ships)
 
-<!-- Backfill as the register is built out. Initial entries to land via the first `compliance-audit` sweep. The skeleton below seeds the pattern. -->
+<!-- Initial entries land via the first `claim-review` sweep when marketing copy ships. Skeletons below seed the pattern. -->
 
-### Chain count — 27
+### Pillar count — 6
 
-- **Claim text:** "27 chains supported" (and variants).
-- **Surfaces:** `BUSINESS.md:22`, homepage hero, pricing copy, blog posts, API reference.
-- **Source of truth:** `projects/allowanceguard/BUSINESS.md:22` (authoritative chain count). Verify before citing.
+- **Claim text:** "Six pillars: identifiers, attributes, titles, catalog mapping, consistency, AI checkout eligibility."
+- **Surfaces:** marketing site (pillars section), scanner results, Shopify app dashboard, email reports.
+- **Source of truth:** `projects/flintmere/SPEC.md` §4.1, `projects/flintmere/ARCHITECTURE.md`.
 - **Classification:** factual
 - **Last verified:** <to be set by first claim-review pass>
-- **Risk if wrong:** every marketing surface + SEO out of sync; customer trust erosion.
+- **Risk if wrong:** every surface out of sync; merchant trust erosion.
 - **Status:** active
 
-### Non-custodial
+### Pricing — Growth £49 / Scale £149 / Agency £399 / Enterprise £499+
 
-- **Claim text:** "Non-custodial. Users sign every transaction in their own wallet."
-- **Surfaces:** homepage, FAQ, docs, every marketing surface that mentions revocation.
-- **Source of truth:** `projects/allowanceguard/ARCHITECTURE.md` (auth + wallet section), product design.
-- **Classification:** security + commercial
-- **Last verified:** <>
-- **Risk if wrong:** catastrophic trust loss; potential misleading-practices exposure under #23.
-- **Status:** active
-
-### Free scanner at /#scan
-
-- **Claim text:** "Free scanner at /#scan, no account required."
-- **Surfaces:** homepage, pricing page, marketing site.
-- **Source of truth:** `projects/allowanceguard/BUSINESS.md:49-54` + product behaviour at `src/app/page.tsx` scanner integration.
+- **Claim text:** tier prices as in `BUSINESS.md` §Tiers.
+- **Surfaces:** pricing page, scanner CTA, Shopify app upgrade flow, Shopify Managed Pricing config, Stripe product configuration.
+- **Source of truth:** `projects/flintmere/BUSINESS.md` §Tiers + Shopify App Subscription configuration + Stripe Dashboard price IDs.
 - **Classification:** commercial
 - **Last verified:** <>
-- **Risk if wrong:** banned-phrase gatekeeper flags inconsistency with "always free core tool".
+- **Risk if wrong:** mismatched copy vs checkout → trust loss + ASA/FTC exposure on advertising.
 - **Status:** active
 
-### Pricing — Pro $9.99/mo or $79/yr
+### AI visibility uplift — "3–4× at 99%+ attribute completion"
 
-- **Claim text (and variants for Sentinel / API tiers):** see `BUSINESS.md:49-54` for the full ladder.
-- **Surfaces:** pricing page, homepage CTA, upgrade flows, Stripe product configuration.
-- **Source of truth:** `BUSINESS.md:49-54` + Stripe Dashboard price IDs.
+- **Claim text:** "Stores at 99%+ attribute completion see 3–4× higher AI visibility."
+- **Surfaces:** marketing numbers strip, scanner stats, email reports.
+- **Source of truth:** `projects/flintmere/SPEC.md` Appendix A; cited from industry reporting (verify exact source before publishing each cycle).
+- **Classification:** performance + AI-outcome
+- **Last verified:** <>
+- **Risk if wrong:** overpromise = ASA / FTC exposure; trust loss. Always qualify "at 99%+ attribute completion" — never as standalone lift.
+- **Status:** active
+
+### 60-second scan promise
+
+- **Claim text:** "Know where you stand in 60 seconds."
+- **Surfaces:** scanner hero, marketing hero, email report.
+- **Source of truth:** `performance-budget.md` (scan-complete-to-results ≤ 55s wall clock, 5s buffer).
+- **Classification:** performance
+- **Last verified:** <>
+- **Risk if wrong:** if scans regularly exceed 60s, claim becomes deceptive; retire or adjust.
+- **Status:** active
+
+### Agency tier — 25 client store seats
+
+- **Claim text:** "Agency tier includes 25 client store seats."
+- **Surfaces:** pricing page, Agency sales collateral, `BUSINESS.md`.
+- **Source of truth:** `projects/flintmere/BUSINESS.md` §Agency tier.
 - **Classification:** commercial
 - **Last verified:** <>
-- **Risk if wrong:** mismatched copy between marketing and checkout = customer distrust; potential advertising standards issue (#23).
+- **Risk if wrong:** feature-gating logic and pricing page out of sync.
+- **Status:** active
+
+### GTIN non-affiliation disclaimer
+
+- **Claim text:** "Flintmere is not affiliated with GS1. Identifier requirements vary by marketplace and jurisdiction."
+- **Surfaces:** scanner results (wherever GTINs are referenced), Shopify app GTIN panel, email reports, pricing page GS1-fee line, marketing GTIN guidance.
+- **Source of truth:** legal requirement (avoid implied association with GS1).
+- **Classification:** regulatory
+- **Last verified:** <>
+- **Risk if wrong:** trademark exposure + implied endorsement; #23 + #24 review veto on removal.
+- **Status:** active
+
+### Reversible fix window — 7 days
+
+- **Claim text:** "Every change previewed. Every change reversible for 7 days."
+- **Surfaces:** marketing, Shopify app Fix History, Terms of Service.
+- **Source of truth:** `projects/flintmere/SPEC.md` §5.1 + `memory/product-engineering/architecture-rules.md` (fix_batches retention).
+- **Classification:** factual + commercial
+- **Last verified:** <>
+- **Risk if wrong:** legally enforceable if shipped in ToS; engineering must back it.
 - **Status:** active
 
 ## When a claim changes
 
 1. `claim-review` (or the originating skill) flags the proposed change.
-2. Legal Council convenes. #24 VETO applies if the change touches privacy / consent language.
+2. Legal Council convenes. #24 VETO applies if the change touches privacy / consent. #23 approval required on regulatory claims. #21 Technical on factual accuracy.
 3. Every surface in the "Surfaces" line updates in lockstep (hand off to `writer` / `web-implementation` / `legal-page-draft` / engineering).
 4. The old entry is marked `retired (replaced by <new entry> on YYYY-MM-DD)`.
 5. A new entry is appended for the updated claim.
 
 No orphan claims. No partial updates.
+
+## Changelog
+
+- 2026-04-19: Rewritten for Flintmere. Replaced allowanceguard Web3 claims (chain count, non-custodial, free-scanner) with Flintmere claims (pillar count, tier pricing, AI-uplift qualifiers, GTIN disclaimer, 60-second promise, 7-day reversibility).
