@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import type { CompositeScore } from '@flintmere/scoring';
 import { z } from 'zod';
 import { prisma } from '@/lib/db';
+import { buildReportEmail } from '@/lib/report-email';
+import { sendEmail } from '@/lib/resend';
+import { signUnsubToken } from '@/lib/unsub-token';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
 
 const BodySchema = z.object({
   email: z.string().email(),
@@ -30,18 +35,66 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  if (scan.status !== 'complete' || !scan.scoreJson) {
+    return NextResponse.json(
+      {
+        ok: false,
+        code: 'scan-not-ready',
+        message: 'Scan has not completed yet. Try again shortly.',
+      },
+      { status: 409 },
+    );
+  }
+
+  const email = body.email.trim().toLowerCase();
+
   const lead = await prisma.lead.create({
     data: {
-      email: body.email.toLowerCase(),
+      email,
       scanId: body.scanId,
       consentedAt: body.consentedAt ? new Date(body.consentedAt) : new Date(),
     },
   });
 
-  // TODO(resend): queue report email delivery when RESEND_API_KEY is configured.
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://flintmere.com';
+  const token = signUnsubToken(lead.id);
+  const unsubscribeUrl = `${appUrl}/api/unsubscribe/${token}`;
+  const mail = buildReportEmail({
+    score: scan.scoreJson as unknown as CompositeScore,
+    unsubscribeUrl,
+    appUrl,
+    recipientEmail: email,
+  });
+
+  const send = await sendEmail({
+    to: email,
+    subject: mail.subject,
+    html: mail.html,
+    text: mail.text,
+    headers: {
+      'List-Unsubscribe': `<${unsubscribeUrl}>, <mailto:hello@flintmere.com?subject=unsubscribe>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
+    tags: [
+      { name: 'kind', value: 'scanner-report' },
+      { name: 'scan_id', value: scan.id },
+    ],
+  });
+
+  if (send.sent) {
+    await prisma.lead.update({
+      where: { id: lead.id },
+      data: { reportSentAt: new Date() },
+    });
+  }
 
   return NextResponse.json(
-    { ok: true, leadId: lead.id },
+    {
+      ok: true,
+      leadId: lead.id,
+      reportSent: send.sent,
+      reason: send.sent ? undefined : send.reason,
+    },
     { status: 201 },
   );
 }
