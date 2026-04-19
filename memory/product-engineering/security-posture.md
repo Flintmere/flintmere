@@ -93,18 +93,51 @@ Security invariants for `apps/*`. **#4 Security** owns this file and holds veto 
 - GDPR `customers/redact`: customer-level data removed within 30 days, confirmation logged.
 - Logs: 90 days hot (Sentry + structured log store), archived for 13 months cold, then deleted.
 
-## Deny list (enforced by `.claude/settings.json`)
+## Permission tiers (enforced by `.claude/settings.json`)
 
-Harness enforces what skills cannot do directly:
+Commands are classified by **blast radius**, not by command name. This gives skills enough capability to finish work without gating on every routine action, while keeping irreversible actions behind a deliberate human step.
 
-- `rm -rf` outside scratch paths.
-- `prisma migrate deploy` without explicit confirm.
-- Shopify API write mutations without a dry-run review.
-- `git push --force` to `main` or release branches.
-- Coolify deploy triggers without a confirm step.
-- `gh release create` without an ADR-linked description.
+### Tier 1 — auto-allowed (reversible, local, recoverable)
 
-If a skill needs something the deny list blocks, the user runs it themselves.
+Skills may run these without prompting. The harness allow-list covers them.
+
+- `pnpm install`, `pnpm -F <app> dev / build / test / lint / typecheck`, `pnpm -r build / test / lint`
+- `prisma generate`, `prisma migrate dev`, `prisma migrate reset`, `prisma studio`, `prisma format`, `prisma validate` (all dev-scoped)
+- `git status / diff / log / show / add / commit / branch / checkout / switch / stash / fetch / pull`
+- `git push`, `git push origin`, `git push -u origin <branch>` (non-force, any branch including main — main-discipline is enforced by commit review, not push blocks, while we're solo)
+- `gh pr view / list / create / diff / checks`, `gh issue view / list / create`, `gh repo view`, `gh run view / list`, `gh api repos/*`
+- `rm -rf` on **build artifacts only**: `node_modules/`, `.next/`, `apps/*/.next`, `apps/*/dist`, `apps/*/build`, `packages/*/dist`, `packages/*/build`, `build/`, `dist/`, `.turbo/`, `.cache/`, `coverage/`
+- Read-only `curl`, `ls`, `tree`, `wc -l`, `mkdir -p`, `cp -R`, `mv`
+
+### Tier 2 — prompts the user (visible or production-scoped)
+
+Not in allow or deny; harness default is "ask." Skills proposing these actions surface them clearly.
+
+- Direct `coolify deploy` to staging (user confirms each)
+- `gh release create`
+- Shopify live-store API writes during manual testing (dev-store writes are Tier 1 inside skill scope)
+- Any `rm` of a path not on the allow-list
+- Adding new top-level dependencies
+
+### Tier 3 — denied (irreversible or catastrophic)
+
+The harness deny-list blocks these. If a workflow truly needs one, the operator runs it from a separate terminal with explicit intent, not through a skill.
+
+- `git push --force`, `git push -f`, `git push --force-with-lease`
+- `git reset --hard origin/*`, `git rebase -i`
+- `prisma migrate deploy`, `prisma db push`, `prisma db execute`, `prisma migrate resolve` (all prod-facing)
+- `pnpm run deploy`, `pnpm -r deploy`
+- `psql`, `pg_dump` (direct DB access — use Prisma or a controlled migration)
+- `stripe live *`, `stripe payments *`, `stripe charges *` (live money movement)
+- `vercel *` (we don't use Vercel)
+- `coolify deploy *--production*` / `--prod`
+- `rm -rf` on: `/*`, `*src/*`, `apps/*/src`, `packages/*/src`, `memory*`, `projects*`, `.claude*`
+- `sudo`
+- `curl * | sh` / `curl * | bash` / `wget * | sh` (remote execution pipelines)
+
+### Rationale
+
+A skill that constantly hands work back to the user for routine actions erodes the value of having skills at all. The previous all-or-nothing deny list treated every potentially-risky command as if it were catastrophic. The tiered model distinguishes between "reversible within minutes" and "data loss." Skills are trusted with the first; the operator owns the second.
 
 ## Disclosure + response
 
