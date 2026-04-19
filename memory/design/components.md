@@ -1,109 +1,140 @@
 # components.md
 
-Component inventory and canonical patterns. This file tells you what already exists; `src/components/` is the source of truth for implementation.
+Component inventory for Flintmere. Canonical source for what exists, where it lives, and what tokens it consumes. Implementations live under `apps/*/src/components/`; shared primitives under `packages/ui/` (when extracted — inline in apps until a second consumer emerges).
 
-## UI primitives — `src/components/ui/`
+## The signature primitive — `Bracket`
 
-Neutral, Ledger-tuned. Consumed by marketing + app surfaces alike (post-ADR 0007 there is no canon split).
+**File (future):** `packages/ui/src/Bracket.tsx` (or inline in each app until extracted).
 
-| Component | File | Key variants |
-|-----------|------|--------------|
-| `Button` | `Button.tsx` | CVA: `primary`, `secondary`, `ghost`, `destructive`, `outline` |
-| `Card` | `Card.tsx` | + `CardHeader`, `CardTitle`, `CardContent`, `CardFooter`. Base is `bg-paper-deep text-ink`. Glass variants (`variant="glass"`, `variant="glass-accent"`) are deprecated and being removed per ADR 0007 Phase C. |
-| `Input` | `Input.tsx` | Labels, error states, icon slot |
-| `Badge` | `Badge.tsx` | `StatusBadge`, `RiskBadge`, `ChainBadge` |
-| `Modal` | `Modal.tsx` | Accessible dialog with focus trap. Ledger paper panel on a `paper-deep`-with-alpha scrim. |
-| `Alert` | `Alert.tsx` | Semantic alerts + auto-dismiss toasts. Ledger chrome with `semantic-*` accents. |
+The legibility-bracket treatment from the canon. Every surface uses this. See `tokens.md` §Signature.
 
-### Rules for `ui/*`
+```tsx
+<Bracket>invisible</Bracket>               // renders [ invisible ] with Geist Mono
+<Bracket size="display">64</Bracket>       // giant bracket on score
+<Bracket aria-hidden>01</Bracket>          // decorative variant for pillar numbers
+<Bracket interactive>Scan my store</Bracket>// wraps inside a CTA with aria-label handling
+```
 
-- Tokens only. No ad-hoc hex, no ad-hoc spacing. If the token doesn't exist, propose it via `design-token`.
-- **Single canon.** Ledger only. No Glass variants, no dark-mode branches. Strip `dark:` when you see it.
-- Focus-ring visible — tested at AA contrast against every paper surface utility.
-- Every interactive element has a keyboard path. Modal focus trap tested.
+Props:
 
-## Ledger components — `src/components/`
+- `children: string` — the word to bracket (single token; enforce at build time via a lint rule)
+- `size?: 'default' | 'display' | 'micro'`
+- `interactive?: boolean` — when inside a button/link, hides brackets from AT via nested `aria-hidden` spans
+- `aria-hidden?: boolean` — for purely decorative uses (pillar numbers, eyebrow treatments)
 
-| Component | File | Role | Canon details |
-|-----------|------|------|---------------|
-| `Hero` | `Hero.tsx` | Homepage hero | `.paper .grain .deckle-bottom`; compass SVG watermark; Fraunces/Plex headline; connected-wallet panel uses `.paper-card-raised` |
-| `HowItWorks` | `HowItWorks.tsx` | Three-step explainer | `.paper .grain`; featured + compact steps in `.paper-card` / `.paper-card-raised`; ink line-art icons (stroke canon: `strokeWidth="1.5"`, `strokeLinecap="round"`) |
-| `FeaturesPreview` | `FeaturesPreview.tsx` | Feature rows | `.paper .grain`; alternating editorial rows with ink line-art diagrams in `.paper-card-raised` |
-| `StatisticsSection` | `StatisticsSection.tsx` | Numbers / stats | `.paper-sub`; giant Fraunces italic display metric; `.dotted-leader` supporting rows |
-| `CTABand` | `CTABand.tsx` | Homepage's inverse moment | `bg-oxblood`; cream Fraunces; protected crimson accent word |
-| `Testimonials` | `Testimonials.tsx` | Social proof | `.paper .grain`; featured Fraunces pull-quote + grid of `.paper-card` quotes |
-| `ChainLogoCarousel` | `ChainLogoCarousel.tsx` | Closing bookend | `.paper-sub`; logo strip; `prefers-reduced-motion` halts scroll |
+Rules:
 
-### Rules for Ledger components (marketing + app)
+- Word MUST be a single token. No spaces. No phrases. (Enforce via prop-type refinement.)
+- Brackets + word render in Geist Mono; word weight 700; brackets match word weight.
+- `0.25em` space inside brackets. No space outside.
+- Colour inherits from parent text context (handles paper and ink surface inversion automatically).
 
-- Never introduce `bg-white`, `bg-slate-*`, `bg-gray-*`, `bg-neutral-*`, glassmorphism utilities, or legacy `primary-*` / `secondary-*` / `neutral-*` / `background-*` scales on any of these.
-- Never re-introduce Vanta / WebGL backgrounds on any surface. Thane's −180KB savings are permanent unless re-argued via ADR.
-- Icons and diagrams inline as JSX SVG, not separate `.svg` files — unless reused in ≥3 components.
-- Headlines use `.font-display-tight` or Fraunces italic. Body uses Plex. Metadata uses JetBrains Mono.
-- The signature move (oversized Fraunces italic numerals + `.ledger-rule`) appears once per major section. Not every section.
+## UI primitives — shared across apps
 
-## App surfaces — authenticated pages (post-ADR 0007)
+Marketing, scanner, and Shopify app (within the Flintmere island) consume these. Polaris primitives are **not** wrapped — they stay pure Polaris.
 
-All authenticated surfaces run on Ledger. The previous "Glass / Midnight Amber" app canon is retired.
+| Component | Purpose | Token consumption |
+|---|---|---|
+| `Bracket` | Signature token (see above) | Geist Mono, `--ink` / `--paper` |
+| `Button` | Primary, secondary, ghost CTAs | `--ink`, `--paper`, Geist Mono; 1px ink border; sharp corners |
+| `Input` | Text, URL, email inputs | `--paper`, `--ink` border, Geist Mono for placeholders |
+| `Eyebrow` | Mono uppercase micro-label | Geist Mono 10–11px, `--mute-2`, optional `Dot` prefix |
+| `Dot` | Small accent marker (sulphur on ink, inverted) | Used inside `Eyebrow` only, not freestanding |
+| `Chip` | Small bordered label | `--line` border, `--mute` text; `--accent` variant inverts |
+| `Pill` | Filled label (higher visual weight than `Chip`) | Variants: `default`, `filled`, `accent`, `alert` |
+| `ScoreRing` | Circular score visual | `conic-gradient(--accent 0 Nx%, --line-soft 0)`, Geist display numeral |
+| `PillarCard` | Pillar-breakdown cell | 1px `--line` border, optional locked state with dashed pattern |
+| `IssueRow` | Ranked issue list item | Severity dot, bracketed noun in title, count, CTA link |
+| `StatNumber` | Giant Geist numeric callout | Geist 52–84px, `-0.04em` tracking, optional sulphur highlight on scanner |
+| `FrameBar` | Ink-surface status strip | Geist Mono labels on `--ink`, dot-cluster left indicator |
+| `ContrastSection` | Two-column "before / after" | 1px vertical `--line` divider, paper and inverted halves |
+| `Manifesto` | Full-bleed ink section | Geist display quote on `--ink`, optional trademark line |
 
-| Area | Location | Notes |
-|------|----------|-------|
-| Account | `src/app/account/**` | Ledger paper canvas. `.paper-card` / `.paper-card-raised` for panels. Ink body + amber-deep accent + `text-crimson-paper` for destructive-path text. |
-| Dashboard | `src/app/(dashboard)/**` (verify in-repo; audit + migrate per ADR 0007 Phase D) | Ledger. Tables use `bg-paper-sub` alternate rows + `border-ink-rule` hairlines. |
-| Docs | `src/app/docs/**` | Ledger. Marketing landing + authenticated content pages. Long-form content uses `prose prose-ink`. |
-| Auth flows | `src/app/login`, `src/app/signup`, `src/app/siwe` (verify) | Ledger. Forms sit in `.paper-card-raised` on a `.paper-sub .grain` canvas. |
-| Modals / toasts | `ui/Modal`, `ui/Alert` consumers | Ledger paper panels. Destructive confirms may use the oxblood inverse treatment. |
+### Rules for primitives
 
-### Rules for app surfaces
+- **Tokens only.** No ad-hoc hex, no ad-hoc spacing. Propose new tokens via `design-token`.
+- **Sharp corners.** No `border-radius` except circles (score ring, Polaris-native elements we don't style).
+- **No shadows, no gradients** except the score ring's conic-gradient.
+- **Every interactive primitive** has a visible focus ring (2px `--ink` on paper, 2px `--accent` on ink).
+- **Accessibility built in.** `Button` has label discipline; `Input` requires a label prop; `Modal` traps focus; `Pill` renders with `aria-label` when colour carries meaning.
+- **Primitives stay in one place.** If a primitive is used by both apps, it lives in `packages/ui/`. Until a second app needs it, inline in the using app. Do not pre-extract.
 
-- Same canon, same tokens, same utilities as marketing. No divergence.
-- Tables: `bg-paper` body, `bg-paper-sub` alternate rows or header, `border-ink-rule` hairlines.
-- Forms: `bg-paper-deep` input backgrounds, `border-ink-rule` default, `border-amber-deep` focus, `text-crimson-paper` error text.
-- Destructive confirms (revoke, delete, cancel subscription): oxblood inverse moment — `bg-oxblood text-cream` for the confirm button, `text-crimson-paper` for the warning text that precedes it.
-- Loading / skeleton states: `bg-paper-deep` shimmer blocks, not grey.
+## Marketing components — `apps/scanner/src/components/marketing/`
 
-## Section extraction (docs recent work — commit `86d86ee`)
+The marketing site lives at `flintmere.com` and (initially) is served from the same Next.js app that hosts the scanner. Split when traffic patterns diverge.
 
-Docs content was extracted into `src/app/docs/sections/`:
-- `ArchitectureSection.tsx`
-- `SettingsSection.tsx`
-- `TeamsSection.tsx`
-- `TroubleshootingSection.tsx`
+| Component | Purpose | Canon notes |
+|---|---|---|
+| `Hero` | Landing hero with manifesto headline | One `Bracket` on the key noun; no imagery; ambient SVG line-art optional |
+| `PillarTimeline` | Numbered pillar walkthrough (01–06) | Bracketed numbers; no icons; copy-forward |
+| `ContrastFraming` | "Before agentic commerce / After agentic commerce" | Uses `ContrastSection` primitive |
+| `NumbersStrip` | 15× / 40% / 5.6M / 3–4× stats row | 4× `StatNumber` + `--line` dividers |
+| `Testimonials` | Named quotes from merchants and agencies | No photos — typography carries it |
+| `ComparisonList` | "Others / The Flintmere way" two-column | Struck-through vs ink-positive |
+| `PricingRows` | Five tiers in a row | 1px `--line` dividers, no cards |
+| `ManifestoBlock` | Full-bleed ink moment near footer | Uses `Manifesto` primitive; optional trademark line |
 
-Pattern to replicate when a docs page grows past the 600-line limit: extract named sections into a sibling `sections/` folder, re-import into the page.
+## Scanner components — `apps/scanner/src/components/scanner/`
 
-## Shared primitives
+Surfaces specific to the public scanner at `audit.flintmere.com`.
 
-| Component | File | Purpose |
-|-----------|------|---------|
-| `SectionHeader` | `src/components/SectionHeader.tsx` | Consistent H2 headings across marketing |
-| `Container` | `src/components/Container.tsx` | Content width constraint |
-| `Highlight` | `src/components/Highlight.tsx` | Inline accent wrapper |
-| `TurnstileWidget` | `src/components/TurnstileWidget.tsx` | Cloudflare Turnstile integration (docs + signup) |
+| Component | Purpose | Canon notes |
+|---|---|---|
+| `ScannerHero` | URL input form with trust micro-copy | Bracketed placeholder in input; submit triggers overlay |
+| `ScanProgressOverlay` | Full-screen modal during scan | Terminal aesthetic — Geist Mono log lines, sulphur `prompt` marker |
+| `ResultsScorecard` | Big score + pillar grid + issues | `ScoreRing` + 6× `PillarCard` (3 locked) + `IssueRow` list |
+| `EmailGate` | Dark ink section with email capture | Inverted palette, bracket on "report", sulphur bullet markers |
+| `ShareableBadge` | Post-email share-for-trial moment | Preview graphic + LinkedIn/X/copy-link actions |
+
+## Shopify app components — `apps/shopify-app/src/components/`
+
+These render inside Polaris-wrapped pages. The Flintmere island is drawn with our primitives; Polaris owns everything else.
+
+| Component | Purpose | Canon notes |
+|---|---|---|
+| `FlintmereScoreCard` | Score + pillar mini-grid on dashboard | `ScoreRing` + 6 mini pillars; 1px ink hairline border; sits on `--paper` inside Polaris `<Card>` |
+| `ChannelHealthWidget` | AI-traffic attribution metrics | `StatNumber`s for clicks / orders / revenue; UTM status line |
+| `IssueListIsland` | Critical issues with bracketed nouns | `IssueRow`s on `--paper`; CTA link opens Polaris-flavoured modal |
+| `FixHistoryTable` | Audit trail with revert buttons | Polaris `<IndexTable>` with Geist Mono column headers |
+| `GTINGuidanceCard` | Geography-aware GS1 path | `--paper-2` embedded card, bracket on country code, disclaimer footer |
+| `SLAStatusCard` | Queue + enrichment progress | Geist Mono status rows, mini progress bars |
+
+### The island rule (restated for code)
+
+- Polaris components stay untouched. Do not restyle `<Button>`, `<Banner>`, `<IndexTable>`.
+- Flintmere island components sit inside Polaris `<Card>` or `<Layout.Section>` but render their own internals in Flintmere canon.
+- The island has a 1px `--ink` hairline border (where Polaris card borders are softer greys).
+- Sulphur accent permitted only on the score-ring fill; never on Polaris primary buttons (those stay Shopify green `#008060`).
+- Bracket tokens allowed on issue titles, pillar numbers, the score display. Never on Polaris-owned CTAs.
 
 ## Adding a new component
 
-Design skill handoff flow:
+Design skill handoff flow (unchanged from kit default):
 
-1. `design-component` emits a spec (TSX sketch, props API, states, tokens, test strategy).
-2. Council review — Kael (systems), Maren (visual), Noor (AA).
-3. User approves the spec.
-4. Engineering picks it up via `build-feature` — lands it in `src/components/ui/` if primitive, or in the domain folder if feature-specific.
-5. Tests ship with the component (see `memory/product-engineering/test-strategy.md`).
+1. `design-component` produces a spec — TSX sketch, props, states, tokens, test strategy.
+2. Council review: Kael (systems), Maren (visual), Noor (AA, veto).
+3. Operator approves the spec.
+4. `build-feature` picks it up — lands in the right location (`packages/ui/` if universal; app-scoped folder if not).
+5. Tests ship with the component — see `../product-engineering/test-strategy.md`.
 
-## Deprecations
+## Deprecated (do not use)
 
-- **Glass / Midnight Amber canon** — retired in full per ADR 0007 (2026-04-17). `.glass-*` utilities, `src/design/tokens.ts`, and Midnight Amber legacy scales in `tailwind.config.js` are being removed. Any new code using them is wrong.
-- **`Card` primitive Glass variants** — `variant="glass"`, `variant="glass-accent"` deprecated; being removed Phase C.
-- **`bg-white`, `bg-slate-*`, `bg-gray-*`, `bg-neutral-*`** on any surface — banned.
-- **Vanta NET on any surface** — removed, do not restore.
-- **`dark:` variants** — no job on a single-canon product.
+Inherited from the allowanceguard reference kit — do not re-introduce in Flintmere code:
+
+- `Hero` (Ledger style — compass watermark, Fraunces italic)
+- `CTABand` (oxblood-inverse moment; Flintmere replaces with a Geist ink section)
+- `ChainLogoCarousel` (Web3-specific)
+- `.paper-card`, `.paper-card-raised`, `.deckle-*`, `.grain`, `.ledger-rule` (Ledger utilities)
+- `.glass-*` primitives in any form
+- `StatusBadge`, `RiskBadge`, `ChainBadge` (Web3 domain; replace with `Pill` variants if needed)
+- Fraunces, IBM Plex Sans, Caveat — all retired. Geist only.
+
+If found in inherited skill copy, migrate or delete.
 
 ## Where to look first
 
-- Canon question? `projects/allowanceguard/DESIGN.md`.
-- Canon change history? `projects/allowanceguard/decisions/0005-ledger-aesthetic.md` → `0007-unified-ledger-canon.md`.
-- Token question? `tokens.md` in this folder, then `tailwind.config.js` / `src/app/globals.css` for authoritative values.
-- Component pattern? This file + the actual component source. Read both.
-- Motion / animation? `motion.md`.
-- Accessibility? `accessibility.md`.
+- Token question → `tokens.md`, then `apps/*/src/app/globals.css` (once it exists)
+- Primitive pattern → this file + the source
+- Motion / animation → `motion.md`
+- Accessibility → `accessibility.md`
+- Surface-level rules → `../../projects/flintmere/DESIGN.md`

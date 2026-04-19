@@ -1,0 +1,26 @@
+{
+  "name": "flintmere",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Flintmere — Shopify app that scores product catalogs for AI-agent readiness and fixes what's broken.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "dev:scanner": "pnpm -F scanner dev",
+    "dev:shopify-app": "pnpm -F shopify-app dev",
+    "prisma:generate": "pnpm -r prisma generate",
+    "clean": "rm -rf apps/*/.next apps/*/build apps/*/dist packages/*/dist .turbo"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.0",
+    "typescript": "^5.6.0"
+  }
+}

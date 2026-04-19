@@ -1,0 +1,45 @@
+# Local development stack for Flintmere.
+# Starts Postgres 16 + Redis for the scanner and shopify-app.
+# Apps themselves run via `pnpm -F <app> dev` on the host.
+#
+# Production is deployed by Coolify, which provisions Postgres + Redis
+# via its one-click services — this file is for localhost only.
+
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: flintmere-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: flintmere
+      POSTGRES_PASSWORD: flintmere_dev
+      POSTGRES_DB: flintmere_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - flintmere_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flintmere -d flintmere_dev"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: flintmere-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - flintmere_redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  flintmere_pg:
+  flintmere_redis:

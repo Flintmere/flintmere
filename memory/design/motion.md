@@ -1,100 +1,120 @@
 # motion.md
 
-Motion spec + `prefers-reduced-motion` contract. Idris owns this file. Noor holds the VETO on anything that violates motion safety.
+Motion spec + `prefers-reduced-motion` contract. **Idris** owns this file. **Noor (#8, veto)** blocks any animation without a reduced-motion branch.
 
 ## Principles
 
-- Motion is punctuation, not content. If the user can't understand the surface without the motion, the motion is hiding something.
-- Sharp easing. No bouncy. No rubber-band.
-- Choreographed entrances. Elements arrive in an order that reads top-to-bottom, left-to-right, primary-then-secondary.
-- Scroll as revelation. Content earns the scroll; the scroll doesn't earn the content.
-- One signature motion per surface. Not three.
+- **Motion is punctuation, not content.** If the user can't understand the surface without the motion, the motion is hiding something.
+- **Sharp easing.** No bouncy. No rubber-band.
+- **Choreographed entrances.** Elements arrive in an order that reads top-to-bottom, left-to-right, primary-then-secondary.
+- **Scroll as revelation.** Content earns the scroll; the scroll doesn't scrub the content.
+- **One signature motion per surface.** Not three.
+- **Less is more.** Flintmere's neutral-bold posture demands restrained motion. No hero parallax. No ambient "breathing" UI. Motion fires when state changes, not as decoration.
 
 ## The reduced-motion contract (mandatory)
 
-Every animation, transition, entrance, parallax, carousel, and amber glow must have a `@media (prefers-reduced-motion: reduce)` branch that:
+Every animation, transition, entrance, and progress indicator must have a `@media (prefers-reduced-motion: reduce)` branch that:
 
 - Disables or drastically shortens the animation.
-- Keeps the end state visible. The reduced-motion user sees the final frame, not a blank.
-- Does not remove functionality. A carousel still advances; the transition is instant instead of animated.
-- Turns off the `.ledger-rule::after` amber glow.
+- Keeps the end state visible. The reduced-motion user sees the final frame, never a blank.
+- Does not remove functionality. Scan progress still shows current state; the transition is instant, not animated.
+- Preserves meaning. A pill that transitions between states under reduced motion still changes colour/text, just without the fade.
 
 Non-negotiable. Noor rejects any PR that animates without this branch.
 
 ## Easing tokens
 
-Canonical values live in the tokens handbook (`docs/design-tokens-handbook.md` §11). Summary:
+| Token | Curve | Duration | Use |
+|---|---|---|---|
+| `--ease-sharp` | `cubic-bezier(0.4, 0, 0.2, 1)` | 180–240ms | Default for entrances, state changes, micro-interactions |
+| `--ease-exit` | `cubic-bezier(0.4, 0, 1, 1)` | 120–160ms | Close, dismiss, exit — keeps UX snappy |
+| `--ease-signature` | `cubic-bezier(0.22, 1, 0.36, 1)` | 400–600ms | **One use per surface** — the score-ring fill on scan completion |
 
-- `ease-editorial` — tight cubic-bezier, short duration (~240ms). Default for entrances.
-- `ease-ledger` — slower, for signature moves (hero headline reveal).
-- `ease-dismiss` — near-instant for close/exit, keeps the UX snappy.
-- Never `ease-in-out` with long duration. That's the bouncy-trampoline feel we don't use.
+Never `ease-in-out` with long duration. Never spring physics. Never bounce.
 
 ## Duration tokens
 
-- `duration-instant` — ≤100ms, micro-interactions (hover, focus)
-- `duration-short` — 200–300ms, entrance of a single element
-- `duration-medium` — 400–600ms, choreographed sequence (stagger)
-- `duration-long` — 800ms+, signature moment (hero reveal). Rare.
+| Token | Range | Use |
+|---|---|---|
+| `--duration-instant` | ≤100ms | Hover, focus, ripple-equivalent |
+| `--duration-short` | 180–240ms | Entrance of a single element, state change |
+| `--duration-medium` | 300–400ms | Choreographed sequence (stagger across 3–5 items) |
+| `--duration-signature` | 500–700ms | Score-ring fill animation — the one signature motion |
 
-Reduced-motion variant halves the duration at most; often sets to 0ms.
+Reduced-motion variant: halves the duration at most; often sets to 0ms.
 
-## Choreography patterns
+## Choreography patterns (Flintmere-specific)
 
-### Homepage hero entrance
+### Scanner — URL submit → progress overlay
 
-- Compass watermark fades in first (`duration-short`).
-- Fraunces headline reveals (`duration-long`, `ease-ledger`).
-- `.paper-card-raised` connected-wallet panel slides up (`duration-short`, `ease-editorial`, 200ms delay).
-- Reduced motion: headline + panel appear instantly, no fade, no slide.
+- User submits URL → overlay fades in (`--duration-short`, `--ease-sharp`).
+- Progress log lines append one at a time (`--duration-instant` per line, stagger 120ms).
+- On completion → overlay fades out, results fade in below (`--duration-short`).
+- Reduced motion: overlay appears instantly; log lines render all at once; results swap instantly.
 
-### Ledger rule amber glow
+### Scanner — score reveal (the signature motion)
 
-- `.ledger-rule::after` animates an amber glow on scroll-into-view.
-- Not a distraction — a slow pulse, under `duration-medium`, 1s cycle, stopped after 2s.
-- Reduced motion: `animation: none`.
+- Score-ring's `conic-gradient` animates from 0% to target percentage.
+- Number counter counts up from 0 to final score, synchronised with the ring.
+- Easing: `--ease-signature`. Duration: `--duration-signature` (~600ms).
+- Reduced motion: ring renders at final percentage immediately; number renders at final value.
+- **This is the one signature motion per scanner view.** No second flourish anywhere else on the page.
 
-### Scroll reveals (feature rows)
+### Marketing — scroll reveals
 
-- Each row fades in + rises 8px when 40% visible.
-- Stagger 60ms between rows.
-- Reduced motion: rows visible immediately on mount.
+- Each section fades in + translates up 8px when 30% visible.
+- Stagger 80ms between sibling elements within a section.
+- Easing `--ease-sharp`, duration `--duration-short`.
+- Reduced motion: elements visible immediately on mount; no translate, no fade.
 
-### Testimonials carousel
+### Shopify app — state transitions
 
-- If a carousel exists: auto-advance pauses on hover, pauses on focus-within, and respects `prefers-reduced-motion` (no auto-advance at all under reduced).
+- Polaris owns most transitions (don't override).
+- Flintmere-island state changes (score update, pillar score change, issue resolution): cross-fade in `--duration-short`.
+- Queue progress bars update in `--duration-instant` on each poll — never animated over a long duration because real-time data needs to look real-time.
+- Reduced motion: instant swaps.
+
+### Bracket hover (if introduced)
+
+- **Deferred.** The bracket is static. Hover-state emphasis might emerge from user testing; defer motion until then. The brackets do their work through typography, not movement.
 
 ## Bans (non-negotiable)
 
 - No animation that moves more than 40px without a reduced-motion alternative.
 - No horizontal scroll-jacking (pinning a section while scroll scrubs content).
-- No infinite animations without a reduced-motion off-switch.
+- No parallax on any surface.
+- No infinite animations (ambient "breathing" UI, pulsing dots, spinning logos outside of genuine loading states).
 - No animating `width`, `height`, `top`, `left`. Use `transform` + `opacity`.
-- No spring physics that exceed one oscillation on entrance.
+- No spring physics exceeding one oscillation.
 - No autoplay video.
-- No parallax on mobile (noise-to-signal ratio too low on small viewports).
+- No motion under `prefers-reduced-motion` except instant transitions between end states.
+- No "demo mode" animations that play on the landing page just because the page loaded.
 
-## Specifying motion
+## Specifying new motion
 
 Every new motion ships with a `design-motion` spec that names:
 
-- What animates (element, property)
-- Timing (duration, delay, easing token)
-- Trigger (mount, scroll-into-view, hover, focus, keyboard activation)
-- Reduced-motion variant (explicit — not "same but faster")
-- Accessibility note (what the animation signals, whether a screen reader needs an alternative)
+- **What animates** — element, property
+- **Timing** — duration token, delay, easing token
+- **Trigger** — mount, scroll-into-view, hover, focus, keyboard activation, state change
+- **Reduced-motion variant** — explicit, not "same but faster"
+- **Accessibility note** — what the motion signals, whether an alternative is needed for screen readers
 
-Spec output → `context/design/motion/<slug>.md`. Engineering implements; this skill does not write CSS.
+Spec output lands in `context/design/motion/<slug>.md` (gitignored). Engineering implements.
 
-## How motion fails the council
+## How motion fails the Council
 
-- Idris rejects: wrong easing family, motion without purpose, too-long duration on a frequent interaction.
-- Noor VETOES: missing `prefers-reduced-motion` branch, focus ring hidden during animation, animation that hides content for >1s.
-- Thane rejects: motion that costs >2ms per frame on marketing pages, triggering layout thrash, running offscreen.
-- Sable rejects: motion that confuses task flow, adds latency to a primary action, or makes the surface feel "demo-y" rather than purposeful.
+- **Idris** rejects: wrong easing family, motion without purpose, too-long duration on a frequent interaction, motion that contradicts the "punctuation not content" principle.
+- **Noor (#8, veto)** — missing `prefers-reduced-motion` branch, focus ring hidden during animation, animation that hides content for >1s, motion triggering vestibular reactions.
+- **Thane (#17 Performance)** — motion that costs >2ms per frame, triggers layout thrash, runs offscreen, delays INP.
+- **Sable** — motion that confuses task flow, adds latency to a primary action, makes the surface feel "demo-y" rather than purposeful.
 
-## Canonical sources
+## Canon alignment
 
-- Motion details in `projects/allowanceguard/DESIGN.md`.
-- Easing / duration values in `docs/design-tokens-handbook.md` §11.
-- Existing motion in `src/app/globals.css` (search for `@keyframes`, `@media (prefers-reduced-motion`).
+This is a **quiet** motion vocabulary. Apple's marketing site uses less motion than, say, Linear or Stripe's product pages. Flintmere matches that posture. The bracket signature, the score-ring fill, the one-signature-per-surface rule — all mean motion should be rare and deliberate. When in doubt, static wins.
+
+## Sources
+
+- `tokens.md` — easing + duration token definitions (when apps scaffold)
+- `accessibility.md` — reduced-motion veto rules
+- `../../projects/flintmere/DESIGN.md` — surface-level motion constraints

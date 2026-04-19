@@ -1,103 +1,134 @@
 # accessibility.md
 
-Accessibility gates for every design surface. Noor holds a **VETO** — nothing that violates AA ships, and nothing that degrades keyboard / screen-reader / motion safety ships.
+Accessibility gates for every Flintmere surface. **Noor (#8, veto)** blocks any AA failure, any missing focus ring, any animation without a reduced-motion branch, any meaningful SVG without an accessible name, any colour-only signal.
 
-WCAG AA is a floor. It is not the goal. The goal is usable for every reader.
+WCAG AA is the floor. The goal is usable for every reader.
 
-## Contrast floors (Ledger)
+## Contrast floors (Flintmere canon — neutral-bold hybrid)
 
-See `tokens.md` for the full text token ladder. Short version:
+Tokens defined in `tokens.md`. Contrast table computed against the real palette:
 
-- Body copy on `paper`, `paper-sub`: `text-ink-muted` or darker (≥ AA).
-- Body copy on `paper-deep`: `text-ink-whisper` is the minimum (5.18:1).
-- Metadata (labels, footnotes, dotted-leader right-hand values): `text-ink-whisper` permitted.
-- Interactive elements (buttons, links): AA minimum; AAA preferred on primary CTAs.
-- Error / destructive: accent red that holds AA on its container.
-- Inverse block (oxblood CTABand): cream on oxblood; verified AA.
+### On `--paper` (`#F7F7F4`)
 
-## Contrast floors (Glass)
+| Text token | Hex | Contrast | Use |
+|---|---|---|---|
+| `--ink` | `#0A0A0B` | **19.1:1** | Body default, headings, bracket tokens |
+| `--ink-2` | `#141518` | **17.2:1** | Lede, card body after lede |
+| `--mute` | `#5A5C64` | **6.3:1** | Secondary body, pillar-row `.desc`, captions — **AA body-safe** |
+| `--mute-2` | `#8B8D95` | **3.5:1** | **Metadata only.** Eyebrows, mono labels, timestamps. Never body. Noor's floor. |
+| `--alert` | `#E54A2A` | 4.6:1 | Inline error text, P0 dot colour |
+| `--ok` | `#3F8F57` | 4.5:1 | Success states, resolved issues |
 
-- Canonical glass text tokens only. No custom low-contrast strings.
-- No text placed directly over unblurred imagery. If imagery is behind text, a scrim brings contrast to AA.
+### On `--paper-2` (`#EDECE6`)
+
+Slight drop from `--paper` — all tokens above still pass AA with margin except `--mute-2`, which drops to 3.2:1. Keep `--mute-2` off `--paper-2` surfaces.
+
+### On `--ink` (`#0A0A0B`) — inverted sections
+
+| Text token | Hex | Contrast | Use |
+|---|---|---|---|
+| `--paper` | `#F7F7F4` | 19.1:1 | Body + headings on dark sections |
+| `--mute-inv` | `#A8AAB2` | **7.4:1** | Secondary text on ink (body-safe) |
+| `--mute-2` | `#8B8D95` | 5.1:1 | Metadata on ink |
+| `--accent` sulphur | `#D9E05A` | **13.6:1** | Rare accent word, score-ring fill (tested AAA) |
+
+### On `--accent` (sulphur `#D9E05A`)
+
+Only `--ink` (`#0A0A0B`) renders on sulphur. Contrast 13.6:1 (AAA). Never white, never `--ink-3`, never `--mute*`.
 
 ## Keyboard
 
-- Every interactive element reachable by Tab in a logical order.
-- Every interactive element has a visible focus ring.
-- Focus ring not removed in animation or transition states.
-- Modal opens → focus moves to first focusable element inside; Esc closes and returns focus to trigger.
-- Skip-to-content link on long pages (docs, blog post).
+- Every interactive element reachable by `Tab` in a logical, left-to-right top-to-bottom order.
+- Every interactive element has a visible focus ring — 2px `--ink` outline with 2px offset on paper surfaces; 2px `--accent` outline on ink surfaces.
+- Focus ring not removed during animation, hover, or transition states.
+- Modal opens → focus moves to first focusable element inside; `Esc` closes and returns focus to trigger.
+- Skip-to-content link on long pages (blog, docs, full marketing home).
+- `Tab` order across the embedded Shopify app follows Polaris's expectations (Polaris handles most of this; Flintmere islands must not break it).
 
 ## Screen readers
 
-- Semantic HTML first. `<nav>`, `<main>`, `<article>`, `<aside>`, `<footer>` — used correctly, not as div substitutes.
-- Heading hierarchy: one `<h1>` per page, no skipping levels.
-- Landmarks labelled when multiple exist (`aria-label="Primary navigation"`, etc.).
-- Live regions (`aria-live`) used when content changes dynamically (toast, scan progress, rate-limit warning).
-- Decorative SVG: `aria-hidden="true"`. Meaningful SVG: `aria-label` or title.
-- Alt text on every image — literal for content images, empty (`alt=""`) for decorative.
+- Semantic HTML first. `<nav>`, `<main>`, `<article>`, `<aside>`, `<footer>` — used correctly, not as `<div>` substitutes.
+- One `<h1>` per page. No skipped heading levels.
+- Landmarks labelled when multiple exist (`aria-label="Primary navigation"`, `aria-label="Scan results"`).
+- Live regions (`aria-live="polite"`) for scan progress, rate-limit warnings, toast notifications.
+- Decorative SVG: `aria-hidden="true"`. Meaningful SVG: `role="img"` + `aria-label` or `<title>`.
+- Alt text on every image — literal for content, empty (`alt=""`) for decorative.
 - Icon-only buttons: `aria-label` mandatory.
+
+### The legibility bracket (signature) — screen reader rules
+
+The bracket `[ word ]` is a visual signature that must not become a screen-reader noise generator.
+
+- **On headings and body prose**: the brackets are part of the sentence. Screen readers announce `left bracket word right bracket`. Acceptable because the bracket adds meaning ("this token is what the agent would extract").
+- **On interactive elements (buttons, links, tabs)**: wrap brackets in `<span aria-hidden="true">[&nbsp;</span>` / `<span aria-hidden="true">&nbsp;]</span>` and provide a clean `aria-label` on the parent. E.g., `<button aria-label="Scan my store">Scan <span aria-hidden>[</span> my store <span aria-hidden>]</span></button>`.
+- **On eyebrows and micro-labels**: brackets may be decorative here — wrap the full bracket in `aria-hidden` if the bracketed word is redundant with surrounding content.
+- **Never bracket an entire CTA** — only the noun within it.
 
 ## Motion safety
 
-- `prefers-reduced-motion` honoured everywhere. See `motion.md` for the contract.
-- No flashing content (>3Hz) — ever.
-- Auto-advancing content (carousel) pauses on hover + focus.
-- Infinite animations have an off-switch under reduced motion.
+- `prefers-reduced-motion: reduce` honoured everywhere. See `motion.md` for the explicit contract.
+- No flashing content (>3Hz) ever.
+- Auto-advancing content pauses on hover + focus. Under reduced motion, no auto-advance at all.
+- Infinite animations have an off-switch under reduced motion. Flintmere avoids them entirely by preference.
 
 ## Forms
 
-- Every input has a label. Placeholder is not a label.
-- Errors: announced via `aria-live="polite"` when they appear.
-- Required fields marked with both `aria-required` and a visual indicator (asterisk is fine; colour alone is not).
-- Error messages tied to the input with `aria-describedby`.
-- Submit button text is a verb (Subscribe, Save, Delete) — never "Click here", never "Submit" alone.
+- Every input has a label. `<label>` or `aria-label`. Placeholder is never a label.
+- Errors announced via `aria-live="polite"` when they appear.
+- Required fields marked with `aria-required` and a visible indicator (asterisk or "required" text). Colour alone is not.
+- Error messages tied to inputs via `aria-describedby`.
+- Submit button text is a verb: "Scan my store", "Send the report", "Apply fix". Never "Click here" or bare "Submit".
 
 ## Colour + meaning
 
-- No colour-only signalling. Every colour-coded signal has a second cue (icon, label, pattern).
-- Risk badges (`RiskBadge`) pair colour with a symbol and a text label.
-- Status dots pair colour with a label tooltip or adjacent text.
+- No colour-only signalling. Every colour-coded signal has a second cue (icon, label, pattern, shape).
+- Severity dots on issue lists pair colour with the text label adjacent ("Critical", "High", "Medium").
+- Pillar progress bars pair colour with numeric percentage and status label.
+- Status pills pair colour with uppercase text.
 
 ## Links + buttons
 
 - Descriptive text. "Read the report" over "click here". "Cancel subscription" over "continue".
-- Destination clear from the link text alone, no context required.
-- Buttons are `<button>`. Links are `<a>`. No `role="button"` on a `<div>`.
+- Destination clear from link text alone.
+- Buttons are `<button>`. Links are `<a>`. No `role="button"` on a `<div>`. No anchor without `href`.
 
 ## Zoom + reflow
 
 - Supports 200% zoom without horizontal scroll on primary content.
-- Supports text-only zoom (browser text-size) without breaking layout.
-- Mobile reflow: 320px wide as the floor.
+- Supports browser text-size zoom without breaking layout.
+- Mobile reflow floor: 320px wide.
+- The Shopify app embeds inside an iframe; verify the app's own reflow inside Shopify admin's iframe sizing.
 
-## Specific AG surfaces
+## Specific Flintmere surfaces
 
-- **Hero**: compass SVG watermark is decorative (`aria-hidden`); headline gets the `<h1>`.
-- **CTABand**: protected crimson accent word stays inside a span that still meets AA. Its semantics are visual, not structural — no role.
-- **ChainLogoCarousel**: under `prefers-reduced-motion`, auto-scroll halts; logos visible as a static row.
-- **Modal**: focus trap tested on every new modal. Escape key closes.
-- **Forms (subscribe, signup, Turnstile)**: labels explicit; Turnstile iframe is announced by its wrapper.
+- **Scanner hero** — the bracketed word in the H1 is announced (`aria-hidden` not used on prose). `StatNumber` components (15×, 40%) use `aria-label` with descriptive text: "15 times year-over-year growth."
+- **Score ring** — `role="img"` with `aria-label="AI-readiness score: 64 out of 100, grade C"`. Decorative conic-gradient hidden.
+- **Pillar cards (locked state)** — locked cards have `aria-disabled="true"` and an `aria-describedby` pointing at the "Install to unlock" explanation.
+- **Email gate** — form inputs labelled; success state announced via live region; newsletter-style consent language explicit (see `memory/marketing/brand.md` when it exists).
+- **Fix preview modal** — focus trap tested. Before/after diff legible with screen reader (each change announced in `role="region"` with `aria-label="Proposed change N of 5"`).
+- **Channel Health widget** — numeric metrics with `aria-label` giving context ("142 AI-agent clicks in the last 30 days, up from 108").
+- **Polaris chrome in the Shopify app** — inherit Polaris's a11y. Flintmere island overrides (the score card + pillar grid + Channel Health) must match or exceed Polaris's floor.
 
-## How accessibility fails the council
+## How accessibility fails the Council
 
-- Noor VETOES: any AA contrast failure, any missing focus ring, any animation without a reduced-motion branch, any meaningful SVG without accessible name, any colour-only signal.
-- Sable rejects: keyboard path that requires memorising non-standard order, focus ring that isn't visible.
-- Maren rejects: text-over-image without scrim, overlapping content at 200% zoom.
+- **Noor (#8, veto)** — any AA contrast failure, missing focus ring, missing reduced-motion branch, meaningful SVG without accessible name, colour-only signal, broken semantic structure.
+- **#13 UX writer** — unclear button labels, inaccessible error messages, microcopy that confuses screen-reader output.
+- **#17 Performance** — animations causing layout thrash, animations running offscreen, animations that delay INP.
 
-## How to check before ship
+## Pre-ship checklist (every surface)
 
-1. Keyboard-only pass. Tab through the surface. Every action reachable? Focus visible?
-2. Screen-reader pass. VoiceOver / NVDA. Does the page read in order? Are interactive elements announced?
-3. Contrast pass. Verify tokens against the ladder in `tokens.md`. Any custom colours? Reject them or run through `design-token`.
-4. Reduced-motion pass. Enable `prefers-reduced-motion` in devtools. Surface still functional?
-5. Zoom pass. 200% browser zoom. No horizontal scroll on primary content?
+1. **Keyboard-only pass.** `Tab` through the surface. Every action reachable? Focus visible? Modal traps + returns focus correctly?
+2. **Screen-reader pass.** VoiceOver (macOS) or NVDA (Windows). Does the page read in order? Are interactive elements announced?
+3. **Contrast pass.** Every text token verified against the ladder above. Any ad-hoc hex? Reject or route through `design-token`.
+4. **Reduced-motion pass.** Enable in devtools. Surface still functional? End states visible?
+5. **Zoom pass.** 200% browser zoom. No horizontal scroll on primary content.
+6. **Bracket-announce pass.** If the surface uses bracket tokens on interactive elements, verify screen reader announces a clean label without bracket noise.
 
-If any check fails, Noor blocks emit.
+Any failure, Noor blocks emit.
 
-## Canonical sources
+## Sources
 
-- `projects/allowanceguard/DESIGN.md` — AA rules, Noor's veto authority.
-- `tokens.md` — contrast floors.
-- `src/components/ui/*` — primitives with built-in a11y (Modal focus trap, Alert `aria-live`).
-- `src/components/TurnstileWidget.tsx` — accessible widget wrapper pattern.
+- `tokens.md` — palette + contrast ladder (authoritative)
+- `motion.md` — reduced-motion contract
+- `components.md` — primitive-level a11y specs
+- `../../projects/flintmere/DESIGN.md` — three-surface island rules
