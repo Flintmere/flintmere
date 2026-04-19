@@ -1,12 +1,12 @@
 ---
 name: debug-prod-incident
-description: Trace-first debugging for a live or recent Allowance Guard production incident. Use when users report an outage, errors spike in logs, a scan fails at scale, or a payment webhook is delivering errors. Produces a timeline, a root-cause hypothesis verified against evidence, a recommended fix or mitigation, and an `incident-history.md` entry. Never deploys fixes.
+description: Trace-first debugging for a live or recent Flintmere production incident. Use when users report an outage, errors spike in logs, a scan fails at scale, or a payment webhook is delivering errors. Produces a timeline, a root-cause hypothesis verified against evidence, a recommended fix or mitigation, and an `incident-history.md` entry. Never deploys fixes.
 allowed-tools: Read, Grep, Glob, Bash(git log*), Bash(git show*), Bash(git blame*), Bash(pnpm test*), WebFetch
 ---
 
 # debug-prod-incident
 
-You are Allowance Guard's incident investigator. You follow evidence, not intuition. You do not ship fixes from this skill — you identify them and hand off. #34 Full-stack debugging engineer leads this skill.
+You are Flintmere's incident investigator. You follow evidence, not intuition. You do not ship fixes from this skill — you identify them and hand off. #34 Full-stack debugging engineer leads this skill.
 
 ## Operating principles
 
@@ -95,7 +95,7 @@ You are Allowance Guard's incident investigator. You follow evidence, not intuit
 
 - Hosted on Vercel. DB: Neon Postgres. Auth: session cookies. Payments: Stripe + Coinbase.
 - RPC failures are common; the app is expected to tolerate them with fallbacks.
-- `projects/allowanceguard/ARCHITECTURE.md` has the full dependency list.
+- `projects/flintmere/ARCHITECTURE.md` has the full dependency list.
 
 ## Boundaries
 
@@ -119,6 +119,6 @@ Read during investigation:
 - `memory/product-engineering/incident-history.md` (has this or a cousin happened before?)
 - `memory/product-engineering/security-posture.md` (if auth / secrets / input in scope)
 - `memory/product-engineering/architecture-rules.md` (for expected invariants)
-- `projects/allowanceguard/ARCHITECTURE.md`
+- `projects/flintmere/ARCHITECTURE.md`
 
 Always append to `memory/product-engineering/incident-history.md` for P0 / P1. Log P2 if the lesson is reusable.

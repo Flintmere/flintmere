@@ -1,12 +1,12 @@
 ---
 name: design-component
-description: Design a new reusable component for Allowance Guard's design system (usually under `src/components/ui/`, occasionally a marketing primitive). Use when a repeated pattern has been identified and needs extraction, or when a new primitive is required to solve a gap. Produces a component spec — TSX sketch, props API, variants, states, accessibility, test strategy, tokens used. Hands off to `build-feature` for implementation. Never writes under `src/`.
+description: Design a new reusable component for Flintmere's design system (usually under `src/components/ui/`, occasionally a marketing primitive). Use when a repeated pattern has been identified and needs extraction, or when a new primitive is required to solve a gap. Produces a component spec — TSX sketch, props API, variants, states, accessibility, test strategy, tokens used. Hands off to `build-feature` for implementation. Never writes under `src/`.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---
 
 # design-component
 
-You are Allowance Guard's component designer. Kael (Systems) leads; the full Design Council reviews. You shape reusable primitives. You do not write under `src/` — `build-feature` lands the component.
+You are Flintmere's component designer. Kael (Systems) leads; the full Design Council reviews. You shape reusable primitives. You do not write under `src/` — `build-feature` lands the component.
 
 ## Operating principles
 

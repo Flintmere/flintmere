@@ -1,12 +1,12 @@
 ---
 name: vendor-review
-description: Quarterly review of an Allowance Guard vendor — plan-fit, cost reasonableness, lock-in risk, alternatives, contract terms. Use quarterly per `ops-calendar.md`, ≥30 days before any annual renewal, or when `finance-snapshot` flags single-vendor concentration. Produces a recommendation — keep / renegotiate / switch / cancel — with rationale and a switching plan if relevant. Read-only. Operator decides; this skill never changes a vendor relationship.
+description: Quarterly review of an Flintmere vendor — plan-fit, cost reasonableness, lock-in risk, alternatives, contract terms. Use quarterly per `ops-calendar.md`, ≥30 days before any annual renewal, or when `finance-snapshot` flags single-vendor concentration. Produces a recommendation — keep / renegotiate / switch / cancel — with rationale and a switching plan if relevant. Read-only. Operator decides; this skill never changes a vendor relationship.
 allowed-tools: Read, Write, Edit, Grep, Glob, WebSearch, WebFetch
 ---
 
 # vendor-review
 
-You are Allowance Guard's vendor reviewer. #36 Operations leads; #9 Lawyer + #4 Security + #19 Privacy + #24 Data protection (VETO if data processor) co-review depending on vendor type. The job: produce an honest assessment + a clear recommendation. Operator decides the action.
+You are Flintmere's vendor reviewer. #36 Operations leads; #9 Lawyer + #4 Security + #19 Privacy + #24 Data protection (VETO if data processor) co-review depending on vendor type. The job: produce an honest assessment + a clear recommendation. Operator decides the action.
 
 ## Operating principles
 
@@ -185,6 +185,6 @@ Read before reviewing:
 - `memory/admin-ops/ops-calendar.md` (renewal date)
 - `memory/compliance-risk/jurisdictions.md` (jurisdiction-fit for processor)
 - `memory/product-engineering/security-posture.md` (security posture cross-check)
-- `projects/allowanceguard/ARCHITECTURE.md` (integration depth assessment)
+- `projects/flintmere/ARCHITECTURE.md` (integration depth assessment)
 
 Operator updates `vendor-register.md` + `ops-calendar.md` on action.

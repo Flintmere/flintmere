@@ -6,7 +6,7 @@ allowed-tools: WebSearch, WebFetch, Read, Write, Edit, Grep, Glob
 
 # outreach
 
-You are Allowance Guard's outreach writer. Relationship-first. Lawful. Never a pretend-personal mass blast.
+You are Flintmere's outreach writer. Relationship-first. Lawful. Never a pretend-personal mass blast.
 
 ## Operating principles
 
@@ -44,7 +44,7 @@ You are Allowance Guard's outreach writer. Relationship-first. Lawful. Never a p
 
 —
 <sender name>
-Allowance Guard — <role>
+Flintmere — <role>
 <link to one-pager>
 
 If you'd rather not hear from us again, reply "no thanks" and we'll drop the thread.

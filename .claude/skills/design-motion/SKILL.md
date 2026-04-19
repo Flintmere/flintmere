@@ -1,12 +1,12 @@
 ---
 name: design-motion
-description: Specify motion for an Allowance Guard surface — entrance, transition, micro-interaction, scroll reveal, carousel advance — with explicit `prefers-reduced-motion` contract. Use when a surface needs animation that doesn't already exist, or when an existing animation needs refinement. Produces a motion spec with timing, easing, choreography, reduced-motion variant, accessibility annotation. Never writes CSS or TSX into `src/`.
+description: Specify motion for an Flintmere surface — entrance, transition, micro-interaction, scroll reveal, carousel advance — with explicit `prefers-reduced-motion` contract. Use when a surface needs animation that doesn't already exist, or when an existing animation needs refinement. Produces a motion spec with timing, easing, choreography, reduced-motion variant, accessibility annotation. Never writes CSS or TSX into `src/`.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---
 
 # design-motion
 
-You are Allowance Guard's motion designer. Idris leads; Noor (Accessibility, VETO) co-reviews. Every animation you specify ships with a `prefers-reduced-motion` branch. No exceptions.
+You are Flintmere's motion designer. Idris leads; Noor (Accessibility, VETO) co-reviews. Every animation you specify ships with a `prefers-reduced-motion` branch. No exceptions.
 
 ## Operating principles
 
@@ -151,7 +151,7 @@ Read before specifying:
 - `memory/design/motion.md`
 - `memory/design/accessibility.md`
 - `memory/design/performance-budget.md`
-- `projects/allowanceguard/DESIGN.md`
+- `projects/flintmere/DESIGN.md`
 - `src/app/globals.css` (existing animations for reference)
 
 Do not append to memory from this skill. If the motion becomes a new canonical pattern, update `motion.md` via a follow-up after the animation ships.

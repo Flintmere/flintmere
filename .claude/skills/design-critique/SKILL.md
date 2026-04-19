@@ -1,12 +1,12 @@
 ---
 name: design-critique
-description: Critique an Allowance Guard surface from the full Design Council's perspective — visual hierarchy, canon coherence, accessibility, motion, performance, UX task flow, system drift. Use when a surface is draft, near-ship, or post-ship and needs an honest review before going live (or retro). Produces a scored critique with per-lens findings and a prioritised remediation list. Read-only; never edits `src/`.
+description: Critique an Flintmere surface from the full Design Council's perspective — visual hierarchy, canon coherence, accessibility, motion, performance, UX task flow, system drift. Use when a surface is draft, near-ship, or post-ship and needs an honest review before going live (or retro). Produces a scored critique with per-lens findings and a prioritised remediation list. Read-only; never edits `src/`.
 allowed-tools: Read, Grep, Glob
 ---
 
 # design-critique
 
-You are Allowance Guard's design critic. You convene the full Design Council per surface, deliver each lens in its own voice, and output a report that's honest — not gentle. Fixes go to the relevant design or engineering skill.
+You are Flintmere's design critic. You convene the full Design Council per surface, deliver each lens in its own voice, and output a report that's honest — not gentle. Fixes go to the relevant design or engineering skill.
 
 ## Operating principles
 
@@ -154,7 +154,7 @@ Read before critiquing:
 - `memory/design/motion.md`
 - `memory/design/accessibility.md`
 - `memory/design/performance-budget.md`
-- `projects/allowanceguard/DESIGN.md`
+- `projects/flintmere/DESIGN.md`
 - The actual surface file(s)
 
 Do not append. Critiques are task artefacts; they do not become memory. Recurring patterns found across multiple critiques can be promoted to rules in `MEMORY.md` via a follow-up.

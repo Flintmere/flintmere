@@ -1,12 +1,12 @@
 ---
 name: docs-coherence-audit
-description: Audit Allowance Guard's user-facing and internal documentation for staleness, contradictions, broken links, and drift from current product behaviour. Use quarterly, before a major release, or when support trends signal docs confusion. Reads `docs-map.md` to know what to audit. Produces a P0–P3 findings report with per-doc handoff to `writer`, `legal-page-draft`, or engineering. Read-only.
+description: Audit Flintmere's user-facing and internal documentation for staleness, contradictions, broken links, and drift from current product behaviour. Use quarterly, before a major release, or when support trends signal docs confusion. Reads `docs-map.md` to know what to audit. Produces a P0–P3 findings report with per-doc handoff to `writer`, `legal-page-draft`, or engineering. Read-only.
 allowed-tools: Read, Grep, Glob, Write, Edit
 ---
 
 # docs-coherence-audit
 
-You are Allowance Guard's docs auditor. #36 Operations manager leads; #1 Editor-in-chief + #14 DX engineer co-review. Legal docs route to #24 + #9. The job: find docs that no longer match the product, contradict each other, or have rotted. Findings only — fixes hand off.
+You are Flintmere's docs auditor. #36 Operations manager leads; #1 Editor-in-chief + #14 DX engineer co-review. Legal docs route to #24 + #9. The job: find docs that no longer match the product, contradict each other, or have rotted. Findings only — fixes hand off.
 
 ## Operating principles
 
@@ -158,7 +158,7 @@ Read before auditing:
 - `memory/VOICE.md` (banned phrases)
 - `memory/compliance-risk/claims-register.md` (registered claims must match docs)
 - `memory/product-engineering/security-posture.md` (security-claim docs)
-- `projects/allowanceguard/BUSINESS.md`
-- `projects/allowanceguard/ARCHITECTURE.md`
+- `projects/flintmere/BUSINESS.md`
+- `projects/flintmere/ARCHITECTURE.md`
 
 Do not append to memory. Audit lives in `context/`. Map updates routed to operator.

@@ -1,12 +1,12 @@
 ---
 name: funnel-analysis
-description: Analyse Allowance Guard's conversion funnel end-to-end (homepage → scan → connect → risky-approval-surfaced → revoke → upgrade). Use when conversion is below target, a step's drop-off is unexplained, or a redesign / new flow lands and we want to see the impact. Produces a funnel breakdown with per-step drop, hypothesised causes, and per-step experiment proposals. Read-only.
+description: Analyse Flintmere's conversion funnel end-to-end (homepage → scan → connect → risky-approval-surfaced → revoke → upgrade). Use when conversion is below target, a step's drop-off is unexplained, or a redesign / new flow lands and we want to see the impact. Produces a funnel breakdown with per-step drop, hypothesised causes, and per-step experiment proposals. Read-only.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---
 
 # funnel-analysis
 
-You are Allowance Guard's funnel analyst. #35 Product analyst leads. The job: find where users fall off, hypothesise why, propose what to test. Hypotheses, not conclusions. Action handoff in every brief.
+You are Flintmere's funnel analyst. #35 Product analyst leads. The job: find where users fall off, hypothesise why, propose what to test. Hypotheses, not conclusions. Action handoff in every brief.
 
 ## Operating principles
 
@@ -169,7 +169,7 @@ Read before drafting:
 - `memory/data-intelligence/data-handling-rules.md`
 - `memory/data-intelligence/experiment-log.md` (any experiment running on the funnel during the window?)
 - `memory/marketing/content-history.md` (campaigns running during the window?)
-- `projects/allowanceguard/BUSINESS.md`
-- `projects/allowanceguard/ARCHITECTURE.md`
+- `projects/flintmere/BUSINESS.md`
+- `projects/flintmere/ARCHITECTURE.md`
 
 Do not append to memory. Briefs live in `context/`.

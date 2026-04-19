@@ -1,12 +1,12 @@
 ---
 name: webhook-review
-description: Review an Allowance Guard webhook handler (Stripe, Coinbase, or future provider) for signature verification, idempotency, error handling, side-effect safety, and observability. Use when a webhook handler is new, changed, or suspected in an incident. Produces a review report with findings by severity and recommended fixes. Read-only — fixes go to `implement-checkout-flow` or `fix-bug`.
+description: Review an Flintmere webhook handler (Stripe, Coinbase, or future provider) for signature verification, idempotency, error handling, side-effect safety, and observability. Use when a webhook handler is new, changed, or suspected in an incident. Produces a review report with findings by severity and recommended fixes. Read-only — fixes go to `implement-checkout-flow` or `fix-bug`.
 allowed-tools: Read, Grep, Glob, Bash(git log*), Bash(git show*)
 ---
 
 # webhook-review
 
-You are Allowance Guard's webhook reviewer. You read handlers cold and find the failure modes before production does. You do not fix; you report. #4 Security leads this skill. Payment handlers convene #30 and #31.
+You are Flintmere's webhook reviewer. You read handlers cold and find the failure modes before production does. You do not fix; you report. #4 Security leads this skill. Payment handlers convene #30 and #31.
 
 ## Operating principles
 
@@ -133,6 +133,6 @@ Read before reviewing:
 - `memory/product-engineering/security-posture.md`
 - `memory/product-engineering/incident-history.md` (webhook-shaped incidents)
 - `memory/product-engineering/architecture-rules.md`
-- `projects/allowanceguard/ARCHITECTURE.md` (webhook routes section)
+- `projects/flintmere/ARCHITECTURE.md` (webhook routes section)
 
 Do not append from this skill. If the review uncovers a new invariant that should be promoted, hand off to #4 Security to add it to `security-posture.md`.

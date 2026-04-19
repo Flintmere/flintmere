@@ -1,12 +1,12 @@
 ---
 name: integration-proposal
-description: Draft an outbound integration proposal for Allowance Guard — into wallets (MetaMask Snap, Rabby panel, Phantom deep link), protocols (DEX / lending / aggregator embedded scan), security tools (collaboration / data share), or developer platforms (API tier, SDK). Use when a target has been identified, their technical constraints are reasonable, and mutual value is plausible. Produces a proposal doc with technical shape, commercial shape, and AG-side effort estimate. Never sends.
+description: Draft an outbound integration proposal for Flintmere — into wallets (MetaMask Snap, Rabby panel, Phantom deep link), protocols (DEX / lending / aggregator embedded scan), security tools (collaboration / data share), or developer platforms (API tier, SDK). Use when a target has been identified, their technical constraints are reasonable, and mutual value is plausible. Produces a proposal doc with technical shape, commercial shape, and AG-side effort estimate. Never sends.
 allowed-tools: Read, Write, Edit, Grep, Glob, WebSearch, WebFetch
 ---
 
 # integration-proposal
 
-You are Allowance Guard's integration proposer. #6 B2B / API economy leads; #12 Ecosystem + #4 Security + #9 Lawyer co-review. Every proposal runs through `claim-review` before the user sends.
+You are Flintmere's integration proposer. #6 B2B / API economy leads; #12 Ecosystem + #4 Security + #9 Lawyer co-review. Every proposal runs through `claim-review` before the user sends.
 
 ## Operating principles
 
@@ -79,7 +79,7 @@ You are Allowance Guard's integration proposer. #6 B2B / API economy leads; #12 
 **5. Opt-out.** <clear line the partner can use to disengage>
 
 — <sender name>
-Allowance Guard
+Flintmere
 
 ## Effort estimate
 | Side | Rough effort | Owner | Unknowns |
@@ -135,7 +135,7 @@ Allowance Guard
 
 ## Product truth
 
-- AG API: canonical in `projects/allowanceguard/ARCHITECTURE.md`. Verify endpoints before citing.
+- AG API: canonical in `projects/flintmere/ARCHITECTURE.md`. Verify endpoints before citing.
 - SDK packages: `packages/client/` + `packages/react/` (verify paths + names in-repo).
 - Tier structure: Pro $9.99 / Sentinel $49.99 / API Developer $39 / API Growth $149 (`BUSINESS.md:49-54`).
 - 27 chains — `BUSINESS.md:22`.
@@ -170,7 +170,7 @@ Read before drafting:
 - `memory/compliance-risk/claims-register.md`
 - `memory/compliance-risk/jurisdictions.md`
 - `memory/product-engineering/security-posture.md` (if security-adjacent integration)
-- `projects/allowanceguard/ARCHITECTURE.md`
-- `projects/allowanceguard/BUSINESS.md`
+- `projects/flintmere/ARCHITECTURE.md`
+- `projects/flintmere/BUSINESS.md`
 
 Append to `partnerships-history.md` at every status change.

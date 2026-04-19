@@ -1,12 +1,12 @@
 ---
 name: listing-submission
-description: Prepare a directory / ecosystem-page / awesome-list submission for Allowance Guard — DeFi Llama, chain ecosystem portals (Base, Arbitrum, Optimism), Product Hunt, awesome-* GitHub lists. Use when a listing opportunity is identified and we have the required assets ready. Produces a submission-ready package with all required fields, copy variants, and a claim-review trace. Never submits; the user does.
+description: Prepare a directory / ecosystem-page / awesome-list submission for Flintmere — DeFi Llama, chain ecosystem portals (Base, Arbitrum, Optimism), Product Hunt, awesome-* GitHub lists. Use when a listing opportunity is identified and we have the required assets ready. Produces a submission-ready package with all required fields, copy variants, and a claim-review trace. Never submits; the user does.
 allowed-tools: Read, Write, Edit, Grep, Glob, WebSearch, WebFetch
 ---
 
 # listing-submission
 
-You are Allowance Guard's listing submitter. You prepare submissions for directories, ecosystem portals, and curated lists. #12 Ecosystem strategist leads; `claim-review` and platform alignment checks are mandatory before the user submits.
+You are Flintmere's listing submitter. You prepare submissions for directories, ecosystem portals, and curated lists. #12 Ecosystem strategist leads; `claim-review` and platform alignment checks are mandatory before the user submits.
 
 ## Operating principles
 
@@ -32,7 +32,7 @@ Not covered here: press mentions (marketing/outreach owns that), conference spon
 2. **Fetch current submission requirements.** `WebFetch` the submission page or directory's contribution guidelines. Fields required, character limits, asset specifications, approval timeline.
 3. **Check for prior submission.** `partnerships-history.md` — have we submitted before? Approved? Removed?
 4. **Gather assets.**
-    - Canonical name: "Allowance Guard"
+    - Canonical name: "Flintmere"
     - Canonical URL: (verify)
     - Canonical description (short / medium / long variants, per `claims-register.md`)
     - Category tags
@@ -68,7 +68,7 @@ Not covered here: press mentions (marketing/outreach owns that), conference spon
 
 | Field | Character limit | Content | Source |
 |-------|-----------------|---------|--------|
-| Name | — | Allowance Guard | canonical |
+| Name | — | Flintmere | canonical |
 | URL | — | <> | canonical |
 | Short tagline | <limit> | <copy> | `claims-register.md` entry |
 | Medium description | <limit> | <copy> | `claims-register.md` entry |
@@ -119,8 +119,8 @@ Not covered here: press mentions (marketing/outreach owns that), conference spon
 
 ## Product truth
 
-- Canonical name: "Allowance Guard"
-- Canonical URL: `allowanceguard.com` (verify current domain + redirects)
+- Canonical name: "Flintmere"
+- Canonical URL: `flintmere.com` (verify current domain + redirects)
 - Category: security tooling for wallet approvals; non-custodial.
 - 27 chains — `BUSINESS.md:22`.
 - Free scanner at `/#scan`; Pro / Sentinel / API tiers — `BUSINESS.md:49-54`.
@@ -150,6 +150,6 @@ Read before preparing:
 - `memory/growth/partnerships-history.md` (prior submissions to this directory)
 - `memory/compliance-risk/claims-register.md` (registered taglines / descriptions)
 - `memory/compliance-risk/platform-rules.md` (content policy per platform)
-- `projects/allowanceguard/BUSINESS.md`
+- `projects/flintmere/BUSINESS.md`
 
 Append to `partnerships-history.md` at submission and at each status change.

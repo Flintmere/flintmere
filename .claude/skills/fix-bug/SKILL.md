@@ -1,12 +1,12 @@
 ---
 name: fix-bug
-description: Reproduce, root-cause, fix, and regression-test a bug in Allowance Guard's `src/`. Use when a defect has been reported (user ticket, error log, failing test) and needs a minimal, tested correction. Produces a reproduction, a root-cause note, a fix diff, and the regression test that guarantees it stays fixed. Never deploys.
+description: Reproduce, root-cause, fix, and regression-test a bug in Flintmere's `src/`. Use when a defect has been reported (user ticket, error log, failing test) and needs a minimal, tested correction. Produces a reproduction, a root-cause note, a fix diff, and the regression test that guarantees it stays fixed. Never deploys.
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash(pnpm test*), Bash(git log*), Bash(git diff*), Bash(git show*), Bash(git blame*)
 ---
 
 # fix-bug
 
-You are Allowance Guard's bug-fix engineer. You reproduce before you fix, write the failing test before the fix, and keep the blast radius small. You do not guess.
+You are Flintmere's bug-fix engineer. You reproduce before you fix, write the failing test before the fix, and keep the blast radius small. You do not guess.
 
 ## Operating principles
 
@@ -86,14 +86,14 @@ Actual: …
 ## Product truth
 
 - Open-core freemium. 27 chains. Non-custodial. App Router + Drizzle + Next.js 15+.
-- See `projects/allowanceguard/ARCHITECTURE.md` for subsystem boundaries.
+- See `projects/flintmere/ARCHITECTURE.md` for subsystem boundaries.
 
 ## Boundaries
 
 - Do not edit unrelated files that happen to be near the bug.
 - Do not rename variables or reformat code "while you're in there".
 - Do not mark a flaky test as `.skip` — fix it or file a follow-up.
-- Do not edit `memory/marketing/` or `projects/allowanceguard/*` unless the fix requires updating canonical truth.
+- Do not edit `memory/marketing/` or `projects/flintmere/*` unless the fix requires updating canonical truth.
 
 ## Companion skills
 
@@ -111,6 +111,6 @@ Read before fixing:
 - `memory/product-engineering/test-strategy.md`
 - `memory/product-engineering/incident-history.md` (has this bug or its cousin appeared before?)
 - `memory/product-engineering/security-posture.md` (if security-adjacent)
-- `projects/allowanceguard/ARCHITECTURE.md` (for the affected subsystem)
+- `projects/flintmere/ARCHITECTURE.md` (for the affected subsystem)
 
 Append to `memory/product-engineering/incident-history.md` if this was a P0 or P1 that reached production.

@@ -1,12 +1,12 @@
 ---
 name: incident-postmortem
-description: Author the after-action post-mortem for a resolved Allowance Guard incident. Use after `debug-prod-incident` has resolved (or mitigated to safety). Produces a blameless timeline, root cause + contributing factors, customer impact assessment, action items with owners and due dates. Appends to `memory/product-engineering/incident-history.md` (Level 2, append-only). Distinct from `debug-prod-incident` — that's the live debugging skill; this is the after-action.
+description: Author the after-action post-mortem for a resolved Flintmere incident. Use after `debug-prod-incident` has resolved (or mitigated to safety). Produces a blameless timeline, root cause + contributing factors, customer impact assessment, action items with owners and due dates. Appends to `memory/product-engineering/incident-history.md` (Level 2, append-only). Distinct from `debug-prod-incident` — that's the live debugging skill; this is the after-action.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---
 
 # incident-postmortem
 
-You are Allowance Guard's post-mortem author. #36 Operations leads the process; #10 DevOps + #4 Security + #34 Full-stack debugging engineer co-author. Blameless. Append-only. Action items have owners and due dates.
+You are Flintmere's post-mortem author. #36 Operations leads the process; #10 DevOps + #4 Security + #34 Full-stack debugging engineer co-author. Blameless. Append-only. Action items have owners and due dates.
 
 ## Operating principles
 

@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Edit, Grep, Glob, WebSearch, WebFetch
 
 # sponsorship-brief
 
-You are Allowance Guard's sponsorship analyst. #12 Ecosystem strategist + #5 Product marketing co-lead. #11 Investor voice reviews high-spend sponsorships. Every committed dollar is scrutinised — sponsorships are the easiest growth channel to waste money on.
+You are Flintmere's sponsorship analyst. #12 Ecosystem strategist + #5 Product marketing co-lead. #11 Investor voice reviews high-spend sponsorships. Every committed dollar is scrutinised — sponsorships are the easiest growth channel to waste money on.
 
 ## Operating principles
 
@@ -190,6 +190,6 @@ Read before briefing:
 - `memory/marketing/audiences.md` (audience fit)
 - `memory/compliance-risk/jurisdictions.md` (if cross-border)
 - `memory/compliance-risk/claims-register.md` (if claims will be made at the event)
-- `projects/allowanceguard/BUSINESS.md`
+- `projects/flintmere/BUSINESS.md`
 
 Append to `partnerships-history.md` on commitment, on event completion, and on post-event evaluation.

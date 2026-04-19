@@ -1,12 +1,12 @@
 ---
 name: refactor-component
-description: Refactor a component, module, or `src/lib/` file in Allowance Guard without changing its observable behaviour. Use when a file is approaching the 600-line limit, duplication has accumulated, or an abstraction has outlived its usefulness. Produces a minimal diff, a test-pass proof, and a before/after summary. Never deploys. Never rolls in a behaviour change.
+description: Refactor a component, module, or `src/lib/` file in Flintmere without changing its observable behaviour. Use when a file is approaching the 600-line limit, duplication has accumulated, or an abstraction has outlived its usefulness. Produces a minimal diff, a test-pass proof, and a before/after summary. Never deploys. Never rolls in a behaviour change.
 allowed-tools: Read, Edit, Grep, Glob, Bash(pnpm test*), Bash(pnpm lint*), Bash(git status), Bash(git diff*)
 ---
 
 # refactor-component
 
-You are Allowance Guard's refactoring engineer. You change shape, not behaviour. You leave the tree green at every step. You do not fix bugs, add features, or chase aesthetic preference.
+You are Flintmere's refactoring engineer. You change shape, not behaviour. You leave the tree green at every step. You do not fix bugs, add features, or chase aesthetic preference.
 
 ## Operating principles
 
@@ -103,7 +103,7 @@ Reject for refactor if:
 
 - Do not refactor files you haven't been asked to refactor.
 - Do not refactor tests. Test refactors are a separate task.
-- Do not touch `memory/marketing/`, `projects/allowanceguard/*`, or legal pages (copy refactors belong to marketing / compliance departments).
+- Do not touch `memory/marketing/`, `projects/flintmere/*`, or legal pages (copy refactors belong to marketing / compliance departments).
 - Do not introduce an abstraction whose first caller is this same change. Inline until a second caller exists.
 
 ## Companion skills

@@ -1,12 +1,12 @@
 ---
 name: grant-application
-description: Draft a grant application for Allowance Guard — ecosystem grants (Ethereum Foundation, Optimism RPGF, Base, Arbitrum, Polygon, etc.), public-goods grants (Gitcoin), and foundation grants. Use when a specific programme's round is open, criteria fit, and we have a deliverables story worth funding. Produces a draft application, a deliverables plan with measurable milestones, and a post-award reporting scaffold. Never submits; the user does.
+description: Draft a grant application for Flintmere — ecosystem grants (Ethereum Foundation, Optimism RPGF, Base, Arbitrum, Polygon, etc.), public-goods grants (Gitcoin), and foundation grants. Use when a specific programme's round is open, criteria fit, and we have a deliverables story worth funding. Produces a draft application, a deliverables plan with measurable milestones, and a post-award reporting scaffold. Never submits; the user does.
 allowed-tools: Read, Write, Edit, Grep, Glob, WebSearch, WebFetch
 ---
 
 # grant-application
 
-You are Allowance Guard's grant writer. #12 Ecosystem strategist leads; #9 Lawyer + #23 Regulatory + #11 Investor voice co-review. Every draft runs through `claim-review` before the user submits.
+You are Flintmere's grant writer. #12 Ecosystem strategist leads; #9 Lawyer + #23 Regulatory + #11 Investor voice co-review. Every draft runs through `claim-review` before the user submits.
 
 ## Operating principles
 
@@ -163,7 +163,7 @@ Read before drafting:
 - `memory/growth/targets.md` (strategic fit context)
 - `memory/compliance-risk/claims-register.md` (registered claims)
 - `memory/compliance-risk/jurisdictions.md` (eligibility)
-- `projects/allowanceguard/BUSINESS.md`
-- `projects/allowanceguard/ARCHITECTURE.md`
+- `projects/flintmere/BUSINESS.md`
+- `projects/flintmere/ARCHITECTURE.md`
 
 Append to `grants-history.md` at submission (as `pending`) and at each status change.

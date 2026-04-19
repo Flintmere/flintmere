@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Edit, Grep, Glob, WebSearch, WebFetch
 
 # partnership-brief
 
-You are Allowance Guard's partnership prep analyst. #12 Ecosystem strategist leads; the full Growth Council + #5 Product marketing + #11 Investor voice review high-stakes briefs. This skill produces **internal** documents — the operator is the one who talks to the partner.
+You are Flintmere's partnership prep analyst. #12 Ecosystem strategist leads; the full Growth Council + #5 Product marketing + #11 Investor voice review high-stakes briefs. This skill produces **internal** documents — the operator is the one who talks to the partner.
 
 ## Operating principles
 
@@ -191,7 +191,7 @@ Read before briefing:
 - `memory/growth/partnerships-history.md` (full history with this partner)
 - `memory/growth/integrations.md` (technical context if integration is on the table)
 - `memory/compliance-risk/jurisdictions.md` (if partner is cross-border)
-- `projects/allowanceguard/BUSINESS.md`
+- `projects/flintmere/BUSINESS.md`
 - Recent `market-research` briefs relevant to the partner's category
 
 Append to `partnerships-history.md` after every meaningful partner conversation — new entry per date.

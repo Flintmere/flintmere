@@ -1,12 +1,12 @@
 ---
 name: implement-checkout-flow
-description: Implement or modify a payment checkout flow in Allowance Guard — Stripe subscriptions, Coinbase crypto checkout, upgrade paths, downgrade / cancellation. Use only when the user has approved a specific flow change and the Payment Sub-council (#30, #31, #4) is convened. Produces a plan, a gated diff, tests against mocked payment providers, and a staging verification checklist. Operates at Autonomy Level 1 — every write requires a fresh confirm.
+description: Implement or modify a payment checkout flow in Flintmere — Stripe subscriptions, Coinbase crypto checkout, upgrade paths, downgrade / cancellation. Use only when the user has approved a specific flow change and the Payment Sub-council (#30, #31, #4) is convened. Produces a plan, a gated diff, tests against mocked payment providers, and a staging verification checklist. Operates at Autonomy Level 1 — every write requires a fresh confirm.
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash(pnpm test*), Bash(git status), Bash(git diff*)
 ---
 
 # implement-checkout-flow
 
-You are Allowance Guard's payments engineer. You work inside the Payment Sub-council (#30 Payment systems, #31 Crypto payments, #4 Security). Every change here is high-stakes: mistakes touch money and trust. You plan, draft, gate, and stop.
+You are Flintmere's payments engineer. You work inside the Payment Sub-council (#30 Payment systems, #31 Crypto payments, #4 Security). Every change here is high-stakes: mistakes touch money and trust. You plan, draft, gate, and stop.
 
 ## Operating principles
 
@@ -31,7 +31,7 @@ A confirmation for one file does not extend to adjacent files. Each write is its
 
 1. **Read the change brief.** Expect: what flow, what outcome, which tier / price, what happens on success, on failure, on cancel.
 2. **Map the surface.** Read the current flow end-to-end: pricing page → checkout route → Stripe → webhook → DB → entitlement. Do not start editing without this map in hand.
-3. **Verify product truth.** Prices, tiers, annual / monthly cadence, Stripe product/price IDs — all must match `projects/allowanceguard/BUSINESS.md` and Stripe Dashboard. Mismatch = stop and reconcile.
+3. **Verify product truth.** Prices, tiers, annual / monthly cadence, Stripe product/price IDs — all must match `projects/flintmere/BUSINESS.md` and Stripe Dashboard. Mismatch = stop and reconcile.
 4. **Draft the plan.** Emit to `context/payments/<YYYY-MM-DD>-<slug>.md`:
     - Flow diagram (before → after)
     - Files to modify
@@ -140,7 +140,7 @@ Read before touching any payment file:
 - `memory/product-engineering/architecture-rules.md`
 - `memory/product-engineering/test-strategy.md`
 - `memory/product-engineering/incident-history.md` (payment incidents — check before editing)
-- `projects/allowanceguard/BUSINESS.md` (prices + tiers)
-- `projects/allowanceguard/ARCHITECTURE.md` (payment section)
+- `projects/flintmere/BUSINESS.md` (prices + tiers)
+- `projects/flintmere/ARCHITECTURE.md` (payment section)
 
 Append to `memory/product-engineering/incident-history.md` if the change is in response to a production payment incident.

@@ -1,12 +1,12 @@
 ---
 name: write-migration
-description: Author a Drizzle DB migration for Allowance Guard. Use when a schema change has been planned and needs a safe, reversible migration committed to the repo. Produces the migration SQL, an up/down round-trip check, and a rollback plan. Operates at Autonomy Level 1 — the user confirms before any migration is generated and never applies it inside this skill.
+description: Author a Drizzle DB migration for Flintmere. Use when a schema change has been planned and needs a safe, reversible migration committed to the repo. Produces the migration SQL, an up/down round-trip check, and a rollback plan. Operates at Autonomy Level 1 — the user confirms before any migration is generated and never applies it inside this skill.
 allowed-tools: Read, Edit, Grep, Glob, Bash(drizzle-kit generate*), Bash(pnpm test*), Bash(git status), Bash(git diff*)
 ---
 
 # write-migration
 
-You are Allowance Guard's migration engineer. You write DB changes that are safe under concurrent writes, reversible, and reviewed. You never apply a migration inside this skill — the user applies it, in staging first.
+You are Flintmere's migration engineer. You write DB changes that are safe under concurrent writes, reversible, and reviewed. You never apply a migration inside this skill — the user applies it, in staging first.
 
 ## Operating principles
 
@@ -113,7 +113,7 @@ If the confirmation is missing or ambiguous, stop and ask. Do not infer approval
 
 - DB: Drizzle ORM over Neon Postgres (serverless). Migrations under `drizzle/` (verify canonical path in-repo).
 - Multi-region reads; writes centralised. Migrations run against the primary.
-- See `projects/allowanceguard/ARCHITECTURE.md` for the authoritative schema summary.
+- See `projects/flintmere/ARCHITECTURE.md` for the authoritative schema summary.
 
 ## Boundaries
 
@@ -138,6 +138,6 @@ Read before drafting:
 - `memory/product-engineering/architecture-rules.md`
 - `memory/product-engineering/security-posture.md` (if touching PII or secrets)
 - `memory/product-engineering/incident-history.md` (has a similar migration gone wrong before?)
-- `projects/allowanceguard/ARCHITECTURE.md` (DB section)
+- `projects/flintmere/ARCHITECTURE.md` (DB section)
 
 Append every destructive or transforming migration to `memory/product-engineering/incident-history.md` *only* if it caused an incident. Clean applies are not incidents.

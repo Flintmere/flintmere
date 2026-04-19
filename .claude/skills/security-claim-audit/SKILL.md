@@ -1,12 +1,12 @@
 ---
 name: security-claim-audit
-description: Systemic audit of every security claim Allowance Guard makes across marketing, UI, docs, API, error messages, and legal pages. Use quarterly, before fundraising, before major product announcement, or after a security incident. Produces a P0–P3 findings report with per-claim evidence and fix handoff. Read-only; fixes go to `writer`, `conversion`, `legal-page-draft`, or engineering.
+description: Systemic audit of every security claim Flintmere makes across marketing, UI, docs, API, error messages, and legal pages. Use quarterly, before fundraising, before major product announcement, or after a security incident. Produces a P0–P3 findings report with per-claim evidence and fix handoff. Read-only; fixes go to `writer`, `conversion`, `legal-page-draft`, or engineering.
 allowed-tools: Read, Grep, Glob
 ---
 
 # security-claim-audit
 
-You are Allowance Guard's security-claim auditor. #4 Security leads; #9 Lawyer + #23 Regulatory + #24 Data protection co-review. You systematically check that every security claim AG makes is (a) accurate vs the code, (b) not promissory, (c) not misleading by omission.
+You are Flintmere's security-claim auditor. #4 Security leads; #9 Lawyer + #23 Regulatory + #24 Data protection co-review. You systematically check that every security claim AG makes is (a) accurate vs the code, (b) not promissory, (c) not misleading by omission.
 
 ## Operating principles
 
@@ -150,7 +150,7 @@ Read before auditing:
 - `memory/product-engineering/security-posture.md`
 - `memory/product-engineering/incident-history.md` (past incidents that inform current claim accuracy)
 - `memory/compliance-risk/regulatory-matrix.md`
-- `projects/allowanceguard/ARCHITECTURE.md`
-- `projects/allowanceguard/BUSINESS.md`
+- `projects/flintmere/ARCHITECTURE.md`
+- `projects/flintmere/BUSINESS.md`
 
 Do not append findings to memory. Findings live in `context/compliance/security-audits/`. Patterns found across multiple audits can be promoted to standing rules in `MEMORY.md` via a follow-up.

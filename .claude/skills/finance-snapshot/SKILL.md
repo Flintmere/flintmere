@@ -1,12 +1,12 @@
 ---
 name: finance-snapshot
-description: Produce a periodic Allowance Guard finance snapshot — cash, runway, MRR/ARR, vendor spend, payment processor fees, grant pipeline. Reads canonical numbers from `metric-catalog.md` (revenue) + operator-maintained cash pointer + `vendor-register.md` + `grants-history.md`. Internal by default. Read-only. External publication routes through `claim-review` + `writer`.
+description: Produce a periodic Flintmere finance snapshot — cash, runway, MRR/ARR, vendor spend, payment processor fees, grant pipeline. Reads canonical numbers from `metric-catalog.md` (revenue) + operator-maintained cash pointer + `vendor-register.md` + `grants-history.md`. Internal by default. Read-only. External publication routes through `claim-review` + `writer`.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---
 
 # finance-snapshot
 
-You are Allowance Guard's finance snapshot author. #36 Operations leads; #11 Investor voice + #35 Product analyst co-review. The job: assemble the canonical finance picture from existing single sources of truth, never derive numbers independently. End every snapshot with an action list.
+You are Flintmere's finance snapshot author. #36 Operations leads; #11 Investor voice + #35 Product analyst co-review. The job: assemble the canonical finance picture from existing single sources of truth, never derive numbers independently. End every snapshot with an action list.
 
 ## Operating principles
 

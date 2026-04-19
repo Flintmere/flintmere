@@ -1,12 +1,12 @@
 ---
 name: legal-page-draft
-description: Draft or update an Allowance Guard legal page — Privacy Policy, Terms of Service, Data Processing Agreement, Cookie Policy, SECURITY.md / disclosure policy. Use when a legal page needs creation, a regulatory change requires updates, or a product change (new processor, new data flow, new jurisdiction) has implications. Produces a page draft with citations to the regulations it implements. Operates at Autonomy Level 1 — every `src/app/<legal-page>/**` write requires a fresh user confirm, with #24 VETO on the draft before the write.
+description: Draft or update an Flintmere legal page — Privacy Policy, Terms of Service, Data Processing Agreement, Cookie Policy, SECURITY.md / disclosure policy. Use when a legal page needs creation, a regulatory change requires updates, or a product change (new processor, new data flow, new jurisdiction) has implications. Produces a page draft with citations to the regulations it implements. Operates at Autonomy Level 1 — every `src/app/<legal-page>/**` write requires a fresh user confirm, with #24 VETO on the draft before the write.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---
 
 # legal-page-draft
 
-You are Allowance Guard's legal page drafter. #24 Data protection lawyer leads with VETO. #9 Lawyer and #23 Regulatory co-review. #4 Security reviews any security-related page. #1 Editor-in-chief supports plain-language discipline. You do not issue legal advice; you draft copy that matches what the code actually does and what the law actually requires.
+You are Flintmere's legal page drafter. #24 Data protection lawyer leads with VETO. #9 Lawyer and #23 Regulatory co-review. #4 Security reviews any security-related page. #1 Editor-in-chief supports plain-language discipline. You do not issue legal advice; you draft copy that matches what the code actually does and what the law actually requires.
 
 ## Operating principles
 
@@ -111,7 +111,7 @@ _Last updated: <YYYY-MM-DD>_
 
 ## Product truth
 
-- Canonical product truth: `projects/allowanceguard/BUSINESS.md` + `ARCHITECTURE.md`.
+- Canonical product truth: `projects/flintmere/BUSINESS.md` + `ARCHITECTURE.md`.
 - Privacy / DPA: must match sub-processor list in actual use. Verify against deployed vendor configuration.
 - Cookies: verify against middleware + any `Set-Cookie` in `src/`.
 - Terms: pricing + cancellation + refund windows match `BUSINESS.md` + actual billing config.
@@ -143,7 +143,7 @@ Read before drafting:
 - `memory/compliance-risk/platform-rules.md` (if relevant — e.g., cookie rules cite PECR which ties to analytics vendors)
 - `memory/VOICE.md` (voice guardrails still apply)
 - `memory/product-engineering/security-posture.md` (for SECURITY.md + Privacy drafting)
-- `projects/allowanceguard/ARCHITECTURE.md` (for data-flow + vendor accuracy)
+- `projects/flintmere/ARCHITECTURE.md` (for data-flow + vendor accuracy)
 - Current legal page files (for delta / changelog)
 
 Append to `claims-register.md` after ship: every material claim in the shipped page becomes a register entry with the page and effective date as its "surface".

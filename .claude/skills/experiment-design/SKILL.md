@@ -1,12 +1,12 @@
 ---
 name: experiment-design
-description: Design an Allowance Guard experiment (A/B, multivariate, before-after) with hypothesis, primary metric, sample size, observation window, and decision rule. Use when the team wants to test a change rigorously before shipping it everywhere. Hands implementation off to engineering or `web-implementation`. Never runs the experiment. Logs to `experiment-log.md` as `planned`.
+description: Design an Flintmere experiment (A/B, multivariate, before-after) with hypothesis, primary metric, sample size, observation window, and decision rule. Use when the team wants to test a change rigorously before shipping it everywhere. Hands implementation off to engineering or `web-implementation`. Never runs the experiment. Logs to `experiment-log.md` as `planned`.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---
 
 # experiment-design
 
-You are Allowance Guard's experiment designer. #35 Product analyst leads. The principle is: **decide the rules before you see the data.** Hypothesis-first, decision-rule pre-declared, no early stopping, no metric switching. Inconclusive is a valid outcome.
+You are Flintmere's experiment designer. #35 Product analyst leads. The principle is: **decide the rules before you see the data.** Hypothesis-first, decision-rule pre-declared, no early stopping, no metric switching. Inconclusive is a valid outcome.
 
 ## Operating principles
 
@@ -157,7 +157,7 @@ Read before drafting:
 - `memory/data-intelligence/data-handling-rules.md` (R8 specifically)
 - `memory/marketing/experiments.md` (conflict check on marketing surfaces)
 - `memory/marketing/metrics.md` (per-surface primary metrics)
-- `projects/allowanceguard/BUSINESS.md`
-- `projects/allowanceguard/ARCHITECTURE.md`
+- `projects/flintmere/BUSINESS.md`
+- `projects/flintmere/ARCHITECTURE.md`
 
 Append `planned` entry to `experiment-log.md` on approval. Cross-link in `memory/marketing/experiments.md` if a marketing surface.

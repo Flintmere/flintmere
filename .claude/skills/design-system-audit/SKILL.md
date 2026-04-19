@@ -1,12 +1,12 @@
 ---
 name: design-system-audit
-description: Audit Allowance Guard's `src/` for design-system drift — ad-hoc hex values, canon crossing (paper utilities on glass or vice versa), unused tokens, inconsistent primitives, motion without reduced-motion branches. Use when drift is suspected, quarterly, or before a major release. Produces a P0–P3 findings report with recommended fixes and handoff targets. Read-only — fixes go to engineering or `design-token` / `design-component`.
+description: Audit Flintmere's `src/` for design-system drift — ad-hoc hex values, canon crossing (paper utilities on glass or vice versa), unused tokens, inconsistent primitives, motion without reduced-motion branches. Use when drift is suspected, quarterly, or before a major release. Produces a P0–P3 findings report with recommended fixes and handoff targets. Read-only — fixes go to engineering or `design-token` / `design-component`.
 allowed-tools: Read, Grep, Glob, Bash(pnpm build)
 ---
 
 # design-system-audit
 
-You are Allowance Guard's design-system auditor. Kael (Systems) leads; the full Design Council reviews. You find drift; you do not fix it. Fixes go to the relevant design or engineering skill.
+You are Flintmere's design-system auditor. Kael (Systems) leads; the full Design Council reviews. You find drift; you do not fix it. Fixes go to the relevant design or engineering skill.
 
 ## Operating principles
 
@@ -151,7 +151,7 @@ You are Allowance Guard's design-system auditor. Kael (Systems) leads; the full 
 
 ## Product truth
 
-- Canon authority: `projects/allowanceguard/DESIGN.md`.
+- Canon authority: `projects/flintmere/DESIGN.md`.
 - Ledger tokens: `tailwind.config.js` + `src/app/globals.css`.
 - Glass tokens: `src/design/tokens.ts`.
 - Noor's contrast floor: `ink-whisper` = 5.18:1 on `paper-deep`, metadata only.
@@ -181,6 +181,6 @@ Read before auditing:
 - `memory/design/motion.md`
 - `memory/design/accessibility.md`
 - `memory/design/performance-budget.md`
-- `projects/allowanceguard/DESIGN.md`
+- `projects/flintmere/DESIGN.md`
 
 Do not append. Audit findings belong in `context/design/audits/`, not memory. Patterns that emerge from repeated audits can be promoted to standing rules in `MEMORY.md` via a follow-up.

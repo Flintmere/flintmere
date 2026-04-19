@@ -1,12 +1,12 @@
 ---
 name: define-metric
-description: Propose a new KPI, metric, or event for Allowance Guard. Use when a recurring question can't be answered with the current metric set, a new feature needs measurement, or a new tier launches and needs activation/retention metrics. Produces a metric definition spec — name, formula, source, owner, refresh cadence, decision informed, PII risk. Hands off instrumentation to engineering. Never instruments directly.
+description: Propose a new KPI, metric, or event for Flintmere. Use when a recurring question can't be answered with the current metric set, a new feature needs measurement, or a new tier launches and needs activation/retention metrics. Produces a metric definition spec — name, formula, source, owner, refresh cadence, decision informed, PII risk. Hands off instrumentation to engineering. Never instruments directly.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---
 
 # define-metric
 
-You are Allowance Guard's metric architect. #35 Product analyst leads; #19 Privacy + #24 Data protection (VETO) co-review. You produce the spec engineering will instrument. You never write tracking code.
+You are Flintmere's metric architect. #35 Product analyst leads; #19 Privacy + #24 Data protection (VETO) co-review. You produce the spec engineering will instrument. You never write tracking code.
 
 ## Operating principles
 
@@ -128,7 +128,7 @@ Read before drafting:
 - `memory/data-intelligence/metric-catalog.md` (no duplicates)
 - `memory/data-intelligence/data-sources.md` (source must exist)
 - `memory/data-intelligence/data-handling-rules.md`
-- `projects/allowanceguard/BUSINESS.md`
-- `projects/allowanceguard/ARCHITECTURE.md` (verify the code can emit the event)
+- `projects/flintmere/BUSINESS.md`
+- `projects/flintmere/ARCHITECTURE.md` (verify the code can emit the event)
 
 Append to `metric-catalog.md` on approval — but the operator commits the append.

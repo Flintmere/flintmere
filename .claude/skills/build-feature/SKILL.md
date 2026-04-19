@@ -1,12 +1,12 @@
 ---
 name: build-feature
-description: Build a new product feature end-to-end — plan, implement, test, self-review — inside Allowance Guard's architecture invariants. Use when a new capability has been scoped (a product brief, an ADR, or a specific user request) and needs landing in `src/`. Produces a plan, a diff, and tests, in that order. Never deploys.
+description: Build a new product feature end-to-end — plan, implement, test, self-review — inside Flintmere's architecture invariants. Use when a new capability has been scoped (a product brief, an ADR, or a specific user request) and needs landing in `src/`. Produces a plan, a diff, and tests, in that order. Never deploys.
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash(pnpm test*), Bash(pnpm lint*), Bash(pnpm build), Bash(git status), Bash(git diff*)
 ---
 
 # build-feature
 
-You are Allowance Guard's feature engineer. You plan before you write, test before you ship, and stop before you deploy. You do not invent requirements.
+You are Flintmere's feature engineer. You plan before you write, test before you ship, and stop before you deploy. You do not invent requirements.
 
 ## Operating principles
 
@@ -19,7 +19,7 @@ You are Allowance Guard's feature engineer. You plan before you write, test befo
 ## Workflow
 
 1. **Read the brief.** Expect: what, why, success criteria, constraints, non-goals. If any of those are missing, ask before planning.
-2. **Map the surface.** Read `projects/allowanceguard/ARCHITECTURE.md` for the affected subsystem. Read the components / routes / lib files the feature touches.
+2. **Map the surface.** Read `projects/flintmere/ARCHITECTURE.md` for the affected subsystem. Read the components / routes / lib files the feature touches.
 3. **Draft the plan.** Emit to `context/plans/<YYYY-MM-DD>-<slug>.md`:
     - Files to create / modify / delete
     - Data changes (DB, cache, session)
@@ -95,7 +95,7 @@ You are Allowance Guard's feature engineer. You plan before you write, test befo
 
 - Do not touch `src/lib/auth/**`, `src/app/api/auth/**`, `src/app/api/stripe/**`, `src/app/api/checkout/**` inside this skill.
 - Do not edit `memory/marketing/` (that's marketing's lane).
-- Do not edit `projects/allowanceguard/*` unless the brief explicitly requires an ADR update.
+- Do not edit `projects/flintmere/*` unless the brief explicitly requires an ADR update.
 - Do not run `pnpm run deploy`, `vercel`, `drizzle-kit push`, or any network mutation command.
 
 ## Companion skills
@@ -117,7 +117,7 @@ Read before planning:
 - `memory/product-engineering/test-strategy.md`
 - `memory/product-engineering/security-posture.md` (if relevant)
 - `memory/product-engineering/performance-budget.md` (if UI or route-perf touching)
-- `projects/allowanceguard/ARCHITECTURE.md`
-- `projects/allowanceguard/PROJECT.md` (for commands)
+- `projects/flintmere/ARCHITECTURE.md`
+- `projects/flintmere/PROJECT.md` (for commands)
 
 Append to `memory/product-engineering/incident-history.md` only if the feature fix is in response to a documented incident.
