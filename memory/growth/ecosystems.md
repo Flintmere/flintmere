@@ -1,141 +1,160 @@
 # ecosystems.md
 
-Live tracked ecosystems with their funding programmes, deadlines, contacts, and evaluation criteria. This is the **operational file** for `grant-application`. Targets in general live in `targets.md`; programme-specific detail lives here.
+Live tracked ecosystems for Flintmere with their programmes, deadlines, contacts, and evaluation criteria. This is the **operational file** for `grant-application`, `partnership-brief`, and `integration-proposal`. Targets in general live in `targets.md`; programme-specific detail lives here.
+
+Flintmere's primary ecosystem is **Shopify**. Secondary ecosystems are the UK/EU SaaS startup environment, ecommerce trade organisations, and the tooling adjacencies (PIM, SEO, headless, analytics) that operate around Shopify.
 
 ## Tracking format
 
 ```
 ## <Ecosystem name>
 
-- **Programme(s):** <name each open programme>
-- **Application URL:** <link — verify before use>
-- **Amount range:** <typical award size>
+- **Programme(s):** <named programmes that open to us>
+- **Application / submission URL:** <link — verify before use>
+- **Amount range or benefit:** <cash, promotion, listing, access>
 - **Evaluation cycle:** <rolling | seasonal | ad-hoc>
-- **Typical deadline:** <when the next one is if seasonal>
-- **Decision timeline:** <typical days from submission to outcome>
-- **Contact:** <ecosystem lead, email, community channel>
+- **Typical deadline:** <>
+- **Decision timeline:** <>
+- **Contact:** <programme lead, email, community channel>
 - **Evaluation criteria (verbatim or paraphrased with source):** <>
-- **Common disqualifiers:** <things that reject applications>
-- **AG's fit:** <why AG matches this programme>
-- **Evidence of AG's fit:** <chain support, user count, public writeups, open-source commits>
+- **Common disqualifiers:** <>
+- **Flintmere's fit:** <>
+- **Evidence of Flintmere's fit:** <install count, merchant testimonials, Built-for-Shopify status, research publications>
 - **Last updated:** YYYY-MM-DD
 ```
 
-## Ethereum Foundation
+---
 
-- **Programme(s):** Ecosystem Support Program (ESP), Academic Grants, Next Billion Fellowship.
-- **Application URL:** <verify live URL before use; the EF regularly updates their programme pages>.
-- **Amount range:** $10K–$250K typical; larger for infrastructure grants.
-- **Evaluation cycle:** rolling (ESP); seasonal (others).
-- **Decision timeline:** 4–12 weeks.
-- **Evaluation criteria:** public-goods orientation; developer / ecosystem impact; open source; credibility of the team.
-- **AG's fit:** security infrastructure for Ethereum users; open-core; 27-chain coverage reinforces Ethereum-centric story.
-- **Common disqualifiers:** closed-source; token launch baked into application; primarily L1-competing.
-- **Last updated:** <to set on first use of this file>
+## Shopify (primary ecosystem)
 
-## Optimism
+### Shopify Partner Program
 
-- **Programme(s):** RPGF (Retroactive Public Goods Funding) rounds; Grants Council (standard grants); Mission Grants (specific initiatives).
-- **Application URL:** <verify>.
-- **Amount range:** highly variable. RPGF: six-figure to seven-figure for top projects. Standard grants: $10K–$100K.
-- **Evaluation cycle:** RPGF seasonal (previously ~2×/year; check current cadence). Standard: quarterly-ish.
-- **Evaluation criteria:** (RPGF) retroactive impact on the Optimism ecosystem; (standard) forward-looking deliverables aligned with roadmap.
-- **AG's fit:** security for OP-stack chains; growing footprint across Base + Optimism + other OP-stack networks.
-- **Common disqualifiers:** projects that have already received substantial funding elsewhere (RPGF accounts for this).
-- **Last updated:** <>
+- **Programme(s):** Partner registration ($19 one-time); Plus Partner; Built-for-Shopify badge.
+- **Application URL:** `https://partners.shopify.com/` (verify before use).
+- **Amount range or benefit:** Revenue share (0% first $1M lifetime, 15% after); Plus Partner access; Built-for-Shopify review priority.
+- **Evaluation cycle:** Partner registration is instant; Plus Partner is by application; Built-for-Shopify by review.
+- **Decision timeline:** Partner: instant. Plus: weeks. Built-for-Shopify: after install base + reviews accumulated (~month 6+).
+- **Evaluation criteria:** Technical quality + merchant outcomes + adherence to App Store requirements.
+- **Flintmere's fit:** direct — we're a Shopify app.
+- **Evidence:** install count, merchant NPS (via `weekly-metrics-brief`), case studies.
+- **Last updated:** 2026-04-19
 
-## Base (Coinbase ecosystem)
+### Shopify App Store
 
-- **Programme(s):** Base Ecosystem Fund (in partnership with Coinbase Ventures); Builder Grants.
-- **Application URL:** <verify>.
-- **Amount range:** Ventures: material equity / token rounds. Builder grants: smaller.
-- **Evaluation cycle:** Ventures: ongoing. Builder grants: rolling.
-- **Evaluation criteria:** Base adoption signal; alignment with Coinbase product roadmap; revenue potential for ecosystem.
-- **AG's fit:** wallet security on Base; Coinbase Commerce already in our payment stack.
-- **Common disqualifiers:** pure infrastructure without user-visible story.
-- **Last updated:** <>
+- **Programme(s):** App listing; App Store categorisation; Shopify's curated selections ("Editor's Choice", "Trending", category features).
+- **Application URL:** Via Partner Dashboard → App submission.
+- **Amount range or benefit:** Discovery-driven installs. App Store is one of the top two install channels.
+- **Evaluation cycle:** Initial submission + reviews with each version update.
+- **Decision timeline:** 1–4 weeks for initial submission; 1–3 weeks for updates.
+- **Evaluation criteria:** App Store requirements checklist (see `memory/compliance-risk/platform-rules.md`).
+- **Flintmere's fit:** target categories — "Store management", "Product information", "Marketing & conversion", "AI" (if Shopify creates a dedicated category — watch for it).
+- **Common disqualifiers:** missing GDPR webhooks, slow webhook responses (>5s), misleading listing copy, Polaris violations.
+- **Last updated:** 2026-04-19
 
-## Arbitrum Foundation
+### Shopify Plus Partner Directory
 
-- **Programme(s):** STIP (Short-Term Incentive Programme), LTIPP (Long-Term), Domain Grants.
-- **Application URL:** <verify; Arbitrum Forum proposals are part of the flow>.
-- **Amount range:** varies; STIP rounds have been $ARB-denominated with material grants for qualifying protocols.
-- **Evaluation cycle:** seasonal rounds with specific open windows.
-- **Evaluation criteria:** ecosystem activity; on-chain metrics the programme specifies; decentralised governance vote where applicable.
-- **AG's fit:** approvals security for Arbitrum ecosystem.
-- **Common disqualifiers:** weak on-chain activity (programmes evaluate against TVL / user metrics).
-- **Last updated:** <>
+- **Programme(s):** Plus Partner status → listed in Shopify Plus Partner Directory, visible to enterprise merchants.
+- **Benefit:** direct agency prospecting channel + Enterprise-merchant visibility.
+- **Evaluation criteria:** proven track record with mid-market / Plus merchants; agency business model; certifications.
+- **Flintmere's fit:** **candidate path for scaling agency-tier revenue.** Get listed here once we have 5+ agencies using Agency tier successfully.
+- **Last updated:** 2026-04-19
 
-## Polygon
+### Shopify events
 
-- **Programme(s):** Polygon Village grants; Polygon Ventures.
-- **Application URL:** <verify>.
-- **Amount range:** variable.
-- **Evaluation cycle:** rolling.
-- **AG's fit:** Polygon support in AG; approvals on POS and zkEVM.
-- **Last updated:** <>
+- **ShopTalk (US, global)** — retail + ecom industry conference. Flintmere's primary target: sponsoring agency-track sessions + booking Enterprise merchant meetings.
+- **ShopTalk Europe (UK)** — closer-to-home variant. Same strategy.
+- **IRCE** — retail-focused. Secondary priority.
+- **Shopify Unite** — platform-specific (when it resumes). Highest signal-to-noise ratio for Shopify ecosystem integrations.
+- **Regional Shopify meetups** (London, NYC, Toronto) — grassroots. Good for agency network-building.
 
-## Gitcoin Grants
+---
 
-- **Programme(s):** Quadratic-funded rounds; Beta rounds; community rounds.
-- **Application URL:** `grants.gitcoin.co` (verify).
-- **Amount range:** community-funded; matching pool varies by round. Often $100–$10K per project per round.
-- **Evaluation cycle:** seasonal rounds.
-- **AG's fit:** security public good; open-core story fits quadratic funding.
-- **Common disqualifiers:** sybil flags; poor community engagement during round.
-- **Last updated:** <>
+## Tooling adjacencies
 
-## Protocol Guild
+### PIM vendors (Product Information Management)
 
-- **Programme(s):** Open-source funding for Ethereum protocol maintainers.
-- **Application URL:** <verify>.
-- **Amount range:** material; ongoing rather than one-off.
-- **AG's fit:** **limited** — Protocol Guild is for L1 protocol maintainers specifically. AG is ecosystem-adjacent. Cite only where a direct contribution to protocol-level infrastructure is credible.
-- **Last updated:** <>
+- **Shape:** integration partnerships — PIM vendors feed cleaned product data into Shopify; Flintmere reads from Shopify and scores readiness. Natural complementarity.
+- **Programme(s):** partner programmes vary per PIM vendor.
+- **Named vendors:**
+  - **Plytix** — mid-market PIM, Shopify-native integrations.
+  - **Sales Layer** — mid-market → enterprise.
+  - **Pimcore** — larger enterprise.
+  - **Akeneo** — mid-market → enterprise; open-source variant exists.
+- **Flintmere's fit:** "if you use PIM X, Flintmere reads from it to score your catalog" — positions us non-competitively.
+- **Contact strategy:** `integration-proposal` + `partnership-brief` for each target vendor.
+- **Last updated:** 2026-04-19
 
-## a16z Crypto Startup School / Paradigm Fellowship
+### Shopify SEO app ecosystem
 
-- **Programme(s):** Accelerator cohorts (a16z CSS); research fellowships (Paradigm).
-- **Amount range:** equity / fellowship-based rather than straight grant.
-- **AG's fit:** accelerator story is stronger than fellowship (AG is a shipping product).
-- **Common disqualifiers:** geographic restrictions on cohort participation; commitment requirements.
-- **Last updated:** <>
+- **Shape:** complementary positioning — SEO apps target Google; Flintmere targets AI agents. Cross-promotion opportunities.
+- **Vendors:** Schema Plus, JSON-LD for SEO, Booster SEO. We do not compete with these; Flintmere is about agentic commerce, not keyword-SEO.
+- **Flintmere's fit:** joint content ("the SEO/AI split in 2026 catalog optimisation"), co-webinars, cross-referral.
+- **Last updated:** 2026-04-19
 
-## Smaller ecosystem programmes
+### Headless commerce + composable stack vendors
 
-Each of the following has a grant programme worth tracking (add per-programme entries as they become relevant):
+- **Shape:** integration partnerships — headless storefronts (Hydrogen, Remix, Next.js commerce) still need scored catalog data to publish to agentic surfaces.
+- **Named vendors:**
+  - **Hydrogen agencies** (Shopify's own).
+  - **Composable commerce agencies** — Occtoo, Fabric.
+- **Flintmere's fit:** adjacent; we score what's published regardless of the front-end stack.
+- **Last updated:** 2026-04-19
 
-- Avalanche Foundation
-- BNB Chain Innovation Program
-- Scroll ecosystem grants
-- zkSync ecosystem
-- Linea ecosystem
-- Mantle grants
-- Blast ecosystem (when post-incentive phase matures)
+---
 
-Our 27-chain coverage means most major EVM ecosystems have some fit — but the evaluation criteria differ widely. Tier 3 (monitor) until a specific programme becomes relevant.
+## Ecommerce press + media
+
+Primary channels for launch + research-report amplification (not grants — editorial coverage).
+
+- **Modern Retail** — US, ecom-focused, good for research-piece pickup.
+- **Retail Dive / Retail Week** — US + UK. Wider retail, less ecom-native.
+- **RetailWire** — industry commentary.
+- **eComExperts** — Shopify-ecosystem focused.
+- **Shopify Masters (podcast)** — Shopify-native.
+- **Modern Retail Unlimited (newsletter)** — ecom insider.
+
+See `memory/marketing/outreach.md` for contact protocol.
+
+---
+
+## UK / EU startup programmes (low priority at launch)
+
+SPEC does not position Flintmere as a grant-funded product. These are tracked in case they become relevant.
+
+- **Innovate UK** — SME innovation grants. Relevant if Flintmere pursues AI-specific R&D funding. Low priority pre-launch.
+- **EU Horizon Europe** — digital commerce research programmes. Very bureaucratic; not a launch fit.
+- **Tech Nation / UK Digital** (successor programmes) — UK digital scale-up programmes. Relevant at Series A-adjacent stage.
+- **R&D Tax Credits** (UK) — not a grant, but material cash-flow instrument for SaaS dev. Route through accountancy.
+
+**Current posture:** none actively pursued. Revisit at month 4+ when traction exists.
+
+---
 
 ## Ecosystems we do not pursue
 
-Write these down to avoid re-asking:
+Write down to avoid re-asking:
 
-- Closed-source only programmes — AG is open-core; closed-source grants are a poor fit.
-- Token-gated programmes that require launching a token — we do not have a token, and launching one against the claim "no token" in our voice memo would be catastrophic.
-- Programmes that require equity at terms that conflict with founder governance.
-- Programmes in OFAC-sanctioned jurisdictions (see `memory/compliance-risk/jurisdictions.md`).
+- **Web3 ecosystem grants** (Ethereum Foundation, Optimism, Base, Arbitrum, Polygon, Gitcoin) — inherited from allowanceguard kit; do not apply. Flintmere is not Web3.
+- **Crypto accelerators** (a16z Crypto, Paradigm) — not applicable.
+- **Closed-source only programmes** — if we consider open-sourcing `packages/scoring`, revisit; not currently.
+- **Programmes in OFAC-sanctioned jurisdictions** (see `memory/compliance-risk/jurisdictions.md`).
 
 ## How this file is maintained
 
-- On every `grant-application` run: verify the programme's URL is live and the criteria haven't shifted.
-- When a programme launches / ends / restructures: update here + note in `grants-history.md`.
-- When we are invited into a programme we didn't apply to: add an entry here noting the relationship origin.
-- Every entry cites a source + date on its last-updated line.
+- On every `grant-application` / `partnership-brief` run: verify URLs live + criteria current.
+- When a programme launches / ends / restructures: update here + note in `grants-history.md` or `partnerships-history.md`.
+- Every entry cites source + date on its last-updated line.
 
 ## Open questions for the operator
 
-- What is AG's current annual revenue / run-rate? Some programmes require financials.
-- Is AG a UK Ltd company only, or are there sister entities? Jurisdictional fit matters.
-- Is there a stated policy on equity / token / convertible structures the company will / won't accept? Needed for accelerator programmes.
-- Who is authorised to sign grant agreements? (Usually the founder, but must be documented.)
+Most answers live in `BUSINESS.md` / `PROJECT.md`. Flintmere-specific:
 
-Answer these once; they become canonical. Store answers in `BUSINESS.md` or an ADR, not here.
+- Are we open to being the "Shopify-only AI readiness tool" long-term, or do we plan to expand to WooCommerce / BigCommerce / other platforms? Affects ecosystem partnership strategy.
+- Is Agency tier the primary distribution channel, or do we plan a direct Enterprise sales motion in year 1?
+- Do we participate in Shopify Unite (speaking slots, booth presence) once it resumes?
+
+Answer once; they become canonical in `BUSINESS.md` or an ADR.
+
+## Changelog
+
+- 2026-04-19: Rewritten for Flintmere. Replaced Web3 ecosystem programmes (Ethereum Foundation, Optimism, Base, Arbitrum, Polygon, Gitcoin, Protocol Guild, a16z Crypto) with Shopify ecosystem (Partner Program, App Store, Plus Partner Directory, Shopify events) + tooling adjacencies (PIM, SEO apps, headless) + ecommerce press + UK/EU startup programmes.

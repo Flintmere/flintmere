@@ -1,135 +1,156 @@
 # integrations.md
 
-Current integrations + requested integrations + technical constraints per integration partner. This is the **operational file** for `integration-proposal`.
+Current integrations + requested integrations + technical constraints per partner. Operational file for `integration-proposal`.
 
 ## Integration shapes
 
-AG can be integrated outbound (we provide API / SDK / data; partner consumes) or inbound (we consume partner data). Most opportunities are outbound — our value to partners is the approval scan engine, the revocation flow, and the risk labelling.
+Flintmere can be integrated **outbound** (partner embeds Flintmere scores / insights into their UI) or **inbound** (Flintmere consumes partner data to enrich its scoring). Most opportunities are **outbound — the scoring API + merchant dashboard are the valuable surfaces** — and **inbound infrastructure** (Shopify, Vertex AI, etc.) is mandatory for operation.
 
 ### Outbound integration surfaces
 
-- **REST API** — `projects/allowanceguard/ARCHITECTURE.md` documents the canonical API. Two tiers: API Developer ($39/mo — `BUSINESS.md:49-54`), API Growth ($149/mo).
-- **JS client package** — `@allowance-guard/client` (verify package name in `packages/client/`). Types generated from OpenAPI.
-- **React components** — `@allowance-guard/react` (verify in `packages/react/`). Drop-in widgets.
-- **Webhook** — for protocols wanting async risk notifications.
-- **Reference data** — malicious-contract lists (where available); safe-to-revoke heuristics.
+- **REST API** — `projects/flintmere/ARCHITECTURE.md` documents the canonical API (Agency + Enterprise tiers). Rate-limited; tier-appropriate.
+- **Shareable scorecards** — `flintmere.com/score/<shop-slug>` public badge widget for merchants to embed in their site footer.
+- **Webhooks** — partners can subscribe to score-drift events for their client merchants.
+- **White-label reports** — Agency tier: PDF + HTML reports with agency branding.
+- **CSV exports** — score history, fix history, pillar-level breakdowns.
 
-### Inbound integrations (where AG consumes partner data)
+### Inbound integrations (where Flintmere consumes partner data)
 
-- **RPC providers** — Alchemy, Infura, QuickNode, Ankr. Already core infrastructure.
-- **Malicious-contract feeds** — Chainabuse, ScamSniffer, MistTrack (potential; evaluate legal + commercial terms).
-- **Wallet risk data** — Harpie, Chainalysis (potential; caution on cost + privacy).
-- **Token metadata** — CoinGecko, Trust Wallet assets, 1inch tokens list.
+- **Shopify Admin + Storefront APIs** — core; see `memory/product-engineering/shopify-api-rules.md`.
+- **Google Cloud Vertex AI + Azure OpenAI** — LLM providers; see ADRs 0005 + 0006.
+- **Stripe + Shopify Managed Pricing** — billing.
+- **GS1 GEPIR** (optional, rate-limited) — GTIN verification.
+- **PIM vendor APIs** (roadmap) — direct read from Plytix / Sales Layer / Akeneo etc. to reduce merchant friction for mid-market.
 
-## Current integrations
+## Current integrations (core infrastructure — all inbound)
 
-### Cloudflare Turnstile
+### Shopify (Admin + Storefront + Managed Pricing + Webhooks)
+- **Shape:** inbound infrastructure + commercial.
+- **Surface:** the entire Shopify app (`apps/shopify-app`).
+- **Agreement:** Shopify Partner Program Agreement.
+- **Notes:** see `memory/product-engineering/shopify-api-rules.md`.
 
+### Google Vertex AI
 - **Shape:** inbound infrastructure.
-- **Surface:** signup form, subscribe form, certain docs paths (`src/components/TurnstileWidget.tsx`, `src/lib/turnstile.ts`).
-- **Agreement:** Cloudflare standard ToS.
-- **Notes:** respect accessibility requirements (Noor review).
+- **Surface:** `packages/llm` provider adapter; used by scoring + enrichment paths.
+- **Agreement:** Google Cloud Master Services Agreement + DPA. Region-pinned `europe-west1`.
+- **Notes:** ADR 0005 + 0006.
+
+### Azure OpenAI
+- **Shape:** inbound infrastructure (fallback).
+- **Surface:** circuit-breaker fallback in `packages/llm`.
+- **Agreement:** Microsoft Enterprise Services Agreement + DPA. Region EU.
 
 ### Stripe
+- **Shape:** inbound payment infrastructure.
+- **Surface:** Agency + Enterprise direct invoicing + £97 concierge audit one-offs.
+- **Agreement:** Stripe standard ToS.
 
-- **Shape:** payment integration.
-- **Surface:** subscription checkout, webhook-driven entitlement.
-- **Agreement:** Stripe standard ToS + Restricted Businesses approved status.
+### Resend
+- **Shape:** inbound infrastructure (transactional email).
+- **Surface:** scanner full reports, app drift alerts, support replies.
+- **Agreement:** Resend standard ToS + DPA.
 
-### Coinbase Commerce + Coinbase Business
+### Sentry
+- **Shape:** inbound infrastructure (observability).
+- **Surface:** error tracking for both apps.
+- **Agreement:** Sentry standard ToS + DPA (PII-scrubbed).
 
-- **Shape:** crypto payment integration.
-- **Surface:** crypto checkout (USDC on Base primarily).
+### PostHog
+- **Shape:** inbound infrastructure (self-hosted analytics).
+- **Surface:** product analytics; runs on the Coolify droplet.
+- **Agreement:** self-hosted open source; no data leaves our droplet.
 
-### Neon
+### GS1 GEPIR (optional)
+- **Shape:** inbound reference data.
+- **Surface:** real-time GTIN verification at rate-limited cadence.
+- **Agreement:** GS1 terms for their public-ish API.
 
-- **Shape:** database infrastructure.
-
-### Vercel
-
-- **Shape:** hosting infrastructure.
-
-### GitHub
-
-- **Shape:** code hosting + CI.
-
-(This list is inbound-infrastructure heavy; outbound integration targets are where the growth opportunity lives.)
-
-## Requested / in-progress integrations
+## Requested / in-progress integrations (outbound — the growth opportunities)
 
 <!-- Append as conversations begin. Entries here become `partnerships-history.md` records once formal engagement happens. -->
 
-### Example template
+### Entry template
 
 ```
 ### <Partner name>
-
-- **Shape:** outbound API | SDK | widget | data | Snap | deep link | other
-- **Status:** scoping | proposal drafted | proposal sent | technical conversation | integration build | live | declined | paused
+- **Shape:** outbound API | white-label report | shareable badge | data exchange | webhook subscription
+- **Status:** scoping | proposal drafted | proposal sent | technical conversation | build | live | declined | paused
 - **Contact:** <person, role, company, channel>
 - **Technical constraints:**
-    - Required chains: <>
+    - Shopify merchants they serve: <segment / vertical>
     - Required response time: <>
     - Required SLA: <>
-    - Data shape: <>
-- **Commercial shape:** <free, paid API tier, revenue share, grant-funded integration>
+    - Data shape they want: <pillar scores | issue list | Channel Health | full scorecard>
+- **Commercial shape:** <free tier access for their users, paid API tier, revenue share, integration-funded build>
 - **Timeline:** <>
-- **AG-side work:** <engineering effort estimate; handoff to build-feature>
+- **Flintmere-side work:** <engineering effort; handoff to build-feature>
 - **Partner-side work:** <their effort estimate>
-- **Risk flags:** <jurisdiction, compliance, security concerns>
+- **Risk flags:** <jurisdiction, brand alignment, exclusivity ask>
 - **Last activity:** YYYY-MM-DD
 ```
 
 ## Integration shapes by partner type
 
-### Wallets → AG Snap / panel / deep link
+### PIM vendors
 
-- **Snap (MetaMask):** TypeScript Snap consuming AG API + rendering in wallet UI. Snap permissions model is the constraint.
-- **Rabby / Phantom / Coinbase Wallet:** deep-link integration or in-wallet panel via the wallet's platform.
-- **Safe / multisig:** transaction-preview integration before approval; different risk story (team signing).
+- **Shape:** Flintmere reads product data from PIM → scores → writes suggestions back to PIM via their API (if supported) or exports CSV for merchant to import.
+- **Partners:** Plytix, Sales Layer, Akeneo, Pimcore.
+- **Value to partner:** their customers get an AI-readiness score layer.
+- **Value to us:** direct channel to mid-market merchants; reduces onboarding friction.
 
-### Protocols → AG embedded scan
+### Shopify agencies
 
-- DEX / lending / aggregator embeds "Check your approvals" CTA → deep-link to AG scan.
-- Advanced: protocol calls AG API during user session to warn before approval.
+- **Shape:** Flintmere Agency tier with API + white-label reports embedded in agency's client dashboards.
+- **Value to partner:** client-retention tool; QBR artefact.
+- **Value to us:** 25-store seats per agency = leverage (SPEC §8.2).
 
-### Security tool collaborations
+### Complementary Shopify apps
 
-- Data-sharing partnerships (AG exports malicious-contract observations; partner reciprocates).
-- Mutual-endorsement (joint content; not paid endorsement).
-- Integration where the security tool uses AG's revocation engine as a component.
+- **Shape:** cross-promotion + joint content. Non-competitive apps (PIM-adjacent, SEO apps for keyword search, headless-stack apps).
+- **Partners:** Klaviyo (email), Yotpo (reviews), Judge.me (reviews), Gorgias (support).
+- **Value:** joint case studies ("how a Klaviyo + Flintmere stack lifted X"); not deep integrations.
 
-### Chain ecosystems → featured listing
+### Shopify ecosystem (platform-level)
 
-- Ecosystem portal listing (Base, Arbitrum, Optimism portals).
-- Ecosystem marketing push (joint announcement, cohort programme).
+- **Shape:** Built-for-Shopify badge, App Store category features, Shopify Plus Partner Directory listing.
+- **Value:** credibility + merchant-visible distribution.
 
-### Education platforms
+### Research + content partnerships
 
-- Curriculum module (e.g., "wallet approval safety" course using AG as the lab environment).
-- Hackathon sponsorship with AG API as a prize track.
+- **Shape:** "State of AI Readiness in [Vertical]" research reports co-published with ecommerce media (Modern Retail, Retail Dive, eComExperts).
+- **Value:** category-defining content + distribution.
 
-## Technical standards we maintain for integrations
+### Platform integrations (future)
 
-- **OpenAPI spec** — public; canonical path in `projects/allowanceguard/ARCHITECTURE.md`. Every integration partner references this.
-- **Rate-limit tiers** — per API tier; documented in `ARCHITECTURE.md`. Partners negotiate higher tiers if justified.
-- **Webhook reliability** — signed, idempotent, versioned. See `webhook-review` skill in engineering.
+- **Shape:** when Flintmere expands beyond Shopify (WooCommerce / BigCommerce / Salesforce Commerce Cloud — not at launch).
+- **Status:** not pursued. Revisit at month 12+ with 500+ paying merchants.
+
+## Technical standards we maintain for outbound integrations
+
+- **OpenAPI spec** — public; canonical path documented in `projects/flintmere/ARCHITECTURE.md` (when API ships). Every partner references this.
+- **Rate-limit tiers** — per API tier; documented. Partners negotiate higher tiers if justified.
+- **Webhook reliability** — signed (HMAC), idempotent, versioned. See `webhook-review` skill.
 - **SDK compatibility** — semver; breaking changes batched into major releases with 90-day deprecation notice.
-- **Uptime story** — honest SLA, not marketing SLA. Current posture: best-effort 99.9% on scan endpoints; no SLA on dashboard. Sentinel tier may move toward paid SLA.
+- **Uptime story** — honest SLA, not marketing SLA. Current: best-effort 99.5% on scanner + app. Enterprise SLAs contractual.
 
 ## Hard-no integration patterns
 
 We do not integrate with:
 
-- Wallets or services operating in OFAC-sanctioned jurisdictions.
-- Projects whose primary business is market-making for tokens with evident fraud history.
-- Partners who request that AG disable risk labels on specific contracts they have interest in (conflict of interest).
-- Partners who require white-labelling that hides the AG brand in ways inconsistent with our open-source story.
-- Partners who require exclusivity we are not prepared to offer. We are not exclusive to any chain or wallet.
+- Partners operating in OFAC-sanctioned jurisdictions.
+- Partners who request that Flintmere hide specific merchants' low scores from their clients.
+- Partners who require Flintmere to white-label in ways inconsistent with the legibility-bracket signature (the signature is non-negotiable on our surfaces).
+- Partners who require exclusivity we are not prepared to offer. We are not exclusive to any specific Shopify plan tier or vertical.
+- Partners whose primary business is selling fake barcodes or GTINs (conflict with our canonical honesty posture).
 
 ## How this file is maintained
 
-- On every `integration-proposal` run: verify status + technical constraints per partner entry.
-- On every integration shipping / pausing / ending: update status + note in `partnerships-history.md`.
-- On every change to AG's own API / SDK / reference data: update the "Technical standards" section above.
-- On every integration termination: the reason is recorded in `partnerships-history.md`; no finger-pointing, facts only.
+- On every `integration-proposal` run: verify status + technical constraints per entry.
+- On every integration shipping / pausing / ending: update status + `partnerships-history.md`.
+- On every change to Flintmere's own API / SDK / reference data: update the "Technical standards" section.
+- On every integration termination: the reason is recorded in `partnerships-history.md`; facts only.
+
+## Changelog
+
+- 2026-04-19: Rewritten for Flintmere. Replaced allowanceguard integration targets (wallet Snaps, DEX embeds, security-tool data exchanges, chain ecosystem listings) with Flintmere-appropriate integrations (PIM vendors, Shopify agencies, complementary Shopify apps, research content partnerships).

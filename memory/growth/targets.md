@@ -1,119 +1,132 @@
 # targets.md
 
-Categorised list of growth targets — who Allowance Guard wants to reach and why. This file is the **map**, not the outreach log. Attempts and outcomes go to `partnerships-history.md`, `grants-history.md`, or `memory/marketing/outreach.md`.
+Categorised list of growth targets — who Flintmere wants to reach and why. The **map**, not the outreach log. Attempts and outcomes go to `partnerships-history.md`, `grants-history.md`, or `memory/marketing/outreach.md`.
 
 ## Categories
 
-### 1. Wallets
+### 1. Shopify agencies (highest-leverage)
 
-The highest-leverage category. If a wallet surfaces AG inside its UI (as a recommended scan, as a feature, as a Snap, as an in-wallet panel), every user of that wallet sees us.
+Per SPEC §8.2, agencies are the economic engine. One Agency tier sale = 25 client seats. Highest-leverage category by a distance.
 
-- **MetaMask** — MetaMask Snaps platform; AG as a Snap is a natural integration shape.
-- **Rabby** — security-forward wallet; approval transparency is already their brand.
-- **Rainbow** — mobile-first; different integration surface.
-- **Phantom** — multi-chain expansion; approvals surfaced in UI.
-- **Coinbase Wallet** — higher bar; commercial partnership more likely than open integration.
-- **Safe (Gnosis Safe)** — multisig focus; team / treasury use case fits Sentinel tier.
-- **Frame / Zerion / Trust Wallet / OKX Wallet** — emerging integrations.
+- **Shopify Plus Partners** — listed in Shopify's directory. Higher credibility, higher ACV.
+- **Growth agencies** (non-Plus) managing 5–50 Shopify stores. Often vertical-specialised (beauty, supplements, apparel).
+- **Specific named tiers of interest:**
+  - UK/EU agencies (cultural fit + data-residency positioning).
+  - Agencies with named AI-commerce or PIM competency.
+  - Agencies that publish case studies (indicates content muscle we can leverage).
 
-Integration shapes: Snap, deep link, in-wallet panel, browser extension overlay, SDK embed.
+### 2. Complementary Shopify apps
 
-### 2. Protocols + DeFi tools
+Apps that serve our target merchants without competing:
 
-Protocols that either (a) their users sign a lot of approvals on them (so users need AG adjacent) or (b) can embed AG as a safety layer for their own users.
+- **PIM / catalog** — Plytix, Sales Layer, Akeneo, Pimcore.
+- **Reviews** — Yotpo, Judge.me, Stamped.io.
+- **Email/SMS** — Klaviyo, Drip, Postscript.
+- **Search/SEO** — Algolia, Klevu, Boost AI Search.
+- **Headless** — Hydrogen agencies, composable-commerce agencies.
 
-- **DEXs** — Uniswap, PancakeSwap, 1inch, Cowswap: high approval volume.
-- **Lending** — Aave, Compound, Morpho: high-value approvals.
-- **Aggregators** — 0x, Odos, LiFi: cross-chain approval surfaces.
-- **Security tools** (potential collaborators, not direct competitors) — Blowfish, Wallet Guard, Web3 Antivirus, Fire, De.Fi Shield, Harpie.
-- **Bridge / L2 onboarding** — Hop, Across, Stargate, LayerZero, Socket.
+Integration shapes: cross-promotion, case studies, occasionally shallow API handshakes. We don't build deep integrations until a specific deal justifies it.
 
-### 3. Ecosystems + chain foundations
+### 3. Shopify ecosystem + Partner team
 
-Chain ecosystems run grant programmes, ecosystem pages, and marketing support for security-adjacent tools.
+- **Shopify Dev Relations** (individuals who post about agentic commerce, Catalog Mapping, Flow).
+- **Shopify Plus Partner team** (account reps, specialist reps).
+- **Built-for-Shopify review team** (once we apply for the badge at month 6+).
 
-- **Ethereum Foundation** — grants, research ties.
-- **Optimism** — RPGF (Retroactive Public Goods Funding), ecosystem grants.
-- **Base** — ecosystem programmes, Coinbase Ventures relationship.
-- **Arbitrum Foundation** — STIP, LTIPP, ecosystem pages.
-- **Polygon** — grants, ecosystem marketing.
-- **Avalanche, BNB, Scroll, zkSync, Linea, Mantle, Blast, Mode, ApeChain** — chain-by-chain ecosystem programmes.
-- **Polkadot / Kusama treasury** — if AG ever supports Substrate.
-- **Solana Foundation** — if AG ever expands beyond EVM.
+Strategy: relationship-first. No pitches without prior value exchange.
 
-Our chain list (`BUSINESS.md:22`) tells us which ecosystems we already have a story for.
+### 4. Individual merchants
 
-### 4. Grant programmes (non-chain)
+Direct-merchant acquisition targets — the Growth tier and Scale tier buyers.
 
-- **Gitcoin Grants** — public goods rounds; AG qualifies as security public good.
-- **Protocol Guild** — maintainer-of-maintainers funding (indirect relevance).
-- **Ethereum Protocol Fellowship** (EPF) — indirect.
-- **ETHPrague / ETHDenver / ETHCC** — hackathon prize sponsorships (inbound, not outbound).
-- **a16z Crypto Startup School, Paradigm Fellowship, Seed Club, Alliance DAO** — accelerator programmes.
-- **GitHub Sponsors, Open Collective** — continuous funding for open-source core.
+- **Scanner → email → cold follow-up** pipeline: scanner lead < 50 score + opted in for full report.
+- **LinkedIn targets** — founder-operators of 100–5,000 SKU stores in high-AI-visibility verticals (beauty, supplements, apparel).
+- **Reddit / Shopify Community** — engaged participants who post about catalog issues.
 
-### 5. Security researchers + firms
+### 5. Enterprise merchants (Shopify Plus)
 
-Potential collaborators, integration partners, and distribution channels via their audiences.
+Per SPEC §7.1 Enterprise tier: 10,000+ SKU stores on Shopify Plus.
 
-- **Trail of Bits, OpenZeppelin, Spearbit, Code4rena, Sherlock, Immunefi** — audit firms + bug-bounty platforms.
-- **SlowMist, PeckShield, CertiK, Quantstamp** — security firms with large audiences.
-- **Individual researchers** — high-signal Twitter / Farcaster / personal-blog authors in wallet / approval space.
+- **Direct outbound via LinkedIn** — Head of Ecom / CMO / CTO at named Plus merchants.
+- **Referrals from Agency tier** — the cleanest path.
+- **ShopTalk / IRCE in-person** — most Enterprise conversations start here.
+- **Post-audit upsell** — merchants who buy the £97 concierge audit and have a >5K SKU catalog are Enterprise candidates.
 
-Outbound is relationship-first. Ask for a follow-up chat, not for a listing.
+### 6. Ecommerce press + industry media
 
-### 6. Press + media
+Primary channels for launch amplification + "State of AI Readiness" research-report pickup.
 
-(Mostly owned by marketing's `outreach` skill. Growth coordinates on the announcement side.)
+- **Modern Retail, Retail Dive, Retail Week, RetailWire** — US + UK.
+- **eComExperts** — Shopify-native.
+- **Shopify Masters podcast** — Shopify native.
+- **Modern Retail Unlimited + other ecom newsletters**.
 
-- **CoinDesk, The Block, Decrypt, Cointelegraph** — crypto mainstream.
-- **Bankless, Unchained, Crypto Hayes podcast network, Bell Curve** — crypto native audio.
-- **Milk Road, The Defiant, DL News** — newsletter-first.
-- **Not-in-Scope-Yet**: traditional mainstream outlets (FT, WSJ, Wired) — only post-milestone events.
+See `memory/marketing/outreach.md` for contact protocol.
 
-### 7. Directories + listings
+### 7. Events + conferences
 
-- **DeFi Llama security categories** — the canonical DeFi infrastructure index.
-- **Wallet Security Alliance, Crypto Security Alliance** (if such exist / emerge).
-- **Awesome-* GitHub lists** — curated by-chain lists (awesome-ethereum, awesome-base, etc.).
-- **Chain ecosystem pages** — Base ecosystem, Arbitrum portal, Optimism app directory.
-- **Product Hunt** — crypto launch visibility.
-- **Alternativeto** / software comparison sites — lower priority.
+- **ShopTalk (Las Vegas + Europe)** — primary target for Enterprise + agency prospecting.
+- **IRCE** — secondary.
+- **Shopify Unite** (if / when it resumes) — highest signal-to-noise for ecosystem integrations.
+- **Regional Shopify meetups** (London, NYC, Toronto) — grassroots.
 
-### 8. Educational platforms
+### 8. Research + data partnerships
 
-- **Alchemy University, Buildspace, Encode Club, LearnWeb3, Pointer** — developer education; AG as curriculum component.
-- **TechSkills / university blockchain clubs** — lower priority.
+- **Academic ecommerce research programs** (LBS, INSEAD, Wharton Baker Retailing Center).
+- **Industry research firms** (Forrester, Gartner, IDC) for covered-analyst reports once we have ≥500 merchants.
+- **Shopify's own Merchant Insights team** (if / when they publish research).
 
-### 9. Developer platforms
+Strategy: offer aggregated data from our scanner corpus for co-authored research reports.
 
-- **Hardhat, Foundry** — tooling ecosystems where AG's approach can be referenced in security tutorials.
-- **Tenderly, Defender (OZ)** — infrastructure for monitoring that can overlap with Sentinel.
+### 9. Educational + certification platforms
+
+- **Shopify Partner Academy** — curriculum inclusion for AI-readiness certification modules.
+- **Shopify Learn** — public-facing education.
+- **Third-party ecom courses** (e.g., Ezra Firestone's, Drew Sanocki's academies) — partner curriculum segments.
+
+### 10. Future platforms (not pursued at launch)
+
+- **WooCommerce** — WordPress ecosystem. Large but different buyer profile. Post-500 merchants.
+- **BigCommerce** — mid-market ecom. Post-500 merchants.
+- **Salesforce Commerce Cloud** — enterprise. Different sales motion entirely. Post-1000 merchants.
+
+---
 
 ## Selection criteria
 
-Before any outbound, the skill (`integration-proposal`, `partnership-brief`, etc.) checks:
+Before any outbound, the skill (`integration-proposal`, `partnership-brief`, `outreach`, etc.) checks:
 
-1. **Segment fit.** Does the target serve our audience segments (see `memory/marketing/audiences.md`)?
-2. **Mutual value.** What do we offer them? What do they offer us? Balance.
-3. **Timing.** Are they in a period where integrations / listings / grants are being evaluated?
-4. **Jurisdiction.** Does partnering / receiving funds from this target create a cross-border or sanctions issue?
-5. **History.** Have we already approached this target? See `partnerships-history.md`. Avoid double-sending.
+1. **Segment fit.** Does the target serve our audience segments (`memory/marketing/audiences.md`)?
+2. **Mutual value.** What do we offer them? What do they offer us? Balance matters.
+3. **Timing.** Are they in a period where integrations / partnerships / listings are being evaluated?
+4. **Jurisdiction.** Does partnering / receiving funds from this target create cross-border or sanctions issues? (`memory/compliance-risk/jurisdictions.md`)
+5. **History.** Have we already approached this target? (`partnerships-history.md`) Avoid double-sending.
+6. **Brand alignment.** Does the target operate in ways inconsistent with our positioning (e.g., selling fake GTINs, recommending black-box AI fixes)? If so, decline the partnership.
 
 ## How this file is maintained
 
-- **Add** when a target surfaces from `market-research`, a user request, or a partnership inbound.
-- **Remove** when a target sunsets (wallet deprecated, chain foundation dissolves, programme ends). Mark retired; keep historic reference.
-- **Update contact + programme info** when a target's approach changes (new grant cohort, new application link, new ecosystem lead).
+- **Add** when a target surfaces from `market-research`, operator request, or partnership inbound.
+- **Remove** when a target sunsets. Mark retired; keep historic reference.
+- **Update** contact + programme info when a target's approach changes.
 
-Every material update cites a source + date.
+Every material update cites source + date.
 
 ## Priority tiers
 
-Not every target is worth pursuing now. Tier them.
-
-- **Tier 1 — active.** We are pursuing this target this quarter. Resources allocated.
+- **Tier 1 — active.** We are pursuing this quarter. Resources allocated.
 - **Tier 2 — warm.** We plan to pursue within 6 months. Relationship groundwork possible now.
-- **Tier 3 — monitored.** We are not pursuing; we track for changes.
+- **Tier 3 — monitored.** We track for changes; not pursuing.
 
 Initial tiering of categories above to be done in `partnerships-history.md` + `grants-history.md` as each target is first engaged.
+
+## Pre-launch Tier 1 list (Week 1 per SPEC §2.3)
+
+- **10 Shopify agencies** — cold outreach: "what's the dumbest data cleanup task you bill clients for?"
+- **100 low-scoring scanner merchants** — cold DM follow-up after email capture.
+- **Shopify Partner Slack** — community presence.
+- **r/shopify + r/ecommerce** — free-tool launch post.
+- **Founder LinkedIn** — "I audited 200 Shopify stores" post.
+
+## Changelog
+
+- 2026-04-19: Rewritten for Flintmere. Replaced 9 Web3 categories (wallets, protocols, chain foundations, crypto grants, security researchers, crypto press, DeFi Llama listings, wallet-security audits, blockchain educational platforms) with 10 Flintmere categories (agencies, complementary Shopify apps, Shopify Partner team, individual merchants, Enterprise merchants, ecom press, events, research, education, future platforms).

@@ -1,69 +1,70 @@
 # open-source-program.md
 
-Allowance Guard's open-source program — contribution process, CLA, PR triage, community governance. Owned by #2 Open source maintainer.
+Flintmere is **closed-source commercial software at launch.** This file governs the posture toward open source + the criteria under which we might selectively open-source specific packages.
 
-AG is **open-core**. The scanner + revocation UI + the core product is open source; the Pro / Sentinel / API tier infrastructure may run on closed layers. This file governs the **open-source part** of the product.
+Owned by **#2 Open source maintainer** + operator. Reviewed jointly by #9 Lawyer when license questions arise.
 
-## Principles
+## Current posture
 
-- **Core tool: free and open source. Always.** The phrase in our voice memo is a commitment, not marketing.
-- **Contributions welcome, not exploited.** Every contributor gets credit. No contribution is commercially appropriated in ways contributors didn't consent to.
-- **License clarity.** Every package states its license. The license is enforceable in our jurisdictions.
-- **CLA is not a weapon.** The Contributor License Agreement exists so we can (a) ship contributions in our commercial tier and (b) defend the project if needed. It is not a capture tool.
-- **Responsive maintenance.** PRs get a first response within defined SLAs. Issues are triaged. A project that ignores contributions dies.
-- **Security disclosure first.** Public vulnerability reports go dark until patched; see `SECURITY.md` + `memory/compliance-risk/incident-disclosure.md`.
+- **Closed source by default.** All code in `apps/`, `packages/`, and supporting infrastructure is proprietary.
+- **Licensing**: `UNLICENSED` in root `package.json` until we commit to an explicit license.
+- **Contributions**: no public contributor pathway at launch. No open GitHub issues for contributions. No CLA required because nothing is taken.
+- **Public artefacts**: the scanner UI, marketing pages, documentation, and research reports are public-facing products but **not** open source.
 
-## Licensing
+This stance is deliberate. Shopify app businesses where the scoring engine is the durable asset (per SPEC §11.1 moat) benefit from keeping that asset proprietary. Open-sourcing `packages/scoring/` would enable immediate commodification.
 
-- **Core packages:** <specify canonical license — verify in `LICENSE` file at repo root before committing to a public statement>.
-- **API client / React package:** same unless otherwise stated in the package's own LICENSE.
-- **Content under `memory/marketing/`:** not open source by default — internal strategy.
-- **Documentation under `docs/`:** Creative Commons or equivalent — to be confirmed.
+## What might open source in the future
 
-Every package has a `LICENSE` file. Before shipping any new package, #2 + #9 sign off on the license choice.
+Specific packages where open-sourcing would be strategically beneficial (revisit month 12+):
 
-## Contributor License Agreement (CLA)
+### `packages/scoring` (scoring engine)
 
-- **Purpose:** permit AG to use, sublicense, and distribute contributions; preserve the contributor's copyright.
-- **Mechanism:** CLA-assistant style GitHub bot; DCO (Developer Certificate of Origin) as an alternative where preferred.
-- **Threshold:** non-trivial contributions (typically >30 LOC or any architectural change) require CLA. Typo fixes do not.
-- **CLA text:** lives at <path to CLA file — verify / create>.
-- **Record-keeping:** CLA signatures archived; queryable.
+- **Case for open-sourcing**: builds ecosystem goodwill; invites research community contributions; signals confidence in product beyond the scoring math.
+- **Case against**: the scoring algorithm IS the moat. Competitors could fork, tune against our benchmarks, and commodify us.
+- **Likely posture**: keep closed. Consider publishing a **specification document** (non-code) at month 12+ if we want to invite ecosystem alignment.
 
-#9 Lawyer reviews CLA text every 12 months or when law changes. #24 Data protection reviews personal-data handling in CLA records.
+### `packages/llm` (LLM provider abstraction)
 
-## Contribution process
+- **Case for open-sourcing**: generic utility; no Flintmere-specific IP; could be a modest community-building artefact.
+- **Case against**: none material.
+- **Likely posture**: viable candidate for MIT-licensing at month 6+ once stable. Not a priority.
 
-### For new contributors
+### Shopify app boilerplate / Dockerfile templates
 
-1. Read `CONTRIBUTING.md` (verify path — create if missing).
-2. Open an issue describing the change (for non-trivial work).
-3. Wait for label / triage (see SLA below).
-4. Fork, branch, code.
-5. Sign CLA if prompted.
-6. Open PR. Link to issue.
-7. Respond to review within 14 days, or PR may be closed (with re-open option).
+- **Case for open-sourcing**: helps the broader Shopify app community; credits us as authors.
+- **Case against**: none.
+- **Likely posture**: viable for MIT-licensing. Extract as `@flintmere/shopify-coolify-starter` if we do.
 
-### For issue reporters
+### Scanner UI components (non-core)
 
-1. Use the issue template.
-2. For bug reports: reproduction steps are mandatory. See `memory/product-engineering/test-strategy.md`.
-3. For security reports: do NOT open a public issue. Follow `SECURITY.md`.
-4. For feature requests: explain the user problem, not just the proposed feature.
+- **Case for**: demos our design system; developer-evangelism.
+- **Case against**: gives competitors the legibility-bracket signature components.
+- **Likely posture**: **never open-source anything carrying the bracket signature.** The signature is brand, not boilerplate.
 
-### Labels (GitHub)
+## If / when we open-source
 
-- `bug`, `feature`, `docs`, `security`, `performance`, `a11y` — topic.
-- `good-first-issue`, `help-wanted`, `needs-repro`, `needs-review`, `blocked` — workflow.
-- `tier:core`, `tier:api-client`, `tier:react`, `tier:docs` — area.
-- `priority:p0`, `p1`, `p2`, `p3` — severity.
+Whenever a package moves from closed to open:
 
-## PR triage SLAs
+1. **ADR** — `projects/flintmere/decisions/NNNN-open-source-<package>.md`. Context, rationale, competitive analysis, license choice.
+2. **License**: MIT preferred for utility packages, Apache-2.0 if patent protection matters, AGPL **never** (alienates commercial adopters), proprietary with source-visibility if we want a "source-available" model (not open source).
+3. **CLA**: CLA-assistant bot + DCO alternative. Threshold: non-trivial contributions (>30 LOC or any architectural change). Typo fixes don't need CLA.
+4. **CLA text** reviewed by #9 Lawyer; approved CLA lives at `CLA.md` at repo root.
+5. **Contribution process** — `CONTRIBUTING.md` documents the flow.
+6. **Code of conduct** — `CODE_OF_CONDUCT.md`, based on Contributor Covenant.
+7. **Security disclosure** — cross-reference `SECURITY.md`.
 
-These are commitments. Measured openly; missed SLAs discussed in retrospectives.
+## Community spaces (if we open up)
+
+- **GitHub Issues + Discussions** — primary.
+- **Discord / Slack** — optional secondary. Not a decision venue; decisions happen in GitHub.
+- Flintmere team members identify themselves as such when participating.
+
+## PR triage SLAs (if contributions are accepted)
+
+These would be commitments. Measured openly.
 
 | Event | SLA |
-|-------|-----|
+|---|---|
 | First response on a new PR | 5 business days |
 | First response on a new issue | 5 business days |
 | Review round on a responded PR | 5 business days |
@@ -71,76 +72,45 @@ These are commitments. Measured openly; missed SLAs discussed in retrospectives.
 | Security report triage | 5 business days |
 | Merge or final decline on a ready-to-merge PR | 10 business days |
 
-A "first response" is a human labelling + initial review / question, not a bot auto-comment.
+A "first response" is a human labelling + initial review or question, not a bot auto-comment.
 
-## Governance
+## Licensing principles (if we ever go open)
 
-- **Maintainers:** list in `MAINTAINERS.md` (verify / create).
-- **Decision-making:** maintainers by consensus; AG founders hold final veto on strategic direction. Consensus failures escalate to a documented tie-breaker.
-- **Adding maintainers:** nomination from an existing maintainer after sustained contribution (typically 6+ months, 20+ merged PRs, trusted review history).
-- **Removing maintainers:** documented cause; rare.
-- **Code of conduct:** `CODE_OF_CONDUCT.md` (verify / create) — based on Contributor Covenant. Enforcement process documented.
+- **License clarity.** Every package states its license at the file tree root.
+- **CLA is not a weapon.** Exists to let us ship contributions in our commercial tiers and defend the project. Not a capture tool.
+- **No rug-pulling.** License changes from permissive → proprietary require contributor notice + transition plan + Legal Council review. Avoid BSL-style transitions; they are controversial.
+- **No "open source as marketing."** Don't open-source what we can't maintain.
 
-## Roadmap transparency
+## Governance (if we ever go open)
 
-- Public issues + labelled milestones tell contributors what's planned.
-- Private roadmap items (Pro / Sentinel / API tier features) are not disclosed in the open repo.
-- Major architectural decisions land as ADRs under `projects/allowanceguard/decisions/` when they affect the open-source part.
+- **Maintainers**: list in `MAINTAINERS.md`. Add via nomination from existing maintainer after sustained contribution.
+- **Decision-making**: maintainers by consensus; founders hold final veto on strategic direction.
+- **Removing maintainers**: documented cause; rare.
 
-## Recognition
+## Security disclosure
 
-- Every merged PR gets the contributor's GitHub handle on the release notes.
-- Significant contributors get a named entry in `CONTRIBUTORS.md`.
-- "Significant" is judged qualitatively by maintainers; not a formula.
+See `SECURITY.md` at repo root. Applies whether or not code is open-source:
 
-## Community spaces
-
-- GitHub Issues + Discussions.
-- Optional: Discord / Farcaster channel for live conversation (not a decision venue; decisions still happen in GitHub).
-- AG team members identify themselves as such when participating.
-
-## Code of Conduct enforcement
-
-- Reports to a documented private email (`conduct@` or similar — verify).
-- Escalation path: maintainer → founder → #9 Lawyer if legal involvement required.
-- Sanctions: warning → ban from repo → ban from community spaces. Proportionate.
-- Every enforcement action recorded privately with date + reason. Retained for 3 years.
-
-## Security disclosure (cross-reference)
-
-See `SECURITY.md` and `memory/compliance-risk/incident-disclosure.md`. Short version:
-
-- Reports to the documented disclosure address.
+- Reports to `security@flintmere.com`.
 - Acknowledgement within 48 hours.
 - Triage within 5 business days.
 - Public disclosure coordinated after patch + user notification.
 
-## What this program deliberately does not do
+## What this program deliberately does not do (current posture)
 
-- No "open source as marketing" — we don't open source work we can't actually maintain.
-- No soliciting contributions only to ignore them.
-- No rug-pulling license changes to proprietary without contributor notice + transition plan (BSL-style transitions are controversial and require #9 + Legal Council review).
-- No "core team only" guarded areas with no explanation.
+- **Does not ship unlabelled open source.** Every open file states a license.
+- **Does not open-source the legibility-bracket signature** (brand, not boilerplate).
+- **Does not solicit contributions to closed code.** If a community member writes code against our proprietary packages without our agreement, we do not accept it (potential licensing contamination).
 
-## Commercial boundaries
+## Open questions for the operator
 
-- Contributions to the open-source core may be used in Pro / Sentinel / API tiers under the CLA license grant.
-- AG does not sell contributor identities or attributions.
-- AG does not take credit for contributors' work in marketing without naming them (with consent).
+- Do we publish a public CHANGELOG for the Shopify app? (Recommended: yes. Does not require open-source.)
+- Do we publish an aggregated "State of AI Readiness" dataset? (Potential: aggregated CSVs under CC-BY license. Separate from code.)
+- When do we commit to open-sourcing `packages/llm` and `@flintmere/shopify-coolify-starter`? Target: month 6+ if bandwidth allows.
+- Do we ever publish the scoring specification (not code) as a community standard? Target: month 18+ once positioning established.
 
-## Metrics we track
+Answer when the moment calls for it; until then, closed by default.
 
-- PR first-response latency (p50 + p95).
-- Issue triage latency.
-- Release cadence.
-- CLA signatures.
-- Recognition count.
-- Community health signals (active contributors, retention of contributors, civil discourse level).
+## Changelog
 
-These roll into `grants-history.md` narratives (ecosystem grants often ask) and into `partnerships-history.md` where community health is a partnership value.
-
-## How this file is maintained
-
-- Update when the license changes, a maintainer is added / removed, the CoC is enforced, or SLAs are adjusted.
-- Every material change reviewed by #2 + #9.
-- Never update to walk back a commitment quietly. Document the reason for any relaxed standard.
+- 2026-04-19: Rewritten for Flintmere. Flipped posture from open-core (allowanceguard) to closed-source-by-default. Listed specific packages where open-sourcing might be strategic (with analysis of each). Removed CLA / CoC / contributor-process assumptions that only apply when code goes open.
