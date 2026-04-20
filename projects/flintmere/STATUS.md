@@ -33,7 +33,7 @@ Current phase, what's shipped, what's next. Update as state changes so Claude's 
 
 ### `packages/scoring/`
 
-Six-pillar scoring engine. Scanner-mode pillars live (identifiers, titles, consistency). Attributes, mapping, checkout-eligibility scaffolded but locked to app-mode data. Unit tests cover GTIN checksum, title fluff detection, consistency rules.
+Seven-pillar scoring engine. Scanner-mode pillars live (identifiers, titles, consistency, crawlability). Attributes, mapping, checkout-eligibility scaffolded but locked to app-mode data. Unit tests cover GTIN checksum, title fluff detection, consistency rules, crawlability (llms.txt + robots.txt AI-agent detection + sitemap).
 
 ### `packages/llm/`
 
@@ -47,7 +47,7 @@ Provider abstraction per ADRs 0005 + 0006. Shipped:
 ### `apps/scanner/` (Next.js 15, audit.flintmere.com + marketing)
 
 - App Router layout, Tailwind v4 with `@theme` directive, Geist fonts self-hosted
-- Marketing home (`/`) with hero + six pillars + before/after + three-chapter narrative + testimonials + pricing grid + manifesto + footer (324 lines)
+- Marketing home (`/`) with hero + seven pillars + before/after + three-chapter narrative + testimonials + pricing grid + manifesto + footer
 - `/pricing` — five tiers + FAQ + GTIN disclaimer
 - `/research` — State of AI Readiness reports (stub)
 - `/audit` + `/audit/success` — £97 concierge landing with Stripe checkout form + Calendly fallback
@@ -106,6 +106,7 @@ Provider abstraction per ADRs 0005 + 0006. Shipped:
 
 ## Changelog
 
+- **2026-04-20** (latest): Seventh pillar landed — `crawlability` (weight 15%). Scores `/llms.txt` presence + well-formedness, `/robots.txt` AI-agent access (GPTBot/ClaudeBot/Google-Extended/PerplexityBot/Applebot-Extended/cohere-ai/Bytespider/CCBot/OAI-SearchBot/ChatGPT-User), `/sitemap.xml` discoverability, and sitemap reference in robots. Scanner route fetches all three with 5s timeouts in parallel, fails soft on missing. Attributes weight rebalanced 25 → 20 to keep composite at 100. 9 new unit tests in `packages/scoring/test/crawlability.test.ts`. Driven by xgentech/Nimstrata/Rankfirms industry research — llms.txt is the emerging agent-manifest standard and Shopify storefronts overwhelmingly omit it.
 - **2026-04-20** (later): Four legal-page drafts (Privacy, ToS, Cookie Policy, DPA) written to `context/compliance/legal-drafts/` per `legal-page-draft` skill Level 1 rules. Awaiting council + user confirm before any `src/app/<legal>/**` write.
 - **2026-04-20**: Updated to reflect scaffolding-complete state. `packages/scoring`, `packages/llm`, `apps/scanner` (full surface + marketing + Stripe concierge + Resend email gate + PECR unsubscribe), `apps/shopify-app` (OAuth + Polaris + GDPR webhooks + AES-256-GCM + BullMQ + bulk-sync + three Tier 2 enrichment paths) all shipped across 11 commits since 2026-04-19. Now operator-blocked for launch.
 - **2026-04-19**: Foundations complete. Phases 1–3 shipped in 12 commits. All seven memory departments rewritten for Flintmere, six ADRs written, 50+ skills audited.

@@ -39,13 +39,13 @@ Marketing, scanner, and Shopify app (within the Flintmere island) consume these.
 | `Button` | Primary, secondary, ghost CTAs | `--ink`, `--paper`, Geist Mono; 1px ink border; sharp corners |
 | `Input` | Text, URL, email inputs | `--paper`, `--ink` border, Geist Mono for placeholders |
 | `Eyebrow` | Mono uppercase micro-label | Geist Mono 10–11px, `--mute-2`, optional `Dot` prefix |
-| `Dot` | Small accent marker (sulphur on ink, inverted) | Used inside `Eyebrow` only, not freestanding |
+| `Dot` | Small accent marker (amber on paper or ink — passes everywhere as a graphic fill) | Used inside `Eyebrow` only, not freestanding |
 | `Chip` | Small bordered label | `--line` border, `--mute` text; `--accent` variant inverts |
 | `Pill` | Filled label (higher visual weight than `Chip`) | Variants: `default`, `filled`, `accent`, `alert` |
 | `ScoreRing` | Circular score visual | `conic-gradient(--accent 0 Nx%, --line-soft 0)`, Geist display numeral |
 | `PillarCard` | Pillar-breakdown cell | 1px `--line` border, optional locked state with dashed pattern |
 | `IssueRow` | Ranked issue list item | Severity dot, bracketed noun in title, count, CTA link |
-| `StatNumber` | Giant Geist numeric callout | Geist 52–84px, `-0.04em` tracking, optional sulphur highlight on scanner |
+| `StatNumber` | Giant Geist numeric callout | Geist 52–84px, `-0.04em` tracking, optional amber highlight (display ≥48px passes amber-on-paper, per ADR 0007) |
 | `FrameBar` | Ink-surface status strip | Geist Mono labels on `--ink`, dot-cluster left indicator |
 | `ContrastSection` | Two-column "before / after" | 1px vertical `--line` divider, paper and inverted halves |
 | `Manifesto` | Full-bleed ink section | Geist display quote on `--ink`, optional trademark line |
@@ -81,9 +81,9 @@ Surfaces specific to the public scanner at `audit.flintmere.com`.
 | Component | Purpose | Canon notes |
 |---|---|---|
 | `ScannerHero` | URL input form with trust micro-copy | Bracketed placeholder in input; submit triggers overlay |
-| `ScanProgressOverlay` | Full-screen modal during scan | Terminal aesthetic — Geist Mono log lines, sulphur `prompt` marker |
+| `ScanProgressOverlay` | Full-screen modal during scan | Terminal aesthetic — Geist Mono log lines, amber `prompt` marker (on ink canvas, AAA) |
 | `ResultsScorecard` | Big score + pillar grid + issues | `ScoreRing` + 6× `PillarCard` (3 locked) + `IssueRow` list |
-| `EmailGate` | Dark ink section with email capture | Inverted palette, bracket on "report", sulphur bullet markers |
+| `EmailGate` | Dark ink section with email capture | Inverted palette, bracket on "report", amber bullet markers (amber on ink is AAA) |
 | `ShareableBadge` | Post-email share-for-trial moment | Preview graphic + LinkedIn/X/copy-link actions |
 
 ## Shopify app components — `apps/shopify-app/src/components/`
@@ -104,7 +104,7 @@ These render inside Polaris-wrapped pages. The Flintmere island is drawn with ou
 - Polaris components stay untouched. Do not restyle `<Button>`, `<Banner>`, `<IndexTable>`.
 - Flintmere island components sit inside Polaris `<Card>` or `<Layout.Section>` but render their own internals in Flintmere canon.
 - The island has a 1px `--ink` hairline border (where Polaris card borders are softer greys).
-- Sulphur accent permitted only on the score-ring fill; never on Polaris primary buttons (those stay Shopify green `#008060`).
+- Amber accent permitted on the score-ring fill and severity-high dots inside the Flintmere island only; never on Polaris primary buttons (those stay Shopify green `#008060`). See ADR 0007.
 - Bracket tokens allowed on issue titles, pillar numbers, the score display. Never on Polaris-owned CTAs.
 
 ## Adding a new component

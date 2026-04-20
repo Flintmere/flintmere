@@ -24,8 +24,9 @@
   --color-mute-2: #8b8d95;
   --color-mute-inv: #a8aab2;
 
-  /* --- Accent (scanner-surface only) --- */
-  --color-accent: #d9e05a;
+  /* --- Accent (Glowing Amber — portfolio signature, ADR 0007) --- */
+  /* Amber ≈ 11:1 on ink (AAA), ≈ 1.7:1 on paper (never use for text on paper). */
+  --color-accent: #f8bf24;
   --color-accent-ink: #0a0a0b;
 
   /* --- Semantic --- */

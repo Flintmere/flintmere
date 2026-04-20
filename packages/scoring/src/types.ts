@@ -55,15 +55,17 @@ export type PillarId =
   | 'titles'
   | 'mapping'
   | 'consistency'
-  | 'checkout-eligibility';
+  | 'checkout-eligibility'
+  | 'crawlability';
 
 export const PILLAR_WEIGHTS: Readonly<Record<PillarId, number>> = Object.freeze({
   identifiers: 20,
-  attributes: 25,
+  attributes: 20,
   titles: 15,
   mapping: 15,
   consistency: 15,
   'checkout-eligibility': 10,
+  crawlability: 15,
 });
 
 export type Severity = 'critical' | 'high' | 'medium' | 'low';
@@ -102,6 +104,13 @@ export interface CompositeScore {
   issues: Issue[];
 }
 
+export interface CrawlabilityInput {
+  robotsTxt: string | null;
+  llmsTxt: string | null;
+  sitemapXml: string | null;
+}
+
 export interface ScoreOptions {
   locked?: readonly PillarId[];
+  crawlability?: CrawlabilityInput;
 }

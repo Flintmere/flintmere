@@ -8,7 +8,7 @@ export default function MarketingHome() {
       <header className="border-b border-[color:var(--color-line)]">
         <div className="mx-auto max-w-[1280px] px-8 h-[56px] flex items-center justify-between">
           <Link href="/" aria-label="Flintmere home" className="text-[18px] font-medium tracking-tight">
-            Flintmere
+            Flintmere<span className="font-mono font-bold" aria-hidden="true">]</span>
           </Link>
           <nav className="hidden md:flex gap-8" aria-label="Primary">
             <Link href="/#pillars" className="eyebrow hover:text-[color:var(--color-ink)]">
@@ -65,15 +65,16 @@ export default function MarketingHome() {
 
       {/* Pillars */}
       <section id="pillars" className="mx-auto max-w-[1280px] px-8 py-24">
-        <p className="eyebrow mb-6">The six pillars</p>
-        <h2 className="max-w-[18ch] mb-12">One composite score. Six things we check.</h2>
+        <p className="eyebrow mb-6">The seven pillars</p>
+        <h2 className="max-w-[18ch] mb-12">One composite score. Seven things we check.</h2>
         <ol className="list-none p-0 m-0 divide-y divide-[color:var(--color-line)] border-y border-[color:var(--color-line)]">
           <Pillar n="01" name="Identifier completeness" weight="20%" desc="GTIN, MPN, brand, SKU — present, valid, and verifiable." />
-          <Pillar n="02" name="Attribute completeness" weight="25%" desc="Metafields populated against a vertical-specific template." />
+          <Pillar n="02" name="Attribute completeness" weight="20%" desc="Metafields populated against a vertical-specific template." />
           <Pillar n="03" name="Title &amp; description quality" weight="15%" desc="Literal language. No fluff. Agent-parseable length." />
           <Pillar n="04" name="Catalog mapping coverage" weight="15%" desc="Custom fields mapped to Shopify Catalog standard fields." />
           <Pillar n="05" name="Consistency &amp; integrity" weight="15%" desc="Price, inventory, status aligned across Admin API, Storefront API, and rendered JSON-LD." />
-          <Pillar n="06" name="AI checkout eligibility" weight="10%" desc="External URL metafield, store policies, published status, agentic channel enabled." />
+          <Pillar n="06" name="Agent crawlability" weight="15%" desc="llms.txt present, robots.txt allows AI agents, sitemap discoverable and referenced." />
+          <Pillar n="07" name="AI checkout eligibility" weight="10%" desc="External URL metafield, store policies, published status, agentic channel enabled." />
         </ol>
       </section>
 

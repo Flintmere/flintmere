@@ -1,4 +1,5 @@
 import { scoreConsistency } from './pillars/consistency.js';
+import { scoreCrawlability } from './pillars/crawlability.js';
 import { scoreIdentifiers } from './pillars/identifiers.js';
 import { scoreTitles } from './pillars/titles.js';
 import {
@@ -27,6 +28,10 @@ export function scoreCatalog(
   const titles = applyLock(scoreTitles(input), locked);
   const consistency = applyLock(scoreConsistency(input), locked);
 
+  const crawlability = options.crawlability
+    ? applyLock(scoreCrawlability(options.crawlability), locked)
+    : lockedPillar('crawlability', 'crawlability-not-fetched');
+
   const attributes = lockedPillar('attributes', 'requires-install');
   const mapping = lockedPillar('mapping', 'requires-install');
   const checkout = lockedPillar('checkout-eligibility', 'requires-install');
@@ -38,6 +43,7 @@ export function scoreCatalog(
     mapping,
     consistency,
     checkout,
+    crawlability,
   ];
 
   const composite = computeComposite(pillars);

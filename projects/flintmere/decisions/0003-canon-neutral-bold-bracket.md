@@ -1,7 +1,8 @@
 # 0003 — Visual canon: neutral-bold hybrid with the legibility bracket
 
-- **Status:** Accepted
+- **Status:** Accepted — *partially superseded 2026-04-20 by [0007](./0007-canon-amber-signature.md)*
 - **Date:** 2026-04-19
+- **Supersedes:** the colour axis (sulphur demoted to scanner-only) and the dark-form wordmark (`Flint[ mere ]`) parts of this ADR. All other parts of 0003 — the bracket signature, Geist type stack, warm-paper + near-black structure, Apple-bold scale, sharp-corners / no-shadows / 1px-hairline rules — remain authoritative.
 
 ## Context
 

@@ -30,11 +30,22 @@ Slight drop from `--paper` — all tokens above still pass AA with margin except
 | `--paper` | `#F7F7F4` | 19.1:1 | Body + headings on dark sections |
 | `--mute-inv` | `#A8AAB2` | **7.4:1** | Secondary text on ink (body-safe) |
 | `--mute-2` | `#8B8D95` | 5.1:1 | Metadata on ink |
-| `--accent` sulphur | `#D9E05A` | **13.6:1** | Rare accent word, score-ring fill (tested AAA) |
+| `--accent` amber | `#F8BF24` | **≈ 11:1** | Accent word, score-ring fill, severity-high dot, warn-row marker on ink — all AAA. |
 
-### On `--accent` (sulphur `#D9E05A`)
+### On `--accent` (amber `#F8BF24`)
 
-Only `--ink` (`#0A0A0B`) renders on sulphur. Contrast 13.6:1 (AAA). Never white, never `--ink-3`, never `--mute*`.
+Only `--ink` (`#0A0A0B`) renders on amber. Contrast ≈ 11:1 (AAA). Never white, never `--ink-3`, never `--mute*`.
+
+### Amber on `--paper` — text is not allowed
+
+Amber on `#F7F7F4` paper is ≈ **1.7:1** — insufficient for any text role. Amber on paper is permitted only as:
+
+- Graphic fills (score-ring, dots, bars, icon fills, focus-ring shapes)
+- Display type ≥ 48px (glyph thickness compensates)
+- Bracket under-tick hairlines (1px)
+- Amber-fill CTAs where the text on top is `--ink` (ink-on-amber passes AAA)
+
+Amber is never body (14–16px), never meta text, never eyebrow text on paper, never inline link text on paper. See ADR 0007 for the full rule.
 
 ## Keyboard
 

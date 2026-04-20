@@ -2,6 +2,7 @@ export { scoreCatalog } from './score.js';
 export { scoreIdentifiers } from './pillars/identifiers.js';
 export { scoreTitles, titleWordCount } from './pillars/titles.js';
 export { scoreConsistency } from './pillars/consistency.js';
+export { scoreCrawlability } from './pillars/crawlability.js';
 export { isValidGtin, gtinLength } from './utils/gtin.js';
 export { detectFluff } from './utils/fluff.js';
 export {
@@ -22,6 +23,7 @@ export type {
   ProductInput,
   VariantInput,
   CompositeScore,
+  CrawlabilityInput,
   PillarResult,
   PillarId,
   Issue,

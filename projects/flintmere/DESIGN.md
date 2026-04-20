@@ -10,9 +10,9 @@ Visual canon pointers. Authoritative tokens and rules live in `../../memory/desi
 
 | Surface | URL | Chrome | Brand posture | Reference |
 |---|---|---|---|---|
-| Marketing | `flintmere.com` | Custom (Apple-bold) | Technical confidence, manifesto-scroll, zero sulphur | `wireframes/` + `memory/design/tokens.md` |
-| Scanner | `audit.flintmere.com` | Custom (Apple-bold) | Diagnostic tool, sulphur appears for live-state readouts only | `wireframes/` scanner variants |
-| Shopify app | `app.flintmere.com` | Polaris (host) + Flintmere island (ours) | Platform-native with Flintmere-brand moments | Below |
+| Marketing | `flintmere.com` | Custom (Apple-bold) | Technical confidence, manifesto-scroll, amber accent at display scale + brand moments | `wireframes/` + `memory/design/tokens.md` |
+| Scanner | `audit.flintmere.com` | Custom (Apple-bold) | Diagnostic tool, amber is the live-state colour (score-ring, severity high, warn rows) | `wireframes/` scanner variants |
+| Shopify app | `app.flintmere.com` | Polaris (host) + Flintmere island (ours) | Platform-native with Flintmere-brand moments; amber inside island only | Below |
 
 ## The Shopify app island rule
 
@@ -39,14 +39,14 @@ The Shopify app embeds inside Shopify admin. Polaris is non-negotiable for Built
 - Polaris primitives stay pure Polaris. Do not restyle `Button`, `Banner`, etc.
 - Flintmere island components have a 1px ink hairline border and sit on `--paper`, not Polaris's `#FAFBFB`.
 - The only bracket moments in the app are on the score card, issue titles, and pillar numbers — not on Polaris CTAs.
-- Sulphur accent permitted only on the score-ring fill (not on Polaris primary buttons — those stay Polaris green).
+- Amber accent permitted on the score-ring fill and severity-high dots inside the island only. Never on Polaris primary buttons — those stay Polaris green `#008060`.
 
 ## The laws
 
 Five rules that apply to every Flintmere surface. #8 Accessibility (Noor) holds veto on any breach of law 3.
 
 1. **Type is the image.** No stock photography, no AI gradient hero, no decorative illustration. Large Geist display carries the visual weight.
-2. **One accent per section.** On marketing: the bracket is the accent (no colour). On scanner + app: sulphur is permitted once per surface, only for live diagnostic state (score ring, severity-high dot).
+2. **One accent per section.** Amber is the sole colour accent. On marketing: amber appears as display-scale `StatNumber`, bracket under-tick, icon fills, or one amber-fill CTA (ink-on-amber). On scanner + Shopify-app island: amber is the live-diagnostic colour — score-ring, severity-high dot, warn rows, `prompt` marker. Amber is never body text, meta text, or small-label text on `--paper`. See ADR 0007.
 3. **WCAG AA on every text surface. AAA on primary CTAs.** `--mute-2` is metadata only (below body-text contrast on paper). Noor veto on any regression.
 4. **`prefers-reduced-motion` honoured everywhere.** Every animation has a reduced-motion branch that disables movement while preserving meaning.
 5. **Sharp corners. No shadows. No glass.** Separation is 1px ink hairline. If a surface looks weak, it's the layout, not the missing shadow.
@@ -70,7 +70,7 @@ If a designer or copywriter produces a section without a bracket moment, that se
 | `PillarCard` | scanner + shopify-app | Pillar cell with progress bar, bracketed number, locked state |
 | `IssueRow` | scanner + shopify-app | Issue title (with bracket), severity dot, count, CTA |
 | `EmailGate` | scanner | Dark-section email capture with ink-inverted palette |
-| `Eyebrow` | all | Geist Mono 11px uppercase, optional sulphur dot prefix |
+| `Eyebrow` | all | Geist Mono 11px uppercase, optional amber dot prefix |
 | `Bracket` | all | The primitive — wraps a word, handles aria-hidden variant |
 | `StatNumber` | marketing + scanner | Giant Geist number for numeric callouts (15×, 40%, 5.6M) |
 | `ContrastSection` | marketing | Two-column "Before / After agentic commerce" framing |
@@ -88,7 +88,8 @@ Canonical: `../../memory/design/tokens.md`. Highlights for quick reference:
 - **Paper:** `#F7F7F4` (canvas), `#EDECE6` (secondary).
 - **Ink:** `#0A0A0B` (text + dividers), `#141518` (lede).
 - **Mute:** `#5A5C64` (body-safe muted), `#8B8D95` (metadata only).
-- **Accent (sulphur, demoted):** `#D9E05A`. Scanner-surfaces only. Never on marketing.
+- **Accent (Glowing Amber — portfolio signature):** `#F8BF24`. All three surfaces. Fills, display type ≥48px, under-tick, amber-fill CTAs. Never small text on paper (contrast ≈1.7:1). See ADR 0007.
+- **Accent foreground:** `--accent-ink` = `#0A0A0B`. Ink on amber is the only text-on-amber combination.
 - **Alert:** `#E54A2A`. True critical only.
 - **Ok:** `#3F8F57`. Sparingly.
 
@@ -98,11 +99,17 @@ Canonical: `../../memory/design/tokens.md`. Highlights for quick reference:
 - Gradients (except the one `conic-gradient` on score-rings).
 - Drop shadows. Glassmorphism. Blur. Translucency.
 - Caveat font, Fraunces font, Space Grotesk, IBM Plex Sans (all retired from earlier directions).
-- Sulphur on marketing surfaces. Sulphur on Polaris chrome.
+- Sulphur `#D9E05A` (retired 2026-04-20, ADR 0007 — amber replaces it everywhere).
+- Amber on body text, meta text, eyebrows, small labels, or inline links on `--paper` (fails AA at ≈1.7:1).
+- Amber on Polaris primary buttons (they stay Polaris green `#008060` — amber lives inside the Flintmere island only).
 - Stock photography. AI-generated gradient heroes. Emojis as decoration.
 - Drop-cap or other editorial ornaments that aren't the bracket.
+- Logomarks, cube icons, isometric or 3D brand renders. The wordmark is the mark. See `../../memory/design/tokens.md` §Wordmark + §Rejected brand-asset patterns.
+- Tagline lockups inside the wordmark. "AI-agent readiness platform" is page copy, never mark.
+- Asymmetric single-bracket wordmark forms (`FLINTMERE]`). The bracket signature is bilateral — the dark-form wordmark is `Flint[ mere ]`.
 
 ## ADR pointers
 
-- `decisions/0003-canon-neutral-bold-bracket.md` — why this canon, what was rejected
+- `decisions/0003-canon-neutral-bold-bracket.md` — why this canon, what was rejected (partially superseded on colour axis by 0007)
+- `decisions/0007-canon-amber-signature.md` — Glowing Amber as portfolio signature, sulphur retired, asymmetric `Flintmere]` wordmark
 - `decisions/0001-single-repo-monorepo.md` — repo topology that this canon spans

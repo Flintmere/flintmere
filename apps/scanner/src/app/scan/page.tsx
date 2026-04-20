@@ -69,8 +69,8 @@ export default function ScanPage() {
     <main id="main">
       <header className="border-b border-[color:var(--color-line)]">
         <div className="mx-auto max-w-[1280px] px-8 h-[56px] flex items-center justify-between">
-          <Link href="/" className="text-[18px] font-medium tracking-tight">
-            Flintmere
+          <Link href="/" aria-label="Flintmere home" className="text-[18px] font-medium tracking-tight">
+            Flintmere<span className="font-mono font-bold" aria-hidden="true">]</span>
           </Link>
           <Link href="/contact" className="btn">
             Book a demo
@@ -163,6 +163,7 @@ function Results({ result }: { result: ScanResult }) {
     mapping: 'Catalog mapping',
     consistency: 'Consistency & integrity',
     'checkout-eligibility': 'AI checkout eligibility',
+    crawlability: 'Agent crawlability',
   };
 
   return (

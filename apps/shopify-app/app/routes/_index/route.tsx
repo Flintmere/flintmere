@@ -97,7 +97,7 @@ export default function App() {
             type="submit"
             style={{
               border: '1px solid #0a0a0b',
-              background: '#d9e05a',
+              background: '#f8bf24',
               color: '#0a0a0b',
               padding: '14px 24px',
               fontFamily: 'ui-monospace, monospace',

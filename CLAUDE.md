@@ -41,7 +41,7 @@ Target users: Shopify merchants (100–5,000 SKUs, £500K–£20M revenue) and a
 
 ## The canon in one line
 
-**Neutral-bold hybrid + the legibility bracket + Geist Sans + Geist Mono.** Warm near-white + near-black. Sulphur demoted to scanner-only. Apple-bold structure. See `memory/design/tokens.md` for the authoritative statement and `projects/flintmere/decisions/0003-canon-neutral-bold-bracket.md` for the rationale.
+**Neutral-bold hybrid + the legibility bracket + Geist Sans + Geist Mono.** Warm near-white + near-black. Glowing Amber `#F8BF24` as portfolio signature (sole accent, all surfaces). Apple-bold structure. See `memory/design/tokens.md` for the authoritative statement, `decisions/0003` for the structural rationale, and `decisions/0007` for the amber + asymmetric-wordmark canon.
 
 ## The signature
 
@@ -146,8 +146,8 @@ Skills: `support-triage`, `docs-coherence-audit`, `finance-snapshot`, `vendor-re
 
 ## Surface-specific reminders
 
-- **Marketing site**: zero sulphur, zero stock photos, one bracket per section, Geist display.
-- **Scanner**: sulphur allowed for live diagnostic state; score ring is the signature motion.
+- **Marketing site**: zero stock photos, one bracket per section, Geist display. Amber as display-scale accent + under-tick + amber-fill CTA; never body text on paper.
+- **Scanner**: amber is the live-diagnostic colour (score-ring, severity-high, warn rows). Score ring is the signature motion.
 - **Shopify app**: Polaris chrome + Flintmere island. Never restyle Polaris primitives.
 
 ## Canon hygiene
@@ -155,7 +155,7 @@ Skills: `support-triage`, `docs-coherence-audit`, `finance-snapshot`, `vendor-re
 If you encounter any of these in code or copy, they are retired — migrate or delete:
 
 - Fraunces, IBM Plex Sans, Space Grotesk, Caveat (retired faces)
-- Oxblood, amber-deep, crimson-paper (retired colours)
+- Oxblood, amber-deep, crimson-paper, sulphur `#D9E05A` (retired colours; sulphur replaced by Glowing Amber `#F8BF24` in ADR 0007)
 - `.paper-card`, `.ledger-rule`, `.deckle-*`, `.grain`, `.glass-*` (retired utilities)
 - `bg-white`, `bg-slate-*`, `bg-gray-*`, `bg-neutral-*`, `dark:*` (banned)
 - The word "approved." as a protected moment (allowanceguard heritage)

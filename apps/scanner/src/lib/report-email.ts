@@ -109,7 +109,7 @@ function renderHtml(input: ReportEmailInput): string {
           <tr>
             <td style="padding:24px 32px;">
               <p style="margin:0;font-size:16px;line-height:1.55;color:#141518;">
-                Your catalog scores ${score.score}/100 against the six pillars AI shopping agents parse. Your GTIN-less ceiling — the highest score reachable without GS1 identifiers — is <strong>${score.gtinlessCeiling}/100</strong>.
+                Your catalog scores ${score.score}/100 against the seven pillars AI shopping agents parse. Your GTIN-less ceiling — the highest score reachable without GS1 identifiers — is <strong>${score.gtinlessCeiling}/100</strong>.
               </p>
               <p style="margin:12px 0 0 0;font-size:14px;color:#5A5C64;line-height:1.55;">
                 This is the partial audit. Three pillars stay locked until you install Flintmere on your store; those are the ones that need OAuth access to your metafields + catalog-mapping config.
@@ -146,7 +146,7 @@ function renderHtml(input: ReportEmailInput): string {
               <p style="margin:16px 0 24px 0;font-size:14px;color:#A8AAB2;line-height:1.55;">
                 Every change previewed before it ships. Every change reversible for 7 days. First month £29 for scanner users (Growth tier, normally £49).
               </p>
-              <a href="${esc(appUrl)}" style="display:inline-block;background:#D9E05A;color:#0A0A0B;padding:14px 24px;border:1px solid #D9E05A;font-family:ui-monospace,Menlo,monospace;font-size:13px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;text-decoration:none;">Install Flintmere →</a>
+              <a href="${esc(appUrl)}" style="display:inline-block;background:#F8BF24;color:#0A0A0B;padding:14px 24px;border:1px solid #F8BF24;font-family:ui-monospace,Menlo,monospace;font-size:13px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;text-decoration:none;">Install Flintmere →</a>
             </td>
           </tr>
 
@@ -236,6 +236,8 @@ function pillarLabel(pillar: string): string {
       return 'Consistency & integrity';
     case 'checkout-eligibility':
       return 'AI checkout eligibility';
+    case 'crawlability':
+      return 'Agent crawlability';
     default:
       return pillar;
   }

@@ -55,7 +55,7 @@ A standalone web page at `audit.flintmere.com`. User enters a Shopify store URL.
 - Sample product pages (JSON-LD structured data)
 - Homepage (detects theme, store policies)
 
-Returns a partial score (3 of 6 pillars) with specific issues. Full report gated behind email.
+Returns a partial score (4 of 7 pillars — identifiers, titles, consistency, crawlability) with specific issues. Full report gated behind email.
 
 **No install, no OAuth, no Shopify app listing.** Pure marketing funnel.
 
@@ -154,17 +154,18 @@ Scope discipline matters. Merchants don't need another swiss-army-knife.
 
 ## 4. The scoring system
 
-Single composite 0–100 score, six weighted pillars. The composite IS the product — a single-dimension audit is just a linter.
+Single composite 0–100 score, seven weighted pillars. The composite IS the product — a single-dimension audit is just a linter.
 
 ### 4.1 Pillars and weights
 
 | Pillar | Weight | What it measures |
 |---|---|---|
 | Identifier completeness | 20% | GTIN, MPN, brand, SKU presence and validity |
-| Attribute completeness | 25% | Metafield population against category template |
+| Attribute completeness | 20% | Metafield population against category template |
 | Title & description quality | 15% | Literal language, length, agent-parseability |
 | Catalog mapping coverage | 15% | Custom fields mapped to Shopify Catalog standard fields |
 | Consistency & integrity | 15% | Price/inventory/status alignment across surfaces |
+| Agent crawlability | 15% | llms.txt presence, robots.txt bot access, sitemap discoverability |
 | AI checkout eligibility | 10% | External URL metafield, published status, store policies present |
 
 *Note on terminology: we deliberately use "AI checkout eligibility" in merchant-facing language rather than "agentic readiness" — it maps to Shopify's own Agentic Storefronts vocabulary while being instantly legible to non-technical merchants. Internal code and API can still use `agentic_readiness` if preferred for brevity.*
@@ -214,6 +215,16 @@ Score = weighted % of expected attributes populated (typed metafields score high
 - D2C-only products flagged correctly (B2B exclusions)
 - Product status not set to Unlisted
 - Agentic storefronts channel enabled
+
+**Agent crawlability (15%)**
+- `/llms.txt` served at the site root (emerging standard for agent-optimised content manifests)
+- `/llms.txt` is well-formed — top-level `# Site` heading + at least one `## Section`
+- `/robots.txt` does not block named AI agents (GPTBot, ClaudeBot, Google-Extended, PerplexityBot, Applebot-Extended, cohere-ai, Bytespider, CCBot, OAI-SearchBot, ChatGPT-User)
+- `/robots.txt` does not apply `Disallow: /` to `User-agent: *` (blanket block)
+- `/sitemap.xml` present and well-formed (`<urlset>` or `<sitemapindex>`)
+- `Sitemap:` directive in `robots.txt` points to the sitemap
+
+Scanner fetches each URL with a 5s timeout and fails soft — missing or unreachable files count against the pillar, they never fail the whole scan.
 
 ### 4.2.1 The GTIN-less path (80% ceiling)
 
@@ -396,7 +407,7 @@ Separate from the app. Simpler stack:
 
 - Static Next.js landing page
 - Edge function accepts URL → fetches `{shop}/products.json` + sitemap + sample product JSON-LD
-- Partial scoring (3 pillars: identifiers, titles, consistency) runs in-edge
+- Partial scoring (4 pillars: identifiers, titles, consistency, crawlability) runs in-edge
 - Email-gated full report sent via Resend or Postmark
 - Leads piped to a simple CRM (Attio, HubSpot free, or just a Postgres table with a Retool dashboard)
 

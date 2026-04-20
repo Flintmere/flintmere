@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { scoreCatalog } from '@flintmere/scoring';
 import { prisma } from '@/lib/db';
+import { fetchCrawlability } from '@/lib/crawlability-fetcher';
 import { fetchCatalog, ShopifyFetchError } from '@/lib/shopify-fetcher';
 import { hashIp } from '@/lib/hash';
 
@@ -46,7 +47,13 @@ export async function POST(req: NextRequest) {
 
   try {
     const catalog = await fetchCatalog(body.shopUrl, { maxPages: 4 });
-    const score = scoreCatalog(catalog);
+    const crawlability = await fetchCrawlability(catalog.shopDomain).catch(
+      () => null,
+    );
+    const score = scoreCatalog(
+      catalog,
+      crawlability ? { crawlability } : {},
+    );
 
     await prisma.scan.update({
       where: { id: scan.id },

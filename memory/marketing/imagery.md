@@ -51,7 +51,7 @@ Used sparingly for process / flow diagrams (the "Audit → Fix → Monitor" thre
 - Ink-2 — `#141518`
 - Mute — `#5A5C64` (body-safe)
 - Mute-2 — `#8B8D95` (metadata only)
-- Accent (sulphur) — `#D9E05A` (scanner only)
+- Accent (Glowing Amber — portfolio signature) — `#F8BF24` (all surfaces; never small text on paper — see ADR 0007)
 - Alert — `#E54A2A`
 - Ok — `#3F8F57`
 

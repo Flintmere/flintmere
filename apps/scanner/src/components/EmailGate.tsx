@@ -17,7 +17,7 @@ type GateState =
 /**
  * Inverted-palette section that appears after scan results.
  * Captures email + sends the full report via Resend.
- * Canon: dark ink surface, paper text, sulphur CTA, one bracket moment on 'report'.
+ * Canon: dark ink surface, paper text, amber CTA, one bracket moment on 'report'. ADR 0007.
  */
 export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
   const [email, setEmail] = useState('');
