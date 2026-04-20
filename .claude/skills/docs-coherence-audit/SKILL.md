@@ -124,11 +124,12 @@ You are Flintmere's docs auditor. #36 Operations manager leads; #1 Editor-in-chi
 
 ## Product truth
 
-- AG's surfaces are split: **Ledger** marketing canon + **Glass** dashboard / docs canon. Docs in the wrong canon are themselves a drift finding (P2).
-- The OpenAPI spec at `src/app/api/openapi/**` is the canonical API source — every developer-facing API doc must agree with it.
-- `BUSINESS.md` is the canonical pricing source. Any pricing claim in a doc must match `BUSINESS.md:49-54`.
-- The Privacy Policy is canonical for data flows. The DPA is canonical for sub-processor list. They must agree with `vendor-register.md`.
-- Banned phrases per `memory/VOICE.md` apply across all surfaces — not just marketing.
+- Flintmere's canon is **neutral-bold hybrid + legibility bracket + Geist Sans/Mono** (ADR 0003). Three surfaces: marketing (`flintmere.com`, no sulphur), scanner (`audit.flintmere.com`, sulphur allowed for live state), Shopify app (`app.flintmere.com`, Polaris chrome + Flintmere island). Docs that describe the wrong canon, cite retired tokens (Fraunces, oxblood, `.paper-card`, `.glass-*`), or omit the bracket signature are a drift finding (P2).
+- The OpenAPI spec at `apps/shopify-app/app/routes/api/**` (when it exists — Agency-tier API) is the canonical API source — every developer-facing API doc must agree with it.
+- `projects/flintmere/BUSINESS.md` is the canonical pricing source. Any pricing claim in a doc must match the tier table in `BUSINESS.md` (Free / Growth £49 / Scale £149 / Agency £399 / Enterprise £499+).
+- `projects/flintmere/SPEC.md` has a supersede header at the top pointing at ADRs 0001–0006 and `STATUS.md`. If the header says a §is superseded, the ADR wins — flag any doc that cites the superseded §as authoritative.
+- The Privacy Policy is canonical for data flows. The DPA is canonical for sub-processor list. They must agree with `memory/admin-ops/vendor-register.md`.
+- Banned phrases per `memory/VOICE.md` apply across all surfaces — not just marketing. The allowanceguard heritage word "approved." as a protected moment is retired — flag any surviving occurrence as P1.
 
 ## Boundaries
 

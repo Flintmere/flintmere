@@ -2,13 +2,31 @@
 
 *A Shopify app that scores product catalogs for AI-agent readiness and fixes what's broken so ChatGPT, Gemini, and Copilot can actually recommend them.*
 
-**Status**: Pre-build scoping document. v1.2
+**Status**: Pre-build scoping document. v1.2 — **intent, not truth.**
 **Target market**: Shopify merchants, 100–5,000 SKUs, $500K–$20M revenue
 **Brand**: Flintmere (parent brand). Public scanner lives at `audit.flintmere.com`. Main marketing site at `flintmere.com`.
+
+> ## ⚠ Supersede header — read before trusting any §
+>
+> This document is the **original product & go-to-market plan**, preserved for intent. Some sections have been **superseded by Architecture Decision Records** (`decisions/0001`–`0006`) written after scoping, and by the current state tracked in `STATUS.md`. Where a §below disagrees with the docs referenced here, the ADR / STATUS wins.
+>
+> | § in SPEC | Supersedes |
+> |---|---|
+> | §5.1, §10.2 (LLM: Claude Haiku / Sonnet) | **ADR 0005** (Gemini 2.5 Flash primary + GPT-4o-mini fallback) + **ADR 0006** (Gemini 2.5 Pro hard-case lock) |
+> | §6.1 (Hosting: Fly.io / Render) | **ADR 0002** (Coolify on DigitalOcean) |
+> | §6.1 (ORM decision implicit) | **ADR 0004** (Prisma over Drizzle) |
+> | §6.1 (monorepo topology) | **ADR 0001** (single-repo monorepo: `apps/` + `packages/`) |
+> | §12.4 (Fraunces + warm palette) | **ADR 0003** (neutral-bold hybrid + legibility bracket + Geist Sans/Mono) |
+> | §6.4 (scanner architecture as separate app) | Reconciled: scanner + marketing both live in `apps/scanner/`; split deferred per `STATUS.md` §Open decisions |
+> | §9 (week-by-week roadmap) | `STATUS.md` is canonical for what's shipped vs planned |
+>
+> Everything else (the scoring system, the three-tier fix engine, the six pillars, pricing, GTM sequence, the GTIN-less path, Channel Health, risks) still stands.
 
 *v1.2 updates: domain locked to flintmere.com / audit.flintmere.com, Next-7-days list refreshed to reflect v1.1 changes, risk section updated to cross-reference §11.2 Channel Health.*
 
 *v1.1 added: vertical moat strategy, Enterprise tier, viral badge + share-for-trial loop, Channel Health measurement, GTIN-less path, Fix History UX, SLA commitments, streaming JSONL architecture, renamed pillar terminology.*
+
+*Supersede header added 2026-04-20 — reconciling SPEC against shipped code and ADRs 0001–0006.*
 
 ---
 
@@ -227,7 +245,7 @@ Three tiers. Gating based on safety, not arbitrary capability.
 Changes that cannot realistically go wrong:
 
 - Move existing barcode values into a typed GTIN metafield
-- Generate alt text for product images via vision LLM (Haiku or GPT-4o-mini — ~$0.001–0.005 per image)
+- Generate alt text for product images via vision LLM (Gemini 2.5 Flash via Vertex `europe-west1`, GPT-4o-mini fallback — ~$0.0003–0.002 per image. Supersedes ADR 0005.)
 - Populate `brand` metafield from vendor field
 - Create missing metafield definitions with correct typed schemas
 - Expose metafields to Storefront API (`access.storefront = "public_read"`) where agentic visibility requires it
@@ -307,14 +325,16 @@ Things that fundamentally require merchant action:
 
 ### 6.1 Stack
 
+> **Superseded in part** — LLM row by ADRs 0005 + 0006 (Gemini Flash/Pro + Azure fallback); Hosting row by ADR 0002 (Coolify on DigitalOcean); ORM decision by ADR 0004 (Prisma). Current stack of record: `projects/flintmere/PROJECT.md` §Stack.
+
 | Component | Choice | Rationale |
 |---|---|---|
 | App framework | Remix (Shopify official template) | Maintained by Shopify, ships App Bridge integration, fast iteration |
 | Language | TypeScript | Type safety with GraphQL codegen for Shopify schema |
 | Database | Postgres | Well-understood, Prisma works well with Remix |
 | Queue | BullMQ on Redis | Audit jobs run async for stores with 500+ SKUs |
-| LLM | Anthropic Claude (Haiku for bulk, Sonnet for hard cases) | Cost-effective, good quality. Fallback to GPT-4o-mini if needed. |
-| Hosting | Fly.io or Render | Cheap, scales linearly, good Postgres integrations |
+| LLM | ~~Anthropic Claude~~ → **Gemini 2.5 Flash primary, Gemini 2.5 Pro hard cases, GPT-4o-mini fallback** (ADRs 0005, 0006) | EU data residency via Vertex `europe-west1`; ~40% cost reduction vs Claude at comparable quality on our task shapes |
+| Hosting | ~~Fly.io or Render~~ → **Coolify on existing DigitalOcean droplet** (ADR 0002) | Sunk cost on droplet; UK/EU residency; single-droplet routing via Traefik |
 | Admin UI | Shopify Polaris + App Bridge | Required for "Built for Shopify" badge |
 | Analytics | PostHog | Self-hostable, good cohort analysis |
 | Error tracking | Sentry | Standard |
@@ -515,7 +535,7 @@ Cornerstone content pieces to produce in first 90 days:
 
 ### 10.2 Tactical risks
 
-**LLM API costs balloon.** Mitigation: tiered models (Haiku for bulk, Sonnet only for hard reasoning), aggressive caching of attribute inferences (products don't change often), hard rate limits per subscription tier.
+**LLM API costs balloon.** Mitigation: tiered models (Gemini 2.5 Flash for bulk, Gemini 2.5 Pro only for hard reasoning — ADRs 0005 + 0006), aggressive caching of attribute inferences (products don't change often), hard rate limits per subscription tier, `CircuitBreaker` in `packages/llm` that fails over to Azure GPT-4o-mini before Vertex quotas bite.
 
 **Merchants don't trust automated changes to product data.** Mitigation: every Tier 2 change requires explicit approval by default; only flip to auto after merchant has approved 20+ suggestions manually; full audit trail with one-click revert within 7 days; never write to pricing or inventory.
 
@@ -585,7 +605,7 @@ In priority order. Each step has a stop-condition — skip to "only if time" onc
    - Cold DM opener: *"Ran your store through our scanner — you're at X/100 for AI readiness. Want the full breakdown? No pitch."*
    If none of these feel urgent, pause — positioning is wrong. Reframe before shipping.
 
-4. **Day 3–4**: UI for the scorecard using the distinctive design (Fraunces + warm palette — not generic AI slop). Email capture gates the full report. Include economic framing in the report preview ("Your 47 missing GTINs could lift AI visibility by ~34%").
+4. **Day 3–4**: UI for the scorecard using the distinctive design (~~Fraunces + warm palette~~ → **Geist Sans/Mono + neutral-bold hybrid + legibility bracket**, per ADR 0003 — not generic AI slop). Email capture gates the full report. Include economic framing in the report preview ("Your 47 missing GTINs could lift AI visibility by ~34%").
 
 5. **Day 4**: Stand up the `/audit` paid-concierge landing page — Stripe £97 button + Calendly link + 48h turnaround promise. Cross-link from scanner results: *"Want us to do this for you?"*
 

@@ -189,7 +189,7 @@ Assumes the droplet already has Coolify installed (you said it does).
   - [ ] Build: Dockerfile → `apps/shopify-app/Dockerfile`
   - [ ] Domain: `app.flintmere.com`
   - [ ] Port: `3000`
-  - [ ] Health check: `/healthz` (route TODO — add in a follow-up commit)
+  - [ ] Health check: `/healthz` (shipped at `apps/shopify-app/app/routes/healthz.tsx`)
 - [ ] Add environment variables (from `apps/shopify-app/.env.example`):
   - `SHOPIFY_API_KEY` + `SHOPIFY_API_SECRET`
   - `SHOPIFY_APP_URL=https://app.flintmere.com`
@@ -344,16 +344,24 @@ Miss 2+ gates → pause. Reposition before writing more code.
 - When a stage triggers a new ADR (e.g. SOC 2 posture decision), write the ADR first; don't ad-hoc it.
 - Operator owns this file. Claude proposes additions but does not tick items on your behalf.
 
-## Current state (updated 2026-04-19)
+## Current state (updated 2026-04-20)
 
 **Code complete**:
 
-- `packages/scoring` — six-pillar engine, unit-tested
-- `apps/scanner` — Next.js 15, full scanner flow, wired to scoring
-- `apps/shopify-app` — Remix + OAuth + Polaris + mandatory GDPR webhooks + Prisma app schema + AES-256-GCM token encryption
+- `packages/scoring` — six-pillar engine, unit-tested, scanner-mode pillars live
+- `packages/llm` — Vertex (Gemini Flash + Pro) + Azure OpenAI (GPT-4o-mini) + circuit breaker + mock for tests (ADRs 0005 + 0006)
+- `apps/scanner` — Next.js 15, full scanner flow + marketing home + `/pricing` + `/research` + `/audit` + `/audit/success` + `/unsubscribe`; API routes: `/api/scan`, `/api/scan/:id`, `/api/lead` (Resend), `/api/unsubscribe`, `/api/concierge/checkout` (Stripe), `/api/webhooks/stripe`, `/api/healthz`
+- `apps/shopify-app` — Remix + OAuth + Polaris + mandatory GDPR webhooks + product drift webhooks + Prisma app schema + AES-256-GCM token encryption + BullMQ queues + streaming JSONL bulk-catalog-sync + three Tier 2 enrichment paths (alt text, title rewrite, attribute inference) + `/healthz` + `/api/rescan` + `/api/enrichment/preview`
 
 **Operator-blocked (can't progress without you)**:
 
 - Any Stage 2 account creation (domains, Shopify, Google, Azure, Stripe, Resend, Sentry, BetterStack)
 - Any Stage 3 Coolify deploy (needs you to paste credentials)
 - Any Stage 5 business/legal work
+
+**Not yet built (code, next up)**:
+
+- Fix History UI + `/api/fix/:id/revert` endpoint (SPEC §5.2.1 — schema + fix_batches table exist)
+- Shareable badge + share-for-trial loop (SPEC §2.1.2 + §2.1.3)
+- Worker Dockerfile for separate Coolify service (BullMQ worker currently bundled with web)
+- Legal pages (Privacy / Terms / DPA / Cookie Policy)

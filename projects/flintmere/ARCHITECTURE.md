@@ -19,33 +19,38 @@ OAuth-installed via `@shopify/shopify-app-remix`. Bulk catalog sync via `bulkOpe
 
 ## API routes (canonical surface)
 
+**Status key**: ✅ shipped · 🚧 planned · ⏳ partial (route exists, handler stub).
+
 ### Scanner
 
-| Route | Method | Auth | Rate limit | Purpose |
-|---|---|---|---|---|
-| `/api/scan` | POST | public | 10/hr per IP | Accept store URL, enqueue scan job, return job ID |
-| `/api/scan/:id` | GET | public (job-ID auth) | 60/hr per IP | Poll scan status + return results |
-| `/api/lead` | POST | public | 5/hr per IP + 3/hr per email | Email capture for full report |
-| `/api/report/:token` | GET | one-time token | 30/hr per token | Serve full PDF report from a tokenised link |
-| `/api/healthz` | GET | public | none | Liveness |
+| Route | Method | Auth | Rate limit | Purpose | Status |
+|---|---|---|---|---|---|
+| `/api/scan` | POST | public | 10/hr per IP | Accept store URL, enqueue scan job, return job ID | ✅ |
+| `/api/scan/:id` | GET | public (job-ID auth) | 60/hr per IP | Poll scan status + return results | ✅ |
+| `/api/lead` | POST | public | 5/hr per IP + 3/hr per email | Email capture + send full report via Resend | ✅ |
+| `/api/unsubscribe` | POST | HMAC token | 30/hr per token | RFC 8058 one-click unsubscribe | ✅ |
+| `/api/concierge/checkout` | POST | public | — | £97 concierge — create Stripe Checkout Session, 303-redirect | ✅ |
+| `/api/webhooks/stripe` | POST | Stripe signature | — | `checkout.session.completed` → upsert `scanner_concierge_audits` | ✅ |
+| `/api/report/:token` | GET | one-time token | 30/hr per token | Serve full PDF report from a tokenised link | 🚧 |
+| `/api/healthz` | GET | public | none | Liveness | ✅ |
 
 ### Shopify app
 
-| Route | Method | Auth | Rate limit | Purpose |
-|---|---|---|---|---|
-| `/auth/shopify` | GET | Shopify OAuth | none (Shopify owns) | OAuth install flow |
-| `/auth/shopify/callback` | GET | Shopify OAuth | none | OAuth callback, token encryption, initial sync trigger |
-| `/api/webhooks/products-create` | POST | HMAC | none (Shopify rate) | Enqueue re-score on new product |
-| `/api/webhooks/products-update` | POST | HMAC | none | Enqueue re-score |
-| `/api/webhooks/products-delete` | POST | HMAC | none | Remove from index |
-| `/api/webhooks/app-uninstalled` | POST | HMAC | none | Scrub tokens, enqueue data purge |
-| `/api/webhooks/customers-data-request` | POST | HMAC | none | GDPR DSAR |
-| `/api/webhooks/customers-redact` | POST | HMAC | none | GDPR erasure |
-| `/api/webhooks/shop-redact` | POST | HMAC | none | Shop-level erasure |
-| `/api/fix` | POST | session token | 60/min per shop | Apply a fix batch |
-| `/api/fix/:id/revert` | POST | session token | 20/min per shop | Revert a fix batch (7-day window) |
-| `/api/rescan` | POST | session token | 2/hr per shop | Manual rescan trigger |
-| `/api/export/:type` | GET | session token | 10/hr per shop | CSV exports (fix history, product-level scores) |
+| Route | Method | Auth | Rate limit | Purpose | Status |
+|---|---|---|---|---|---|
+| `/auth/$` (OAuth) | GET | Shopify OAuth | none (Shopify owns) | OAuth install + callback, token encryption, initial sync trigger | ✅ |
+| `/auth/login` | GET | public | — | Offline auth entry point for unembedded testing | ✅ |
+| `/webhooks/products` | POST | HMAC | none | `products/create|update|delete` → enqueue drift re-score | ✅ |
+| `/webhooks/app-uninstalled` | POST | HMAC | none | Scrub tokens, enqueue data purge | ✅ |
+| `/webhooks/customers-data-request` | POST | HMAC | none | GDPR DSAR | ✅ |
+| `/webhooks/customers-redact` | POST | HMAC | none | GDPR erasure | ✅ |
+| `/webhooks/shop-redact` | POST | HMAC | none | Shop-level erasure | ✅ |
+| `/api/rescan` | POST | session token | 2/hr per shop | Manual rescan trigger | ✅ |
+| `/api/enrichment/preview` | POST | session token | 10/hr per shop | Tier 2 LLM dry-run (5-sample preview before bulk apply) | ✅ |
+| `/healthz` | GET | public | none | Liveness | ✅ |
+| `/api/fix` | POST | session token | 60/min per shop | Apply a fix batch | 🚧 |
+| `/api/fix/:id/revert` | POST | session token | 20/min per shop | Revert a fix batch (7-day window) | 🚧 |
+| `/api/export/:type` | GET | session token | 10/hr per shop | CSV exports (fix history, product-level scores) | 🚧 |
 
 ## Database schema (high level)
 

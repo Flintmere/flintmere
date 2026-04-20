@@ -23,9 +23,10 @@ The map `docs-coherence-audit` reads. One row per doc. New docs appended on crea
 |---|---|---|---|---|---|
 | `apps/scanner/src/app/page.tsx` (marketing home) | marketing | #5 + #20 | BUSINESS.md, scanner UX | TBD | Hero + pillars + pricing peek |
 | `apps/scanner/src/app/pricing/page.tsx` | marketing | #5 + #22 | BUSINESS.md §Tiers | TBD | Tier + pricing canonical |
-| `apps/scanner/src/app/audit/page.tsx` (£97 concierge landing) | marketing | #5 + #22 | BUSINESS.md, SPEC §2.4 | TBD | Stripe button + Calendly |
+| `apps/scanner/src/app/audit/page.tsx` (£97 concierge landing) | marketing | #5 + #22 | BUSINESS.md, SPEC §2.4 | 2026-04-20 | Stripe checkout form + Calendly fallback |
+| `apps/scanner/src/app/audit/success/page.tsx` (post-payment) | marketing | #5 + #22 | Stripe session metadata | 2026-04-20 | Calendly kickoff prompt |
 | `apps/scanner/src/app/research/**` (State-of-AI-Readiness reports) | marketing | #1 + #20 | per-report data | rolling | `memory/marketing/content-history.md` is canonical log |
-| `apps/scanner/src/app/blog/**` (when exists) | marketing | #1 + #20 | per-post topic | rolling | |
+| `apps/scanner/src/app/blog/**` (when exists) | marketing | #1 + #20 | per-post topic | rolling | Not yet scaffolded |
 
 ## Product docs (in-app surfaces)
 
@@ -34,7 +35,8 @@ The map `docs-coherence-audit` reads. One row per doc. New docs appended on crea
 | `apps/scanner/src/app/scan/**` (public scanner UI) | product | #13 + #7 | scoring packages + pillar defs | TBD | Scanner results layout |
 | `apps/shopify-app/app/routes/_index.tsx` (dashboard) | product | #13 + #7 | score card + pillar grid | TBD | Polaris + Flintmere island |
 | `apps/shopify-app/app/routes/issues.*` | product | #13 + #7 | issue-row primitive | TBD | Bracketed noun rule |
-| `apps/shopify-app/app/routes/fix-history.*` | product | #13 + #7 | fix_batches schema | TBD | |
+| `apps/shopify-app/app/routes/fix-history.*` | product | #13 + #7 | fix_batches schema | TBD | Not yet built; schema exists |
+| `apps/scanner/src/app/unsubscribe/page.tsx` | product | #24 + #7 | HMAC token contract | 2026-04-20 | RFC 8058 one-click; `timingSafeEqual` |
 | In-product error messages (across both apps) | product | #13 + #4 | error code map | rolling | `writer` skill audits microcopy |
 
 ## API docs (developer-facing — Agency tier)
@@ -55,11 +57,18 @@ The map `docs-coherence-audit` reads. One row per doc. New docs appended on crea
 | `apps/scanner/src/app/dpa/page.tsx` (DPA) | legal | #24 + #9 | sub-processor list | TBD | |
 | `SECURITY.md` (disclosure policy) | legal | #4 + #24 | disclosure process | 2026-04-19 | Repo root |
 
+## Package docs
+
+| Path | Surface | Owner | Depends on | Last reviewed | Notes |
+|---|---|---|---|---|---|
+| `packages/scoring/README.md` | contributor | #13 | pillar engine API | TBD | Consumed by both apps |
+| `packages/llm/README.md` | contributor | #13 + #4 | `LLMProvider` interface; ADRs 0005 + 0006 | TBD | Provider abstraction |
+
 ## Contributor docs
 
 | Path | Surface | Owner | Depends on | Last reviewed | Notes |
 |---|---|---|---|---|---|
-| `README.md` (repo root) | contributor | #1 + #2 | quickstart; install | TBD | First-impression doc |
+| `README.md` (repo root) | contributor | #1 + #2 | quickstart; install | 2026-04-20 | Flintmere-specific (replaced kit template) |
 | `CONTRIBUTING.md` (if/when exists) | contributor | #2 | branch / PR process | TBD | Open-source-program owns |
 | `CODE_OF_CONDUCT.md` (if/when exists) | contributor | #2 | community policy | TBD | |
 | `CHANGELOG.md` (when first release) | contributor | #1 + #14 | release pipeline | rolling | |
@@ -108,4 +117,5 @@ The map `docs-coherence-audit` reads. One row per doc. New docs appended on crea
 
 ## Changelog
 
+- 2026-04-20: Added rows for `/audit/success`, `/unsubscribe`, `packages/scoring/README.md`, `packages/llm/README.md`. Re-dated repo-root `README.md` to reflect Flintmere rewrite. Noted `fix-history` not yet built.
 - 2026-04-19: Rewritten for Flintmere. Paths updated from `src/app/**` (single-app) to `apps/*/src/` (monorepo). Removed allowanceguard-specific surfaces (Sentinel, sitemap). Added Flintmere surfaces (scanner, scanner/scan, Shopify app routes, research reports, audit concierge landing).
