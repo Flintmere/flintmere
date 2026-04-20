@@ -32,7 +32,7 @@ cp apps/scanner/.env.example apps/scanner/.env.local
 cp apps/shopify-app/.env.example apps/shopify-app/.env.local
 pnpm -F scanner prisma migrate dev --name init_scanner
 pnpm -F shopify-app prisma migrate dev --name init_app
-pnpm -F scanner dev                         # http://localhost:3000
+pnpm -F scanner dev                         # http://localhost:3001
 ```
 
 Full operator checklist (domains, Shopify Partner app, Vertex AI, Stripe, Resend, Sentry, Coolify): `projects/flintmere/OPERATOR-TASKS.md`.

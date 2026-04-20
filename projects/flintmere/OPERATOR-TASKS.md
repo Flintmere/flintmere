@@ -36,7 +36,7 @@ Sections are ordered roughly by **when you need them**. Do Stage 1 first; Stage 
 ### Verify scanner runs locally
 
 - [ ] `pnpm -F scanner dev`
-- [ ] Open `http://localhost:3000`
+- [ ] Open `http://localhost:3001`
 - [ ] Test the scanner with a real Shopify store URL (e.g. `allbirds.com`, `gymshark.com`, or any `*.myshopify.com`)
 - [ ] Check the `POST /api/scan` route responds with a real score and pillar breakdown
 - [ ] Check the `GET /api/healthz` endpoint returns `{ status: 'ok' }`

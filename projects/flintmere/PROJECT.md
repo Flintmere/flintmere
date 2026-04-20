@@ -55,7 +55,7 @@ Canonical (authoritative) commands:
 
 ```
 pnpm install                 # install all workspace deps
-pnpm -F scanner dev          # scanner dev server (localhost:3000)
+pnpm -F scanner dev          # scanner dev server (localhost:3001)
 pnpm -F shopify-app dev      # Shopify app dev server + Shopify CLI tunnel
 pnpm -F @flintmere/llm test  # package tests
 pnpm -r build                # build all apps + packages

@@ -74,7 +74,7 @@ Provider abstraction per ADRs 0005 + 0006. Shipped:
 
 ## In progress
 
-None — current code is committed and pushed. Waiting on operator to unblock launch path.
+- **Legal page drafts** — Privacy Policy, Terms of Service, Cookie Policy, DPA drafted to `context/compliance/legal-drafts/2026-04-20-*.mdx` (gitignored). Skill autonomy is Level 1, so each draft is awaiting (a) #24 Data Protection + #9 Lawyer council sign-off, and (b) explicit per-file user confirm before a write to `apps/scanner/src/app/{privacy,terms,cookies,dpa}/page.tsx`. Open items (registered company details, ICO number, consent banner + GPC honour, automated DSR SLA verification) are tracked inside each draft's "Open items before publish" section.
 
 ## Next (in order of leverage)
 
@@ -82,7 +82,7 @@ None — current code is committed and pushed. Waiting on operator to unblock la
 2. **Validation week (SPEC §2)** — scanner live at `audit.flintmere.com`, cold outreach (LinkedIn + r/shopify + Partner Slack), £97 concierge audits.
 3. **Fix History UI + revert endpoint** (SPEC §5.2.1) — schema + job exist; UI + `POST /api/fix/:id/revert` route to wire.
 4. **Shareable badge + share-for-trial loop** (SPEC §2.1.3, §2.1.2) — `flintmere.com/score/{shop}` public page + LinkedIn/X verification.
-5. **Legal pages** — Privacy, Terms, DPA, Cookie Policy (draft via `legal-page-draft` → UK commercial lawyer review).
+5. **Legal pages** — drafts landed 2026-04-20 in `context/compliance/legal-drafts/`. Next: #24 + #9 review, resolve per-doc "Open items" blockers (registered office, ICO number, consent-banner implementation, backup retention verification), then user-confirmed writes to `apps/scanner/src/app/{privacy,terms,cookies,dpa}/page.tsx`.
 6. **Worker Dockerfile** — separate Coolify service for the Shopify app's BullMQ worker process (currently bundled with the web container).
 7. **App Store submission prep** (SPEC Week 7–10) — `shopify-app-store-submission` skill checklist, screenshots, demo video.
 8. **Beta merchant onboarding** — private MVP for 10–20 merchants.
@@ -106,5 +106,6 @@ None — current code is committed and pushed. Waiting on operator to unblock la
 
 ## Changelog
 
+- **2026-04-20** (later): Four legal-page drafts (Privacy, ToS, Cookie Policy, DPA) written to `context/compliance/legal-drafts/` per `legal-page-draft` skill Level 1 rules. Awaiting council + user confirm before any `src/app/<legal>/**` write.
 - **2026-04-20**: Updated to reflect scaffolding-complete state. `packages/scoring`, `packages/llm`, `apps/scanner` (full surface + marketing + Stripe concierge + Resend email gate + PECR unsubscribe), `apps/shopify-app` (OAuth + Polaris + GDPR webhooks + AES-256-GCM + BullMQ + bulk-sync + three Tier 2 enrichment paths) all shipped across 11 commits since 2026-04-19. Now operator-blocked for launch.
 - **2026-04-19**: Foundations complete. Phases 1–3 shipped in 12 commits. All seven memory departments rewritten for Flintmere, six ADRs written, 50+ skills audited.
