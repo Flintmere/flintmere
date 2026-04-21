@@ -18,11 +18,17 @@ enum ScanStatus {
   failed
 }
 
+enum ScanSource {
+  user
+  bot
+}
+
 model Scan {
   id          String     @id @default(cuid())
   shopUrl     String     @map("shop_url")
   normalisedDomain String @map("normalised_domain")
   status      ScanStatus @default(pending)
+  source      ScanSource @default(user)
   score       Int?
   grade       String?
   scoreJson   Json?      @map("score_json")
@@ -40,6 +46,7 @@ model Scan {
   @@index([normalisedDomain])
   @@index([createdAt])
   @@index([status])
+  @@index([source])
   @@map("scanner_scans")
 }
 

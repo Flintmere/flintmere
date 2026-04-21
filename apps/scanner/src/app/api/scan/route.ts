@@ -33,12 +33,14 @@ export async function POST(req: NextRequest) {
     req.headers.get('x-real-ip') ??
     null;
   const userAgent = req.headers.get('user-agent') ?? null;
+  const source = userAgent?.includes('FlintmereBot') ? 'bot' : 'user';
 
   const scan = await prisma.scan.create({
     data: {
       shopUrl: body.shopUrl,
       normalisedDomain: body.shopUrl.toLowerCase().trim(),
       status: 'running',
+      source,
       ipHash: hashIp(ip),
       userAgent,
       startedAt,
