@@ -6,7 +6,7 @@ import { CheckoutCard } from './CheckoutCard';
 export const metadata: Metadata = {
   title: 'Concierge audit — £97',
   description:
-    "We'll run the full Flintmere audit on your Shopify store and deliver a 30-day remediation plan within 48 hours.",
+    'John reviews your Shopify store personally, records a 15-minute video walkthrough, and sends a prioritised fix plan within three working days.',
 };
 
 export default function Audit() {
@@ -40,18 +40,18 @@ export default function Audit() {
 
       <section className="mx-auto max-w-[640px] px-6 pt-20 pb-10 text-center">
         <p className="eyebrow mb-6">
-          Concierge audit · £97 · 48-hour delivery
+          Concierge audit · £97 one-off · three working days
         </p>
         <h1 className="mx-auto max-w-[14ch]">
-          Want us to do it <Bracket>for you</Bracket>?
+          Want John to do it <Bracket>for you</Bracket>?
         </h1>
         <p
           className="mx-auto mt-8 max-w-[48ch] text-[color:var(--color-ink-2)]"
           style={{ fontSize: 17, lineHeight: 1.55 }}
         >
-          One of us runs the full Flintmere audit against your store,
-          hand-weights the issues, and delivers a prioritised 30-day plan. No
-          subscription, no sales call, no upsell.
+          John reviews your store personally, records a 15-minute video
+          walkthrough of what to fix first, and sends a prioritised plan in
+          plain English. No subscription, no sales call, no upsell.
         </p>
       </section>
 
@@ -67,74 +67,37 @@ export default function Audit() {
             style={{ fontSize: 16, lineHeight: 1.55 }}
           >
             <li className="flex gap-3">
-              <span
-                aria-hidden="true"
-                className="text-[color:var(--color-mute-2)]"
-              >
-                —
-              </span>
+              <span aria-hidden="true" className="text-[color:var(--color-mute-2)]">—</span>
               <span>
-                Full catalog scan across all seven checks (we take OAuth access
-                or an export CSV).
+                A 15-minute video walkthrough of your store — John on screen,
+                pointing at the exact things to fix first.
               </span>
             </li>
             <li className="flex gap-3">
-              <span
-                aria-hidden="true"
-                className="text-[color:var(--color-mute-2)]"
-              >
-                —
-              </span>
+              <span aria-hidden="true" className="text-[color:var(--color-mute-2)]">—</span>
               <span>
-                Every issue ranked by revenue impact × score deficit — not
-                alphabetical, not severity-only.
+                A prioritised fix list in plain English — no jargon, no 80-page
+                PDF. Ranked by how many products each fix unblocks.
               </span>
             </li>
             <li className="flex gap-3">
-              <span
-                aria-hidden="true"
-                className="text-[color:var(--color-mute-2)]"
-              >
-                —
-              </span>
+              <span aria-hidden="true" className="text-[color:var(--color-mute-2)]">—</span>
               <span>
-                Per-product CSV: every affected SKU, the fix required, the
-                estimated lift.
+                A CSV of every product that has a problem, and which fix it
+                needs.
               </span>
             </li>
             <li className="flex gap-3">
-              <span
-                aria-hidden="true"
-                className="text-[color:var(--color-mute-2)]"
-              >
-                —
-              </span>
+              <span aria-hidden="true" className="text-[color:var(--color-mute-2)]">—</span>
               <span>
-                30-day remediation plan sequenced by effort and dependency.
+                The right GS1 office for where your business is registered, so
+                you buy real barcodes from the right place.
               </span>
             </li>
             <li className="flex gap-3">
-              <span
-                aria-hidden="true"
-                className="text-[color:var(--color-mute-2)]"
-              >
-                —
-              </span>
+              <span aria-hidden="true" className="text-[color:var(--color-mute-2)]">—</span>
               <span>
-                Geography-aware GTIN path — the right GS1 office for where
-                you&rsquo;re registered.
-              </span>
-            </li>
-            <li className="flex gap-3">
-              <span
-                aria-hidden="true"
-                className="text-[color:var(--color-mute-2)]"
-              >
-                —
-              </span>
-              <span>
-                One 15-minute kickoff call so we understand your vertical. No
-                pitch.
+                Reply with questions afterwards. John reads every one.
               </span>
             </li>
           </ul>
@@ -147,34 +110,25 @@ export default function Audit() {
             style={{ fontSize: 15, lineHeight: 1.55 }}
           >
             <li>
-              <strong
-                className="text-[color:var(--color-ink)]"
-                aria-hidden="true"
-              >
+              <strong className="text-[color:var(--color-ink)]" aria-hidden="true">
                 [ 01 ]
               </strong>
-              &nbsp;&nbsp;Pay £97. 30-day refund if we miss the 48-hour
-              deadline.
+              &nbsp;&nbsp;Pay £97. You get a confirmation email from John
+              straight away.
             </li>
             <li>
-              <strong
-                className="text-[color:var(--color-ink)]"
-                aria-hidden="true"
-              >
+              <strong className="text-[color:var(--color-ink)]" aria-hidden="true">
                 [ 02 ]
               </strong>
-              &nbsp;&nbsp;Book a 15-minute kickoff call from the confirmation
-              email.
+              &nbsp;&nbsp;Optional: book a 15-minute call from the confirmation
+              email. Most people skip it — John can work from the URL alone.
             </li>
             <li>
-              <strong
-                className="text-[color:var(--color-ink)]"
-                aria-hidden="true"
-              >
+              <strong className="text-[color:var(--color-ink)]" aria-hidden="true">
                 [ 03 ]
               </strong>
-              &nbsp;&nbsp;We audit; we don&rsquo;t sell. 48 hours later your
-              report lands in your inbox.
+              &nbsp;&nbsp;Within three working days, the walkthrough plus fix
+              plan lands in your inbox.
             </li>
           </ol>
         </div>
@@ -183,18 +137,20 @@ export default function Audit() {
           className="mt-14 text-[color:var(--color-mute)]"
           style={{ fontSize: 12, lineHeight: 1.55 }}
         >
-          Flintmere Ltd is a trading name of Eazy Access Ltd (England &amp;
-          Wales). Eazy Access Ltd is not VAT-registered, so £97 is the full
-          price — no VAT is added. Flintmere is not affiliated with GS1.
-          Identifier requirements vary by marketplace and jurisdiction. Outcome
-          estimates in the report are indicative, based on comparable Shopify
-          stores in the same vertical and size band.
+          Flintmere is a trading name of Eazy Access Ltd (England &amp; Wales).
+          Eazy Access Ltd is not VAT-registered, so £97 is the full price — no
+          VAT is added. Flintmere is not affiliated with GS1. Identifier
+          requirements vary by marketplace and jurisdiction. The audit is
+          informational; the checks map to Shopify product data requirements,
+          GS1 UK identifier rules, and Google Merchant Center specifications.
         </p>
       </section>
 
       <footer className="border-t border-[color:var(--color-line)] py-10">
         <div className="mx-auto max-w-[1280px] px-8 flex flex-wrap justify-between gap-6">
-          <p className="eyebrow">© 2026 Flintmere Ltd</p>
+          <p className="eyebrow">
+            © 2026 Flintmere · a trading name of Eazy Access Ltd
+          </p>
           <nav className="flex gap-8" aria-label="Footer">
             <Link href="/privacy" className="eyebrow">
               Privacy

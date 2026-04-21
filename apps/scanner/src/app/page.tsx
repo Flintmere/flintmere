@@ -39,61 +39,119 @@ export default function MarketingHome() {
           className="mt-10 max-w-[52ch] text-[color:var(--color-ink-2)]"
           style={{ fontSize: 19, lineHeight: 1.5 }}
         >
-          AI shopping agents now drive measurable commerce traffic on Shopify. Roughly 40% of catalogs get excluded from agent recommendations because the product data isn&rsquo;t structured the way agents read it. We tell you where you stand in 60 seconds.
+          Shoppers are starting to buy through ChatGPT, Perplexity and Claude instead of Google. Those agents skip stores whose product data doesn&rsquo;t match Shopify, GS1 UK and Google Merchant Center rules. Paste your URL — we show you exactly where you disappear.
         </p>
         <div className="mt-12 flex flex-wrap gap-3">
           <Link href="/scan" className="btn btn-accent">
-            Scan my store →
+            Run the free scan →
           </Link>
-          <Link href="/#pillars" className="btn">
-            How it works
+          <Link href="/audit" className="btn">
+            Or book the £97 concierge audit →
           </Link>
         </div>
+        <p
+          className="mt-6 max-w-[52ch] text-[color:var(--color-mute)]"
+          style={{ fontSize: 13, lineHeight: 1.55 }}
+        >
+          Prefer to talk first? Email{' '}
+          <a
+            href="mailto:hello@flintmere.com"
+            className="underline"
+          >
+            hello@flintmere.com
+          </a>{' '}
+          — John usually replies within two working days.
+        </p>
       </section>
 
       <hr className="rule" />
 
-      {/* Numbers strip */}
-      <section aria-label="Key statistics" className="mx-auto max-w-[1280px] px-0">
-        <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-[color:var(--color-line)] border-y border-[color:var(--color-line)]">
-          <Stat big="15×" label="YoY growth in AI-agent orders on Shopify (2025)" />
-          <Stat big="40%" label="Catalogs ignored by AI agents today" />
-          <Stat big="5.6M" label="Shopify stores auto-enrolled in agentic storefronts" />
-          <Stat big="3–4×" label="Visibility lift at 99%+ attribute completion" />
+      {/* Numbers strip — only verifiable claims */}
+      <section aria-label="Key facts" className="mx-auto max-w-[1280px] px-0">
+        <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[color:var(--color-line)] border-y border-[color:var(--color-line)]">
+          <Stat
+            big="7"
+            label="Checks we run on every scan — Shopify data, GS1 UK barcodes, Google Merchant Center, crawler rules, llms.txt, sitemap, checkout."
+          />
+          <Stat
+            big="60s"
+            label="Time the free scan takes on a store with 5,000 products. No signup."
+          />
+          <Stat
+            big="£97"
+            label="One-off concierge audit by John — 15-minute video walkthrough plus a prioritised plan, within three working days."
+          />
         </div>
       </section>
 
-      {/* Pillars */}
+      {/* Seven checks */}
       <section id="pillars" className="mx-auto max-w-[1280px] px-8 py-24">
-        <p className="eyebrow mb-6">The seven checks</p>
-        <h2 className="max-w-[18ch] mb-12">One composite score. Seven things we check.</h2>
+        <p className="eyebrow mb-6">What we check</p>
+        <h2 className="max-w-[22ch] mb-12">
+          Seven things an AI shopping agent looks for before it will recommend your product.
+        </h2>
         <ol className="list-none p-0 m-0 divide-y divide-[color:var(--color-line)] border-y border-[color:var(--color-line)]">
-          <Pillar n="01" name="Identifier completeness" weight="20%" desc="GTIN, MPN, brand, SKU — present, valid, and verifiable." />
-          <Pillar n="02" name="Attribute completeness" weight="20%" desc="Metafields populated against a vertical-specific template." />
-          <Pillar n="03" name="Title &amp; description quality" weight="15%" desc="Literal language. No fluff. Agent-parseable length." />
-          <Pillar n="04" name="Catalog mapping coverage" weight="15%" desc="Custom fields mapped to Shopify Catalog standard fields." />
-          <Pillar n="05" name="Consistency &amp; integrity" weight="15%" desc="Price, inventory, status aligned across Admin API, Storefront API, and rendered JSON-LD." />
-          <Pillar n="06" name="Agent crawlability" weight="15%" desc="llms.txt present, robots.txt allows AI agents, sitemap discoverable and referenced." />
-          <Pillar n="07" name="AI checkout eligibility" weight="10%" desc="External URL metafield, store policies, published status, agentic channel enabled." />
+          <Pillar
+            n="01"
+            name="Product IDs"
+            weight="20%"
+            desc="Whether each product carries the codes agents look it up by — barcode, brand, manufacturer part number."
+          />
+          <Pillar
+            n="02"
+            name="Structured attributes"
+            weight="20%"
+            desc="Whether size, colour, material and other fields exist as structured data — not hidden inside the description."
+          />
+          <Pillar
+            n="03"
+            name="Title &amp; description quality"
+            weight="15%"
+            desc="Whether titles and descriptions read like spec sheets an agent can parse — not marketing copy."
+          />
+          <Pillar
+            n="04"
+            name="Google category match"
+            weight="15%"
+            desc="Whether products carry a Google Merchant Center category, so agents know what you sell."
+          />
+          <Pillar
+            n="05"
+            name="Data consistency"
+            weight="15%"
+            desc="Whether the catalog looks healthy — images load, active products have stock, alt text exists, prices match across pages."
+          />
+          <Pillar
+            n="06"
+            name="AI agent access"
+            weight="15%"
+            desc="Whether AI shopping agents are allowed to read your site at all — robots rules, sitemap, llms.txt."
+          />
+          <Pillar
+            n="07"
+            name="Agent checkout readiness"
+            weight="10%"
+            desc="Whether an AI agent can actually complete a purchase on your store without human intervention."
+          />
         </ol>
       </section>
 
       <hr className="rule" />
 
-      {/* Before / After agentic commerce */}
+      {/* Before / After */}
       <section aria-labelledby="before-after-heading" className="grid md:grid-cols-2 border-b border-[color:var(--color-line)]">
         <div className="p-12 md:p-16 border-b md:border-b-0 md:border-r border-[color:var(--color-line)]">
-          <p className="eyebrow mb-6">Before agentic commerce</p>
-          <h3 id="before-after-heading" className="max-w-[18ch]">Catalogs were written for keyword search.</h3>
+          <p className="eyebrow mb-6">How product pages used to work</p>
+          <h3 id="before-after-heading" className="max-w-[18ch]">Titles written for Google. Humans did the rest.</h3>
           <p className="mt-6 text-[color:var(--color-ink-2)] max-w-[38ch]" style={{ fontSize: 16, lineHeight: 1.55 }}>
-            Titles stuffed with modifiers. Attributes buried in descriptions. Barcodes optional. Every merchant played the same SEO game, and it worked — until the shoppers stopped being human.
+            Stuffed titles. Attributes buried in descriptions. Barcodes optional. Humans skimmed and filled in the gaps. The same catalog ranked fine in Google search for a decade.
           </p>
         </div>
         <div className="p-12 md:p-16">
-          <p className="eyebrow mb-6">After agentic commerce</p>
-          <h3 className="max-w-[18ch]">Catalogs are read by machines that don&rsquo;t skim.</h3>
+          <p className="eyebrow mb-6">How they work now</p>
+          <h3 className="max-w-[18ch]">Machines read every word and check every field.</h3>
           <p className="mt-6 text-[color:var(--color-ink-2)] max-w-[38ch]" style={{ fontSize: 16, lineHeight: 1.55 }}>
-            Agents parse structured data, verify GTINs, cross-check price across surfaces, and reason about fit. If the data isn&rsquo;t there — or isn&rsquo;t consistent — your product isn&rsquo;t in the answer.
+            ChatGPT, Perplexity and Claude don&rsquo;t skim. They verify barcodes, compare prices across pages, and reject products with missing fields. No field, no recommendation.
           </p>
         </div>
       </section>
@@ -101,61 +159,76 @@ export default function MarketingHome() {
       {/* Three-chapter narrative */}
       <section className="mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">How Flintmere works</p>
-        <h2 className="max-w-[20ch]">Audit. Fix. Monitor. In that order, forever.</h2>
+        <h2 className="max-w-[20ch]">Audit. Fix. Watch. In that order, forever.</h2>
         <div className="mt-12 grid md:grid-cols-3 gap-12">
-          <Chapter num="01" name="Audit" copy="Enter a URL. We read the public catalog, sitemap, and JSON-LD. You get a score out of 100 and the top issues ranked by revenue impact." />
-          <Chapter num="02" name="Fix" copy="Safe changes apply instantly. Interpretive changes preview on five sample products before you roll them. Every batch is reversible for 7 days." />
-          <Chapter num="03" name="Monitor" copy="Webhooks plus nightly sync catch score drift. We tell you when a competitor passes you, when standards change, and when your catalog slips." />
+          <Chapter
+            num="01"
+            name="Audit"
+            copy="Enter a URL. We read your public catalog in 60 seconds and show you the top issues, ranked by how many products they affect."
+          />
+          <Chapter
+            num="02"
+            name="Fix"
+            copy="Safe changes apply with one click. Anything judgement-based previews on five sample products before you roll it out. Every batch is reversible for 7 days."
+          />
+          <Chapter
+            num="03"
+            name="Watch"
+            copy="We re-scan nightly and tell you if something slips — a competitor passes you, a new requirement lands, or a plugin breaks your structured data."
+          />
         </div>
       </section>
 
       <hr className="rule" />
 
-      {/* Testimonials */}
-      <section className="mx-auto max-w-[1280px] px-8 py-24">
-        <p className="eyebrow mb-10">From merchants and agencies</p>
-        <div className="grid md:grid-cols-3 gap-0 border-y border-[color:var(--color-line)]">
-          <Testimonial
-            quote="We thought we had clean product data. Flintmere surfaced 412 missing GTINs in ten seconds. The scorecard gave our ops lead something to own."
-            name="Rachel Oduya"
-            role="Founder"
-            company="Meridian Supplements"
-          />
-          <Testimonial
-            quote="Gave the client a score they could improve. They went from 52 to 84 in a month and saw Google Shopping approvals climb in parallel."
-            name="James Whitmore"
-            role="Head of Ecom"
-            company="Brightgrid Agency"
-          />
-          <Testimonial
-            quote="The only tool I've seen that's honest about GTINs. No fake barcodes, just a clear path to GS1 and a bulk importer when you're ready."
-            name="Lia Fernández"
-            role="Shopify Plus consultant"
-            company="Freelance"
-          />
-        </div>
+      {/* What makes us different */}
+      <section aria-labelledby="different-heading" className="mx-auto max-w-[1280px] px-8 py-24">
+        <p className="eyebrow mb-6">Who builds Flintmere</p>
+        <h2 id="different-heading" className="max-w-[22ch]">
+          One founder. One focus. Read every reply.
+        </h2>
+        <p
+          className="mt-8 max-w-[54ch] text-[color:var(--color-ink-2)]"
+          style={{ fontSize: 17, lineHeight: 1.55 }}
+        >
+          Flintmere is built by John Morris. If you book the £97 concierge
+          audit, John does it — the video walkthrough and the fix plan. If
+          you email hello@flintmere.com with a question, John replies. No
+          operator team, no pitch, no sales call.
+        </p>
       </section>
 
-      {/* Others / Flintmere way */}
+      {/* How we&rsquo;re different */}
       <section aria-labelledby="compare-heading" className="grid md:grid-cols-2 border-y border-[color:var(--color-line)]">
         <div className="p-12 md:p-16 border-b md:border-b-0 md:border-r border-[color:var(--color-line)]">
-          <p className="eyebrow mb-6">Others</p>
-          <ul className="list-none p-0 m-0 space-y-4 text-[color:var(--color-mute)]" style={{ fontSize: 20, letterSpacing: '-0.01em', textDecoration: 'line-through', textDecorationColor: 'var(--color-line-soft)' }}>
-            <li>Generic SEO tools retrofitted for AI</li>
-            <li>Sell fake barcodes and hope nobody checks</li>
-            <li>Black-box AI changes, no revert path</li>
+          <p className="eyebrow mb-6">What other tools do</p>
+          <ul
+            className="list-none p-0 m-0 space-y-4 text-[color:var(--color-mute)]"
+            style={{
+              fontSize: 20,
+              letterSpacing: '-0.01em',
+              textDecoration: 'line-through',
+              textDecorationColor: 'var(--color-line-soft)',
+            }}
+          >
+            <li>Retrofit a Google-SEO scanner and rebrand it for AI</li>
+            <li>Sell you fake barcodes that fail the first checksum test</li>
+            <li>Charge by the credit, so a big catalog triples your bill</li>
             <li>One-time audit, then silence</li>
-            <li>Credit-based billing — bill shock by month two</li>
+            <li>Hide the founder behind a support queue</li>
           </ul>
         </div>
         <div className="p-12 md:p-16 bg-[color:var(--color-paper-2)]">
-          <p className="eyebrow mb-6" id="compare-heading">The Flintmere way</p>
-          <ul className="list-none p-0 m-0 space-y-4" style={{ fontSize: 20, letterSpacing: '-0.01em' }}>
-            <li>Built for agentic commerce from the first line</li>
-            <li>Honest GTIN guidance — buy them from GS1, we&rsquo;ll help you import them</li>
-            <li>Every change previewed and reversible for 7 days</li>
-            <li>Continuous drift monitoring and competitor alerts</li>
-            <li>Flat-rate subscriptions. Predictable is a feature.</li>
+          <p className="eyebrow mb-6" id="compare-heading">What Flintmere does</p>
+          <ul
+            className="list-none p-0 m-0 space-y-4"
+            style={{ fontSize: 20, letterSpacing: '-0.01em' }}
+          >
+            <li>Built from the first line for ChatGPT, Perplexity and Claude — not Google</li>
+            <li>Honest barcode guidance: buy GS1 barcodes from GS1 UK, we help you import them</li>
+            <li>Every change is previewed before it ships, and reversible for 7 days</li>
+            <li>Flat monthly price. Scan as often as you like. No credits.</li>
+            <li>John reads every reply — usually within two working days</li>
           </ul>
         </div>
       </section>
@@ -204,7 +277,7 @@ export default function MarketingHome() {
               letterSpacing: '0.2em',
             }}
           >
-            Catalogs built for the agentic web™
+            Catalogs built for AI shopping agents
           </p>
         </div>
       </section>
@@ -212,7 +285,9 @@ export default function MarketingHome() {
       {/* Footer */}
       <footer className="border-t border-[color:var(--color-line)] py-10">
         <div className="mx-auto max-w-[1280px] px-8 flex flex-wrap justify-between gap-6">
-          <p className="eyebrow">© 2026 Flintmere Ltd</p>
+          <p className="eyebrow">
+            © 2026 Flintmere · a trading name of Eazy Access Ltd
+          </p>
           <nav className="flex gap-8" aria-label="Footer">
             <Link href="/privacy" className="eyebrow">Privacy</Link>
             <Link href="/terms" className="eyebrow">Terms</Link>
@@ -272,19 +347,6 @@ function Chapter({ num, name, copy }: { num: string; name: string; copy: string 
         {copy}
       </p>
     </div>
-  );
-}
-
-function Testimonial({ quote, name, role, company }: { quote: string; name: string; role: string; company: string }) {
-  return (
-    <blockquote className="p-12 border-r border-[color:var(--color-line)] last:border-r-0 max-md:border-r-0 max-md:border-b max-md:last:border-b-0">
-      <p style={{ fontSize: 20, lineHeight: 1.3, letterSpacing: '-0.015em' }}>
-        &ldquo;{quote}&rdquo;
-      </p>
-      <footer className="mt-6 text-[color:var(--color-mute)]" style={{ fontSize: 13 }}>
-        <strong className="text-[color:var(--color-ink)] font-medium">{name}</strong> · {role}, {company}
-      </footer>
-    </blockquote>
   );
 }
 
