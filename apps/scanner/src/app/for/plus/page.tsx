@@ -189,7 +189,7 @@ export default function FlintmereForPlus() {
             className="mt-8 max-w-[52ch]"
             style={{ color: 'var(--color-mute-inv)', fontSize: 16, lineHeight: 1.55 }}
           >
-            £97 gets you a senior-led audit across all seven pillars, a
+            £97 gets you a senior-led audit across all seven checks, a
             prioritised fix sequence by revenue impact, and a 30-minute call
             with our team to walk through the findings. Plus merchants skip the
             scan queue and get direct review.

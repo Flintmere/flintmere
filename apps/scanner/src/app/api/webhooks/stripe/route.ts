@@ -11,8 +11,11 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /**
- * Stripe webhook handler — verifies signature, processes checkout.session.completed
- * for concierge audit purchases. Every side effect is idempotent by Stripe event ID.
+ * Stripe webhook handler — verifies signature, processes payment_intent.succeeded
+ * for concierge audit purchases. Every side effect is idempotent by payment intent ID.
+ *
+ * We also accept `checkout.session.completed` so older bookings made via hosted
+ * Checkout (pre-Payment-Element) still reconcile if Stripe retries them.
  */
 export async function POST(req: NextRequest) {
   const stripe = getStripe();
@@ -53,7 +56,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    if (event.type === 'checkout.session.completed') {
+    if (event.type === 'payment_intent.succeeded') {
+      const intent = event.data.object as Stripe.PaymentIntent;
+      await handleConciergePaymentIntent(intent);
+    } else if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
       await handleConciergeCheckout(session);
     }
@@ -67,11 +73,31 @@ export async function POST(req: NextRequest) {
         error: err instanceof Error ? err.message : String(err),
       }),
     );
-    // Return 500 so Stripe retries.
     return NextResponse.json({ ok: false, code: 'handler-failed' }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true, received: event.id });
+}
+
+async function handleConciergePaymentIntent(
+  intent: Stripe.PaymentIntent,
+): Promise<void> {
+  if (intent.metadata?.kind !== 'concierge-audit') return;
+
+  const email = (
+    intent.metadata?.email ||
+    intent.receipt_email ||
+    ''
+  ).toLowerCase();
+  const shopUrl = typeof intent.metadata?.shop_url === 'string' ? intent.metadata.shop_url : '';
+
+  if (!email || !shopUrl) return;
+
+  await finaliseConciergeBooking({
+    email,
+    shopUrl,
+    paymentIntentId: intent.id,
+  });
 }
 
 async function handleConciergeCheckout(
@@ -84,6 +110,16 @@ async function handleConciergeCheckout(
   const paymentIntentId = typeof session.payment_intent === 'string' ? session.payment_intent : null;
 
   if (!email || !shopUrl || !paymentIntentId) return;
+
+  await finaliseConciergeBooking({ email, shopUrl, paymentIntentId });
+}
+
+async function finaliseConciergeBooking(args: {
+  email: string;
+  shopUrl: string;
+  paymentIntentId: string;
+}): Promise<void> {
+  const { email, shopUrl, paymentIntentId } = args;
 
   const row = await prisma.conciergeAudit.upsert({
     where: { stripePaymentIntentId: paymentIntentId },

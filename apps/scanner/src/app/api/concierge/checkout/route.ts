@@ -10,6 +10,15 @@ const BodySchema = z.object({
   shopUrl: z.string().min(4).max(512),
 });
 
+/**
+ * Creates a PaymentIntent for the £97 concierge audit and returns its client
+ * secret so the Payment Element on /audit can confirm the payment in-place.
+ *
+ * Metadata mirrors what the Stripe webhook expects: `kind: concierge-audit`
+ * plus `shop_url`. The webhook reads `customer_email` off the expanded Charge;
+ * we set `receipt_email` so Stripe sends its receipt and so the webhook has an
+ * email even when the Payment Element's AddressElement is not used.
+ */
 export async function POST(req: NextRequest) {
   const stripe = getStripe();
   if (!stripe) {
@@ -23,24 +32,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const contentType = req.headers.get('content-type') ?? '';
   let email: string;
   let shopUrl: string;
 
   try {
-    if (contentType.includes('application/json')) {
-      const json = BodySchema.parse(await req.json());
-      email = json.email;
-      shopUrl = json.shopUrl;
-    } else {
-      const form = await req.formData();
-      const parsed = BodySchema.parse({
-        email: form.get('email'),
-        shopUrl: form.get('shopUrl'),
-      });
-      email = parsed.email;
-      shopUrl = parsed.shopUrl;
-    }
+    const json = BodySchema.parse(await req.json());
+    email = json.email.toLowerCase();
+    shopUrl = json.shopUrl.trim();
   } catch {
     return NextResponse.json(
       { ok: false, code: 'bad-request', message: 'Check your email and shop URL.' },
@@ -48,48 +46,30 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://flintmere.com';
-  const priceId = process.env.STRIPE_CONCIERGE_PRICE_ID;
-
-  const session = await stripe.checkout.sessions.create({
-    mode: 'payment',
-    customer_email: email.toLowerCase(),
-    line_items: [
-      priceId
-        ? { price: priceId, quantity: 1 }
-        : {
-            quantity: 1,
-            price_data: {
-              currency: 'gbp',
-              unit_amount: 9700,
-              product_data: {
-                name: 'Flintmere concierge audit',
-                description:
-                  'Full Shopify catalog audit + 30-day remediation plan. 48-hour delivery.',
-              },
-            },
-          },
-    ],
-    success_url: `${appUrl}/audit/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${appUrl}/audit`,
+  const intent = await stripe.paymentIntents.create({
+    amount: 9700,
+    currency: 'gbp',
+    receipt_email: email,
+    description: 'Flintmere concierge audit — 48-hour delivery',
+    statement_descriptor_suffix: 'AUDIT',
+    automatic_payment_methods: { enabled: true },
     metadata: {
       kind: 'concierge-audit',
+      email,
       shop_url: shopUrl.slice(0, 250),
-    },
-    payment_intent_data: {
-      metadata: {
-        kind: 'concierge-audit',
-        shop_url: shopUrl.slice(0, 250),
-      },
     },
   });
 
-  if (!session.url) {
+  if (!intent.client_secret) {
     return NextResponse.json(
-      { ok: false, code: 'stripe-no-session-url', message: 'Could not open checkout.' },
+      { ok: false, code: 'stripe-no-client-secret', message: 'Could not start checkout.' },
       { status: 502 },
     );
   }
 
-  return NextResponse.redirect(session.url, 303);
+  return NextResponse.json({
+    ok: true,
+    clientSecret: intent.client_secret,
+    paymentIntentId: intent.id,
+  });
 }
