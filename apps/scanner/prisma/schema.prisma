@@ -65,6 +65,7 @@ model ConciergeAudit {
   stripePaymentIntentId String @unique @map("stripe_payment_intent_id")
   status         String    @default("paid")
   calendlyUrl    String?   @map("calendly_url")
+  notificationSentAt DateTime? @map("notification_sent_at")
   deliveredAt    DateTime? @map("delivered_at")
   createdAt      DateTime  @default(now()) @map("created_at")
 

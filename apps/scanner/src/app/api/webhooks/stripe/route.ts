@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 import { prisma } from '@/lib/db';
 import { getStripe } from '@/lib/stripe';
+import {
+  sendConciergeCustomerEmail,
+  sendConciergeOpsEmail,
+} from '@/lib/concierge-email';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -81,7 +85,7 @@ async function handleConciergeCheckout(
 
   if (!email || !shopUrl || !paymentIntentId) return;
 
-  await prisma.conciergeAudit.upsert({
+  const row = await prisma.conciergeAudit.upsert({
     where: { stripePaymentIntentId: paymentIntentId },
     update: { status: 'paid' },
     create: {
@@ -91,4 +95,33 @@ async function handleConciergeCheckout(
       status: 'paid',
     },
   });
+
+  if (row.notificationSentAt) return;
+
+  const calendlyUrl = process.env.CALENDLY_CONCIERGE_URL || null;
+  const opsEmail = process.env.CONCIERGE_OPS_EMAIL || process.env.RESEND_REPLY_TO || 'hello@flintmere.com';
+
+  const [customerResult, opsResult] = await Promise.all([
+    sendConciergeCustomerEmail({ to: email, shopUrl, calendlyUrl }),
+    sendConciergeOpsEmail({ to: opsEmail, customerEmail: email, shopUrl, paymentIntentId }),
+  ]);
+
+  if (customerResult.sent && opsResult.sent) {
+    await prisma.conciergeAudit.update({
+      where: { stripePaymentIntentId: paymentIntentId },
+      data: { notificationSentAt: new Date() },
+    });
+  } else {
+    // eslint-disable-next-line no-console
+    console.warn(
+      JSON.stringify({
+        event: 'concierge-email-partial-failure',
+        paymentIntentId,
+        customerSent: customerResult.sent,
+        opsSent: opsResult.sent,
+        customerReason: customerResult.reason,
+        opsReason: opsResult.reason,
+      }),
+    );
+  }
 }
