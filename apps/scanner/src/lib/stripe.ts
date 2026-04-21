@@ -15,7 +15,7 @@ export function getStripe(): Stripe | null {
   const key = process.env.STRIPE_SECRET_KEY;
   const instance = key
     ? new Stripe(key, {
-        apiVersion: '2024-10-28.acacia',
+        apiVersion: '2025-02-24.acacia',
         typescript: true,
       })
     : null;
