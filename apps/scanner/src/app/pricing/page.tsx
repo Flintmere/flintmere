@@ -163,11 +163,11 @@ export default function Pricing() {
         <div className="p-12 border border-[color:var(--color-line)] bg-[color:var(--color-paper-2)] flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <p className="eyebrow mb-3">One-off audit</p>
-            <h2 className="max-w-[26ch]" style={{ fontSize: 28, letterSpacing: '-0.02em' }}>
-              Want us to do it for you? <Bracket>£97</Bracket> concierge audit, 48-hour delivery.
+            <h2 className="max-w-[28ch]" style={{ fontSize: 28, letterSpacing: '-0.02em' }}>
+              Want John to read your store? <Bracket>£97</Bracket>, delivered in three working days.
             </h2>
-            <p className="mt-4 text-[color:var(--color-mute)] max-w-[44ch]" style={{ fontSize: 14, lineHeight: 1.55 }}>
-              Full scan, prioritised fix list, 30-day remediation plan, per-product CSV. Operator-run, no subscription.
+            <p className="mt-4 text-[color:var(--color-mute)] max-w-[48ch]" style={{ fontSize: 14, lineHeight: 1.55 }}>
+              Written audit letter, per-product fix CSV with the worst ten already drafted, 30-day fix sequence, GS1 UK barcode path, and a 30-day re-scan. No video, no call &mdash; just the data.
             </p>
           </div>
           <Link href="/audit" className="btn btn-accent whitespace-nowrap">Book the audit →</Link>

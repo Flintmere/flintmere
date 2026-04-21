@@ -182,17 +182,18 @@ export default function FlintmereForPlus() {
             className="mt-6 max-w-[22ch]"
             style={{ color: 'var(--color-paper)' }}
           >
-            Send us your store URL. We send back a ranked{' '}
-            <Bracket>action</Bracket> list in 48 hours.
+            Send your store URL. Three working days later, a written{' '}
+            <Bracket>audit</Bracket> lands in your inbox.
           </h2>
           <p
-            className="mt-8 max-w-[52ch]"
+            className="mt-8 max-w-[56ch]"
             style={{ color: 'var(--color-mute-inv)', fontSize: 16, lineHeight: 1.55 }}
           >
-            £97 gets you a senior-led audit across all seven checks, a
-            prioritised fix sequence by revenue impact, and a 30-minute call
-            with our team to walk through the findings. Plus merchants skip the
-            scan queue and get direct review.
+            £97 gets you John reading your catalog product by product, a 1,500-word
+            letter pointing at specific SKUs by name, a per-product fix CSV with the
+            worst ten offenders already drafted, a 30-day fix sequence, and a 30-day
+            re-scan. No video, no call — just the data a Plus ops team can action
+            the same morning it arrives.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link

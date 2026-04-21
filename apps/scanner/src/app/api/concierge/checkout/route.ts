@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     amount: 9700,
     currency: 'gbp',
     receipt_email: email,
-    description: 'Flintmere concierge audit — 48-hour delivery',
+    description: 'Flintmere concierge audit — written deliverable in three working days',
     statement_descriptor_suffix: 'AUDIT',
     automatic_payment_methods: { enabled: true },
     metadata: {

@@ -193,7 +193,7 @@ export function CheckoutCard() {
           className="mt-2 text-[color:var(--color-mute)]"
           style={{ fontSize: 13, lineHeight: 1.55 }}
         >
-          One-time. No VAT added. 48-hour delivery or full refund.
+          One-time. No VAT added. Delivered in three working days or full refund.
         </p>
       </div>
 
@@ -278,8 +278,8 @@ export function CheckoutCard() {
           lineHeight: 1.55,
         }}
       >
-        30-day refund if we miss the 48-hour deadline. Card details stay with
-        Stripe — never on our servers.
+        30-day refund if we miss the three-working-day deadline. Card details
+        stay with Stripe — never on our servers.
       </div>
     </CardShell>
   );
