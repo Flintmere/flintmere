@@ -56,13 +56,17 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://flintmere.com';
+  const scannerUrl =
+    process.env.NEXT_PUBLIC_APP_URL ?? 'https://audit.flintmere.com';
+  const marketingUrl =
+    process.env.NEXT_PUBLIC_MARKETING_URL ?? 'https://flintmere.com';
   const token = signUnsubToken(lead.id);
-  const unsubscribeUrl = `${appUrl}/api/unsubscribe/${token}`;
+  const unsubscribeUrl = `${scannerUrl}/api/unsubscribe/${token}`;
   const mail = buildReportEmail({
     score: scan.scoreJson as unknown as CompositeScore,
     unsubscribeUrl,
-    appUrl,
+    appUrl: `${marketingUrl}/for/plus`,
+    auditUrl: `${scannerUrl}/audit`,
     recipientEmail: email,
   });
 

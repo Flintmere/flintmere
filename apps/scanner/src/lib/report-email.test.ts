@@ -36,59 +36,71 @@ function makeScore(overrides: Partial<CompositeScore> = {}): CompositeScore {
   };
 }
 
+const baseInput = {
+  unsubscribeUrl: 'https://audit.flintmere.com/api/unsubscribe/abc',
+  appUrl: 'https://flintmere.com/for/plus',
+  auditUrl: 'https://audit.flintmere.com/audit',
+  recipientEmail: 'founder@meridian-coffee.com',
+};
+
 describe('buildReportEmail', () => {
-  it('puts the score and domain in the subject with the bracket signature', () => {
-    const email = buildReportEmail({
-      score: makeScore(),
-      unsubscribeUrl: 'https://audit.flintmere.com/api/unsubscribe/abc',
-      appUrl: 'https://flintmere.com',
-      recipientEmail: 'founder@meridian-coffee.com',
-    });
-    expect(email.subject).toContain('[ Flintmere Report ]');
-    expect(email.subject).toContain('64/100');
-    expect(email.subject).toContain('Grade C');
+  it('puts the invisible-product count and domain in the subject', () => {
+    const email = buildReportEmail({ score: makeScore(), ...baseInput });
+    // Critical issue affects 412 products → invisibleCount = 412.
     expect(email.subject).toContain('meridian-coffee.myshopify.com');
+    expect(email.subject).toContain('412');
+    expect(email.subject).toContain('invisible to AI agents');
+  });
+
+  it('uses a ready-for-agents subject when the grade is A', () => {
+    const email = buildReportEmail({
+      score: makeScore({ grade: 'A', score: 92 }),
+      ...baseInput,
+    });
+    expect(email.subject).toContain('ready for AI shopping agents');
+    expect(email.subject).toContain('Grade A');
   });
 
   it('embeds the unsubscribe link in HTML + text', () => {
-    const email = buildReportEmail({
-      score: makeScore(),
-      unsubscribeUrl: 'https://audit.flintmere.com/api/unsubscribe/abc',
-      appUrl: 'https://flintmere.com',
-      recipientEmail: 'founder@meridian-coffee.com',
-    });
+    const email = buildReportEmail({ score: makeScore(), ...baseInput });
     expect(email.html).toContain('https://audit.flintmere.com/api/unsubscribe/abc');
     expect(email.text).toContain('https://audit.flintmere.com/api/unsubscribe/abc');
   });
 
   it('includes the GTIN non-affiliation disclaimer', () => {
-    const email = buildReportEmail({
-      score: makeScore(),
-      unsubscribeUrl: 'u',
-      appUrl: 'a',
-      recipientEmail: 'x@y.com',
-    });
+    const email = buildReportEmail({ score: makeScore(), ...baseInput });
     expect(email.html).toContain('not affiliated with GS1');
     expect(email.text).toContain('not affiliated with GS1');
   });
 
-  it('shows the 3 locked pillars with an install CTA', () => {
-    const email = buildReportEmail({
-      score: makeScore(),
-      unsubscribeUrl: 'u',
-      appUrl: 'https://flintmere.com',
-      recipientEmail: 'x@y.com',
-    });
+  it('shows the 3 locked checks with a bracketed count', () => {
+    const email = buildReportEmail({ score: makeScore(), ...baseInput });
     expect(email.html).toContain('[&nbsp;3&nbsp;]');
     expect(email.html).toContain('Install Flintmere');
+  });
+
+  it('links Door 1 to the concierge audit page', () => {
+    const email = buildReportEmail({ score: makeScore(), ...baseInput });
+    expect(email.html).toContain('https://audit.flintmere.com/audit');
+    expect(email.html).toContain('Book the £97 audit');
+  });
+
+  it('signs off from John Morris', () => {
+    const email = buildReportEmail({ score: makeScore(), ...baseInput });
+    expect(email.html).toContain('John Morris');
+    expect(email.text).toContain('John Morris');
+  });
+
+  it('translates the missing-gtin code into founder-speak', () => {
+    const email = buildReportEmail({ score: makeScore(), ...baseInput });
+    expect(email.html).toContain('Products have no barcode');
+    expect(email.text).toContain('Products have no barcode');
   });
 
   it('escapes untrusted strings in the shop domain', () => {
     const email = buildReportEmail({
       score: makeScore({ shopDomain: "<script>alert('x')</script>" }),
-      unsubscribeUrl: 'u',
-      appUrl: 'a',
-      recipientEmail: 'x@y.com',
+      ...baseInput,
     });
     expect(email.html).not.toContain('<script>');
     expect(email.html).toContain('&lt;script&gt;');

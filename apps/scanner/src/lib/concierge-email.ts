@@ -1,8 +1,20 @@
 /**
  * Concierge booking emails — customer confirmation + ops notification.
- * Fired from the Stripe webhook handler after checkout.session.completed.
+ * Fired from the Stripe webhook handler after payment_intent.succeeded.
+ *
+ * Copy rules (Copy Council #20 #21 #22 #37):
+ *   - No operator / team language. John reviews personally.
+ *   - Delivery window matches the report email promise (three working days).
+ *   - Plain-language: no jargon, no "deliverables", no "remediation plan".
+ *   - Bracket signature preserved on [ in ] moment.
  */
 
+import {
+  JOHN_SIGNATURE_NAME,
+  JOHN_SIGNATURE_REPLY_INVITE,
+  JOHN_SIGNATURE_TITLE,
+  REPLY_SLA,
+} from './copy';
 import { sendEmail, type SendEmailResult } from './resend';
 
 function esc(s: string): string {
@@ -25,12 +37,17 @@ export async function sendConciergeCustomerEmail(
 ): Promise<SendEmailResult> {
   const { to, shopUrl, calendlyUrl } = input;
   const safeShop = esc(shopUrl);
-  const kickoffBlockHtml = calendlyUrl
-    ? `<a href="${esc(calendlyUrl)}" style="display:inline-block;background:#F8BF24;color:#0A0A0B;padding:14px 24px;border:1px solid #F8BF24;font-family:ui-monospace,Menlo,monospace;font-size:13px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;text-decoration:none;">Book your kickoff call →</a>`
-    : `<p style="margin:0;font-size:14px;color:#5A5C64;">We&rsquo;ll email you to schedule the 15-minute kickoff call.</p>`;
-  const kickoffBlockText = calendlyUrl
-    ? `Book your 15-minute kickoff call: ${calendlyUrl}`
-    : `We'll email you to schedule the 15-minute kickoff call.`;
+
+  const optionalCallBlockHtml = calendlyUrl
+    ? `<div style="margin-top:24px;padding:18px;border:1px solid #D5D2C8;">
+         <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;margin-bottom:6px;">Optional</div>
+         <p style="margin:0 0 12px 0;font-size:14px;line-height:1.55;color:#141518;">Want to walk me through your store first? Book a 15-minute call — or skip it, I can work from the URL alone.</p>
+         <a href="${esc(calendlyUrl)}" style="display:inline-block;color:#0A0A0B;font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:0.04em;text-transform:uppercase;text-decoration:underline;">Book the 15-minute call →</a>
+       </div>`
+    : '';
+  const optionalCallBlockText = calendlyUrl
+    ? `\nOptional: Want to walk me through your store first? Book a 15-minute call — or skip it, I can work from the URL alone. ${calendlyUrl}\n`
+    : '';
 
   const html = `<!doctype html>
 <html>
@@ -40,7 +57,7 @@ export async function sendConciergeCustomerEmail(
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background:#FFFFFF;border:1px solid #0A0A0B;">
           <tr>
             <td style="padding:28px 32px 8px 32px;border-bottom:1px solid #0A0A0B;">
-              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;">Flintmere concierge audit</div>
+              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;">Flintmere concierge audit · ${esc(shopUrl)}</div>
               <div style="margin-top:12px;font-size:26px;font-weight:500;letter-spacing:-0.02em;color:#0A0A0B;">
                 You&rsquo;re <span style="font-family:ui-monospace,Menlo,monospace;font-weight:700;">[&nbsp;in&nbsp;]</span>. Payment confirmed.
               </div>
@@ -48,24 +65,30 @@ export async function sendConciergeCustomerEmail(
           </tr>
           <tr>
             <td style="padding:24px 32px;">
-              <p style="margin:0;font-size:16px;line-height:1.55;color:#141518;">Thanks — your £97 booking is confirmed. A Flintmere operator will email you within 2 hours to scope the audit for <strong>${safeShop}</strong>.</p>
-              <p style="margin:16px 0 0 0;font-size:16px;line-height:1.55;color:#141518;">Your full audit + 30-day remediation plan lands in your inbox inside 48 hours of the kickoff call.</p>
+              <p style="margin:0;font-size:16px;line-height:1.55;color:#141518;">Thanks for trusting me with this. Your £97 booking is confirmed.</p>
+              <p style="margin:16px 0 0 0;font-size:16px;line-height:1.55;color:#141518;">Here&rsquo;s what happens next, in order:</p>
+              <ol style="margin:12px 0 0 0;padding-left:20px;font-size:15px;line-height:1.6;color:#141518;">
+                <li><strong>Today:</strong> I start the review of <strong>${safeShop}</strong>. I read every product, check the structured data, test how AI agents see your site.</li>
+                <li><strong>Within three working days:</strong> you get a 15-minute video walkthrough and a prioritised list of exactly what to fix first, in plain English — no jargon, no 80-page PDF.</li>
+                <li><strong>After that:</strong> reply with questions. I read every one.</li>
+              </ol>
             </td>
           </tr>
           <tr>
             <td style="padding:0 32px 24px 32px;">
-              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;margin-bottom:12px;">Next step</div>
-              ${kickoffBlockHtml}
+              <p style="margin:0;font-size:14px;line-height:1.55;color:#5A5C64;">If the shop URL above is wrong, just reply to this email and I&rsquo;ll fix it before I start. Stripe has sent a separate receipt for your records.</p>
+              ${optionalCallBlockHtml}
             </td>
           </tr>
           <tr>
-            <td style="padding:24px 32px;border-top:1px solid #D5D2C8;">
-              <p style="margin:0;font-size:13px;color:#5A5C64;line-height:1.55;">Reply to this email if the shop URL above is wrong or if you want to brief us before the call. Stripe has sent a separate receipt for your records.</p>
+            <td style="padding:20px 32px 24px 32px;border-top:1px solid #D5D2C8;">
+              <p style="margin:0;font-size:15px;color:#141518;line-height:1.55;">— ${esc(JOHN_SIGNATURE_NAME)}, ${esc(JOHN_SIGNATURE_TITLE)}</p>
+              <p style="margin:6px 0 0 0;font-size:13px;color:#8B8D95;line-height:1.55;">${esc(JOHN_SIGNATURE_REPLY_INVITE)}</p>
             </td>
           </tr>
           <tr>
-            <td style="padding:20px 32px;background:#0A0A0B;color:#A8AAB2;font-size:12px;line-height:1.55;">
-              Flintmere Ltd · London · <a href="https://flintmere.com" style="color:#A8AAB2;text-decoration:underline;">flintmere.com</a>
+            <td style="padding:16px 32px;background:#0A0A0B;color:#A8AAB2;font-size:12px;line-height:1.55;">
+              Flintmere is a trading name of Eazy Access Ltd · <a href="https://flintmere.com" style="color:#A8AAB2;text-decoration:underline;">flintmere.com</a>
             </td>
           </tr>
         </table>
@@ -74,22 +97,33 @@ export async function sendConciergeCustomerEmail(
   </body>
 </html>`;
 
-  const text = `Flintmere concierge audit — payment confirmed
+  const text = `Flintmere concierge audit — you're in. Payment confirmed.
 
-Thanks — your £97 booking is confirmed. A Flintmere operator will email you within 2 hours to scope the audit for ${shopUrl}.
+Thanks for trusting me with this. Your £97 booking is confirmed.
 
-Your full audit + 30-day remediation plan lands in your inbox inside 48 hours of the kickoff call.
+Here's what happens next, in order:
 
-${kickoffBlockText}
+1. Today: I start the review of ${shopUrl}. I read every product, check
+   the structured data, test how AI agents see your site.
 
-Reply to this email if the shop URL above is wrong or if you want to brief us before the call. Stripe has sent a separate receipt for your records.
+2. Within three working days: you get a 15-minute video walkthrough and
+   a prioritised list of exactly what to fix first, in plain English —
+   no jargon, no 80-page PDF.
+
+3. After that: reply with questions. I read every one.
+
+If the shop URL above is wrong, just reply to this email and I'll fix it
+before I start. Stripe has sent a separate receipt for your records.
+${optionalCallBlockText}
+— ${JOHN_SIGNATURE_NAME}, ${JOHN_SIGNATURE_TITLE}
+${JOHN_SIGNATURE_REPLY_INVITE}
 
 —
-Flintmere Ltd · London · flintmere.com`;
+Flintmere is a trading name of Eazy Access Ltd · flintmere.com`;
 
   return sendEmail({
     to,
-    subject: 'Flintmere concierge audit — you\'re booked',
+    subject: `You're in — Flintmere concierge audit for ${shopUrl}`,
     html,
     text,
     tags: [{ name: 'kind', value: 'concierge-customer' }],
@@ -120,7 +154,7 @@ export async function sendConciergeOpsEmail(
       <tr><td style="color:#5A5C64;">Payment intent</td><td style="font-family:ui-monospace,Menlo,monospace;"><a href="${esc(stripeUrl)}" style="color:#0A0A0B;">${esc(paymentIntentId)}</a></td></tr>
       <tr><td style="color:#5A5C64;">Booked at</td><td>${new Date().toISOString()}</td></tr>
     </table>
-    <p style="margin:20px 0 0 0;font-size:13px;color:#5A5C64;line-height:1.55;">Reach out within 2 hours per the confirmation email promise. Customer already has the Cal.com kickoff link.</p>
+    <p style="margin:20px 0 0 0;font-size:13px;color:#5A5C64;line-height:1.55;">${esc(REPLY_SLA)} Delivery promise to the customer: video walkthrough + prioritised fix list within three working days.</p>
   </div>
 </body></html>`;
 
@@ -132,8 +166,8 @@ Payment intent:  ${paymentIntentId}
 Stripe:          ${stripeUrl}
 Booked at:       ${new Date().toISOString()}
 
-Reach out within 2 hours per the confirmation email promise.
-Customer already has the Cal.com kickoff link.`;
+${REPLY_SLA}
+Delivery promise to the customer: video walkthrough + prioritised fix list within three working days.`;
 
   return sendEmail({
     to,

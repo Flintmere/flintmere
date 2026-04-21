@@ -68,13 +68,14 @@ If a domain isn't represented (e.g. regulatory area not covered, or shipping in 
 | 34 | Full-stack debugging engineer | End-to-end request tracing, RPC failure modes, timeout handling, error propagation, logging, production debugging |
 | 35 | Product analyst | Evidence-first metrics, experiment rigor, funnel analysis, hypothesis/result discipline, aggregated-only data handling |
 | 36 | Operations manager | Support triage, docs coherence, finance snapshots, vendor review, internal coordination, incident post-mortems |
+| 37 | Consumer psychologist / decision scientist (**veto power on customer-facing language**) | Reading comprehension under skim, cognitive load, objection anatomy, loss-aversion framing, identity activation, status-signal vocabulary, plain-language testing (target Flesch-Kincaid ≤ grade 8 for marketing prose, ≤ grade 10 for technical copy), jargon detection from the buyer's perspective (not ours). Reviews every merchant-facing sentence: "would a non-technical Shopify founder reading this on a phone between meetings get it on one pass?" If no, rewrite. |
 
 ## Sub-councils
 
 Specialist groups convened **in addition to** the Standing Council for their domain.
 
 - **Design Council (6)** — Maren (Visual), Idris (Motion), Sable (UX), Kael (Systems), Noor (Accessibility, **veto power**), Thane (Performance). Convened for visual / motion / system design work as documented in the redesign specs in `docs/`.
-- **Copy Council (3)** — #20 Brand, #21 Technical, #22 Conversion. Convened for any user-facing copy: marketing pages, legal pages, emails, microcopy, blog posts. Every sentence must survive all three lenses: does it sound right (#20), is it accurate (#21), does it move the reader (#22)?
+- **Copy Council (4)** — #20 Brand, #21 Technical, #22 Conversion, #37 Consumer psychologist. Convened for any user-facing copy: marketing pages, legal pages, emails, microcopy, blog posts. Every sentence must survive all four lenses: does it sound right (#20), is it accurate (#21), does it move the reader (#22), will the reader **understand it on first skim** (#37)? #37 holds veto on language that fails plain-language + jargon tests.
 - **Legal Council (3)** — #9 Lawyer/compliance, #23 Regulatory, #24 Data protection. Convened for legal pages, privacy policy, terms, DPA, consent copy, and any claim that could create liability. #24 has **veto power** on privacy/consent language.
 
 ## Rules of operation

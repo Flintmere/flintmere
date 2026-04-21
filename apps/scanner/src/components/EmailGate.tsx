@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Bracket } from './Bracket';
+import { REPLY_SLA } from '@/lib/copy';
 
 export interface EmailGateProps {
   scanId: string;
@@ -15,9 +17,11 @@ type GateState =
   | { phase: 'error'; message: string };
 
 /**
- * Inverted-palette section that appears after scan results.
- * Captures email + sends the full report via Resend.
- * Canon: dark ink surface, paper text, amber CTA, one bracket moment on 'report'. ADR 0007.
+ * Post-scan commit surface. Three doors:
+ *   1. Book the £97 concierge audit — primary, amber CTA.
+ *   2. Email me the free report — secondary.
+ *   3. Reply to John direct — tertiary, soft.
+ * Canon: dark ink surface, paper text, amber accent, one bracket moment.
  */
 export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
   const [email, setEmail] = useState('');
@@ -84,7 +88,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
               margin: 0,
             }}
           >
-            Check your inbox. Your full <Bracket>report</Bracket> for{' '}
+            Check your inbox. The full <Bracket>report</Bracket> for{' '}
             {shopDomain} is on the way.
           </h2>
           <p
@@ -98,7 +102,24 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
           >
             {state.reportSent
               ? 'Delivery usually takes under a minute. If it does not arrive within 10 minutes, check your spam folder.'
-              : 'We captured your email. Report generation is queued; you will receive it shortly.'}
+              : 'We captured your email. The report is queued and will arrive shortly.'}
+          </p>
+          <p
+            style={{
+              marginTop: 24,
+              fontSize: 15,
+              lineHeight: 1.55,
+              color: 'var(--color-paper)',
+              maxWidth: '52ch',
+            }}
+          >
+            Want the full fix plan instead of the summary?{' '}
+            <Link
+              href="/audit"
+              style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}
+            >
+              Book the £97 concierge audit →
+            </Link>
           </p>
         </div>
       </section>
@@ -107,7 +128,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
 
   return (
     <section
-      aria-labelledby="email-gate-heading"
+      aria-labelledby="commit-heading"
       style={{
         background: 'var(--color-ink)',
         color: 'var(--color-paper)',
@@ -120,10 +141,10 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
           className="eyebrow"
           style={{ color: 'var(--color-mute-inv)', marginBottom: 16 }}
         >
-          Full report · free · 10 minutes
+          What next
         </p>
         <h2
-          id="email-gate-heading"
+          id="commit-heading"
           style={{
             fontSize: 'clamp(28px, 4vw, 44px)',
             letterSpacing: '-0.025em',
@@ -132,70 +153,58 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
             margin: 0,
           }}
         >
-          Get the full <Bracket>report</Bracket>. Free, delivered to your inbox.
+          Three ways to fix the <Bracket>gaps</Bracket> we found on{' '}
+          {shopDomain}.
         </h2>
 
-        <ul
+        {/* Door 1 — primary: £97 concierge */}
+        <div
           style={{
-            listStyle: 'none',
-            margin: '24px 0 0 0',
-            padding: 0,
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '10px 24px',
-            color: 'var(--color-mute-inv)',
-            fontSize: 14,
-            lineHeight: 1.5,
+            marginTop: 32,
+            padding: '28px',
+            border: '1px solid var(--color-accent)',
+            background: 'rgba(248, 191, 36, 0.06)',
           }}
         >
-          <li>Pillar-by-pillar breakdown with fix priorities</li>
-          <li>Per-product CSV — every issue + affected SKU</li>
-          <li>Vertical benchmark against 500+ stores</li>
-          <li>Install-free path to your GTIN-less ceiling</li>
-        </ul>
-
-        <form
-          onSubmit={submit}
-          style={{
-            marginTop: 28,
-            display: 'flex',
-            gap: 0,
-            maxWidth: 560,
-            border: '1px solid var(--color-paper)',
-          }}
-        >
-          <label htmlFor="email" className="sr-only">
-            Email address
-          </label>
-          <input
-            id="email"
-            type="email"
-            required
-            placeholder="you@store.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={state.phase === 'submitting'}
-            autoComplete="email"
-            aria-describedby={
-              state.phase === 'error' ? 'email-gate-error' : undefined
-            }
-            aria-invalid={state.phase === 'error' ? 'true' : undefined}
+          <p
+            className="eyebrow"
             style={{
-              flex: 1,
-              padding: '14px 18px',
-              background: 'transparent',
-              color: 'var(--color-paper)',
-              border: 0,
-              outline: 'none',
-              fontFamily: 'var(--font-mono)',
-              fontSize: 14,
+              color: 'var(--color-accent)',
+              marginBottom: 8,
+              margin: 0,
             }}
-          />
-          <button
-            type="submit"
-            disabled={state.phase === 'submitting'}
+          >
+            Recommended · £97 one-off
+          </p>
+          <h3
             style={{
-              border: 0,
+              fontSize: 22,
+              letterSpacing: '-0.015em',
+              lineHeight: 1.2,
+              color: 'var(--color-paper)',
+              margin: '12px 0 0 0',
+            }}
+          >
+            Book the concierge audit.
+          </h3>
+          <p
+            style={{
+              marginTop: 12,
+              fontSize: 15,
+              lineHeight: 1.5,
+              color: 'var(--color-mute-inv)',
+              maxWidth: '52ch',
+            }}
+          >
+            John reviews your store personally, records a 15-minute video
+            walkthrough of what to fix first, and sends a prioritised plan in
+            plain English. Delivered within three working days.
+          </p>
+          <Link
+            href="/audit"
+            style={{
+              display: 'inline-block',
+              marginTop: 20,
               background: 'var(--color-accent)',
               color: 'var(--color-accent-ink)',
               padding: '14px 24px',
@@ -204,26 +213,147 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
               fontWeight: 500,
               letterSpacing: '0.04em',
               textTransform: 'uppercase',
-              cursor: 'pointer',
+              textDecoration: 'none',
             }}
           >
-            {state.phase === 'submitting' ? 'Sending…' : 'Send me the report'}
-          </button>
-        </form>
+            Book the £97 audit →
+          </Link>
+        </div>
 
-        {state.phase === 'error' ? (
+        {/* Door 2 — secondary: free report */}
+        <div
+          style={{
+            marginTop: 28,
+            paddingTop: 28,
+            borderTop: '1px solid var(--color-line-inv, rgba(250,247,242,0.15))',
+          }}
+        >
           <p
-            id="email-gate-error"
-            role="alert"
-            style={{ marginTop: 12, fontSize: 13, color: 'var(--color-alert)' }}
+            className="eyebrow"
+            style={{ color: 'var(--color-mute-inv)', marginBottom: 8 }}
           >
-            {state.message}
+            Free · 10 minutes
           </p>
-        ) : null}
+          <h3
+            style={{
+              fontSize: 20,
+              letterSpacing: '-0.015em',
+              lineHeight: 1.2,
+              color: 'var(--color-paper)',
+              margin: '8px 0 0 0',
+            }}
+          >
+            Or email me the full report.
+          </h3>
+          <p
+            style={{
+              marginTop: 8,
+              fontSize: 14,
+              lineHeight: 1.5,
+              color: 'var(--color-mute-inv)',
+              maxWidth: '52ch',
+            }}
+          >
+            Every issue on this page, plus a CSV of every product affected, a
+            short explanation of what AI agents expect, and which fix to do
+            first.
+          </p>
+
+          <form
+            onSubmit={submit}
+            style={{
+              marginTop: 16,
+              display: 'flex',
+              gap: 0,
+              maxWidth: 560,
+              border: '1px solid var(--color-paper)',
+            }}
+          >
+            <label htmlFor="email" className="sr-only">
+              Email address
+            </label>
+            <input
+              id="email"
+              type="email"
+              required
+              placeholder="you@store.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={state.phase === 'submitting'}
+              autoComplete="email"
+              aria-describedby={
+                state.phase === 'error' ? 'email-gate-error' : undefined
+              }
+              aria-invalid={state.phase === 'error' ? 'true' : undefined}
+              style={{
+                flex: 1,
+                padding: '14px 18px',
+                background: 'transparent',
+                color: 'var(--color-paper)',
+                border: 0,
+                outline: 'none',
+                fontFamily: 'var(--font-mono)',
+                fontSize: 14,
+              }}
+            />
+            <button
+              type="submit"
+              disabled={state.phase === 'submitting'}
+              style={{
+                border: 0,
+                background: 'var(--color-paper)',
+                color: 'var(--color-ink)',
+                padding: '14px 24px',
+                fontFamily: 'var(--font-mono)',
+                fontSize: 13,
+                fontWeight: 500,
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+              }}
+            >
+              {state.phase === 'submitting' ? 'Sending…' : 'Send the report'}
+            </button>
+          </form>
+
+          {state.phase === 'error' ? (
+            <p
+              id="email-gate-error"
+              role="alert"
+              style={{
+                marginTop: 12,
+                fontSize: 13,
+                color: 'var(--color-alert)',
+              }}
+            >
+              {state.message}
+            </p>
+          ) : null}
+        </div>
+
+        {/* Door 3 — tertiary: direct reply */}
+        <p
+          style={{
+            marginTop: 28,
+            fontSize: 14,
+            lineHeight: 1.55,
+            color: 'var(--color-mute-inv)',
+            maxWidth: '52ch',
+          }}
+        >
+          Prefer to talk first? Email{' '}
+          <a
+            href={`mailto:hello@flintmere.com?subject=Scan%20of%20${encodeURIComponent(shopDomain)}`}
+            style={{ color: 'var(--color-paper)', textDecoration: 'underline' }}
+          >
+            hello@flintmere.com
+          </a>{' '}
+          and tell us what you need. {REPLY_SLA}
+        </p>
 
         <p
           style={{
-            marginTop: 16,
+            marginTop: 24,
             fontFamily: 'var(--font-mono)',
             fontSize: 10.5,
             letterSpacing: '0.08em',
