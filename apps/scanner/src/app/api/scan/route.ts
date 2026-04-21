@@ -12,6 +12,7 @@ export const maxDuration = 60;
 
 const BodySchema = z.object({
   shopUrl: z.string().min(1).max(512),
+  vertical: z.string().min(1).max(64).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -34,6 +35,9 @@ export async function POST(req: NextRequest) {
     null;
   const userAgent = req.headers.get('user-agent') ?? null;
   const source = userAgent?.includes('FlintmereBot') ? 'bot' : 'user';
+  // Only persist the vertical hint on bot scans — the field is meant
+  // for operator-curated aggregate data, not user-supplied free text.
+  const vertical = source === 'bot' ? (body.vertical ?? null) : null;
 
   const scan = await prisma.scan.create({
     data: {
@@ -41,6 +45,7 @@ export async function POST(req: NextRequest) {
       normalisedDomain: body.shopUrl.toLowerCase().trim(),
       status: 'running',
       source,
+      vertical,
       ipHash: hashIp(ip),
       userAgent,
       startedAt,

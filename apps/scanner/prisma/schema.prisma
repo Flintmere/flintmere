@@ -29,6 +29,7 @@ model Scan {
   normalisedDomain String @map("normalised_domain")
   status      ScanStatus @default(pending)
   source      ScanSource @default(user)
+  vertical    String?    @db.VarChar(64)
   score       Int?
   grade       String?
   scoreJson   Json?      @map("score_json")
@@ -47,6 +48,7 @@ model Scan {
   @@index([createdAt])
   @@index([status])
   @@index([source])
+  @@index([vertical])
   @@map("scanner_scans")
 }
 

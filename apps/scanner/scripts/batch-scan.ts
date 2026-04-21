@@ -225,7 +225,10 @@ async function scanOne(store: Store): Promise<ResultRow> {
         'content-type': 'application/json',
         'user-agent': BOT_UA,
       },
-      body: JSON.stringify({ shopUrl: store.canonicalUrl || store.shopDomain }),
+      body: JSON.stringify({
+        shopUrl: store.canonicalUrl || store.shopDomain,
+        vertical: store.vertical && store.vertical !== 'unknown' ? store.vertical : undefined,
+      }),
       signal: controller.signal,
     });
     const body = (await res.json().catch(() => ({}))) as {
