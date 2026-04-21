@@ -28,7 +28,15 @@ import { fileURLToPath } from 'node:url';
 
 const BOT_UA = 'FlintmereBot/1.0 (+https://audit.flintmere.com/bot)';
 const REQUEST_TIMEOUT_MS = 10_000;
-const DEFAULT_CONCURRENCY = 8;
+// Shopify's edge CDN applies a per-IP throttle pooled across all the
+// stores it fronts. At concurrency=8 with no inter-request delay we
+// tripped it — 136/150 came back 429 on the first run. With CONCURRENCY=2
+// and a 2s-per-worker floor we stay at ~60 req/min from our IP, inside
+// Shopify's global per-IP allowance and matching the "1 req/2s per host"
+// kindness rule we publish on /bot.
+const DEFAULT_CONCURRENCY = 2;
+const REQUEST_INTERVAL_MS = 2_000;
+const REQUEST_JITTER_MS = 500;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..', '..', '..');
@@ -318,10 +326,21 @@ async function runPool<T>(
     while (cursor < items.length) {
       const i = cursor;
       cursor += 1;
+      const started = Date.now();
       await worker(items[i]!);
+      if (cursor < items.length) {
+        const elapsed = Date.now() - started;
+        const jitter = Math.floor(Math.random() * REQUEST_JITTER_MS);
+        const wait = Math.max(0, REQUEST_INTERVAL_MS - elapsed + jitter);
+        if (wait > 0) await sleep(wait);
+      }
     }
   });
   await Promise.all(runners);
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
 }
 
 function formatOutputCsv(rows: Validated[]): string {
