@@ -107,6 +107,7 @@
   font-family: var(--font-mono);
   font-weight: 700;
   font-feature-settings: 'ss01';
+  white-space: nowrap;
 }
 
 .bracket::before,
