@@ -14,7 +14,8 @@
     "test:watch": "vitest",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "benchmark:compile": "tsx scripts/compile-store-list.ts"
+    "benchmark:compile": "tsx scripts/compile-store-list.ts",
+    "benchmark:scan": "tsx scripts/batch-scan.ts"
   },
   "dependencies": {
     "@flintmere/scoring": "workspace:*",

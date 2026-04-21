@@ -14,8 +14,10 @@ candidates.csv      (operator-supplied — URL list, any source)
 stores.csv          (validated live Shopify storefronts)
 stores.report.json  (rejection reasons, per-run summary)
        │
-       │  batch-scan worker (#31, tbd)
+       │  pnpm --filter scanner benchmark:scan     (scanner must be running)
        ▼
+scans.jsonl         (per-store outcome, one JSON per line)
+scans.report.json   (error breakdown, totals)
 scanner_scans       (Postgres rows tagged source='bot')
 ```
 
@@ -32,6 +34,18 @@ scanner_scans       (Postgres rows tagged source='bot')
    ```
 4. Inspect `data/benchmark/stores.csv` and
    `data/benchmark/stores.report.json`.
+5. Start the scanner in another terminal:
+   ```
+   pnpm --filter scanner dev
+   ```
+6. Run the batch scanner:
+   ```
+   pnpm --filter scanner benchmark:scan
+   ```
+   This writes each outcome to `scans.jsonl` and each completed row
+   lands in Postgres `scanner_scans` tagged `source='bot'`. Safe to
+   ctrl-c and resume — `RESUME=true` (default) skips domains already
+   present in the output file.
 
 ## Candidate sources
 
