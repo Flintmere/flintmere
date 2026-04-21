@@ -81,3 +81,8 @@ context/
 tmp/
 .tmp/
 *.tmp
+
+# Benchmark working data (operator-supplied candidates, scan outputs)
+data/benchmark/*
+!data/benchmark/README.md
+!data/benchmark/candidates.example.csv

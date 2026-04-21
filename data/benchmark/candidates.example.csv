@@ -1,0 +1,10 @@
+# Flintmere benchmark — candidate Shopify URLs.
+# Copy this to candidates.csv and append your own URLs.
+# Format: url[,vertical]  (vertical is an operator hint, any string)
+# Lines starting with # are ignored.
+url,vertical
+allbirds.com,apparel
+gymshark.com,apparel
+deathwishcoffee.com,food-and-drink
+manscaped.com,beauty
+beardbrand.com,beauty
