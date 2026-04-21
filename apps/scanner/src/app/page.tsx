@@ -12,7 +12,7 @@ export default function MarketingHome() {
           </Link>
           <nav className="hidden md:flex gap-8" aria-label="Primary">
             <Link href="/#pillars" className="eyebrow hover:text-[color:var(--color-ink)]">
-              Pillars
+              Checks
             </Link>
             <Link href="/#pricing" className="eyebrow hover:text-[color:var(--color-ink)]">
               Pricing
@@ -65,7 +65,7 @@ export default function MarketingHome() {
 
       {/* Pillars */}
       <section id="pillars" className="mx-auto max-w-[1280px] px-8 py-24">
-        <p className="eyebrow mb-6">The seven pillars</p>
+        <p className="eyebrow mb-6">The seven checks</p>
         <h2 className="max-w-[18ch] mb-12">One composite score. Seven things we check.</h2>
         <ol className="list-none p-0 m-0 divide-y divide-[color:var(--color-line)] border-y border-[color:var(--color-line)]">
           <Pillar n="01" name="Identifier completeness" weight="20%" desc="GTIN, MPN, brand, SKU — present, valid, and verifiable." />

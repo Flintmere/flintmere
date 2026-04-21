@@ -84,9 +84,9 @@ export function scoreConsistency(input: CatalogInput): PillarResult {
       pillar: 'consistency',
       code: 'active-zero-inventory',
       severity: 'medium',
-      title: `${activeWithNoStock.length} products active with zero inventory`,
+      title: `${activeWithNoStock.length} products are listed for sale but have no stock`,
       description:
-        'Agents penalise catalogs with stock inconsistencies. Set to draft or enable continuous tracking.',
+        'Each one is set to Active with zero units in stock and backorders turned off. Shoppers land on the page and hit a dead end. AI agents stop recommending products that behave like this. Fix by adding stock, enabling backorders, or switching the product to Draft.',
       affectedCount: activeWithNoStock.length,
       affectedProductIds: activeWithNoStock.map((p) => p.id),
       revenueImpactScore: 40,

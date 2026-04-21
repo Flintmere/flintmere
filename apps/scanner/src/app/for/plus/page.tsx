@@ -5,7 +5,7 @@ import { Bracket } from '@/components/Bracket';
 export const metadata: Metadata = {
   title: 'Flintmere for Shopify Plus — seven-figure catalogs, agent-ready',
   description:
-    'The catalog mistakes that quietly cost Plus brands share-of-shelf in AI shopping agents — and the Flintmere pillars that detect them.',
+    'The catalog mistakes that quietly cost Plus brands share-of-shelf in AI shopping agents — and the Flintmere checks that detect them.',
 };
 
 interface Mistake {
@@ -278,7 +278,7 @@ function MistakeRow({ mistake }: { mistake: Mistake }) {
         </p>
       </div>
       <p className="eyebrow text-right max-md:text-left">
-        Pillar · {mistake.pillar}
+        Check · {mistake.pillar}
       </p>
     </li>
   );

@@ -109,10 +109,10 @@ function renderHtml(input: ReportEmailInput): string {
           <tr>
             <td style="padding:24px 32px;">
               <p style="margin:0;font-size:16px;line-height:1.55;color:#141518;">
-                Your catalog scores ${score.score}/100 against the seven pillars AI shopping agents parse. Your GTIN-less ceiling — the highest score reachable without GS1 identifiers — is <strong>${score.gtinlessCeiling}/100</strong>.
+                Your catalog scores ${score.score}/100 across the seven checks AI shopping agents run on product catalogs. Your ceiling without GS1-registered barcodes is <strong>${score.gtinlessCeiling}/100</strong>.
               </p>
               <p style="margin:12px 0 0 0;font-size:14px;color:#5A5C64;line-height:1.55;">
-                This is the partial audit. Three pillars stay locked until you install Flintmere on your store; those are the ones that need OAuth access to your metafields + catalog-mapping config.
+                This is the partial audit. Three checks stay locked until you install Flintmere on your store — those need access to your metafields and catalog-mapping settings.
               </p>
             </td>
           </tr>
@@ -120,7 +120,7 @@ function renderHtml(input: ReportEmailInput): string {
           <!-- Pillar breakdown -->
           <tr>
             <td style="padding:0 32px 24px 32px;">
-              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;margin-bottom:4px;">Pillar breakdown</div>
+              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;margin-bottom:4px;">Score breakdown</div>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 ${pillarRows}
                 ${lockedRows}
@@ -141,7 +141,7 @@ function renderHtml(input: ReportEmailInput): string {
             <td style="padding:32px;background:#0A0A0B;color:#F7F7F4;">
               <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#A8AAB2;">Next step</div>
               <div style="margin-top:12px;font-size:22px;font-weight:500;letter-spacing:-0.02em;line-height:1.3;">
-                Install Flintmere to unlock <span style="font-family:ui-monospace,Menlo,monospace;font-weight:700;">[&nbsp;${lockedPillars.length}&nbsp;]</span> locked pillars and apply safe auto-fixes with 7-day revert.
+                Install Flintmere to unlock the remaining <span style="font-family:ui-monospace,Menlo,monospace;font-weight:700;">[&nbsp;${lockedPillars.length}&nbsp;]</span> checks and apply safe auto-fixes with 7-day revert.
               </div>
               <p style="margin:16px 0 24px 0;font-size:14px;color:#A8AAB2;line-height:1.55;">
                 Every change previewed before it ships. Every change reversible for 7 days. First month £29 for scanner users (Growth tier, normally £49).
@@ -199,14 +199,14 @@ function renderText(input: ReportEmailInput): string {
 [ ${score.score} ] / 100 · Grade ${score.grade}
 ${score.productCount} products analysed · GTIN-less ceiling: ${score.gtinlessCeiling}/100
 
-Pillar breakdown
+Score breakdown
 ${pillars}
 
 Top issues (ranked by revenue impact)
 ${top}
 
 Next step
-Install Flintmere to unlock the remaining pillars and apply safe auto-fixes
+Install Flintmere to unlock the remaining checks and apply safe auto-fixes
 with 7-day revert. First month £29 for scanner users.
 
 ${appUrl}
