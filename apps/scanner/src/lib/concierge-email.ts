@@ -41,12 +41,12 @@ export async function sendConciergeCustomerEmail(
   const optionalCallBlockHtml = calendlyUrl
     ? `<div style="margin-top:24px;padding:18px;border:1px solid #D5D2C8;">
          <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;margin-bottom:6px;">Optional</div>
-         <p style="margin:0 0 12px 0;font-size:14px;line-height:1.55;color:#141518;">Want to walk me through your store first? Book a 15-minute call — or skip it, I can work from the URL alone.</p>
+         <p style="margin:0 0 12px 0;font-size:14px;line-height:1.55;color:#141518;">If it&rsquo;s easier, book a 15-minute call to walk me through the store. Most people skip this — the URL is all I need.</p>
          <a href="${esc(calendlyUrl)}" style="display:inline-block;color:#0A0A0B;font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:0.04em;text-transform:uppercase;text-decoration:underline;">Book the 15-minute call →</a>
        </div>`
     : '';
   const optionalCallBlockText = calendlyUrl
-    ? `\nOptional: Want to walk me through your store first? Book a 15-minute call — or skip it, I can work from the URL alone. ${calendlyUrl}\n`
+    ? `\nOptional: if it's easier, book a 15-minute call to walk me through the store. Most people skip this — the URL is all I need. ${calendlyUrl}\n`
     : '';
 
   const html = `<!doctype html>
@@ -68,9 +68,10 @@ export async function sendConciergeCustomerEmail(
               <p style="margin:0;font-size:16px;line-height:1.55;color:#141518;">Thanks for trusting me with this. Your £97 booking is confirmed.</p>
               <p style="margin:16px 0 0 0;font-size:16px;line-height:1.55;color:#141518;">Here&rsquo;s what happens next, in order:</p>
               <ol style="margin:12px 0 0 0;padding-left:20px;font-size:15px;line-height:1.6;color:#141518;">
-                <li><strong>Today:</strong> I start the review of <strong>${safeShop}</strong>. I read every product, check the structured data, test how AI agents see your site.</li>
-                <li><strong>Within three working days:</strong> you get a 15-minute video walkthrough and a prioritised list of exactly what to fix first, in plain English — no jargon, no 80-page PDF.</li>
-                <li><strong>After that:</strong> reply with questions. I read every one.</li>
+                <li><strong>Today:</strong> I start reading <strong>${safeShop}</strong>. Every product, the structured data, how AI agents see your site.</li>
+                <li><strong>Within three working days:</strong> you get a written audit letter, a per-product fix CSV (with the worst 10 products drafted for you), a 30-day fix sequence, and the right GS1 UK barcode path. No video, no call — just the data.</li>
+                <li><strong>Day 30:</strong> the scanner re-runs and emails you a progress report, so you know whether the fixes moved the score.</li>
+                <li><strong>Any time:</strong> reply with questions. I read every one.</li>
               </ol>
             </td>
           </tr>
@@ -103,14 +104,18 @@ Thanks for trusting me with this. Your £97 booking is confirmed.
 
 Here's what happens next, in order:
 
-1. Today: I start the review of ${shopUrl}. I read every product, check
-   the structured data, test how AI agents see your site.
+1. Today: I start reading ${shopUrl}. Every product, the structured
+   data, how AI agents see your site.
 
-2. Within three working days: you get a 15-minute video walkthrough and
-   a prioritised list of exactly what to fix first, in plain English —
-   no jargon, no 80-page PDF.
+2. Within three working days: you get a written audit letter, a
+   per-product fix CSV (with the worst 10 products drafted for you), a
+   30-day fix sequence, and the right GS1 UK barcode path. No video,
+   no call — just the data.
 
-3. After that: reply with questions. I read every one.
+3. Day 30: the scanner re-runs and emails you a progress report, so
+   you know whether the fixes moved the score.
+
+4. Any time: reply with questions. I read every one.
 
 If the shop URL above is wrong, just reply to this email and I'll fix it
 before I start. Stripe has sent a separate receipt for your records.
@@ -154,7 +159,7 @@ export async function sendConciergeOpsEmail(
       <tr><td style="color:#5A5C64;">Payment intent</td><td style="font-family:ui-monospace,Menlo,monospace;"><a href="${esc(stripeUrl)}" style="color:#0A0A0B;">${esc(paymentIntentId)}</a></td></tr>
       <tr><td style="color:#5A5C64;">Booked at</td><td>${new Date().toISOString()}</td></tr>
     </table>
-    <p style="margin:20px 0 0 0;font-size:13px;color:#5A5C64;line-height:1.55;">${esc(REPLY_SLA)} Delivery promise to the customer: video walkthrough + prioritised fix list within three working days.</p>
+    <p style="margin:20px 0 0 0;font-size:13px;color:#5A5C64;line-height:1.55;">${esc(REPLY_SLA)} Delivery promise: written audit letter + per-product CSV + 30-day sequence + GS1 UK path within three working days. 30-day re-scan included.</p>
   </div>
 </body></html>`;
 
@@ -167,7 +172,7 @@ Stripe:          ${stripeUrl}
 Booked at:       ${new Date().toISOString()}
 
 ${REPLY_SLA}
-Delivery promise to the customer: video walkthrough + prioritised fix list within three working days.`;
+Delivery promise: written audit letter + per-product CSV + 30-day sequence + GS1 UK path within three working days. 30-day re-scan included.`;
 
   return sendEmail({
     to,

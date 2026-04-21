@@ -174,7 +174,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
               margin: 0,
             }}
           >
-            Recommended · £97 one-off
+            Recommended · £97 one-off · three working days
           </p>
           <h3
             style={{
@@ -185,7 +185,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
               margin: '12px 0 0 0',
             }}
           >
-            Book the concierge audit.
+            Have John read your store for you.
           </h3>
           <p
             style={{
@@ -196,9 +196,10 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
               maxWidth: '52ch',
             }}
           >
-            John reviews your store personally, records a 15-minute video
-            walkthrough of what to fix first, and sends a prioritised plan in
-            plain English. Delivered within three working days.
+            John reads your store product by product, writes a detailed audit
+            letter pointing at exactly what to fix, and sends a per-product CSV
+            with the worst 10 products already drafted. A 30-day re-scan is
+            included. No video, no call — just the data.
           </p>
           <Link
             href="/audit"

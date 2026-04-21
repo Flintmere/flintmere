@@ -2,11 +2,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Bracket } from '@/components/Bracket';
 import { CheckoutCard } from './CheckoutCard';
+import { CONCIERGE_DELIVERABLE_LIST } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: 'Concierge audit — £97',
   description:
-    'John reviews your Shopify store personally, records a 15-minute video walkthrough, and sends a prioritised fix plan within three working days.',
+    'John reads your Shopify store product by product and sends a written audit letter plus a per-product fix CSV within three working days. 30-day re-scan included.',
 };
 
 export default function Audit() {
@@ -42,16 +43,17 @@ export default function Audit() {
         <p className="eyebrow mb-6">
           Concierge audit · £97 one-off · three working days
         </p>
-        <h1 className="mx-auto max-w-[14ch]">
-          Want John to do it <Bracket>for you</Bracket>?
+        <h1 className="mx-auto max-w-[16ch]">
+          Want John to read your store <Bracket>for you</Bracket>?
         </h1>
         <p
-          className="mx-auto mt-8 max-w-[48ch] text-[color:var(--color-ink-2)]"
+          className="mx-auto mt-8 max-w-[50ch] text-[color:var(--color-ink-2)]"
           style={{ fontSize: 17, lineHeight: 1.55 }}
         >
-          John reviews your store personally, records a 15-minute video
-          walkthrough of what to fix first, and sends a prioritised plan in
-          plain English. No subscription, no sales call, no upsell.
+          John reads your store product by product, writes a detailed audit
+          letter pointing at exactly what to fix, and sends a per-product CSV
+          with the worst 10 products already drafted for you. No video, no
+          call, no upsell. Just the data.
         </p>
       </section>
 
@@ -62,45 +64,36 @@ export default function Audit() {
       <section className="mx-auto max-w-[720px] px-6 pb-24">
         <div className="border-t border-[color:var(--color-line-soft)] pt-12">
           <p className="eyebrow mb-4">What you get</p>
-          <ul
-            className="list-none p-0 m-0 space-y-3"
+          <ol
+            className="list-none p-0 m-0 space-y-5"
             style={{ fontSize: 16, lineHeight: 1.55 }}
           >
-            <li className="flex gap-3">
-              <span aria-hidden="true" className="text-[color:var(--color-mute-2)]">—</span>
-              <span>
-                A 15-minute video walkthrough of your store — John on screen,
-                pointing at the exact things to fix first.
-              </span>
-            </li>
-            <li className="flex gap-3">
-              <span aria-hidden="true" className="text-[color:var(--color-mute-2)]">—</span>
-              <span>
-                A prioritised fix list in plain English — no jargon, no 80-page
-                PDF. Ranked by how many products each fix unblocks.
-              </span>
-            </li>
-            <li className="flex gap-3">
-              <span aria-hidden="true" className="text-[color:var(--color-mute-2)]">—</span>
-              <span>
-                A CSV of every product that has a problem, and which fix it
-                needs.
-              </span>
-            </li>
-            <li className="flex gap-3">
-              <span aria-hidden="true" className="text-[color:var(--color-mute-2)]">—</span>
-              <span>
-                The right GS1 office for where your business is registered, so
-                you buy real barcodes from the right place.
-              </span>
-            </li>
-            <li className="flex gap-3">
-              <span aria-hidden="true" className="text-[color:var(--color-mute-2)]">—</span>
-              <span>
-                Reply with questions afterwards. John reads every one.
-              </span>
-            </li>
-          </ul>
+            {CONCIERGE_DELIVERABLE_LIST.map((item, idx) => (
+              <li key={item.title} className="grid grid-cols-[48px_1fr] gap-3">
+                <span
+                  aria-hidden="true"
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 12,
+                    letterSpacing: '0.12em',
+                    color: 'var(--color-mute)',
+                    paddingTop: 4,
+                  }}
+                >
+                  [&nbsp;0{idx + 1}&nbsp;]
+                </span>
+                <div>
+                  <p style={{ fontSize: 17, fontWeight: 500 }}>{item.title}</p>
+                  <p
+                    className="mt-1 text-[color:var(--color-ink-2)]"
+                    style={{ fontSize: 15, lineHeight: 1.55 }}
+                  >
+                    {item.body}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
 
         <div className="mt-14">
@@ -113,22 +106,30 @@ export default function Audit() {
               <strong className="text-[color:var(--color-ink)]" aria-hidden="true">
                 [ 01 ]
               </strong>
-              &nbsp;&nbsp;Pay £97. You get a confirmation email from John
-              straight away.
+              &nbsp;&nbsp;Pay £97. A confirmation email from John arrives
+              within a minute.
             </li>
             <li>
               <strong className="text-[color:var(--color-ink)]" aria-hidden="true">
                 [ 02 ]
               </strong>
-              &nbsp;&nbsp;Optional: book a 15-minute call from the confirmation
-              email. Most people skip it — John can work from the URL alone.
+              &nbsp;&nbsp;John reads your catalog and writes the audit. No
+              call, no screen-share — the URL is all he needs.
             </li>
             <li>
               <strong className="text-[color:var(--color-ink)]" aria-hidden="true">
                 [ 03 ]
               </strong>
-              &nbsp;&nbsp;Within three working days, the walkthrough plus fix
-              plan lands in your inbox.
+              &nbsp;&nbsp;Within three working days, the letter plus CSV plus
+              30-day plan lands in your inbox. Reply with questions — John
+              reads every one.
+            </li>
+            <li>
+              <strong className="text-[color:var(--color-ink)]" aria-hidden="true">
+                [ 04 ]
+              </strong>
+              &nbsp;&nbsp;Day 30: the scanner re-runs and emails you a
+              progress report.
             </li>
           </ol>
         </div>

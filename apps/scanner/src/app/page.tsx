@@ -79,7 +79,7 @@ export default function MarketingHome() {
           />
           <Stat
             big="£97"
-            label="One-off concierge audit by John — 15-minute video walkthrough plus a prioritised plan, within three working days."
+            label="One-off concierge audit by John — written audit letter, per-product fix CSV, and 30-day re-scan, within three working days."
           />
         </div>
       </section>
@@ -192,9 +192,10 @@ export default function MarketingHome() {
           style={{ fontSize: 17, lineHeight: 1.55 }}
         >
           Flintmere is built by John Morris. If you book the £97 concierge
-          audit, John does it — the video walkthrough and the fix plan. If
-          you email hello@flintmere.com with a question, John replies. No
-          operator team, no pitch, no sales call.
+          audit, John does it — he reads your store product by product and
+          writes the audit letter and per-product CSV himself. If you email
+          hello@flintmere.com with a question, John replies. No operator
+          team, no pitch, no sales call.
         </p>
       </section>
 

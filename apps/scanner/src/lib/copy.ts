@@ -22,6 +22,50 @@ export const JOHN_SIGNATURE_NAME = 'John Morris'
 export const JOHN_SIGNATURE_TITLE = 'Flintmere founder'
 export const JOHN_SIGNATURE_REPLY_INVITE = 'Reply direct. I read every one.'
 
+// The concierge deliverable. Written audit — no video, no call —
+// because John delivers at scale. Every customer-facing surface that
+// describes what £97 buys must use this wording (or the list below).
+// If you change the deliverable shape, update all five surfaces in
+// the same commit.
+export const CONCIERGE_DELIVERABLE_SUMMARY =
+  'John reads every product, writes a detailed audit letter pointing at exactly what to fix, and sends a per-product CSV with the worst 10 products already drafted for you. A 30-day re-scan is included. Delivered within three working days.'
+
+// Five-item list used on the /audit page and in the report email
+// Door 1 expansion. Keep in this order — #37 sequenced it for
+// objection handling (letter first = personal; CSV second = scale;
+// plan third = immediacy; GS1 fourth = authority; re-scan fifth =
+// accountability).
+export const CONCIERGE_DELIVERABLE_LIST: Array<{
+  title: string
+  body: string
+}> = [
+  {
+    title: 'A written audit letter',
+    body:
+      'John reads your store product by product, then writes a 1,500-word letter pointing at specific products by name with annotated screenshots. Not a generic template — a read of your store.',
+  },
+  {
+    title: 'A per-product fix CSV',
+    body:
+      'Every product that has a problem, which problem, and the fix. For the worst 10 offenders, John drafts the full replacement text — title, description, metafield values — ready to paste into Shopify.',
+  },
+  {
+    title: 'A 30-day fix sequence',
+    body:
+      'A one-page plan: what to do Day 1, Week 1, Week 2, Week 3-4 — ranked by how many products each fix unblocks first.',
+  },
+  {
+    title: 'A GS1 UK barcode path',
+    body:
+      'The right GS1 office for where your business is registered, what to buy, and how to import the codes into Shopify without breaking your theme.',
+  },
+  {
+    title: 'A 30-day re-scan',
+    body:
+      'Included. The scanner re-runs on day 30 and emails you a progress report, so you know whether the fixes moved the score.',
+  },
+]
+
 // Words that fail the #37 veto on Copy Council: Flintmere-internal or
 // Shopify-developer jargon that a non-technical founder will not parse
 // on one skim. Never ship any of these in customer-facing surfaces.
