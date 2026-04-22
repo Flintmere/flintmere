@@ -47,13 +47,16 @@ Provider abstraction per ADRs 0005 + 0006. Shipped:
 ### `apps/scanner/` (Next.js 15, audit.flintmere.com + marketing)
 
 - App Router layout, Tailwind v4 with `@theme` directive, Geist fonts self-hosted
-- Marketing home (`/`) with hero + seven pillars + before/after + three-chapter narrative + testimonials + pricing grid + manifesto + footer
-- `/pricing` — five tiers + FAQ + GTIN disclaimer
-- `/research` — State of AI Readiness reports (stub)
-- `/audit` + `/audit/success` — £97 concierge landing with Stripe checkout form + Calendly fallback
-- `/scan` — public scanner UI
+- Marketing home (`/`) with hero + seven pillars + before/after + three-chapter narrative + testimonials + pricing grid + manifesto + footer — live benchmark strip (median + n) wired to `/api/benchmark/summary`
+- `/pricing` — five tiers + concierge callout + FAQ + GTIN disclaimer
+- `/research` — State of Shopify Catalogs 2026, fully wired: overall median, grade distribution, by-vertical deep cards (apparel/beauty/food-and-drink) + full-breadth grid across all scanned verticals, methodology, CTA. ISR `revalidate=3600`
+- `/for/apparel`, `/for/beauty`, `/for/food-and-drink` — per-vertical landing pages with live benchmark numbers and vertical-specific copy
+- `/bot` — FlintmereBot disclosure page (user-agent, rate limits, crawl scope, opt-out)
+- `/audit` + `/audit/success` — £97 concierge landing with written-audit methodology, Stripe Payment Element checkout, Calendly fallback
+- `/scan` — public scanner UI with three-door close, merchant opt-in to benchmark on Results
 - `/unsubscribe` — PECR/GDPR one-click unsubscribe page
-- API routes: `POST /api/scan`, `GET /api/scan/:id`, `POST /api/lead` (Resend full-report delivery), `POST /api/unsubscribe`, `POST /api/concierge/checkout` (Stripe Checkout Session, 303-redirect), `POST /api/webhooks/stripe` (signature-verified, idempotent on payment intent), `GET /api/healthz`
+- API routes: `POST /api/scan`, `GET /api/scan/:id`, `POST /api/lead` (Resend full-report delivery), `POST /api/unsubscribe`, `POST /api/concierge/checkout` (Stripe Checkout Session, 303-redirect), `POST /api/webhooks/stripe` (signature-verified, idempotent on payment intent), `GET /api/benchmark/summary` (aggregate-only, cache-controlled), `POST /api/scan/:id/publish-to-benchmark` (merchant opt-in), `GET /api/healthz`
+- Benchmark pipeline: `scripts/compile-store-list.ts` (validates candidates against `/products.json` + sitemap fallback, kindness-compliant rate limits) and `scripts/batch-scan.ts` (success-only resume, PACE_MS throttling). Rolling cohort — 253 stores across 35 verticals as of 2026-04-22.
 - `lib/stripe.ts` — Stripe SDK singleton pinned to API `2024-10-28.acacia`, returns null gracefully when `STRIPE_SECRET_KEY` unset (routes 503 instead of crashing)
 - `lib/email.ts` — Resend wrapper with RFC 8058 one-click unsubscribe headers + HMAC-SHA256 unsubscribe tokens + `timingSafeEqual` verification
 - Prisma schema: `scanner_scans`, `scanner_leads`, `scanner_reports`, `scanner_concierge_audits`
@@ -106,7 +109,8 @@ Provider abstraction per ADRs 0005 + 0006. Shipped:
 
 ## Changelog
 
-- **2026-04-20** (latest): Seventh pillar landed — `crawlability` (weight 15%). Scores `/llms.txt` presence + well-formedness, `/robots.txt` AI-agent access (GPTBot/ClaudeBot/Google-Extended/PerplexityBot/Applebot-Extended/cohere-ai/Bytespider/CCBot/OAI-SearchBot/ChatGPT-User), `/sitemap.xml` discoverability, and sitemap reference in robots. Scanner route fetches all three with 5s timeouts in parallel, fails soft on missing. Attributes weight rebalanced 25 → 20 to keep composite at 100. 9 new unit tests in `packages/scoring/test/crawlability.test.ts`. Driven by xgentech/Nimstrata/Rankfirms industry research — llms.txt is the emerging agent-manifest standard and Shopify storefronts overwhelmingly omit it.
+- **2026-04-22** (latest): Benchmark widened — pool jumped 134 → **253 scored stores across 35 verticals**, headline finding now **98% below ceiling** (D+F). New `/research` breadth grid surfaces every scanned vertical (flagships first, remainder by sample size). Display-weight pass applied across home + pricing + research + `/for/*` — giant median/score moments at `clamp(88px, 14vw, 220px)` with amber under-tick; bracket cap enforced (≤2 per page). 2-stage benchmark pipeline proven end-to-end: `compile-store-list` validates candidates kindness-compliantly, `batch-scan` runs success-only resume at PACE_MS=4000/CONCURRENCY=1 to respect Shopify's edge CDN per-IP pool. Per-vertical cells below publish-floor render as "early sample".
+- **2026-04-20**: Seventh pillar landed — `crawlability` (weight 15%). Scores `/llms.txt` presence + well-formedness, `/robots.txt` AI-agent access (GPTBot/ClaudeBot/Google-Extended/PerplexityBot/Applebot-Extended/cohere-ai/Bytespider/CCBot/OAI-SearchBot/ChatGPT-User), `/sitemap.xml` discoverability, and sitemap reference in robots. Scanner route fetches all three with 5s timeouts in parallel, fails soft on missing. Attributes weight rebalanced 25 → 20 to keep composite at 100. 9 new unit tests in `packages/scoring/test/crawlability.test.ts`. Driven by xgentech/Nimstrata/Rankfirms industry research — llms.txt is the emerging agent-manifest standard and Shopify storefronts overwhelmingly omit it.
 - **2026-04-20** (later): Four legal-page drafts (Privacy, ToS, Cookie Policy, DPA) written to `context/compliance/legal-drafts/` per `legal-page-draft` skill Level 1 rules. Awaiting council + user confirm before any `src/app/<legal>/**` write.
 - **2026-04-20**: Updated to reflect scaffolding-complete state. `packages/scoring`, `packages/llm`, `apps/scanner` (full surface + marketing + Stripe concierge + Resend email gate + PECR unsubscribe), `apps/shopify-app` (OAuth + Polaris + GDPR webhooks + AES-256-GCM + BullMQ + bulk-sync + three Tier 2 enrichment paths) all shipped across 11 commits since 2026-04-19. Now operator-blocked for launch.
 - **2026-04-19**: Foundations complete. Phases 1–3 shipped in 12 commits. All seven memory departments rewritten for Flintmere, six ADRs written, 50+ skills audited.
