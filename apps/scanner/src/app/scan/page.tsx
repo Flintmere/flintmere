@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Bracket } from '@/components/Bracket';
 import { EmailGate } from '@/components/EmailGate';
@@ -165,7 +165,47 @@ function ErrorBlock({ message }: { message: string }) {
   );
 }
 
+interface LiveSample {
+  show: boolean;
+  median: number;
+  n: number;
+}
+
+function useLiveSample(): LiveSample {
+  // Lazily fetch the published aggregate once the user has a result to
+  // contextualise. Below the publish floor we still show nothing — the
+  // claim-review contract applies here too.
+  const [sample, setSample] = useState<LiveSample>({
+    show: false,
+    median: 0,
+    n: 0,
+  });
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/benchmark/summary', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((body) => {
+        if (cancelled || !body) return;
+        const available = Boolean(body.available);
+        const preview = Boolean(body.preview);
+        const median = body.overall?.medianScore;
+        const n = body.overall?.n ?? 0;
+        if (available && !preview && typeof median === 'number') {
+          setSample({ show: true, median, n });
+        }
+      })
+      .catch(() => {
+        /* benchmark is optional context, never block the result */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  return sample;
+}
+
 function Results({ result }: { result: ScanResult }) {
+  const sample = useLiveSample();
   const criticalAndHigh = result.issues.filter(
     (i) => i.severity === 'critical' || i.severity === 'high',
   );
@@ -224,6 +264,25 @@ function Results({ result }: { result: ScanResult }) {
           >
             {AUTHORITY_LINE}
           </p>
+          {sample.show ? (
+            <p
+              className="mt-4 max-w-[54ch]"
+              style={{
+                fontSize: 14,
+                lineHeight: 1.5,
+                color: 'var(--color-mute)',
+              }}
+            >
+              For context — in our rolling sample of{' '}
+              <Bracket>{sample.n.toLocaleString()}</Bracket> mid-market
+              Shopify catalogs, the median score is{' '}
+              <Bracket>{sample.median}/100</Bracket>. You scored{' '}
+              <Bracket>{result.score}/100</Bracket>.{' '}
+              <Link href="/research" className="underline">
+                Read the full report →
+              </Link>
+            </p>
+          ) : null}
         </div>
       </div>
 

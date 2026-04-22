@@ -1,7 +1,53 @@
 import Link from 'next/link';
 import { Bracket } from '@/components/Bracket';
+import { prisma } from '@/lib/db';
+import {
+  summariseBenchmark,
+  type BenchmarkRow,
+} from '@/lib/benchmark-summary';
 
-export default function MarketingHome() {
+// ISR: hourly, matching /research + /api/benchmark/summary. Keeps the
+// live-sample line on the home page aligned with what John cites and
+// with what /research publishes.
+export const revalidate = 3600;
+
+async function loadLiveSample(): Promise<{
+  show: boolean;
+  median: number;
+  n: number;
+}> {
+  const rows = await prisma.scan.findMany({
+    where: {
+      OR: [{ source: 'bot' }, { publishedToBenchmark: true }],
+      status: 'complete',
+      score: { not: null },
+      grade: { not: null },
+    },
+    select: { score: true, grade: true, vertical: true },
+  });
+  const typed: BenchmarkRow[] = rows.map((r) => ({
+    score: r.score ?? 0,
+    grade: r.grade ?? '',
+    vertical: r.vertical,
+  }));
+  const summary = summariseBenchmark(typed);
+  // Only surface on home once we clear the publish floor — below that
+  // we quote the same numbers on /research as "early sample" but we
+  // don't front-door them. Claim review (#9 + #23) — no median framing
+  // at sub-publish-floor n.
+  const show =
+    summary.available &&
+    !summary.preview &&
+    summary.overall.medianScore !== null;
+  return {
+    show,
+    median: summary.overall.medianScore ?? 0,
+    n: summary.overall.n,
+  };
+}
+
+export default async function MarketingHome() {
+  const sample = await loadLiveSample();
   return (
     <main id="main">
       {/* Nav */}
@@ -83,6 +129,39 @@ export default function MarketingHome() {
           />
         </div>
       </section>
+
+      {sample.show ? (
+        <section
+          aria-label="Live sample"
+          className="mx-auto max-w-[1280px] px-8 py-10 border-b border-[color:var(--color-line)]"
+        >
+          <div className="grid md:grid-cols-[auto_1fr] gap-8 items-baseline">
+            <p
+              aria-hidden="true"
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: 14,
+                letterSpacing: '0.14em',
+                color: 'var(--color-mute)',
+              }}
+            >
+              [&nbsp;LIVE&nbsp;]
+            </p>
+            <p
+              className="max-w-[64ch]"
+              style={{ fontSize: 18, lineHeight: 1.5 }}
+            >
+              In our rolling sample of{' '}
+              <Bracket>{sample.n.toLocaleString()}</Bracket> mid-market
+              Shopify catalogs, the median score is{' '}
+              <Bracket>{sample.median}/100</Bracket>.{' '}
+              <Link href="/research" className="underline">
+                See the full report →
+              </Link>
+            </p>
+          </div>
+        </section>
+      ) : null}
 
       {/* Seven checks */}
       <section id="pillars" className="mx-auto max-w-[1280px] px-8 py-24">
