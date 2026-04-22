@@ -129,6 +129,55 @@ export default function Pricing() {
         </p>
       </section>
 
+      <section
+        aria-label="Start here"
+        className="border-y border-[color:var(--color-line)] bg-[color:var(--color-paper-2)]"
+      >
+        <div className="mx-auto max-w-[1280px] px-8 py-24 grid md:grid-cols-[auto_1fr] gap-12 items-end">
+          <div>
+            <p className="eyebrow mb-4">Start here</p>
+            <p
+              style={{
+                fontSize: 'clamp(88px, 14vw, 220px)',
+                fontWeight: 500,
+                letterSpacing: '-0.045em',
+                lineHeight: 0.92,
+              }}
+            >
+              £0
+              <span
+                aria-hidden="true"
+                className="inline-block align-baseline ml-2"
+                style={{
+                  width: '0.22em',
+                  height: '2px',
+                  background: 'var(--color-accent)',
+                  transform: 'translateY(-0.22em)',
+                }}
+              />
+            </p>
+          </div>
+          <div className="pb-6">
+            <p
+              className="max-w-[40ch]"
+              style={{
+                fontSize: 24,
+                lineHeight: 1.35,
+                letterSpacing: '-0.015em',
+              }}
+            >
+              The free scan runs in 60 seconds. No signup, no credit card.
+              Upgrade when the value is visible.
+            </p>
+            <p className="mt-6">
+              <Link href="/scan" className="underline eyebrow">
+                Run the free scan →
+              </Link>
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section aria-label="Tiers" className="grid grid-cols-1 md:grid-cols-5 border-y border-[color:var(--color-line)]">
         {TIERS.map((tier) => (
           <div
