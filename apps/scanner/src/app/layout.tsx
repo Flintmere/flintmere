@@ -20,6 +20,12 @@ export const metadata: Metadata = {
     locale: 'en_GB',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Flintmere — Catalog readiness for AI agents',
+    description:
+      'Score your Shopify catalog for AI-agent readiness. Free scan, 60 seconds.',
+  },
   robots: {
     index: true,
     follow: true,

@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Flintmere — Wireframes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="marketing.jsx"></script>
+<script type="text/babel" src="scanner.jsx"></script>
+<script type="text/babel" src="app.jsx"></script>
+
+<script type="text/babel" data-presets="react" data-plugins="">
+const DEFAULTS = /*EDITMODE-BEGIN*/{
+  "surface": "marketing",
+  "annotations": true,
+  "width": "desktop",
+  "variant": "both"
+}/*EDITMODE-END*/;
+
+const TWEAKS = { ...DEFAULTS };
+
+const SURFACES = [
+  { id: 'marketing', label: 'Marketing site', n: '01', url: 'flintmere.com' },
+  { id: 'scanner', label: 'Public scanner', n: '02', url: 'audit.flintmere.com' },
+  { id: 'app', label: 'Merchant app', n: '03', url: 'app.flintmere.com' },
+];
+
+const TITLES = {
+  marketing: {
+    title: 'flintmere.com — the marketing site',
+    sub: 'Long-scroll editorial. Big type. The manifesto move. Two directions: warm editorial vs data-forward with a split hero.',
+    variants: [
+      { label: 'variant A', title: 'Editorial manifesto', idea: 'one image, big type, the long read' },
+      { label: 'variant B', title: 'Data-forward, split hero', idea: 'live proof on the right, number bands' },
+    ],
+  },
+  scanner: {
+    title: 'audit.flintmere.com — the scanner',
+    sub: 'Terminal aesthetic. Mono-heavy data readouts. Score is the whole product. Two directions: diagnostic terminal vs consultancy report.',
+    variants: [
+      { label: 'variant A', title: 'Terminal diagnostic', idea: 'scan runs live, 3 pillars locked' },
+      { label: 'variant B', title: 'Consultancy report', idea: 'issued report, tabular findings' },
+    ],
+  },
+  app: {
+    title: 'app.flintmere.com — the merchant app',
+    sub: 'Admin-native patterns — sidebar, tables, status pills — without lifting any platform\u2019s component kit. Two directions: overview dashboard vs issue-detail fix flow.',
+    variants: [
+      { label: 'variant A', title: 'Dashboard overview', idea: 'score + pillars + issues + channel health' },
+      { label: 'variant B', title: 'Issue detail · auto-fix', idea: 'preview-fix-apply with history' },
+    ],
+  },
+};
+
+function Sidebar({ state, setState }) {
+  return (
+    <aside className="sidebar">
+      <div className="brand">
+        <div className="kicker">wireframes · april 2026</div>
+        <div className="mark">flintmere</div>
+        <div style={{ fontSize: 11, color: 'var(--mute)', marginTop: 2 }}>
+          AI-readiness for Shopify catalogs
+        </div>
+      </div>
+
+      <div className="nav-group">
+        <h4>surfaces</h4>
+        {SURFACES.map(s => (
+          <button key={s.id}
+            className={`nav-btn ${state.surface === s.id ? 'active' : ''}`}
+            onClick={() => setState({ ...state, surface: s.id })}>
+            <span>{s.label}</span>
+            <span className="n">{s.n}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="nav-group">
+        <h4>tweaks</h4>
+        <div className="toggles">
+          <label className="toggle">
+            <span>annotations</span>
+            <input type="checkbox" className="switch" checked={state.annotations}
+              onChange={e => setState({ ...state, annotations: e.target.checked })} />
+          </label>
+          <label className="toggle" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 6 }}>
+            <span>width</span>
+            <div className="seg">
+              <button className={state.width === 'desktop' ? 'on' : ''}
+                onClick={() => setState({ ...state, width: 'desktop' })}>desktop</button>
+              <button className={state.width === 'mobile' ? 'on' : ''}
+                onClick={() => setState({ ...state, width: 'mobile' })}>mobile</button>
+            </div>
+          </label>
+          <label className="toggle" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 6 }}>
+            <span>variants</span>
+            <div className="seg">
+              <button className={state.variant === 'A' ? 'on' : ''}
+                onClick={() => setState({ ...state, variant: 'A' })}>A only</button>
+              <button className={state.variant === 'both' ? 'on' : ''}
+                onClick={() => setState({ ...state, variant: 'both' })}>both</button>
+              <button className={state.variant === 'B' ? 'on' : ''}
+                onClick={() => setState({ ...state, variant: 'B' })}>B only</button>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div className="legend">
+        <div style={{ marginBottom: 8 }}><b>legend</b></div>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4 }}>
+          <span style={{ width: 18, height: 10, background: 'var(--paper-2)', border: '1px dashed var(--line-soft)', display: 'inline-block' }} /> generic block
+        </div>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4 }}>
+          <span style={{ width: 18, height: 10, background: 'repeating-linear-gradient(135deg, transparent 0 3px, var(--line-soft) 3px 4px)', border: '1px solid var(--line-soft)', display: 'inline-block' }} /> image placeholder
+        </div>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4 }}>
+          <span className="hand" style={{ color: 'var(--accent)' }}>aa</span> margin note
+        </div>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <span style={{ width: 10, height: 10, background: 'var(--accent)', borderRadius: '50%', display: 'inline-block' }} /> rust accent · one only
+        </div>
+      </div>
+
+      <div style={{ marginTop: 'auto', fontSize: 10, color: 'var(--mute)', borderTop: '1px dashed var(--line-soft)', paddingTop: 14, lineHeight: 1.6 }}>
+        <b style={{ color: 'var(--ink)' }}>note</b> — these are original structural wireframes. No platform or agency component kits have been reproduced.
+      </div>
+    </aside>
+  );
+}
+
+function renderSurface(state) {
+  const { surface, variant, width, annotations } = state;
+  const mobile = width === 'mobile';
+  const wrapClass = 'variants' + (variant !== 'both' ? ' single' : '') + (annotations ? '' : ' annos-off');
+
+  const v = TITLES[surface];
+
+  const getFrame = (which) => {
+    if (surface === 'marketing') return which === 'A' ? <MarketingA mobile={mobile} /> : <MarketingB mobile={mobile} />;
+    if (surface === 'scanner') return which === 'A' ? <ScannerA mobile={mobile} /> : <ScannerB mobile={mobile} />;
+    if (surface === 'app') return which === 'A' ? <AppA mobile={mobile} /> : <AppB mobile={mobile} />;
+  };
+
+  return (
+    <div className="main">
+      <div className="breadcrumb">
+        <span>flintmere wireframes</span>
+        <span>/</span>
+        <span className="dot">{v.title.split('—')[0].trim()}</span>
+      </div>
+      <h1 className="main-title">{v.title}</h1>
+      <p className="main-sub">{v.sub}</p>
+
+      <div className={wrapClass}>
+        {(variant === 'A' || variant === 'both') && (
+          <div className="variant">
+            <div className="variant-head">
+              <div>
+                <div className="label">{v.variants[0].label}</div>
+                <h3>{v.variants[0].title}</h3>
+              </div>
+              <div className="idea">“{v.variants[0].idea}”</div>
+            </div>
+            <div style={{ position: 'relative', paddingLeft: annotations ? 180 : 0, paddingRight: annotations ? 190 : 0 }}>
+              {getFrame('A')}
+            </div>
+          </div>
+        )}
+        {(variant === 'B' || variant === 'both') && (
+          <div className="variant">
+            <div className="variant-head">
+              <div>
+                <div className="label">{v.variants[1].label}</div>
+                <h3>{v.variants[1].title}</h3>
+              </div>
+              <div className="idea">“{v.variants[1].idea}”</div>
+            </div>
+            <div style={{ position: 'relative', paddingLeft: annotations ? 180 : 0, paddingRight: annotations ? 190 : 0 }}>
+              {getFrame('B')}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={{ marginTop: 60, borderTop: '1px dashed var(--line-soft)', paddingTop: 20, fontSize: 11, color: 'var(--mute)', maxWidth: 700, lineHeight: 1.7 }}>
+        <div style={{ fontFamily: 'Fraunces, serif', fontSize: 16, color: 'var(--ink)', marginBottom: 6 }}>
+          how to read these
+        </div>
+        These are wireframes, not finished design. Use them to make structural decisions: what sections exist,
+        in what order, with what hierarchy. Toggle between variants in the sidebar to compare approaches on
+        the same surface. Switch width to check how the hierarchy survives on mobile. Margin notes (hand type)
+        explain the intent behind each section — they are for the reviewer, not the end user.
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [state, _setState] = React.useState(() => {
+    try {
+      const saved = localStorage.getItem('flintmere-wf');
+      if (saved) return { ...TWEAKS, ...JSON.parse(saved) };
+    } catch (e) {}
+    return TWEAKS;
+  });
+
+  const setState = (next) => {
+    _setState(next);
+    try { localStorage.setItem('flintmere-wf', JSON.stringify(next)); } catch (e) {}
+  };
+
+  // Edit-mode: tweaks from host toolbar
+  const [editPanelOn, setEditPanelOn] = React.useState(false);
+  React.useEffect(() => {
+    function onMsg(ev) {
+      const d = ev.data;
+      if (!d || typeof d !== 'object') return;
+      if (d.type === '__activate_edit_mode') setEditPanelOn(true);
+      if (d.type === '__deactivate_edit_mode') setEditPanelOn(false);
+    }
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  const persist = (patch) => {
+    const next = { ...state, ...patch };
+    setState(next);
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: patch }, '*');
+  };
+
+  return (
+    <div className="app">
+      <Sidebar state={state} setState={setState} />
+      {renderSurface(state)}
+
+      <div className={`tweaks-panel ${editPanelOn ? 'on' : ''}`}>
+        <h5>
+          Tweaks
+          <button className="close" onClick={() => setEditPanelOn(false)}>×</button>
+        </h5>
+        <div className="grp">
+          <label>
+            <span>surface</span>
+            <select value={state.surface} onChange={e => persist({ surface: e.target.value })}>
+              <option value="marketing">marketing</option>
+              <option value="scanner">scanner</option>
+              <option value="app">merchant app</option>
+            </select>
+          </label>
+          <label>
+            <span>variants</span>
+            <select value={state.variant} onChange={e => persist({ variant: e.target.value })}>
+              <option value="A">A only</option>
+              <option value="both">both</option>
+              <option value="B">B only</option>
+            </select>
+          </label>
+          <label>
+            <span>width</span>
+            <select value={state.width} onChange={e => persist({ width: e.target.value })}>
+              <option value="desktop">desktop</option>
+              <option value="mobile">mobile</option>
+            </select>
+          </label>
+          <label>
+            <span>annotations</span>
+            <input type="checkbox" checked={state.annotations}
+              onChange={e => persist({ annotations: e.target.checked })} />
+          </label>
+        </div>
+        <div style={{ fontSize: 10, color: 'var(--mute)', marginTop: 6 }}>
+          Changes persist between sessions.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

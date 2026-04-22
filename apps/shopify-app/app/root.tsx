@@ -9,6 +9,7 @@ import {
 
 export const links: LinksFunction = () => [
   { rel: 'preconnect', href: 'https://cdn.shopify.com' },
+  { rel: 'icon', type: 'image/svg+xml', href: '/icon.svg' },
 ];
 
 export default function App() {
