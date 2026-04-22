@@ -210,96 +210,69 @@ export default async function FlintmereForFoodAndDrink() {
         </div>
       </section>
 
-      <hr className="rule" />
-
       <section
         aria-label="Food benchmark"
-        className="mx-auto max-w-[1280px] px-8 py-16"
+        className="border-y border-[color:var(--color-line)] bg-[color:var(--color-paper-2)]"
       >
-        {bench.available && !bench.preview ? (
-          <div className="grid md:grid-cols-[1fr_auto] items-end gap-8">
-            <div>
-              <p className="eyebrow mb-3">Food &amp; drink benchmark</p>
-              <h2
-                className="max-w-[26ch]"
-                style={{ fontSize: 32, letterSpacing: '-0.02em' }}
-              >
-                The median food store on Shopify scores{' '}
-                <Bracket>{bench.median}/100</Bracket> &mdash; grade {bench.grade}.
-              </h2>
-              <p
-                className="mt-4 max-w-[52ch] text-[color:var(--color-mute)]"
-                style={{ fontSize: 14, lineHeight: 1.55 }}
-              >
-                Based on {bench.n.toLocaleString()} food-and-drink stores
-                scanned by Flintmere across the last rolling window. Updated
-                monthly. Run your own scan to see where your catalog sits
-                against the median.
-              </p>
-            </div>
-            <Link href="/scan" className="btn btn-accent whitespace-nowrap">
-              See my score →
-            </Link>
+        <div className="mx-auto max-w-[1280px] px-8 py-20 grid md:grid-cols-[auto_1fr_auto] gap-10 items-end">
+          <div>
+            <p className="eyebrow mb-4">
+              {bench.available && !bench.preview
+                ? 'Food & drink median'
+                : bench.available
+                  ? 'Food & drink · early sample'
+                  : 'Food & drink benchmark'}
+            </p>
+            <p
+              style={{
+                fontSize: 'clamp(88px, 14vw, 220px)',
+                fontWeight: 500,
+                letterSpacing: '-0.045em',
+                lineHeight: 0.92,
+              }}
+            >
+              {bench.available && bench.median !== null ? bench.median : '—'}
+              <span
+                aria-hidden="true"
+                className="inline-block align-baseline ml-2"
+                style={{
+                  width: '0.22em',
+                  height: '2px',
+                  background: 'var(--color-accent)',
+                  transform: 'translateY(-0.22em)',
+                }}
+              />
+            </p>
+            <p
+              className="eyebrow mt-3 text-[color:var(--color-mute)]"
+              style={{ fontSize: 12 }}
+            >
+              {bench.available && !bench.preview
+                ? `/ 100 · grade ${bench.grade} · ${bench.n.toLocaleString()} stores`
+                : bench.available
+                  ? `/ 100 · ${bench.n.toLocaleString()} store${bench.n === 1 ? '' : 's'} so far`
+                  : 'awaiting first scan'}
+            </p>
           </div>
-        ) : bench.available && bench.preview ? (
-          <div className="grid md:grid-cols-[1fr_auto] items-end gap-8">
-            <div>
-              <p className="eyebrow mb-3">
-                Food &amp; drink benchmark · early sample
-              </p>
-              <h2
-                className="max-w-[26ch]"
-                style={{ fontSize: 32, letterSpacing: '-0.02em' }}
-              >
-                First {bench.n.toLocaleString()} food store
-                {bench.n === 1 ? '' : 's'} scanned:{' '}
-                <Bracket>{bench.median}/100</Bracket> so far. The median
-                publishes at {BENCHMARK_PUBLISH_FLOOR}.
-              </h2>
-              <p
-                className="mt-4 max-w-[52ch] text-[color:var(--color-mute)]"
-                style={{ fontSize: 14, lineHeight: 1.55 }}
-              >
-                Early sample &mdash; at {bench.n.toLocaleString()} food
-                store{bench.n === 1 ? '' : 's'}, this is the score so far,
-                not &ldquo;the median food catalog&rdquo;. We publish what
-                the live dataset supports and no more. Scan your store and
-                the number shifts.
-              </p>
-            </div>
-            <Link href="/scan" className="btn btn-accent whitespace-nowrap">
-              Add my score →
-            </Link>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-[1fr_auto] items-end gap-8">
-            <div>
-              <p className="eyebrow mb-3">Food &amp; drink benchmark</p>
-              <h2
-                className="max-w-[26ch]"
-                style={{ fontSize: 32, letterSpacing: '-0.02em' }}
-              >
-                Food scores appear here as soon as the first stores land
-                in the dataset. <Bracket>Run yours</Bracket> to seed it.
-              </h2>
-              <p
-                className="mt-4 max-w-[52ch] text-[color:var(--color-mute)]"
-                style={{ fontSize: 14, lineHeight: 1.55 }}
-              >
-                Every Flintmere check maps to a published Shopify, GS1 UK,
-                UK FSA or Google Merchant Center requirement &mdash; no
-                opinion-based scoring. Scan your store in sixty seconds, no
-                signup.
-              </p>
-            </div>
-            <Link href="/scan" className="btn btn-accent whitespace-nowrap">
-              Run the free scan →
-            </Link>
-          </div>
-        )}
+          <p
+            className="max-w-[48ch] pb-4 text-[color:var(--color-ink-2)]"
+            style={{ fontSize: 17, lineHeight: 1.5, letterSpacing: '-0.01em' }}
+          >
+            {bench.available && !bench.preview
+              ? 'The median food & drink catalog scored by FlintmereBot. Updated monthly. Run your own scan to see where your store sits against it.'
+              : bench.available
+                ? `Early sample — at ${bench.n.toLocaleString()} food store${bench.n === 1 ? '' : 's'}, this is the score so far, not “the median food catalog.” The median framing publishes at ${BENCHMARK_PUBLISH_FLOOR}. Scan your store and you shift the number.`
+                : 'Food scores appear here as soon as the first stores land in the dataset. Run yours to seed it.'}
+          </p>
+          <Link href="/scan" className="btn btn-accent whitespace-nowrap self-end pb-4">
+            {bench.available && !bench.preview
+              ? 'See my score →'
+              : bench.available
+                ? 'Add my score →'
+                : 'Run the free scan →'}
+          </Link>
+        </div>
       </section>
-
-      <hr className="rule" />
 
       <section
         aria-label="Food-specific mistakes"
