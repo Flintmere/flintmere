@@ -51,6 +51,35 @@ interface Published {
     median: number | null;
     grade: string | null;
   }>;
+  allVerticals: Array<{
+    slug: string;
+    label: string;
+    n: number;
+    median: number | null;
+  }>;
+}
+
+// Hand-labelled overrides for compound slugs and apostrophes — retail
+// taxonomies pair categories ambiguously and title-casing alone gets
+// things like "Mens grooming" or "Tools diy" wrong.
+const VERTICAL_LABEL_OVERRIDES: Record<string, string> = {
+  'food-and-drink': 'Food & drink',
+  'candles-fragrance': 'Candles & fragrance',
+  'bags-leather': 'Bags & leather',
+  'bath-body': 'Bath & body',
+  'baby-kids': 'Baby & kids',
+  'toys-games': 'Toys & games',
+  'books-stationery': 'Books & stationery',
+  'tools-diy': 'Tools & DIY',
+  'mens-grooming': "Men's grooming",
+};
+
+function humanizeSlug(slug: string): string {
+  if (VERTICAL_LABEL_OVERRIDES[slug]) return VERTICAL_LABEL_OVERRIDES[slug];
+  return slug
+    .split('-')
+    .map((w, i) => (i === 0 ? w.charAt(0).toUpperCase() + w.slice(1) : w))
+    .join(' ');
 }
 
 async function loadBenchmark(): Promise<Published> {
@@ -92,6 +121,33 @@ async function loadBenchmark(): Promise<Published> {
     };
   });
 
+  // All verticals with enough rows to render a number, flagship cohorts
+  // first (so the three deep-sampled cards line up with the grid), then
+  // the remainder sorted by sample size descending.
+  const flagshipSlugs = new Set(VERTICALS.map((v) => v.slug));
+  const flagshipRows = VERTICALS.flatMap((v) => {
+    const b = summary.byVertical[v.slug];
+    if (!b || b.n < BENCHMARK_FLOOR) return [];
+    return [
+      {
+        slug: v.slug,
+        label: v.label,
+        n: b.n,
+        median: b.medianScore ?? null,
+      },
+    ];
+  });
+  const restRows = Object.entries(summary.byVertical)
+    .filter(([slug, b]) => !flagshipSlugs.has(slug) && b.n >= BENCHMARK_FLOOR)
+    .map(([slug, b]) => ({
+      slug,
+      label: humanizeSlug(slug),
+      n: b.n,
+      median: b.medianScore ?? null,
+    }))
+    .sort((a, b) => b.n - a.n || a.label.localeCompare(b.label));
+  const allVerticals = [...flagshipRows, ...restRows];
+
   return {
     available: overallAvailable,
     preview: summary.preview,
@@ -104,6 +160,7 @@ async function loadBenchmark(): Promise<Published> {
     }),
     overall,
     byVertical,
+    allVerticals,
   };
 }
 
@@ -485,6 +542,58 @@ export default async function Research() {
           ))}
         </div>
       </section>
+
+      {/* Full breadth — every vertical with enough samples to render */}
+      {data.allVerticals.length > data.byVertical.length ? (
+        <section
+          aria-label="All verticals"
+          className="mx-auto max-w-[1280px] px-8 py-20 border-t border-[color:var(--color-line)]"
+        >
+          <p className="eyebrow mb-6">
+            Across {data.allVerticals.length} verticals
+          </p>
+          <h2 className="max-w-[28ch] mb-10">
+            Same median, same tail — across every Shopify category we&rsquo;ve
+            scanned so far.
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 border-y border-[color:var(--color-line)]">
+            {data.allVerticals.map((v) => (
+              <div
+                key={v.slug}
+                className="p-6 border-b border-r border-[color:var(--color-line-soft)] last:border-r-0"
+              >
+                <p className="eyebrow mb-2">{v.label}</p>
+                <p
+                  style={{
+                    fontSize: 36,
+                    letterSpacing: '-0.03em',
+                    lineHeight: 0.95,
+                    fontWeight: 500,
+                  }}
+                >
+                  {v.median !== null ? v.median : '—'}
+                </p>
+                <p
+                  className="eyebrow mt-2 text-[color:var(--color-mute)]"
+                  style={{ fontSize: 11 }}
+                >
+                  n={v.n}
+                  {v.n < BENCHMARK_PUBLISH_FLOOR ? ' · early' : ''}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p
+            className="mt-8 max-w-[60ch] text-[color:var(--color-ink-2)]"
+            style={{ fontSize: 14, lineHeight: 1.55 }}
+          >
+            Apparel, beauty, and food &amp; drink are the three deep-sampled
+            cohorts (read the breakdowns above). The remainder are surfacing
+            as FlintmereBot widens the crawl — your vertical joins the sample
+            the first time a merchant in it runs a scan.
+          </p>
+        </section>
+      ) : null}
 
       {/* Methodology */}
       <section
