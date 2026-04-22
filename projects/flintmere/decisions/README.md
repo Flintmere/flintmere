@@ -12,6 +12,9 @@ One file per significant decision. Name them `NNNN-slug.md` (4-digit zero-padded
 | [0004](0004-prisma-over-drizzle.md) | Prisma over Drizzle | Accepted | Migrations tooling + team familiarity won |
 | [0005](0005-llm-provider-strategy.md) | LLM provider strategy | Accepted | Gemini 2.5 Flash primary + GPT-4o-mini fallback; DeepSeek + Qwen rejected by Legal Council |
 | [0006](0006-hardcase-llm-lock-gemini-pro.md) | Hard-case LLM locked to Gemini 2.5 Pro | Accepted | Benchmark deferred to month 3 / 50 concierge audits |
+| [0007](0007-canon-amber-signature.md) | Amber signature + asymmetric wordmark | Accepted | Glowing Amber `#F8BF24` as sole accent; sulphur retired |
+| [0008](0008-merchant-store-identity.md) | Merchant / store identity model | Accepted | Shop-as-PK Phase 1; additive agency overlay deferred to Phase 2 |
+| [0009](0009-billing-api-shape.md) | Billing API shape | Accepted | Shopify Billing for Growth/Scale; Stripe Payment Element for Agency/Enterprise; flat-rate, no usage metering |
 
 ## Template
 

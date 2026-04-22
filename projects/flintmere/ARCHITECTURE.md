@@ -193,3 +193,6 @@ Enforcement: `apps/shopify-app/src/lib/tier.ts`. Canonical tier data comes from 
 - `decisions/0004-prisma-over-drizzle.md` — ORM choice
 - `decisions/0005-llm-provider-strategy.md` — primary + fallback LLMs
 - `decisions/0006-hardcase-llm-lock-gemini-pro.md` — hard-case lock
+- `decisions/0007-canon-amber-signature.md` — amber `#F8BF24` + asymmetric wordmark
+- `decisions/0008-merchant-store-identity.md` — shop-as-PK + deferred agency overlay
+- `decisions/0009-billing-api-shape.md` — Shopify Billing for Growth/Scale, Stripe Payment Element for Agency/Enterprise
