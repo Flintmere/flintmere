@@ -7,7 +7,18 @@ import polarisStyles from '@shopify/polaris/build/esm/styles.css?url';
 
 import { authenticate } from '../../shopify.server';
 
-export const links = () => [{ rel: 'stylesheet', href: polarisStyles }];
+export const links = () => [
+  { rel: 'stylesheet', href: polarisStyles },
+  // Flintmere island typography — Geist Sans + Geist Mono. Polaris owns its
+  // own font stack; these load alongside and are applied only inside
+  // IslandFrame children via inline font-family. DESIGN.md §island rule.
+  { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+  { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
+  {
+    rel: 'stylesheet',
+    href: 'https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&family=Geist+Mono:wght@400;700&display=swap',
+  },
+];
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticate.admin(request);

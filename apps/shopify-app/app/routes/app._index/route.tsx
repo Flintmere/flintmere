@@ -12,6 +12,20 @@ import {
 } from '@shopify/polaris';
 import { authenticate } from '../../shopify.server';
 import { prisma } from '../../db.server';
+import { IslandFrame } from '../../components/island/IslandFrame';
+import { ScoreRing } from '../../components/island/ScoreRing';
+import { PillarGrid, type Pillar } from '../../components/island/PillarGrid';
+
+// Static pillar names + weights. Scores fold in from the latest scan row
+// once the P1 schema (task #56) lands and real scoring writes pillarScores.
+const PILLAR_TEMPLATE: Array<Omit<Pillar, 'score'>> = [
+  { n: '01', name: 'Product IDs', weight: '20%' },
+  { n: '02', name: 'Structured attributes', weight: '20%' },
+  { n: '03', name: 'Title & description quality', weight: '15%' },
+  { n: '04', name: 'Google category match', weight: '15%' },
+  { n: '05', name: 'Data consistency', weight: '15%' },
+  { n: '06', name: 'AI agent access', weight: '15%' },
+];
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { session } = await authenticate.admin(request);
@@ -72,20 +86,71 @@ export default function Dashboard() {
         {latestScore ? (
           <>
             <Layout.Section>
-              <Card>
-                <BlockStack gap="400">
-                  <Text variant="headingMd" as="h2">
-                    <span style={{ fontFamily: 'ui-monospace, monospace', fontWeight: 700 }}>
-                      [&nbsp;{latestScore.composite}&nbsp;]
-                    </span>{' '}
-                    / 100 · Grade {latestScore.grade}
-                  </Text>
-                  <Text as="p" tone="subdued">
-                    GTIN-less ceiling: {latestScore.gtinlessCeiling}/100 · Full
-                    ceiling: 100/100
-                  </Text>
-                </BlockStack>
-              </Card>
+              <IslandFrame eyebrow="Flintmere · AI-readiness score">
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '220px 1fr',
+                    gap: 32,
+                    alignItems: 'center',
+                  }}
+                >
+                  <ScoreRing
+                    score={latestScore.composite}
+                    grade={latestScore.grade ?? undefined}
+                  />
+                  <div>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontFamily: 'Geist, -apple-system, sans-serif',
+                        fontSize: 22,
+                        letterSpacing: '-0.015em',
+                        color: '#0A0A0B',
+                        lineHeight: 1.25,
+                        maxWidth: '42ch',
+                      }}
+                    >
+                      Your catalog is{' '}
+                      <span
+                        style={{
+                          fontFamily:
+                            '"Geist Mono", ui-monospace, monospace',
+                          fontWeight: 700,
+                        }}
+                      >
+                        [&nbsp;{latestScore.grade ?? '—'}&nbsp;]
+                      </span>{' '}
+                      for AI shopping agents.
+                    </p>
+                    <p
+                      style={{
+                        margin: 0,
+                        marginTop: 12,
+                        fontFamily:
+                          '"Geist Mono", ui-monospace, monospace',
+                        fontSize: 11,
+                        letterSpacing: '0.2em',
+                        textTransform: 'uppercase',
+                        color: '#5A5C64',
+                      }}
+                    >
+                      GTIN-less ceiling · {latestScore.gtinlessCeiling}/100
+                    </p>
+                  </div>
+                </div>
+              </IslandFrame>
+            </Layout.Section>
+
+            <Layout.Section>
+              <IslandFrame eyebrow="Six pillars">
+                <PillarGrid
+                  pillars={PILLAR_TEMPLATE.map((p, i) => ({
+                    ...p,
+                    score: derivePillarScore(latestScore.composite, i),
+                  }))}
+                />
+              </IslandFrame>
             </Layout.Section>
 
             <Layout.Section>
@@ -146,6 +211,14 @@ export default function Dashboard() {
       </Layout>
     </Page>
   );
+}
+
+// Placeholder until pillarScores JSON lands on the scores row (task #56).
+// Spreads the composite across the six pillars deterministically so the
+// art spike has something to render. Remove once real pillar scores exist.
+function derivePillarScore(composite: number, index: number): number {
+  const spread = [6, -4, 2, -2, 4, -6];
+  return Math.max(0, Math.min(100, composite + (spread[index] ?? 0)));
 }
 
 function timeAgo(date: Date): string {
