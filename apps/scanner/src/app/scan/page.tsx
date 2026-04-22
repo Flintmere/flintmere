@@ -273,11 +273,9 @@ function Results({ result }: { result: ScanResult }) {
                 color: 'var(--color-mute)',
               }}
             >
-              For context — in our rolling sample of{' '}
-              <Bracket>{sample.n.toLocaleString()}</Bracket> mid-market
-              Shopify catalogs, the median score is{' '}
-              <Bracket>{sample.median}/100</Bracket>. You scored{' '}
-              <Bracket>{result.score}/100</Bracket>.{' '}
+              For context — across {sample.n.toLocaleString()} mid-market
+              Shopify catalogs in our rolling sample, the median score is{' '}
+              {sample.median}/100. You scored {result.score}/100.{' '}
               <Link href="/research" className="underline">
                 Read the full report →
               </Link>
@@ -440,8 +438,8 @@ function BenchmarkOptIn({ scanId }: { scanId: string }) {
         <div>
           <p className="eyebrow mb-3">Help the benchmark</p>
           <h3 className="max-w-[28ch]">
-            Add your anonymised score to the{' '}
-            <Bracket>State of Shopify Catalogs</Bracket> sample.
+            Add your anonymised score to the State of Shopify Catalogs
+            sample.
           </h3>
           <p
             className="mt-4 max-w-[58ch] text-[color:var(--color-ink-2)]"

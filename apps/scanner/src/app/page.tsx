@@ -133,32 +133,55 @@ export default async function MarketingHome() {
       {sample.show ? (
         <section
           aria-label="Live sample"
-          className="mx-auto max-w-[1280px] px-8 py-10 border-b border-[color:var(--color-line)]"
+          className="mx-auto max-w-[1280px] px-8 py-24 border-b border-[color:var(--color-line)]"
         >
-          <div className="grid md:grid-cols-[auto_1fr] gap-8 items-baseline">
-            <p
-              aria-hidden="true"
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: 14,
-                letterSpacing: '0.14em',
-                color: 'var(--color-mute)',
-              }}
-            >
-              [&nbsp;LIVE&nbsp;]
-            </p>
-            <p
-              className="max-w-[64ch]"
-              style={{ fontSize: 18, lineHeight: 1.5 }}
-            >
-              In our rolling sample of{' '}
-              <Bracket>{sample.n.toLocaleString()}</Bracket> mid-market
-              Shopify catalogs, the median score is{' '}
-              <Bracket>{sample.median}/100</Bracket>.{' '}
-              <Link href="/research" className="underline">
-                See the full report →
-              </Link>
-            </p>
+          <p className="eyebrow mb-6 text-[color:var(--color-mute)]">
+            Live · from our rolling sample
+          </p>
+          <div className="grid md:grid-cols-[auto_1fr] gap-12 items-end">
+            <div>
+              <p
+                style={{
+                  fontSize: 'clamp(88px, 14vw, 220px)',
+                  fontWeight: 500,
+                  letterSpacing: '-0.045em',
+                  lineHeight: 0.92,
+                }}
+              >
+                {sample.median}
+                <span
+                  aria-hidden="true"
+                  className="inline-block align-baseline ml-2"
+                  style={{
+                    width: '0.22em',
+                    height: '2px',
+                    background: 'var(--color-accent)',
+                    transform: 'translateY(-0.22em)',
+                  }}
+                />
+              </p>
+              <p
+                className="eyebrow mt-4 text-[color:var(--color-mute)]"
+                style={{ fontSize: 12 }}
+              >
+                / 100 · median
+              </p>
+            </div>
+            <div className="pb-4">
+              <p
+                className="max-w-[40ch]"
+                style={{ fontSize: 22, lineHeight: 1.4, letterSpacing: '-0.01em' }}
+              >
+                The median score across {sample.n.toLocaleString()} mid-market
+                Shopify catalogs in our rolling sample. Most fall short on the
+                structured fields AI shopping agents actually filter on.
+              </p>
+              <p className="mt-6">
+                <Link href="/research" className="underline eyebrow">
+                  Read the full report →
+                </Link>
+              </p>
+            </div>
           </div>
         </section>
       ) : null}

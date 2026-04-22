@@ -124,6 +124,17 @@ function distributionPct(
   return Math.round((dist[grade] / n) * 100);
 }
 
+// Share of the sample that grades D or F — the "not agent-ready" cohort.
+// Kept separate from distributionPct so the copy can reference a single
+// number without recomputing (and so claim review can point at the math).
+function belowCeilingPct(
+  dist: Published['overall']['distribution'],
+  n: number,
+): number {
+  if (n === 0) return 0;
+  return Math.round(((dist.D + dist.F) / n) * 100);
+}
+
 export default async function Research() {
   const data = await loadBenchmark();
   const dist = data.overall.distribution;
@@ -209,6 +220,61 @@ export default async function Research() {
           </Link>
         </div>
       </section>
+
+      {data.available && !data.preview ? (
+        <section
+          aria-label="Headline finding"
+          className="border-y border-[color:var(--color-line)] bg-[color:var(--color-paper-2)]"
+        >
+          <div className="mx-auto max-w-[1280px] px-8 py-24 grid md:grid-cols-[auto_1fr] gap-12 items-end">
+            <div>
+              <p className="eyebrow mb-4">Headline finding</p>
+              <p
+                style={{
+                  fontSize: 'clamp(88px, 14vw, 220px)',
+                  fontWeight: 500,
+                  letterSpacing: '-0.045em',
+                  lineHeight: 0.92,
+                }}
+              >
+                {belowCeilingPct(dist, n)}%
+                <span
+                  aria-hidden="true"
+                  className="inline-block align-baseline ml-2"
+                  style={{
+                    width: '0.22em',
+                    height: '2px',
+                    background: 'var(--color-accent)',
+                    transform: 'translateY(-0.22em)',
+                  }}
+                />
+              </p>
+            </div>
+            <div className="pb-6">
+              <p
+                className="max-w-[38ch]"
+                style={{
+                  fontSize: 24,
+                  lineHeight: 1.35,
+                  letterSpacing: '-0.015em',
+                }}
+              >
+                of the {n.toLocaleString()} mid-market Shopify catalogs in our
+                sample score grade D or F against the seven checks AI shopping
+                agents run.
+              </p>
+              <p
+                className="mt-6 max-w-[48ch] text-[color:var(--color-ink-2)]"
+                style={{ fontSize: 15, lineHeight: 1.55 }}
+              >
+                Scores cluster inside a narrow band (47–50). The difference
+                between the median catalog and the top decile is not
+                sophistication; it is structured fields populated.
+              </p>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <hr className="rule" />
 
@@ -478,8 +544,7 @@ export default async function Research() {
             className="mt-6 max-w-[22ch]"
             style={{ color: 'var(--color-paper)' }}
           >
-            Run a free scan. Your score sits inside the next monthly
-            <Bracket>refresh</Bracket>.
+            Run a free scan. Your score sits inside the next monthly refresh.
           </h2>
           <p
             className="mt-8 max-w-[56ch]"
