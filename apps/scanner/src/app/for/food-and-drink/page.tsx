@@ -14,7 +14,8 @@ export const metadata: Metadata = {
     'The food-and-drink catalog mistakes that make AI shopping agents skip your store — allergens in prose, nutrition panels as images, provenance claims without structured data. Flintmere detects each one.',
 };
 
-export const revalidate = 3600;
+// Belt-and-braces: render per request so build never hits the DB.
+export const dynamic = 'force-dynamic';
 
 interface Mistake {
   n: string;

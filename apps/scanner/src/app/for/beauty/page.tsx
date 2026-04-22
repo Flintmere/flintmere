@@ -14,7 +14,8 @@ export const metadata: Metadata = {
     'The beauty-catalog mistakes that make AI shopping agents skip your store — shade names only a human could parse, INCI buried in images, claims taxonomy missing. Flintmere detects each one.',
 };
 
-export const revalidate = 3600;
+// Belt-and-braces: render per request so build never hits the DB.
+export const dynamic = 'force-dynamic';
 
 interface Mistake {
   n: string;

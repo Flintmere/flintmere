@@ -14,10 +14,8 @@ export const metadata: Metadata = {
     'The apparel-catalog mistakes that make AI shopping agents skip your store — size charts buried in images, colour names only a human can parse, composition hidden in description prose. Flintmere detects each one.',
 };
 
-// ISR: re-render the benchmark strip once an hour. The /api/benchmark/summary
-// endpoint sets the same cache window; keeping the page aligned avoids
-// cross-surface skew when John cites numbers in the audit letter.
-export const revalidate = 3600;
+// Belt-and-braces: render per request so build never hits the DB.
+export const dynamic = 'force-dynamic';
 
 interface Mistake {
   n: string;

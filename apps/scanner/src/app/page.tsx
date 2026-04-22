@@ -6,10 +6,9 @@ import {
   type BenchmarkRow,
 } from '@/lib/benchmark-summary';
 
-// ISR: hourly, matching /research + /api/benchmark/summary. Keeps the
-// live-sample line on the home page aligned with what John cites and
-// with what /research publishes.
-export const revalidate = 3600;
+// Belt-and-braces: render per request so build never hits the DB. The
+// live-sample line stays fresh without depending on a build-time crawl.
+export const dynamic = 'force-dynamic';
 
 async function loadLiveSample(): Promise<{
   show: boolean;

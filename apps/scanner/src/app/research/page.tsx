@@ -11,13 +11,13 @@ import { BENCHMARK_FLOOR, BENCHMARK_PUBLISH_FLOOR } from '@/lib/copy';
 export const metadata: Metadata = {
   title: 'Research — State of Shopify Catalogs 2026',
   description:
-    "Flintmere's rolling benchmark of Shopify catalogs against AI shopping agent requirements. Median scores, grade distributions, and the single biggest catalog mistake by vertical — scanned by FlintmereBot, published monthly, aggregate-only.",
+    "The v1 Flintmere benchmark: Shopify catalogs scored against AI shopping agent requirements. Median scores, grade distributions, and the single biggest catalog mistake by vertical — scanned by FlintmereBot, aggregate-only, refreshed monthly.",
 };
 
-// ISR: page re-renders once an hour, matching the /api/benchmark/summary
-// cache window. Keeps the published numbers here aligned with the ones
-// John cites in concierge audit letters.
-export const revalidate = 3600;
+// Belt-and-braces: fully dynamic so the page never prerenders at build
+// time (DB unreachable during Coolify build = broken deploy). The DB call
+// is cheap and the route sits behind CDN caching at the edge anyway.
+export const dynamic = 'force-dynamic';
 
 // Verticals we currently seed + render. Order matches the /for/<vertical>
 // page order and the order they landed in scanner_scans.vertical.
@@ -232,7 +232,7 @@ export default async function Research() {
       </header>
 
       <section className="mx-auto max-w-[1280px] px-8 py-24">
-        <p className="eyebrow mb-6">Research · 2026</p>
+        <p className="eyebrow mb-6">Research · v1 · {data.asOfLabel}</p>
         <h1 className="max-w-[20ch]">
           The state of <Bracket>Shopify</Bracket> catalogs, measured against
           AI shopping agents.
@@ -241,16 +241,16 @@ export default async function Research() {
           className="mt-8 max-w-[58ch] text-[color:var(--color-ink-2)]"
           style={{ fontSize: 18, lineHeight: 1.55 }}
         >
-          FlintmereBot scans Shopify stores monthly, scoring each catalog
-          against seven AI-readiness checks drawn from published Shopify,
-          GS1 UK, and Google Merchant Center specs. We publish the aggregate
-          numbers &mdash; score, grade distribution, per-vertical gaps &mdash;
-          and nothing else. No individual store is ever named.
+          FlintmereBot scans Shopify stores against the seven checks AI
+          shopping agents run &mdash; drawn from published Shopify, GS1 UK,
+          and Google Merchant Center specs. We publish the aggregate numbers
+          &mdash; score, grade distribution, per-vertical gaps &mdash; and
+          nothing else. No individual store is ever named.
           {data.available && !data.preview ? (
             <>
               {' '}
-              {data.n.toLocaleString()} stores included in this edition,
-              refreshed {data.asOfLabel}.
+              This is v1: {data.n.toLocaleString()} stores in the cohort,
+              refreshed monthly.
             </>
           ) : data.available && data.preview ? (
             <>
@@ -316,8 +316,8 @@ export default async function Research() {
                   letterSpacing: '-0.015em',
                 }}
               >
-                of the {n.toLocaleString()} mid-market Shopify catalogs in our
-                sample score grade D or F against the seven checks AI shopping
+                of the {n.toLocaleString()} SMB Shopify catalogs in our v1
+                cohort score grade D or F against the seven checks AI shopping
                 agents run.
               </p>
               <p
@@ -633,6 +633,24 @@ export default async function Research() {
               shared or sold.
             </p>
           </div>
+        </div>
+        <div
+          className="mt-10 p-8 border border-[color:var(--color-line)] bg-[color:var(--color-paper-2)]"
+        >
+          <p className="eyebrow mb-3">A note on what we could reach</p>
+          <p
+            className="max-w-[72ch] text-[color:var(--color-ink-2)]"
+            style={{ fontSize: 15, lineHeight: 1.6 }}
+          >
+            The v1 cohort is the stores FlintmereBot could read politely. A
+            meaningful share of the Shopify market &mdash; mostly the larger
+            catalogs sitting behind enterprise bot-management &mdash; returns
+            a block before any product page loads. Those same blocks apply to
+            ChatGPT, Perplexity, and every other AI shopping agent that comes
+            knocking. So if a store isn&rsquo;t in this sample, the agent
+            reading its catalog today is getting the same answer: nothing.
+            That&rsquo;s the gap this research measures from both sides.
+          </p>
         </div>
         <Link href="/bot" className="btn mt-10 inline-flex">
           Full methodology notes →

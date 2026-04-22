@@ -1,23 +1,23 @@
 import { ImageResponse } from 'next/og';
-import fs from 'node:fs/promises';
-import path from 'node:path';
+import { readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 
 export const alt = 'Flintmere — catalog readiness for AI agents';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 async function loadFont(filename: string) {
-  const fontPath = path.join(process.cwd(), 'src/lib/og-fonts', filename);
-  const buf = await fs.readFile(fontPath);
+  const url = new URL(`./og-fonts/${filename}`, import.meta.url);
+  const buf = await readFile(fileURLToPath(url));
   return new Uint8Array(buf).buffer;
 }
 
 export default async function OG() {
   const [geistBold, geistMedium, monoBold, monoRegular] = await Promise.all([
-    loadFont('Geist-Bold.woff2'),
-    loadFont('Geist-Medium.woff2'),
-    loadFont('GeistMono-Bold.woff2'),
-    loadFont('GeistMono-Regular.woff2'),
+    loadFont('Geist-Bold.ttf'),
+    loadFont('Geist-Medium.ttf'),
+    loadFont('GeistMono-Bold.ttf'),
+    loadFont('GeistMono-Regular.ttf'),
   ]);
 
   return new ImageResponse(
