@@ -7,13 +7,12 @@
  *
  * Publishing contract (memory/project_benchmark_decisions.md):
  *   - Aggregate only. Never expose individual-store data.
- *   - Surfaces that cite "N stores scanned" must gate on
- *     BENCHMARK_FLOOR (see lib/copy.ts).
- *   - Surfaces that cite median grade must gate on n >= 50
- *     (see gradeBadgeAnchor in lib/copy.ts).
+ *   - `available` = n >= BENCHMARK_FLOOR (minimum to render a number)
+ *   - `preview`   = n <  BENCHMARK_PUBLISH_FLOOR (render as early sample,
+ *                   never as "median Shopify store scores N")
  */
 
-import { BENCHMARK_FLOOR } from './copy'
+import { BENCHMARK_FLOOR, BENCHMARK_PUBLISH_FLOOR } from './copy'
 
 export type Grade = 'A' | 'B' | 'C' | 'D' | 'F'
 const GRADE_ORDER: Grade[] = ['A', 'B', 'C', 'D', 'F']
@@ -42,7 +41,9 @@ export interface BenchmarkBucket {
 export interface BenchmarkSummary {
   asOf: string
   floor: number
+  publishFloor: number
   available: boolean
+  preview: boolean
   overall: BenchmarkBucket
   byVertical: Record<string, BenchmarkBucket>
 }
@@ -62,7 +63,9 @@ export function summariseBenchmark(rows: BenchmarkRow[]): BenchmarkSummary {
   return {
     asOf: new Date().toISOString(),
     floor: BENCHMARK_FLOOR,
+    publishFloor: BENCHMARK_PUBLISH_FLOOR,
     available: overall.n >= BENCHMARK_FLOOR,
+    preview: overall.n < BENCHMARK_PUBLISH_FLOOR,
     overall,
     byVertical,
   }

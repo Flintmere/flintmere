@@ -6,6 +6,7 @@ import {
   summariseBenchmark,
   type BenchmarkRow,
 } from '@/lib/benchmark-summary';
+import { BENCHMARK_FLOOR, BENCHMARK_PUBLISH_FLOOR } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: 'Flintmere for apparel brands — size, colour, material, agent-ready',
@@ -101,13 +102,14 @@ const MISTAKES: Mistake[] = [
 
 async function getApparelMedian(): Promise<{
   available: boolean;
+  preview: boolean;
   n: number;
   median: number | null;
   grade: string | null;
 }> {
   const rows = await prisma.scan.findMany({
     where: {
-      source: 'bot',
+      OR: [{ source: 'bot' }, { publishedToBenchmark: true }],
       status: 'complete',
       vertical: 'apparel',
       score: { not: null },
@@ -122,11 +124,18 @@ async function getApparelMedian(): Promise<{
   }));
   const summary = summariseBenchmark(typed);
   const bucket = summary.byVertical.apparel;
-  if (!summary.available || !bucket || bucket.n < 100) {
-    return { available: false, n: bucket?.n ?? 0, median: null, grade: null };
+  if (!bucket || bucket.n < BENCHMARK_FLOOR) {
+    return {
+      available: false,
+      preview: false,
+      n: bucket?.n ?? 0,
+      median: null,
+      grade: null,
+    };
   }
   return {
     available: true,
+    preview: bucket.n < BENCHMARK_PUBLISH_FLOOR,
     n: bucket.n,
     median: bucket.medianScore,
     grade: medianGrade(bucket.medianScore ?? 0),
@@ -207,7 +216,7 @@ export default async function FlintmereForApparel() {
         aria-label="Apparel benchmark"
         className="mx-auto max-w-[1280px] px-8 py-16"
       >
-        {bench.available ? (
+        {bench.available && !bench.preview ? (
           <div className="grid md:grid-cols-[1fr_auto] items-end gap-8">
             <div>
               <p className="eyebrow mb-3">Apparel benchmark</p>
@@ -216,10 +225,8 @@ export default async function FlintmereForApparel() {
                 style={{ fontSize: 32, letterSpacing: '-0.02em' }}
               >
                 The median apparel store on Shopify scores{' '}
-                <Bracket>
-                  {bench.median}/100
-                </Bracket>{' '}
-                &mdash; grade {bench.grade}.
+                <Bracket>{bench.median}/100</Bracket> &mdash; grade{' '}
+                {bench.grade}.
               </h2>
               <p
                 className="mt-4 max-w-[52ch] text-[color:var(--color-mute)]"
@@ -234,6 +241,36 @@ export default async function FlintmereForApparel() {
               See my score →
             </Link>
           </div>
+        ) : bench.available && bench.preview ? (
+          <div className="grid md:grid-cols-[1fr_auto] items-end gap-8">
+            <div>
+              <p className="eyebrow mb-3">
+                Apparel benchmark · early sample
+              </p>
+              <h2
+                className="max-w-[26ch]"
+                style={{ fontSize: 32, letterSpacing: '-0.02em' }}
+              >
+                First {bench.n.toLocaleString()} apparel store
+                {bench.n === 1 ? '' : 's'} scanned:{' '}
+                <Bracket>{bench.median}/100</Bracket> so far. The median
+                publishes at {BENCHMARK_PUBLISH_FLOOR}.
+              </h2>
+              <p
+                className="mt-4 max-w-[52ch] text-[color:var(--color-mute)]"
+                style={{ fontSize: 14, lineHeight: 1.55 }}
+              >
+                Early sample &mdash; we publish the number the live dataset
+                supports and no more. At {bench.n.toLocaleString()} apparel
+                store{bench.n === 1 ? '' : 's'}, this is the score so far,
+                not &ldquo;the median apparel catalog&rdquo;. Scan your store
+                and you shift the number.
+              </p>
+            </div>
+            <Link href="/scan" className="btn btn-accent whitespace-nowrap">
+              Add my score →
+            </Link>
+          </div>
         ) : (
           <div className="grid md:grid-cols-[1fr_auto] items-end gap-8">
             <div>
@@ -242,8 +279,8 @@ export default async function FlintmereForApparel() {
                 className="max-w-[26ch]"
                 style={{ fontSize: 32, letterSpacing: '-0.02em' }}
               >
-                The apparel median will publish once 100 stores have been
-                scanned. <Bracket>Run yours</Bracket> to see where you sit.
+                Apparel scores appear here as soon as the first stores land
+                in the dataset. <Bracket>Run yours</Bracket> to seed it.
               </h2>
               <p
                 className="mt-4 max-w-[52ch] text-[color:var(--color-mute)]"

@@ -1,8 +1,16 @@
 import type { PillarId } from '@flintmere/scoring'
 
-// Hardcoded floor for "stores scanned" mentions until the live
-// benchmark surpasses this. Bump once scanner_scans.count > floor.
-export const BENCHMARK_FLOOR = 100
+// Two-tier floor. BENCHMARK_FLOOR gates whether we render a number at all;
+// BENCHMARK_PUBLISH_FLOOR gates the "State of Shopify Catalogs" publishing
+// claim (median-of-N framing, aggregate report). Below the publish floor
+// the same numbers still surface, but framed as an early sample — never as
+// "the median Shopify store scores X". #38 data-intake + claim-review
+// council authored this split on 2026-04-22 after the first 150-store
+// compile pass yielded only 8 validated stores (apparel 5 / beauty 1 /
+// food-and-drink 2); the integrity line is "show the data, don't claim
+// the stat". Bump the publish floor nowhere else — this is the only place.
+export const BENCHMARK_FLOOR = 1
+export const BENCHMARK_PUBLISH_FLOOR = 100
 
 // The one sentence every report/page uses to answer "who are you?"
 // Must cite verifiable external authorities. Scored by #21 technical

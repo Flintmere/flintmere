@@ -10,9 +10,10 @@ export const revalidate = 3600
 
 /**
  * Public read-only aggregate endpoint. Reads every completed bot scan
- * and emits vertical + overall medians + grade distributions. Never
- * exposes individual shop domains — aggregate-only publishing rule
- * per memory/project_benchmark_decisions.md.
+ * plus every merchant scan opted-in via /api/scan/[id]/publish, then
+ * emits vertical + overall medians + grade distributions. Never exposes
+ * individual shop domains — aggregate-only publishing rule per
+ * memory/project_benchmark_decisions.md.
  *
  * Consumed by:
  *   - Scanner's /research page (vertical reports, monthly refresh)
@@ -22,7 +23,7 @@ export const revalidate = 3600
 export async function GET(): Promise<NextResponse> {
   const rows = await prisma.scan.findMany({
     where: {
-      source: 'bot',
+      OR: [{ source: 'bot' }, { publishedToBenchmark: true }],
       status: 'complete',
       score: { not: null },
       grade: { not: null },

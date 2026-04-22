@@ -6,7 +6,7 @@ import {
   summariseBenchmark,
   type BenchmarkRow,
 } from '@/lib/benchmark-summary';
-import { BENCHMARK_FLOOR } from '@/lib/copy';
+import { BENCHMARK_FLOOR, BENCHMARK_PUBLISH_FLOOR } from '@/lib/copy';
 
 export const metadata: Metadata = {
   title: 'Research — State of Shopify Catalogs 2026',
@@ -33,8 +33,10 @@ const VERTICALS: Array<{ slug: string; label: string; href: string }> = [
 
 interface Published {
   available: boolean;
+  preview: boolean;
   n: number;
   floor: number;
+  publishFloor: number;
   asOfLabel: string;
   overall: {
     median: number | null;
@@ -54,7 +56,7 @@ interface Published {
 async function loadBenchmark(): Promise<Published> {
   const rows = await prisma.scan.findMany({
     where: {
-      source: 'bot',
+      OR: [{ source: 'bot' }, { publishedToBenchmark: true }],
       status: 'complete',
       score: { not: null },
       grade: { not: null },
@@ -92,8 +94,10 @@ async function loadBenchmark(): Promise<Published> {
 
   return {
     available: overallAvailable,
+    preview: summary.preview,
     n: summary.overall.n,
     floor: BENCHMARK_FLOOR,
+    publishFloor: BENCHMARK_PUBLISH_FLOOR,
     asOfLabel: new Date(summary.asOf).toLocaleDateString('en-GB', {
       year: 'numeric',
       month: 'long',
@@ -172,20 +176,27 @@ export default async function Research() {
           FlintmereBot scans Shopify stores monthly, scoring each catalog
           against seven AI-readiness checks drawn from published Shopify,
           GS1 UK, and Google Merchant Center specs. We publish the aggregate
-          numbers &mdash; median score, grade distribution, per-vertical
-          gaps &mdash; and nothing else. No individual store is ever named.
-          {data.available ? (
+          numbers &mdash; score, grade distribution, per-vertical gaps &mdash;
+          and nothing else. No individual store is ever named.
+          {data.available && !data.preview ? (
             <>
               {' '}
               {data.n.toLocaleString()} stores included in this edition,
               refreshed {data.asOfLabel}.
             </>
+          ) : data.available && data.preview ? (
+            <>
+              {' '}
+              Early sample &mdash; {data.n.toLocaleString()} stores scanned so
+              far. We publish the numbers as they come in, but don&rsquo;t
+              frame them as &ldquo;the median Shopify store&rdquo; until the
+              dataset clears {data.publishFloor.toLocaleString()} per vertical.
+            </>
           ) : (
             <>
               {' '}
-              The published edition unlocks once {data.floor.toLocaleString()}{' '}
-              stores have been scanned; the current preview reflects{' '}
-              {data.n.toLocaleString()}.
+              The first bot scans are in flight; numbers appear here as soon
+              as the first store lands in the dataset.
             </>
           )}
         </p>
@@ -208,7 +219,13 @@ export default async function Research() {
       >
         <div className="grid md:grid-cols-[auto_1fr] gap-12 items-start">
           <div>
-            <p className="eyebrow mb-4">Overall median</p>
+            <p className="eyebrow mb-4">
+              {data.available && !data.preview
+                ? 'Overall median'
+                : data.available
+                  ? 'Early sample'
+                  : 'Overall median'}
+            </p>
             <p
               style={{
                 fontSize: 112,
@@ -225,9 +242,11 @@ export default async function Research() {
               className="eyebrow mt-3 text-[color:var(--color-mute)]"
               style={{ fontSize: 12 }}
             >
-              {data.available
+              {data.available && !data.preview
                 ? `/ 100 · grade ${data.overall.grade}`
-                : 'preview — floor not cleared'}
+                : data.available
+                  ? `/ 100 · ${data.n.toLocaleString()} store${data.n === 1 ? '' : 's'} so far`
+                  : 'awaiting first scan'}
             </p>
           </div>
           <div>
@@ -235,15 +254,17 @@ export default async function Research() {
               className="max-w-[26ch]"
               style={{ fontSize: 28, letterSpacing: '-0.02em' }}
             >
-              {data.available
+              {data.available && !data.preview
                 ? 'Most Shopify catalogs fail half the checks an AI shopping agent runs before it recommends a store.'
-                : 'The headline number unlocks when the dataset clears the publishing floor.'}
+                : data.available
+                  ? 'Early signal — the first Shopify catalogs are landing, and the gap between visible and structured data is already loud.'
+                  : 'The headline number appears once the first bot scans complete.'}
             </h2>
             <p
               className="mt-5 max-w-[56ch] text-[color:var(--color-ink-2)]"
               style={{ fontSize: 15, lineHeight: 1.55 }}
             >
-              {data.available ? (
+              {data.available && !data.preview ? (
                 <>
                   Across {data.n.toLocaleString()} scanned stores, the median
                   Shopify catalog earns a grade {data.overall.grade} &mdash;
@@ -253,14 +274,24 @@ export default async function Research() {
                   median store and the top decile is not sophistication; it
                   is fields populated.
                 </>
+              ) : data.available ? (
+                <>
+                  The number to the left is the score on the{' '}
+                  {data.n.toLocaleString()} store
+                  {data.n === 1 ? '' : 's'} scanned so far, not a published
+                  median. We don&rsquo;t call it &ldquo;the median Shopify
+                  catalog&rdquo; until the per-vertical sample clears{' '}
+                  {data.publishFloor.toLocaleString()}. The trend is already
+                  visible though: catalogs score high on titles and imagery
+                  and low on the structured fields agents actually filter on.
+                </>
               ) : (
                 <>
-                  To protect the integrity of the published numbers, Flintmere
-                  does not claim "the median Shopify catalog scores N" until
-                  at least {data.floor.toLocaleString()} stores have been
-                  scanned and bucketed. The per-vertical pages still show
-                  where individual stores land; this page reports only what
-                  the dataset can honestly support.
+                  FlintmereBot is mid-crawl. As soon as the first scan
+                  completes, its score appears here. Aggregate framing
+                  unlocks at {data.publishFloor.toLocaleString()} stores per
+                  vertical; until then this page reports what the dataset
+                  can honestly support.
                 </>
               )}
             </p>
@@ -274,9 +305,13 @@ export default async function Research() {
           aria-label="Grade distribution"
           className="mx-auto max-w-[1280px] px-8 py-20 border-t border-[color:var(--color-line)]"
         >
-          <p className="eyebrow mb-6">Grade distribution</p>
-          <h2 className="max-w-[22ch] mb-10">
-            How {data.n.toLocaleString()} Shopify stores stack up.
+          <p className="eyebrow mb-6">
+            {data.preview ? 'Grade distribution · early sample' : 'Grade distribution'}
+          </p>
+          <h2 className="max-w-[24ch] mb-10">
+            {data.preview
+              ? `How the first ${data.n.toLocaleString()} Shopify store${data.n === 1 ? '' : 's'} ${data.n === 1 ? 'lands' : 'land'} against the seven AI-readiness checks.`
+              : `How ${data.n.toLocaleString()} Shopify stores stack up.`}
           </h2>
           <ul className="list-none p-0 m-0 border-y border-[color:var(--color-line)]">
             {(['A', 'B', 'C', 'D', 'F'] as const).map((g) => {
@@ -359,10 +394,10 @@ export default async function Research() {
                 style={{ fontSize: 12 }}
               >
                 {v.median !== null
-                  ? `median · grade ${v.grade} · ${v.n.toLocaleString()} stores`
-                  : v.n > 0
-                    ? `${v.n.toLocaleString()} / ${BENCHMARK_FLOOR.toLocaleString()} in sample`
-                    : 'sample pending'}
+                  ? v.n >= BENCHMARK_PUBLISH_FLOOR
+                    ? `median · grade ${v.grade} · ${v.n.toLocaleString()} stores`
+                    : `early sample · ${v.n.toLocaleString()} store${v.n === 1 ? '' : 's'} · publishing at ${BENCHMARK_PUBLISH_FLOOR}`
+                  : 'sample pending'}
               </p>
               <p
                 className="mt-4 text-[color:var(--color-ink-2)]"

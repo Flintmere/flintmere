@@ -19,7 +19,10 @@
  *   OUTPUT=data/benchmark/scans.jsonl
  *   CONCURRENCY=4
  *   PER_SCAN_BUDGET_MS=70000         timeout per request (scanner cap is 60s)
- *   RESUME=true                      skip domains already in OUTPUT
+ *   PACE_MS=0                        sleep between scans; set 3000+ to avoid
+ *                                    Shopify edge per-IP throttle on big runs
+ *   RESUME=true                      skip domains ALREADY OK in OUTPUT (failed
+ *                                    rows auto-retry; no manual wipe needed)
  *
  * Kindness:
  *   - UA: FlintmereBot/1.0 (+https://audit.flintmere.com/bot)
@@ -36,6 +39,7 @@ const BOT_UA = 'FlintmereBot/1.0 (+https://audit.flintmere.com/bot)';
 const DEFAULT_BASE_URL = 'http://localhost:3001';
 const DEFAULT_CONCURRENCY = 4;
 const DEFAULT_BUDGET_MS = 70_000;
+const DEFAULT_PACE_MS = 0;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..', '..', '..');
@@ -50,6 +54,7 @@ const CONCURRENCY = Number(process.env.CONCURRENCY ?? DEFAULT_CONCURRENCY);
 const PER_SCAN_BUDGET_MS = Number(
   process.env.PER_SCAN_BUDGET_MS ?? DEFAULT_BUDGET_MS,
 );
+const PACE_MS = Number(process.env.PACE_MS ?? DEFAULT_PACE_MS);
 const RESUME = (process.env.RESUME ?? 'true') !== 'false';
 
 interface Store {
@@ -102,7 +107,7 @@ async function main(): Promise<void> {
     `[batch-scan] ${stores.length} stores · already done=${alreadyDone.size} · to-scan=${todo.length}`,
   );
   console.log(
-    `[batch-scan] base=${BASE_URL} · concurrency=${CONCURRENCY} · budget=${PER_SCAN_BUDGET_MS}ms`,
+    `[batch-scan] base=${BASE_URL} · concurrency=${CONCURRENCY} · budget=${PER_SCAN_BUDGET_MS}ms · pace=${PACE_MS}ms`,
   );
 
   if (!(await reachable(BASE_URL))) {
@@ -135,6 +140,9 @@ async function main(): Promise<void> {
         `[batch-scan] progress ${done}/${stores.length} · ok=${ok} · errors=${errors}`,
       );
     }
+    if (PACE_MS > 0) {
+      await new Promise((r) => setTimeout(r, PACE_MS));
+    }
   });
 
   await writeFile(
@@ -148,6 +156,7 @@ async function main(): Promise<void> {
         output: OUTPUT,
         concurrency: CONCURRENCY,
         perScanBudgetMs: PER_SCAN_BUDGET_MS,
+        paceMs: PACE_MS,
         totals: {
           stores: stores.length,
           alreadyDone: alreadyDone.size,
@@ -187,14 +196,20 @@ function parseStoresCsv(raw: string): Store[] {
 }
 
 async function loadDoneDomains(path: string): Promise<Set<string>> {
+  // Only successful rows count as "done". Failed rows (429, timeout, etc.)
+  // are re-attempted on the next run — the edge throttle that caused them
+  // is transient, so skipping them would strand real stores.
   if (!existsSync(path)) return new Set();
   const raw = await readFile(path, 'utf8');
   const out = new Set<string>();
   for (const line of raw.split(/\r?\n/)) {
     if (!line.trim()) continue;
     try {
-      const obj = JSON.parse(line) as { shopDomain?: string };
-      if (obj.shopDomain) out.add(obj.shopDomain);
+      const obj = JSON.parse(line) as {
+        shopDomain?: string;
+        outcome?: { kind?: string };
+      };
+      if (obj.shopDomain && obj.outcome?.kind === 'ok') out.add(obj.shopDomain);
     } catch {
       /* skip malformed lines */
     }

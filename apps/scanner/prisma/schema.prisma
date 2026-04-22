@@ -39,6 +39,8 @@ model Scan {
   errorMessage String?   @map("error_message")
   ipHash      String?    @map("ip_hash")
   userAgent   String?    @map("user_agent")
+  publishedToBenchmark Boolean @default(false) @map("published_to_benchmark")
+  publishedAt DateTime?  @map("published_at")
   createdAt   DateTime   @default(now()) @map("created_at")
   startedAt   DateTime?  @map("started_at")
   completedAt DateTime?  @map("completed_at")
@@ -49,6 +51,7 @@ model Scan {
   @@index([status])
   @@index([source])
   @@index([vertical])
+  @@index([publishedToBenchmark])
   @@map("scanner_scans")
 }
 
