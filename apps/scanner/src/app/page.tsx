@@ -5,6 +5,7 @@ import {
   summariseBenchmark,
   type BenchmarkRow,
 } from '@/lib/benchmark-summary';
+import { TIERS } from '@/lib/pricing';
 
 // Belt-and-braces: render per request so build never hits the DB. The
 // live-sample line stays fresh without depending on a build-time crawl.
@@ -340,11 +341,16 @@ export default async function MarketingHome() {
         <p className="eyebrow mb-6">Pricing</p>
         <h2 className="max-w-[20ch] mb-12">Four tiers. One question: how many stores?</h2>
         <div className="grid grid-cols-2 md:grid-cols-5 border-y border-[color:var(--color-line)]">
-          <Tier name="Free" price="£0" blurb="Scorecard, read-only. One refresh per 30 days. For anyone who wants to see where they stand." />
-          <Tier name="Growth" price="£49" unit="/mo" featured blurb="Under 500 SKUs. Unlimited audits, safe auto-fixes, 500 LLM enrichments per month. First month £29 for scanner users." />
-          <Tier name="Scale" price="£149" unit="/mo" blurb="500–5,000 SKUs. Unlimited enrichments, competitor benchmarking, bulk-sync SLA." />
-          <Tier name="Agency" price="£399" unit="/mo" blurb="25 client store seats, white-label reports, API access. The tier that runs most of the revenue." />
-          <Tier name="Enterprise" price="£499+" unit="/mo" blurb="Shopify Plus, 10,000+ SKUs. Custom attribute templates, dedicated support, monthly strategy call. Contact sales." />
+          {TIERS.map((tier) => (
+            <Tier
+              key={tier.slug}
+              name={tier.name}
+              price={tier.price}
+              unit={tier.unit}
+              blurb={tier.blurb}
+              featured={tier.featured}
+            />
+          ))}
         </div>
         <p className="mt-6 eyebrow">
           <Link href="/pricing" className="underline">See full pricing →</Link>

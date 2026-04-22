@@ -1,80 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Bracket } from '@/components/Bracket';
+import { TIERS } from '@/lib/pricing';
 
 export const metadata: Metadata = {
   title: 'Pricing',
   description:
-    'Flintmere pricing — Free, Growth £49, Scale £149, Agency £399, Enterprise £499+. First month £29 for scanner users.',
+    'Flintmere pricing — Free, Growth £59, Scale £159, Agency £499, Enterprise £599+. First month £29 for scanner users.',
 };
-
-const TIERS = [
-  {
-    name: 'Free',
-    price: '£0',
-    scope: 'Tire-kickers, audit-only users',
-    features: [
-      'Scorecard, read-only',
-      'One refresh per 30 days',
-      'Partial (3 of 6) pillars scored',
-      'No auto-fixes',
-      'No drift alerts',
-    ],
-  },
-  {
-    name: 'Growth',
-    price: '£49',
-    unit: '/mo',
-    scope: 'SMB, <500 SKUs',
-    features: [
-      'Unlimited audits',
-      'Safe (Tier 1) auto-fixes',
-      '500 LLM enrichments per month',
-      'Weekly drift alerts',
-      'First month £29 for scanner users',
-    ],
-    featured: true,
-  },
-  {
-    name: 'Scale',
-    price: '£149',
-    unit: '/mo',
-    scope: 'Mid-market, 500–5,000 SKUs',
-    features: [
-      'Everything in Growth',
-      'Unlimited LLM enrichments',
-      'Competitor benchmarking',
-      'Priority support',
-      'Bulk sync SLA: 1K products within 2h',
-    ],
-  },
-  {
-    name: 'Agency',
-    price: '£399',
-    unit: '/mo',
-    scope: '5–50 client stores',
-    features: [
-      '25 client store seats',
-      'White-label reports',
-      'API access',
-      'Per-client benchmarking',
-      'Agency dashboard',
-    ],
-  },
-  {
-    name: 'Enterprise',
-    price: '£499+',
-    unit: '/mo',
-    scope: 'Shopify Plus, 10,000+ SKUs',
-    features: [
-      'Custom attribute templates per vertical',
-      'Dedicated support channel',
-      'Monthly strategy call',
-      'Per-contract SLAs',
-      'Contact sales',
-    ],
-  },
-];
 
 const FAQS = [
   {
@@ -181,7 +114,7 @@ export default function Pricing() {
       <section aria-label="Tiers" className="grid grid-cols-1 md:grid-cols-5 border-y border-[color:var(--color-line)]">
         {TIERS.map((tier) => (
           <div
-            key={tier.name}
+            key={tier.slug}
             className="p-8 border-r border-[color:var(--color-line)] last:border-r-0 max-md:border-r-0 max-md:border-b max-md:last:border-b-0"
             style={{ background: tier.featured ? 'var(--color-paper-2)' : undefined }}
           >
