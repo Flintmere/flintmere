@@ -2,7 +2,7 @@
 
 client_id = "255894146cd9736d92d9595e9e1d3e42"
 name = "Flintmere"
-application_url = "https://shopify.dev/apps/default-app-home"
+application_url = "https://app.flintmere.com"
 embedded = true
 handle = "flintmere"
 
@@ -38,7 +38,11 @@ api_version = "2026-07"
 scopes = "read_products,write_products"
 
 [auth]
-redirect_urls = [ "https://shopify.dev/apps/default-app-home/api/auth" ]
+redirect_urls = [
+  "https://app.flintmere.com/auth/callback",
+  "https://app.flintmere.com/auth/shopify/callback",
+  "https://app.flintmere.com/api/auth/callback"
+]
 
 [pos]
 embedded = false
