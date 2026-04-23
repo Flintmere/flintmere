@@ -35,31 +35,31 @@ The cost side is controlled. The bet is on acquisition.
 - **Limits:** No auto-fixes. No enrichment. No drift alerts.
 - **Purpose:** tire-kicker filter; funnel into Growth tier.
 
-### Growth — £49/month
+### Growth — £59/month
 
-- **Price:** £49/month. First month £29 for users who arrive via the public scanner.
+- **Price:** £59/month. 14-day trial (no first-month discount — see ADR 0009).
 - **Target:** SMB stores, <500 SKUs, <£1M revenue.
 - **Scope:** Unlimited audits. Tier 1 auto-safe fixes. 500 Tier 2 LLM enrichments per month. Weekly drift alerts. Score history (30 days).
 - **Shopify pricing ID:** `STRIPE_PRICE_GROWTH_MONTHLY` (via Shopify Managed Pricing, not direct Stripe).
 
-### Scale — £149/month
+### Scale — £159/month
 
-- **Price:** £149/month.
+- **Price:** £159/month. 14-day trial.
 - **Target:** Mid-market, 500–5,000 SKUs, £1M–£10M revenue.
 - **Scope additions:** Unlimited Tier 2 enrichments. Competitor benchmarking. Daily drift alerts. Priority support. Bulk sync SLA (1K products within 2h, 10K within 24h). Score history (12 months).
 - **Shopify pricing ID:** `STRIPE_PRICE_SCALE_MONTHLY`.
 
-### Agency — £399/month
+### Agency — £499/month
 
-- **Price:** £399/month.
+- **Price:** £499/month.
 - **Target:** Shopify agencies managing 5–50 client stores.
 - **Scope additions:** 25 client store seats. White-label reports (remove Flintmere branding, add agency logo). API access. Per-client benchmarking. Agency dashboard for cross-client score views.
 - **Billing:** direct Stripe invoicing (not Shopify Managed Pricing — agencies own the relationship).
 - **Economic significance:** SPEC §8.2 — Agency tier is the economic engine. One sale = 25 stores on the platform. Ratio of revenue to acquisition cost is 8–10× better than direct merchant sales.
 
-### Enterprise — £499+/month
+### Enterprise — £599+/month
 
-- **Price:** £499/month floor. Custom pricing above.
+- **Price:** £599/month floor. Custom pricing above.
 - **Target:** Shopify Plus (£500K/mo+ platform fee tier), 10,000+ SKUs.
 - **Scope additions:** 50,000 SKU support (custom rate limits). Custom attribute templates per vertical. Dedicated Slack support channel. Monthly strategy call. Per-contract SLAs. SOC 2 posture review (when needed).
 - **Billing:** direct Stripe invoicing, contract-based, annual pre-pay available at 15% discount.
@@ -74,10 +74,10 @@ The cost side is controlled. The bet is on acquisition.
 
 ## Promotions
 
-- **First-month £29 for scanner users** (Growth only, first 100 conversions). Creates urgency on the public scanner; gives a data point for A/B testing Growth pricing.
+- **14-day trial on Growth and Scale.** Via Shopify Billing `trialDays`. No first-month discount, no price override — see ADR 0009.
 - **Agency trial:** 30-day full-feature trial of Agency tier, no card required. Converts via 25-store scorecard preview.
-- **Enterprise annual discount:** 15% off on 12-month pre-pay. Applied at contract signature.
-- **Share-for-trial loop** (SPEC §2.1.3): post-scan, share your score on LinkedIn/X → unlock 7 days Growth free, no card.
+- **Enterprise annual pre-pay:** 15% off on 12-month pre-pay. Applied at contract signature.
+- **No share-for-trial loop at launch.** Revisit if month-3 conversion data shows price is the blocker (SPEC §2.1.3 is superseded on this point).
 
 ## Refunds / cancellation
 

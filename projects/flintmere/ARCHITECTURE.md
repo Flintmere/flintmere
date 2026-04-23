@@ -135,7 +135,7 @@ Shopify webhook fires (products/update)
 
 Enforcement: `apps/shopify-app/src/lib/tier.ts`. Canonical tier data comes from Shopify Managed Pricing for Growth/Scale; Postgres `shops.plan_tier` for Agency/Enterprise (direct invoice).
 
-| Feature | Free | Growth £49 | Scale £149 | Agency £399 | Enterprise £499+ |
+| Feature | Free | Growth £59 | Scale £159 | Agency £499 | Enterprise £599+ |
 |---|---|---|---|---|---|
 | Scorecard (read-only) | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Refresh frequency | 30 days | Unlimited | Unlimited | Unlimited | Unlimited |

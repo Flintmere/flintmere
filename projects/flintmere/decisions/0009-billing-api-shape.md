@@ -13,7 +13,7 @@
 ### Inputs
 
 - `BUSINESS.md` §Payment stack — "Shopify Managed Pricing for Growth + Scale; Stripe direct for Agency + Enterprise + the £97 concierge audit. No crypto, no alternative gateways."
-- `BUSINESS.md` §Tiers — first-month £29 promotion on Growth for scanner users (first 100 conversions). Enterprise 15% annual discount.
+- `BUSINESS.md` §Tiers — flat pricing, no discounts at launch. (Enterprise annual pre-pay remains as a single-tier contract term, not a promotion.)
 - `ARCHITECTURE.md` §External integrations — Shopify Managed Pricing / `AppSubscription` is listed as the billing path for Growth + Scale. Stripe is listed for Agency + Enterprise + concierge.
 - **Shopify App Store policy (load-bearing):** any paid functionality subscribed to via the App Store install flow MUST use the Shopify Billing API (`appSubscriptionCreate` GraphQL mutation). Bypassing is an instant rejection.
 - **User-level billing memory (`feedback_payments_payment_element_only.md`):** "Never hosted Stripe Checkout; always PaymentIntent + Payment Element inside the Flintmere shell." This applies to **Flintmere-owned** Stripe surfaces (Agency, Enterprise, concierge £97). It does NOT apply to Shopify Billing — Shopify's confirmation page is not Stripe Checkout and is platform-mandated.
@@ -24,7 +24,7 @@
 1. **Flat subscription vs usage metering?** BUSINESS.md §Tiers says "Unlimited audits", "500 enrichments/mo on Growth", "Unlimited enrichments on Scale". That is a cap-enforced flat subscription, not per-unit billing.
 2. **Shopify Billing vs Stripe for Growth/Scale?** Platform policy answers this: Shopify Billing, mandatory.
 3. **Shopify Billing vs Stripe for Agency/Enterprise?** These do not come through App Store install; no platform mandate. Stripe direct. Payment Element (per memory), not hosted Checkout.
-4. **How is the £29 first-month promo implemented?** Shopify Billing supports `trialDays`, `replacementBehavior`, and discount codes — not a first-month price override. We use `trialDays: 14` + post-trial `price: 29` for month one via a custom price plan, **OR** the simpler route: always charge £59 with a 14-day trial, and the £29 "promo" becomes a month-one-only £30 discount line applied via `AppSubscriptionLineItemUpdate`. Decision below.
+4. **Any launch discounts?** No. The canonical answer at launch is flat prices straight from `lib/pricing.ts`. Scoped out below.
 
 ## Decision
 
@@ -59,15 +59,25 @@ Migration plan (tracked separately, not scoped to this ADR):
 
 Do not do this before Shopify App Store submission. It is cosmetic relative to the app-build critical path.
 
-### First-month £29 promotion
+### No launch discounts
 
-Implemented as a **one-month `AppSubscriptionDiscount`** applied at `appSubscriptionCreate` time:
+The £29 first-month promo previously proposed in BUSINESS.md §Promotions is **out** at launch. We ship flat prices straight from `apps/scanner/src/lib/pricing.ts` and revisit promotions only after we have month-3 conversion data from real flat-price sales.
 
-- `discount: { value: { amount: 30.0 } }`, `durationLimitInIntervals: 1`.
-- Server-side check: merchant must have arrived via the public scanner (UTM or scanner-install code baked into the `returnUrl`) and be within the first 100 Growth conversions. Both checks are enforced in the mutation call path, not in the UI.
-- Expiry: the "first 100" counter lives in a `app_promotions` table (single row) with `CHECK (count <= 100)`. When full, the UI surface the promo naturally falls off.
+Rationale:
+- Every promo shape (`AppSubscriptionDiscount` one-month, price-override-then-swap, trial-extension-as-discount) adds a second billing path we have to test, monitor, and refund against. For the first 100 merchants that is cost we cannot justify.
+- A 50% first-month discount signals "the real price is negotiable" to the Agency buyers we actually want, and anchors the wrong number in their head before the call.
+- The 14-day trial (below) already solves the merchant's "can I try before I pay" objection without muddying the price.
 
-Rejected alternative: custom `£29` price plan for month 1, then upgrade to `£59` at day 31. Breaks the Shopify Billing contract (plans are not time-bounded), requires a cron to flip, and exposes us to billing drift.
+Trial remains. See next section.
+
+If the first 100 conversions come in slow and the data says price sensitivity is the cause, re-open this ADR and add a discount path in a follow-up. Not before.
+
+Downstream cleanup:
+
+- `apps/scanner/src/lib/pricing.ts` — remove "First month £29 for scanner users" from Growth blurb + features.
+- `apps/scanner/src/app/pricing/page.tsx` metadata — remove the same string from the description.
+- `BUSINESS.md` §Promotions — strike the "First-month £29 for scanner users" line; leave the agency trial and annual pre-pay lines.
+- (Tracked below under Rollout.)
 
 ### Usage metering — REJECTED
 

@@ -6,7 +6,7 @@ import { TIERS } from '@/lib/pricing';
 export const metadata: Metadata = {
   title: 'Pricing',
   description:
-    'Flintmere pricing — Free, Growth £59, Scale £159, Agency £499, Enterprise £599+. First month £29 for scanner users.',
+    'Flintmere pricing — Free, Growth £59, Scale £159, Agency £499, Enterprise £599+. 14-day trial on Growth and Scale.',
 };
 
 const FAQS = [

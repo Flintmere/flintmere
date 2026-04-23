@@ -79,14 +79,14 @@ export const TIERS: Tier[] = [
     unit: '/mo',
     scope: 'SMB, <500 SKUs',
     blurb:
-      'Under 500 SKUs. Unlimited audits, safe auto-fixes, LLM enrichments for catalogs up to 500 SKUs/month. First month £29 for scanner users.',
+      'Under 500 SKUs. Unlimited audits, safe auto-fixes, LLM enrichments for catalogs up to 500 SKUs/month. 14-day trial.',
     featured: true,
     features: [
       'Unlimited audits',
       'Safe (Tier 1) auto-fixes',
       'LLM enrichments included for catalogs up to 500 SKUs/month',
       'Weekly drift alerts',
-      'First month £29 for scanner users',
+      '14-day trial',
     ],
     cta: {
       kind: 'waitlist',
