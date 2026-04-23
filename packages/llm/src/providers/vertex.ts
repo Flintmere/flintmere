@@ -1,4 +1,9 @@
-import { VertexAI } from '@google-cloud/vertexai';
+import {
+  VertexAI,
+  type Content,
+  type GenerateContentRequest,
+  type Part,
+} from '@google-cloud/vertexai';
 import {
   LLMError,
   type CompletionOpts,
@@ -60,30 +65,24 @@ export class VertexProvider implements LLMProvider {
         },
       });
 
-      const parts = opts.messages.map((m) => ({
+      const contents: Content[] = opts.messages.map((m) => ({
         role: m.role === 'assistant' ? 'model' : m.role,
-        parts: [{ text: m.content }],
+        parts: [{ text: m.content }] as Part[],
       }));
 
-      const lastUserParts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [
-        { text: parts[parts.length - 1]?.parts[0]?.text ?? '' },
-      ];
-      if (images) {
+      if (images && images.length > 0) {
+        const last = contents[contents.length - 1];
+        const lastText = last?.parts?.[0]?.text ?? '';
+        const lastParts: Part[] = [{ text: lastText }];
         for (const img of images) {
-          lastUserParts.push({
+          lastParts.push({
             inlineData: { mimeType: img.mimeType, data: img.data },
           });
         }
+        contents[contents.length - 1] = { role: 'user', parts: lastParts };
       }
 
-      const request = images
-        ? {
-            contents: [
-              ...parts.slice(0, -1),
-              { role: 'user' as const, parts: lastUserParts },
-            ],
-          }
-        : { contents: parts };
+      const request: GenerateContentRequest = { contents };
 
       const response = await generativeModel.generateContent(request);
       const aggregated = response.response;
