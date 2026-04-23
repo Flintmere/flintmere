@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Bracket } from '@/components/Bracket';
+import { SiteFooter } from '@/components/SiteFooter';
 import { prisma } from '@/lib/db';
 import {
   summariseBenchmark,
@@ -348,26 +349,7 @@ export default async function FlintmereForFoodAndDrink() {
         </div>
       </section>
 
-      <footer className="border-t border-[color:var(--color-line)]">
-        <div className="mx-auto max-w-[1280px] px-8 py-10 flex flex-wrap justify-between gap-4 text-[color:var(--color-mute)]">
-          <p className="eyebrow">
-            Flintmere · a trading name of Eazy Access Ltd · London
-          </p>
-          <p className="eyebrow">
-            <Link href="/research" className="hover:text-[color:var(--color-ink)]">
-              Research
-            </Link>{' '}
-            ·{' '}
-            <Link href="/pricing" className="hover:text-[color:var(--color-ink)]">
-              Pricing
-            </Link>{' '}
-            ·{' '}
-            <Link href="/scan" className="hover:text-[color:var(--color-ink)]">
-              Free scan
-            </Link>
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

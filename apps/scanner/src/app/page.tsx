@@ -1,5 +1,8 @@
 import Link from 'next/link';
 import { Bracket } from '@/components/Bracket';
+import { SectionAnchor } from '@/components/SectionAnchor';
+import { SiteFooter } from '@/components/SiteFooter';
+import { ViewportReveal } from '@/components/ViewportReveal';
 import { prisma } from '@/lib/db';
 import {
   summariseBenchmark,
@@ -74,13 +77,23 @@ export default async function MarketingHome() {
       </header>
 
       {/* Hero */}
-      <section className="mx-auto max-w-[1280px] px-8 py-24 md:py-32">
+      <section className="section-anchor-host mx-auto max-w-[1280px] px-8 py-24 md:py-32">
+        <SectionAnchor variant="numeral" numeral="01" side="top-right" />
         <p className="eyebrow text-[color:var(--color-ink-2)] mb-8">
           Free scan · 60 seconds · No install
         </p>
-        <h1 className="max-w-[14ch]">
-          Your product catalog is <Bracket>invisible</Bracket> to ChatGPT.
-        </h1>
+        <ViewportReveal>
+          <h1 className="max-w-[14ch]">
+            Your product catalog is{' '}
+            <Bracket>
+              <span aria-hidden="true" className="text-outlined text-outlined--reveal">
+                invisible
+              </span>
+              <span className="sr-only">invisible</span>
+            </Bracket>{' '}
+            to ChatGPT.
+          </h1>
+        </ViewportReveal>
         <p
           className="mt-10 max-w-[52ch] text-[color:var(--color-ink-2)]"
           style={{ fontSize: 19, lineHeight: 1.5 }}
@@ -187,7 +200,8 @@ export default async function MarketingHome() {
       ) : null}
 
       {/* Seven checks */}
-      <section id="pillars" className="mx-auto max-w-[1280px] px-8 py-24">
+      <section id="pillars" className="section-anchor-host mx-auto max-w-[1280px] px-8 py-24">
+        <SectionAnchor variant="bracket" bracket="[" side="top-right" />
         <p className="eyebrow mb-6">What we check</p>
         <h2 className="max-w-[22ch] mb-12">
           Seven things an AI shopping agent looks for before it will recommend your product.
@@ -337,7 +351,8 @@ export default async function MarketingHome() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="mx-auto max-w-[1280px] px-8 py-24">
+      <section id="pricing" className="section-anchor-host mx-auto max-w-[1280px] px-8 py-24">
+        <SectionAnchor variant="numeral" numeral="02" side="top-right" />
         <p className="eyebrow mb-6">Pricing</p>
         <h2 className="max-w-[20ch] mb-12">Four tiers. One question: how many stores?</h2>
         <div className="grid grid-cols-2 md:grid-cols-5 border-y border-[color:var(--color-line)]">
@@ -360,13 +375,25 @@ export default async function MarketingHome() {
       {/* Manifesto — inverted ink block */}
       <section
         aria-label="Flintmere manifesto"
+        className="section-anchor-host"
         style={{
           background: 'var(--color-ink)',
           color: 'var(--color-paper)',
           padding: '96px 32px',
         }}
       >
-        <div className="mx-auto max-w-[1000px]">
+        <span
+          aria-hidden="true"
+          className="section-anchor section-anchor--bracket"
+          style={{
+            bottom: '-0.15em',
+            right: '-0.05em',
+            color: 'rgba(248, 191, 36, 0.10)',
+          }}
+        >
+          ]
+        </span>
+        <div className="mx-auto max-w-[1000px]" style={{ position: 'relative', zIndex: 1 }}>
           <p
             style={{
               fontSize: 'clamp(28px, 4.5vw, 56px)',
@@ -391,19 +418,7 @@ export default async function MarketingHome() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[color:var(--color-line)] py-10">
-        <div className="mx-auto max-w-[1280px] px-8 flex flex-wrap justify-between gap-6">
-          <p className="eyebrow">
-            © 2026 Flintmere · a trading name of Eazy Access Ltd
-          </p>
-          <nav className="flex gap-8" aria-label="Footer">
-            <Link href="/privacy" className="eyebrow">Privacy</Link>
-            <Link href="/terms" className="eyebrow">Terms</Link>
-            <Link href="/security" className="eyebrow">Security</Link>
-            <Link href="/scan" className="eyebrow">Scan</Link>
-          </nav>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

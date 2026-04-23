@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Bracket } from '@/components/Bracket';
+import { SiteFooter } from '@/components/SiteFooter';
 import { CheckoutCard } from './CheckoutCard';
 import { CONCIERGE_DELIVERABLE_LIST } from '@/lib/copy';
 
@@ -147,24 +148,7 @@ export default function Audit() {
         </p>
       </section>
 
-      <footer className="border-t border-[color:var(--color-line)] py-10">
-        <div className="mx-auto max-w-[1280px] px-8 flex flex-wrap justify-between gap-6">
-          <p className="eyebrow">
-            © 2026 Flintmere · a trading name of Eazy Access Ltd
-          </p>
-          <nav className="flex gap-8" aria-label="Footer">
-            <Link href="/privacy" className="eyebrow">
-              Privacy
-            </Link>
-            <Link href="/terms" className="eyebrow">
-              Terms
-            </Link>
-            <Link href="/scan" className="eyebrow">
-              Scan
-            </Link>
-          </nav>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

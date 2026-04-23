@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Bracket } from '@/components/Bracket';
+import { SectionAnchor } from '@/components/SectionAnchor';
+import { SiteFooter } from '@/components/SiteFooter';
 import { TIERS } from '@/lib/pricing';
 
 export const metadata: Metadata = {
@@ -49,7 +51,8 @@ export default function Pricing() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-[1280px] px-8 py-24">
+      <section className="section-anchor-host mx-auto max-w-[1280px] px-8 py-24">
+        <SectionAnchor variant="numeral" numeral="01" side="top-right" />
         <p className="eyebrow mb-6">Pricing</p>
         <h1 className="max-w-[20ch]">
           Four tiers. One <Bracket>question</Bracket>: how many stores?
@@ -157,7 +160,8 @@ export default function Pricing() {
       </section>
 
       {/* FAQ */}
-      <section className="mx-auto max-w-[1280px] px-8 py-20 border-t border-[color:var(--color-line)]">
+      <section className="section-anchor-host mx-auto max-w-[1280px] px-8 py-20 border-t border-[color:var(--color-line)]">
+        <SectionAnchor variant="bracket" bracket="]" side="bottom-right" />
         <p className="eyebrow mb-8">Frequently asked</p>
         <ul className="list-none p-0 m-0 border-y border-[color:var(--color-line)]">
           {FAQS.map((item) => (
@@ -181,19 +185,7 @@ export default function Pricing() {
         </p>
       </section>
 
-      <footer className="border-t border-[color:var(--color-line)] py-10">
-        <div className="mx-auto max-w-[1280px] px-8 flex flex-wrap justify-between gap-6">
-          <p className="eyebrow">
-            © 2026 Flintmere · a trading name of Eazy Access Ltd
-          </p>
-          <nav className="flex gap-8" aria-label="Footer">
-            <Link href="/privacy" className="eyebrow">Privacy</Link>
-            <Link href="/terms" className="eyebrow">Terms</Link>
-            <Link href="/security" className="eyebrow">Security</Link>
-            <Link href="/scan" className="eyebrow">Scan</Link>
-          </nav>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
