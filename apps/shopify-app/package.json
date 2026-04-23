@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "shopify app dev",
+    "dev:local": "remix vite:dev --port 3000",
     "build": "remix vite:build",
     "start": "remix-serve ./build/server/index.js",
     "lint": "eslint app",

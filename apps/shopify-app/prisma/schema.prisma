@@ -29,8 +29,6 @@ model Session {
   locale        String?
   collaborator  Boolean?  @default(false)
   emailVerified Boolean?  @default(false)
-
-  @@map("app_sessions")
 }
 
 // ---- Shops (our canonical record, encrypted token) ----

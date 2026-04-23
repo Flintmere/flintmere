@@ -3,11 +3,11 @@
  */
 
 export const QUEUE_NAMES = {
-  sync: 'flintmere:sync',
-  score: 'flintmere:score',
-  enrich: 'flintmere:enrich',
-  drift: 'flintmere:drift',
-  alerts: 'flintmere:alerts',
+  sync: 'sync',
+  score: 'score',
+  enrich: 'fix-tier2',
+  drift: 'drift',
+  alerts: 'alerts',
 } as const;
 
 export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];

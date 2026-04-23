@@ -14,8 +14,8 @@ include_config_on_deploy = true
 api_version = "2026-07"
 
   [[webhooks.subscriptions]]
-  topics = [ "app/uninstalled" ]
-  uri = "/webhooks/app-uninstalled"
+  topics = [ "products/update", "products/delete", "products/create" ]
+  uri = "/webhooks/products"
 
   [[webhooks.subscriptions]]
   uri = "/webhooks/customers-data-request"
@@ -30,8 +30,8 @@ api_version = "2026-07"
   compliance_topics = [ "shop/redact" ]
 
   [[webhooks.subscriptions]]
-  topics = [ "products/create", "products/update", "products/delete" ]
-  uri = "/webhooks/products"
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/app-uninstalled"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
