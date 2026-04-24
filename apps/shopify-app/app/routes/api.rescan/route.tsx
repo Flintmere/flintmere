@@ -1,4 +1,5 @@
 import type { ActionFunctionArgs } from '@remix-run/node';
+import { json } from '@remix-run/node';
 import { authenticate } from '../../shopify.server';
 import { startBulkCatalogQuery, pollBulkOp } from '../../lib/sync/bulk-op.server';
 import { enqueueSync } from '../../queue/queues.server';
@@ -22,7 +23,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const result = await pollBulkOp(admin, { maxWaitMs: 60_000 });
 
     if (result.status !== 'COMPLETED' || !result.url) {
-      return Response.json(
+      return json(
         {
           ok: false,
           code: 'bulk-op-incomplete',
@@ -42,7 +43,7 @@ export async function action({ request }: ActionFunctionArgs) {
     // Attach the signed URL to the job data. The worker reads it from job.data.
     await job.updateData({ ...job.data, signedUrl: result.url } as typeof job.data & { signedUrl: string });
 
-    return Response.json({
+    return json({
       ok: true,
       jobId: job.id,
       bulkOpId: result.id,
@@ -50,7 +51,7 @@ export async function action({ request }: ActionFunctionArgs) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    return Response.json(
+    return json(
       { ok: false, code: 'rescan-failed', message },
       { status: 502 },
     );

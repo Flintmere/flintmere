@@ -41,6 +41,8 @@ model Scan {
   userAgent   String?    @map("user_agent")
   publishedToBenchmark Boolean @default(false) @map("published_to_benchmark")
   publishedAt DateTime?  @map("published_at")
+  publishPublicPage Boolean @default(false) @map("publish_public_page")
+  publicPageAt DateTime? @map("public_page_at")
   createdAt   DateTime   @default(now()) @map("created_at")
   startedAt   DateTime?  @map("started_at")
   completedAt DateTime?  @map("completed_at")
@@ -52,6 +54,7 @@ model Scan {
   @@index([source])
   @@index([vertical])
   @@index([publishedToBenchmark])
+  @@index([publishPublicPage])
   @@map("scanner_scans")
 }
 

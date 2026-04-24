@@ -82,8 +82,13 @@ Production values in Coolify environment configuration. Rotation schedule docume
 
 - **Pattern:** git push → Coolify pulls → rebuild → rolling restart. One app per container, Traefik handles routing.
 - **Environments:** `main` branch → production. Feature branches → Coolify preview environments (per-branch subdomain, e.g. `pr-42.staging.flintmere.com`).
-- **Migrations:** `prisma migrate deploy` runs on container start, not during build. Coolify build container cannot reach the DB.
+- **Migrations:** `prisma migrate deploy` runs on container start, not during build. Coolify build container cannot reach the DB. Only the Shopify app **web** service runs migrate — the **worker** service does not (avoids start-time races).
 - **Rollback:** Coolify's redeploy-previous-commit button. Prisma migrations are forward-only; down-migrations via a new commit, not by reverting.
+- **Coolify services (production):**
+  - `flintmere-scanner` — Dockerfile at `apps/scanner/Dockerfile` → `audit.flintmere.com` (+ root `flintmere.com` marketing)
+  - `flintmere-app-web` — Dockerfile at `apps/shopify-app/Dockerfile` → `app.flintmere.com` (Remix + OAuth + webhooks; runs `prisma migrate deploy` on start)
+  - `flintmere-app-worker` — Dockerfile at `apps/shopify-app/Dockerfile.worker` → no public route (BullMQ consumer; bulk-sync, scoring, drift-rescore)
+  - Postgres 16 + Redis 7 via Coolify one-click services
 
 ## Related
 

@@ -31,8 +31,17 @@ OAuth-installed via `@shopify/shopify-app-remix`. Bulk catalog sync via `bulkOpe
 | `/api/unsubscribe` | POST | HMAC token | 30/hr per token | RFC 8058 one-click unsubscribe | ✅ |
 | `/api/concierge/checkout` | POST | public | — | £97 concierge — create Stripe Checkout Session, 303-redirect | ✅ |
 | `/api/webhooks/stripe` | POST | Stripe signature | — | `checkout.session.completed` → upsert `scanner_concierge_audits` | ✅ |
+| `/api/scan/:id/publish` | POST | scan-id capability | — | Merchant opt-in to anonymised benchmark (aggregate only) | ✅ |
+| `/api/scan/:id/publish-public-page` | POST / DELETE | scan-id capability | — | Merchant opt-in / opt-out for public `/score/{normalisedDomain}` page | ✅ |
 | `/api/report/:token` | GET | one-time token | 30/hr per token | Serve full PDF report from a tokenised link | 🚧 |
 | `/api/healthz` | GET | public | none | Liveness | ✅ |
+
+### Public marketing surfaces (non-API)
+
+| Route | Purpose | Status |
+|---|---|---|
+| `/score/[shop]` | Public per-shop score page, merchant opt-in (`publishPublicPage=true`). ISR `revalidate=3600`. Dynamic OG image. | ✅ |
+| `/sitemap.xml` | Static marketing routes + every `publishPublicPage=true` domain. | ✅ |
 
 ### Shopify app
 
@@ -58,7 +67,7 @@ Shared Postgres 16, two schemas: `scanner_*` (public scanner) and `app_*` (Shopi
 
 ### `scanner_*` schema
 
-- `scanner_scans` — URL, status, partial score JSON, submitted_at, ip, user_agent
+- `scanner_scans` — URL, status, partial score JSON, submitted_at, ip, user_agent, `published_to_benchmark` (aggregate consent), `publish_public_page` (public-page consent; gates `/score/{normalisedDomain}`)
 - `scanner_leads` — email, source_scan_id, consent flags, unsubscribed_at
 - `scanner_reports` — token, scan_id, sent_at, opened_at, pdf_url
 - `scanner_concierge_audits` — Stripe payment intent ID, email, store URL, status, delivered_at

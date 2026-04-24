@@ -55,11 +55,19 @@ Provider abstraction per ADRs 0005 + 0006. Shipped:
 - `/audit` + `/audit/success` — £97 concierge landing with written-audit methodology, Stripe Payment Element checkout, Calendly fallback
 - `/scan` — public scanner UI with three-door close, merchant opt-in to benchmark on Results
 - `/unsubscribe` — PECR/GDPR one-click unsubscribe page
-- API routes: `POST /api/scan`, `GET /api/scan/:id`, `POST /api/lead` (Resend full-report delivery), `POST /api/unsubscribe`, `POST /api/concierge/checkout` (Stripe Checkout Session, 303-redirect), `POST /api/webhooks/stripe` (signature-verified, idempotent on payment intent), `GET /api/benchmark/summary` (aggregate-only, cache-controlled), `POST /api/scan/:id/publish-to-benchmark` (merchant opt-in), `GET /api/healthz`
+- API routes: `POST /api/scan`, `GET /api/scan/:id`, `POST /api/lead` (Resend full-report delivery), `POST /api/unsubscribe`, `POST /api/concierge/checkout` (Stripe Checkout Session, 303-redirect), `POST /api/webhooks/stripe` (signature-verified, idempotent on payment intent), `GET /api/benchmark/summary` (aggregate-only, cache-controlled), `POST /api/scan/:id/publish` (anonymised-benchmark opt-in), `POST|DELETE /api/scan/:id/publish-public-page` (per-shop public page opt-in / opt-out), `GET /api/healthz`
+- Public per-shop score page: `/score/[normalisedDomain]` (ISR 3600s), dedicated `not-found.tsx`, dynamic OG image via `@vercel/og` (bracket signature + amber under-tick). Canonical to `flintmere.com/score/{domain}`. Gated on `publishPublicPage=true` (separate consent column from `publishedToBenchmark` — see §Changelog 2026-04-24).
+- `/sitemap.xml` — static marketing routes + every `publishPublicPage=true` domain.
 - Benchmark pipeline: `scripts/compile-store-list.ts` (validates candidates against `/products.json` + sitemap fallback, kindness-compliant rate limits) and `scripts/batch-scan.ts` (success-only resume, PACE_MS throttling). Rolling cohort — 253 stores across 35 verticals as of 2026-04-22.
 - `lib/stripe.ts` — Stripe SDK singleton pinned to API `2024-10-28.acacia`, returns null gracefully when `STRIPE_SECRET_KEY` unset (routes 503 instead of crashing)
 - `lib/email.ts` — Resend wrapper with RFC 8058 one-click unsubscribe headers + HMAC-SHA256 unsubscribe tokens + `timingSafeEqual` verification
 - Prisma schema: `scanner_scans`, `scanner_leads`, `scanner_reports`, `scanner_concierge_audits`
+
+### Deployment images
+
+- `apps/scanner/Dockerfile` — scanner web (+ marketing).
+- `apps/shopify-app/Dockerfile` — Remix web + OAuth + webhooks. Runs `prisma migrate deploy` on start.
+- `apps/shopify-app/Dockerfile.worker` (2026-04-24) — separate Coolify service running `scripts/worker.ts` via `node --import tsx`. No HTTP port. No migrate. BullMQ consumer for `sync`, `score`, `drift` queues. Graceful SIGINT/SIGTERM shutdown. Shares the deps + prisma-generate build stages with the web image.
 
 ### `apps/shopify-app/` (Remix, app.flintmere.com)
 
@@ -84,11 +92,10 @@ Provider abstraction per ADRs 0005 + 0006. Shipped:
 1. **Operator launch prep** — Stage 2 account creation (Shopify Partner, Google Vertex, Azure OpenAI, Stripe, Resend, Sentry, BetterStack) + Stage 3 Coolify deploy. See `OPERATOR-TASKS.md`.
 2. **Validation week (SPEC §2)** — scanner live at `audit.flintmere.com`, cold outreach (LinkedIn + r/shopify + Partner Slack), £97 concierge audits.
 3. **Fix History UI + revert endpoint** (SPEC §5.2.1) — schema + job exist; UI + `POST /api/fix/:id/revert` route to wire.
-4. **Shareable badge + share-for-trial loop** (SPEC §2.1.3, §2.1.2) — `flintmere.com/score/{shop}` public page + LinkedIn/X verification.
+4. **Share-for-trial loop** (SPEC §2.1.3) — public score page ✅ shipped 2026-04-24; still to build: share-verification endpoint, trial-unlock token flow, Shopify subscription-API interplay, PDF certificate download, embeddable badge SVG widget.
 5. **Legal pages** — drafts landed 2026-04-20 in `context/compliance/legal-drafts/`. Next: #24 + #9 review, resolve per-doc "Open items" blockers (registered office, ICO number, consent-banner implementation, backup retention verification), then user-confirmed writes to `apps/scanner/src/app/{privacy,terms,cookies,dpa}/page.tsx`.
-6. **Worker Dockerfile** — separate Coolify service for the Shopify app's BullMQ worker process (currently bundled with the web container).
-7. **App Store submission prep** (SPEC Week 7–10) — `shopify-app-store-submission` skill checklist, screenshots, demo video.
-8. **Beta merchant onboarding** — private MVP for 10–20 merchants.
+6. **App Store submission prep** (SPEC Week 7–10) — `shopify-app-store-submission` skill checklist, screenshots, demo video.
+7. **Beta merchant onboarding** — private MVP for 10–20 merchants.
 
 ## Known issues (non-blocking)
 
@@ -109,7 +116,8 @@ Provider abstraction per ADRs 0005 + 0006. Shipped:
 
 ## Changelog
 
-- **2026-04-22** (latest): Benchmark widened — pool jumped 134 → **253 scored stores across 35 verticals**, headline finding now **98% below ceiling** (D+F). New `/research` breadth grid surfaces every scanned vertical (flagships first, remainder by sample size). Display-weight pass applied across home + pricing + research + `/for/*` — giant median/score moments at `clamp(88px, 14vw, 220px)` with amber under-tick; bracket cap enforced (≤2 per page). 2-stage benchmark pipeline proven end-to-end: `compile-store-list` validates candidates kindness-compliantly, `batch-scan` runs success-only resume at PACE_MS=4000/CONCURRENCY=1 to respect Shopify's edge CDN per-IP pool. Per-vertical cells below publish-floor render as "early sample".
+- **2026-04-24**: Shareable score page shipped — `/score/[normalisedDomain]` live at both `audit.flintmere.com` and `flintmere.com`, canonical-tagged to the latter. SPEC §2.1.2 bullet 1. Consent-model decision: new `publish_public_page` column added via migration `20260424120000_scan_publish_public_page`, **independent** from the existing `published_to_benchmark` flag. Existing benchmark opt-ins carry an explicit "we never publish your domain" consent (see scan Results screen line 449); retcon-ing them to also publish a public page would violate #24 Data Protection. New Results-screen section `PublicPageOptIn` collects a separate, explicit consent; merchants can toggle off via DELETE on the same endpoint, which removes the page immediately. ISR `revalidate=3600`, dynamic OG image (bracket signature + amber under-tick), hostname-regex validation on the `[shop]` segment (20 unit tests in `lib/badge-url.test.ts`). Also shipped: `app/sitemap.ts` (static routes + every `publishPublicPage=true` domain). Deferred to share-for-trial milestone: verification endpoint + trial-unlock token + PDF certificate + embeddable badge widget. Also 2026-04-24: `apps/shopify-app/Dockerfile.worker` landed for the BullMQ worker Coolify service; marketing/pricing SectionAnchor × 6 removed + home-page pillar `[ 01 ]–[ 07 ]` numerals culled (bracket cap now trivially respected).
+- **2026-04-22** (previous): Benchmark widened — pool jumped 134 → **253 scored stores across 35 verticals**, headline finding now **98% below ceiling** (D+F). New `/research` breadth grid surfaces every scanned vertical (flagships first, remainder by sample size). Display-weight pass applied across home + pricing + research + `/for/*` — giant median/score moments at `clamp(88px, 14vw, 220px)` with amber under-tick; bracket cap enforced (≤2 per page). 2-stage benchmark pipeline proven end-to-end: `compile-store-list` validates candidates kindness-compliantly, `batch-scan` runs success-only resume at PACE_MS=4000/CONCURRENCY=1 to respect Shopify's edge CDN per-IP pool. Per-vertical cells below publish-floor render as "early sample".
 - **2026-04-20**: Seventh pillar landed — `crawlability` (weight 15%). Scores `/llms.txt` presence + well-formedness, `/robots.txt` AI-agent access (GPTBot/ClaudeBot/Google-Extended/PerplexityBot/Applebot-Extended/cohere-ai/Bytespider/CCBot/OAI-SearchBot/ChatGPT-User), `/sitemap.xml` discoverability, and sitemap reference in robots. Scanner route fetches all three with 5s timeouts in parallel, fails soft on missing. Attributes weight rebalanced 25 → 20 to keep composite at 100. 9 new unit tests in `packages/scoring/test/crawlability.test.ts`. Driven by xgentech/Nimstrata/Rankfirms industry research — llms.txt is the emerging agent-manifest standard and Shopify storefronts overwhelmingly omit it.
 - **2026-04-20** (later): Four legal-page drafts (Privacy, ToS, Cookie Policy, DPA) written to `context/compliance/legal-drafts/` per `legal-page-draft` skill Level 1 rules. Awaiting council + user confirm before any `src/app/<legal>/**` write.
 - **2026-04-20**: Updated to reflect scaffolding-complete state. `packages/scoring`, `packages/llm`, `apps/scanner` (full surface + marketing + Stripe concierge + Resend email gate + PECR unsubscribe), `apps/shopify-app` (OAuth + Polaris + GDPR webhooks + AES-256-GCM + BullMQ + bulk-sync + three Tier 2 enrichment paths) all shipped across 11 commits since 2026-04-19. Now operator-blocked for launch.

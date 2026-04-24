@@ -7,10 +7,16 @@ installGlobals();
 
 export default defineConfig({
   server: {
-    port: Number(process.env.PORT) || 3000,
-    fs: { allow: ['app', 'node_modules'] },
-    hmr: { port: 64999 },
-  },
+  port: Number(process.env.PORT) || 3000,
+  fs: { allow: ['app', 'node_modules'] },
+  hmr: { port: 64999 },
+  allowedHosts: [
+    'clarinet-swagger-landmark.ngrok-free.dev',
+    '.ngrok-free.dev',
+    '.trycloudflare.com',
+    '.ngrok.app',
+  ],
+},
   plugins: [
     remix({
       ignoredRouteFiles: ['**/.*'],

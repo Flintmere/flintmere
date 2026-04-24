@@ -1,0 +1,45 @@
+# Flintmere Shopify app — BullMQ worker image for Coolify
+# Separate service from the Remix web image. Shares the deps + build stages
+# but ships the raw TS source (not the Remix bundle) and runs via tsx.
+# No HTTP port. No prisma migrate — the web service owns schema migrations.
+
+# ---- deps ----
+FROM node:22-alpine AS deps
+RUN corepack enable
+WORKDIR /repo
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/shopify-app/package.json apps/shopify-app/package.json
+COPY packages/scoring/package.json packages/scoring/package.json
+COPY packages/llm/package.json packages/llm/package.json
+RUN pnpm install --frozen-lockfile
+
+# ---- build (prisma generate only — worker runs TS directly via tsx) ----
+FROM node:22-alpine AS build
+RUN corepack enable
+WORKDIR /repo
+COPY --from=deps /repo/node_modules ./node_modules
+COPY --from=deps /repo/apps/shopify-app/node_modules ./apps/shopify-app/node_modules
+COPY --from=deps /repo/packages ./packages
+COPY . .
+RUN pnpm -F shopify-app prisma generate
+
+# ---- runtime ----
+FROM node:22-alpine AS runtime
+RUN addgroup -S flintmere && adduser -S flintmere -G flintmere
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY --from=build /repo/node_modules ./node_modules
+COPY --from=build /repo/apps/shopify-app/node_modules ./apps/shopify-app/node_modules
+COPY --from=build /repo/apps/shopify-app/app ./apps/shopify-app/app
+COPY --from=build /repo/apps/shopify-app/scripts ./apps/shopify-app/scripts
+COPY --from=build /repo/apps/shopify-app/prisma ./apps/shopify-app/prisma
+COPY --from=build /repo/apps/shopify-app/package.json ./apps/shopify-app/package.json
+COPY --from=build /repo/apps/shopify-app/tsconfig.json ./apps/shopify-app/tsconfig.json
+COPY --from=build /repo/packages ./packages
+
+USER flintmere
+
+# No EXPOSE — worker has no HTTP surface. BullMQ pulls from Redis.
+# Graceful shutdown (SIGINT/SIGTERM) is handled inside scripts/worker.ts.
+CMD ["sh", "-c", "cd apps/shopify-app && node --import tsx scripts/worker.ts"]

@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { Bracket } from '@/components/Bracket';
-import { SectionAnchor } from '@/components/SectionAnchor';
 import { SiteFooter } from '@/components/SiteFooter';
 import { ViewportReveal } from '@/components/ViewportReveal';
 import { prisma } from '@/lib/db';
@@ -77,8 +76,7 @@ export default async function MarketingHome() {
       </header>
 
       {/* Hero */}
-      <section className="section-anchor-host mx-auto max-w-[1280px] px-8 py-24 md:py-32">
-        <SectionAnchor variant="numeral" numeral="01" side="top-right" />
+      <section className="mx-auto max-w-[1280px] px-8 py-24 md:py-32">
         <p className="eyebrow text-[color:var(--color-ink-2)] mb-8">
           Free scan · 60 seconds · No install
         </p>
@@ -200,51 +198,43 @@ export default async function MarketingHome() {
       ) : null}
 
       {/* Seven checks */}
-      <section id="pillars" className="section-anchor-host mx-auto max-w-[1280px] px-8 py-24">
-        <SectionAnchor variant="bracket" bracket="[" side="top-right" />
+      <section id="pillars" className="mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">What we check</p>
         <h2 className="max-w-[22ch] mb-12">
           Seven things an AI shopping agent looks for before it will recommend your product.
         </h2>
         <ol className="list-none p-0 m-0 divide-y divide-[color:var(--color-line)] border-y border-[color:var(--color-line)]">
           <Pillar
-            n="01"
             name="Product IDs"
             weight="20%"
             desc="Whether each product carries the codes agents look it up by — barcode, brand, manufacturer part number."
           />
           <Pillar
-            n="02"
             name="Structured attributes"
             weight="20%"
             desc="Whether size, colour, material and other fields exist as structured data — not hidden inside the description."
           />
           <Pillar
-            n="03"
             name="Title &amp; description quality"
             weight="15%"
             desc="Whether titles and descriptions read like spec sheets an agent can parse — not marketing copy."
           />
           <Pillar
-            n="04"
             name="Google category match"
             weight="15%"
             desc="Whether products carry a Google Merchant Center category, so agents know what you sell."
           />
           <Pillar
-            n="05"
             name="Data consistency"
             weight="15%"
             desc="Whether the catalog looks healthy — images load, active products have stock, alt text exists, prices match across pages."
           />
           <Pillar
-            n="06"
             name="AI agent access"
             weight="15%"
             desc="Whether AI shopping agents are allowed to read your site at all — robots rules, sitemap, llms.txt."
           />
           <Pillar
-            n="07"
             name="Agent checkout readiness"
             weight="10%"
             desc="Whether an AI agent can actually complete a purchase on your store without human intervention."
@@ -351,8 +341,7 @@ export default async function MarketingHome() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="section-anchor-host mx-auto max-w-[1280px] px-8 py-24">
-        <SectionAnchor variant="numeral" numeral="02" side="top-right" />
+      <section id="pricing" className="mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">Pricing</p>
         <h2 className="max-w-[20ch] mb-12">Four tiers. One question: how many stores?</h2>
         <div className="grid grid-cols-2 md:grid-cols-5 border-y border-[color:var(--color-line)]">
@@ -375,25 +364,13 @@ export default async function MarketingHome() {
       {/* Manifesto — inverted ink block */}
       <section
         aria-label="Flintmere manifesto"
-        className="section-anchor-host"
         style={{
           background: 'var(--color-ink)',
           color: 'var(--color-paper)',
           padding: '96px 32px',
         }}
       >
-        <span
-          aria-hidden="true"
-          className="section-anchor section-anchor--bracket"
-          style={{
-            bottom: '-0.15em',
-            right: '-0.05em',
-            color: 'rgba(248, 191, 36, 0.10)',
-          }}
-        >
-          ]
-        </span>
-        <div className="mx-auto max-w-[1000px]" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="mx-auto max-w-[1000px]">
           <p
             style={{
               fontSize: 'clamp(28px, 4.5vw, 56px)',
@@ -441,15 +418,9 @@ function Stat({ big, label }: { big: string; label: string }) {
   );
 }
 
-function Pillar({ n, name, weight, desc }: { n: string; name: string; weight: string; desc: string }) {
+function Pillar({ name, weight, desc }: { name: string; weight: string; desc: string }) {
   return (
-    <li className="grid grid-cols-[80px_280px_1fr_100px] gap-6 py-7 items-baseline max-md:grid-cols-1 max-md:gap-2">
-      <span
-        aria-hidden="true"
-        style={{ fontSize: 40, fontWeight: 500, letterSpacing: '-0.04em', lineHeight: 1 }}
-      >
-        [&nbsp;{n}&nbsp;]
-      </span>
+    <li className="grid grid-cols-[280px_1fr_100px] gap-6 py-7 items-baseline max-md:grid-cols-1 max-md:gap-2">
       <span style={{ fontSize: 22, letterSpacing: '-0.01em' }} dangerouslySetInnerHTML={{ __html: name }} />
       <span className="text-[color:var(--color-mute)] text-[15px] leading-[1.45]" dangerouslySetInnerHTML={{ __html: desc }} />
       <span className="eyebrow text-right max-md:text-left">{weight}</span>

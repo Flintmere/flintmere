@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Bracket } from '@/components/Bracket';
-import { SectionAnchor } from '@/components/SectionAnchor';
 import { SiteFooter } from '@/components/SiteFooter';
 import { TIERS } from '@/lib/pricing';
 
@@ -51,8 +50,7 @@ export default function Pricing() {
         </div>
       </header>
 
-      <section className="section-anchor-host mx-auto max-w-[1280px] px-8 py-24">
-        <SectionAnchor variant="numeral" numeral="01" side="top-right" />
+      <section className="mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">Pricing</p>
         <h1 className="max-w-[20ch]">
           Four tiers. One <Bracket>question</Bracket>: how many stores?
@@ -160,8 +158,7 @@ export default function Pricing() {
       </section>
 
       {/* FAQ */}
-      <section className="section-anchor-host mx-auto max-w-[1280px] px-8 py-20 border-t border-[color:var(--color-line)]">
-        <SectionAnchor variant="bracket" bracket="]" side="bottom-right" />
+      <section className="mx-auto max-w-[1280px] px-8 py-20 border-t border-[color:var(--color-line)]">
         <p className="eyebrow mb-8">Frequently asked</p>
         <ul className="list-none p-0 m-0 border-y border-[color:var(--color-line)]">
           {FAQS.map((item) => (

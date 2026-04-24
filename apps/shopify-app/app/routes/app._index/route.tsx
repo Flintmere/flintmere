@@ -61,8 +61,9 @@ export default function Dashboard() {
       }
       primaryAction={{
         content: 'Re-scan catalog',
-        onAction: () => {
-          // TODO: POST to /api/rescan
+        onAction: async () => {
+          await fetch('/api/rescan', { method: 'POST' });
+          window.location.reload();
         },
       }}
     >
