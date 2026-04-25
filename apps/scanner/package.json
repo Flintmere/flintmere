@@ -20,6 +20,7 @@
   "dependencies": {
     "@flintmere/scoring": "workspace:*",
     "@prisma/client": "^5.22.0",
+    "@sentry/nextjs": "^8.0.0",
     "@stripe/react-stripe-js": "^3.1.1",
     "@stripe/stripe-js": "^5.5.0",
     "geist": "^1.3.1",

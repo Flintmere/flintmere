@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next';
 import path from 'node:path';
+import { withSentryConfig } from '@sentry/nextjs';
 
 const config: NextConfig = {
   output: 'standalone',
@@ -25,4 +26,13 @@ const config: NextConfig = {
   },
 };
 
-export default config;
+// Wrap with Sentry. Source-map upload disabled by default; enable later by
+// setting SENTRY_AUTH_TOKEN + SENTRY_ORG + SENTRY_PROJECT in build env.
+export default withSentryConfig(config, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: !process.env.CI,
+  sourcemaps: { disable: !process.env.SENTRY_AUTH_TOKEN },
+  hideSourceMaps: true,
+  disableLogger: true,
+});
