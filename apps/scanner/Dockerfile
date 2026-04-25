@@ -36,7 +36,9 @@ RUN pnpm -F scanner build
 
 # ---- runtime ----
 FROM node:22-alpine AS runtime
-RUN apk add --no-cache openssl
+# openssl for Prisma engine; curl for Coolify healthcheck (alpine ships
+# neither by default). Bundling both in one apk add to keep layers minimal.
+RUN apk add --no-cache openssl curl
 RUN addgroup -S flintmere && adduser -S flintmere -G flintmere
 # Install Prisma CLI globally so `prisma migrate deploy` runs without an npx
 # network fetch at boot. Version pinned to match @prisma/client in lockfile.
