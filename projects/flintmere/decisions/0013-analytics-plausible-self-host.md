@@ -1,9 +1,28 @@
-# ADR 0013 — Product analytics: Plausible self-hosted on Coolify
+# ADR 0013 — Product analytics: Plausible Cloud (EU)
 
-- **Status**: Accepted
+- **Status**: Accepted (amended 2026-04-25 evening — see §Amendment 1)
 - **Date**: 2026-04-25
 - **Decider**: Abu Aaliyah (operator) on council recommendation
 - **Supersedes**: implicit "PostHog self-hosted" assumption baked into Privacy Policy clause 05 + DPA Annex 2 + Cookie Policy clause 02.2 (consent banner commitment for `ph_distinct_id`). Those documents will be updated in lockstep with this decision.
+
+## Amendment 1 (2026-04-25 evening) — Self-host → Cloud
+
+Original decision: Plausible Community Edition self-hosted on Coolify. Amended to **Plausible Cloud (EU region)** after droplet resource check revealed the existing DigitalOcean droplet is under-resourced for its current workload, let alone an additional analytics stack.
+
+Droplet ground truth as of 2026-04-25 22:36 UTC:
+- 2 vCPU, 7.8GB RAM, 154GB disk
+- 4.2GB RAM available BUT 1.5GB of 2GB swap actively used (kernel swapping)
+- 15-min load average 4.35 on 2 vCPUs = ~218% sustained CPU saturation
+- Hosts 7+ services across THREE unrelated projects (SalafiMasjid, pageperfect, Flintmere); shopify-app deploy adds 3 more services in the next stage
+- Adding Plausible CE stack (~1.5GB RAM + ClickHouse CPU appetite) would push the box past breaking point and risk cascade failures across ALL three projects, not just Flintmere
+
+Cost of the amendment: $9/mo Plausible Cloud subscription. Cost of NOT amending: blast-radius risk across unrelated production businesses, plus ongoing droplet ops pain.
+
+The privacy posture is preserved: Plausible Cloud is also cookieless (the entire reason we picked Plausible over PostHog stays intact). DPA gains one EU sub-processor (Plausible, Estonia). UK→EU adequacy applies — no IDTA paperwork needed. No consent banner needed. No `ph_distinct_id`-equivalent cookie. No Cookie Policy maintenance.
+
+The "self-hosted" framing was about the privacy story, which was about cookieless + EU residency. Plausible Cloud delivers both. The literal-self-hosted-bit is conceded for $9/mo and the elimination of all operational complexity.
+
+A separate concern surfaced during the resource check: the droplet itself needs attention (resize OR migrate non-Flintmere projects off OR both). That's logged as a known issue in STATUS.md but is not part of this ADR's scope.
 
 ## Context
 
@@ -26,9 +45,11 @@ Three serious candidates:
 | **Plausible Community Edition (self-host)** | Pageviews + custom events + basic funnels. Cookieless by design — no consent banner required. Self-hostable on Coolify; needs Postgres + ClickHouse (~1.5GB RAM stack, not the 50MB previously claimed in initial comparison). EU company (Estonia). Free. |
 | **Plausible Cloud** | Same product, $9/mo from day one, no ops. |
 
-## Decision
+## Decision (amended)
 
-**Plausible Community Edition, self-hosted on Coolify** at `analytics.flintmere.com` (subdomain TBD at install time — `analytics.` neutral if we ever swap tools; `plausible.` honest but couples brand to vendor).
+**Plausible Cloud (EU region — `eu.plausible.io`)**, $9/mo. No subdomain needed. Site `audit.flintmere.com` registered as the tracked domain.
+
+Original decision was self-hosted on Coolify; superseded by Amendment 1 above after droplet resource check.
 
 ## Reasoning (council vote 8–2 in favour, with veto pressure from #37)
 
