@@ -37,7 +37,7 @@ Flintmere scores Shopify product catalogs for AI-agent readiness and fixes what'
 - `audit.flintmere.com` — public scanner (Next.js)
 - `app.flintmere.com` — Shopify embedded app (Remix)
 
-Target users: Shopify merchants (100–5,000 SKUs, £500K–£20M revenue) and agencies (5–50 client stores). Pricing: Free / Growth £49 / Scale £149 / Agency £399 / Enterprise £499+.
+Target users: Shopify merchants (100–5,000 SKUs, £500K–£20M revenue) and agencies (5–50 client stores). Pricing: Free / Growth £59 / Scale £159 / Agency £499 / Enterprise £599+ + £97 concierge audit (one-off). Canonical source: `projects/flintmere/BUSINESS.md` + `apps/scanner/src/app/pricing/page.tsx`.
 
 ## The canon in one line
 
