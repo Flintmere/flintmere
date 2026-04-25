@@ -137,6 +137,16 @@ Skills: `support-triage`, `docs-coherence-audit`, `finance-snapshot`, `vendor-re
 3. **Conserve tokens.** Terse. No re-reads. Batch independent tool calls. Prefer `Edit` over `Write` on existing files.
 4. **Convene the Standing Council.** Reason through every non-trivial change through the relevant 36-member lenses.
 
+## Five anti-waste rules (added 2026-04-25 after the Sentry-integration arc cost ~4h of iterate-fix-iterate)
+
+These bind. If a rule conflicts with my instinct, the rule wins.
+
+1. **Use the official wizard / CLI before hand-rolling vendor SDKs.** Every major SaaS (Sentry, Stripe, Resend, Sentry, Shopify, Vertex, OpenAI, Coolify) ships a setup tool that captures the canonical pattern. Hand-rolling means I am guessing at things their tool gets right by definition. Default to the wizard; only deviate with a written reason.
+2. **Verify symptom matches diagnosis BEFORE pushing a fix.** When results don't match expectations after one fix, STOP. The premise is wrong. Don't push a second fix on the same hypothesis.
+3. **Read response bodies, not just headers.** Headers can be misread; the body is ground truth. (Cost of violating this: I confused `not-found.tsx`'s prerender headers for a "prerender bug" on a route that didn't exist for a different reason entirely.)
+4. **Three failed hypotheses on the same symptom = full reset.** Stop iterating. Ask the operator for the SINGLE specific artifact that produces ground truth (deployment log, file contents on the box, screenshot of the actual UI state). No more "let me try one more thing."
+5. **Use canonical naming. Never prefix or suffix without verifying framework semantics.** Underscore-prefixed directories in Next.js App Router are private and excluded from routing. I cost ~2 hours fighting a routing problem because I named a folder `_sentry-test`. Always read framework docs for naming conventions before introducing a new path.
+
 ## Active vetos
 
 - **Noor (#8) — Accessibility.** WCAG AA, contrast, motion safety, semantic structure. See `memory/design/accessibility.md`.
