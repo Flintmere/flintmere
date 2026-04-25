@@ -1,12 +1,16 @@
-import * as Sentry from '@sentry/nextjs';
+// Sentry edge-runtime init. Wizard-generated; manually amended for Privacy
+// Policy compliance. Same posture as sentry.server.config.ts.
 
-const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN ?? process.env.SENTRY_DSN;
+import * as Sentry from "@sentry/nextjs";
 
-if (dsn) {
-  Sentry.init({
-    dsn,
-    tracesSampleRate: 0.1,
-    sendDefaultPii: false,
-    environment: process.env.NODE_ENV,
-  });
-}
+Sentry.init({
+  dsn: "https://79d1fef09f845649f00fe46fbb99b29e@o4511281229266944.ingest.de.sentry.io/4511281236344912",
+
+  tracesSampleRate: 0.1,
+  enableLogs: true,
+
+  // PRIVACY: must stay false (clause 04 — "hashed IP only").
+  sendDefaultPii: false,
+
+  environment: process.env.NODE_ENV,
+});
