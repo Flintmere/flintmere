@@ -46,6 +46,11 @@ RUN npm install -g prisma@5.22.0
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
+# Bind Next.js standalone server to all interfaces, not the container hostname.
+# Docker auto-sets HOSTNAME to the container ID; without this override Next.js
+# reads that and binds to a single interface, leaving localhost unreachable
+# (Coolify's in-container healthcheck `wget localhost:port` then gets ECONNREFUSED).
+ENV HOSTNAME=0.0.0.0
 
 # Next.js standalone output ships its own minimal node_modules. With
 # outputFileTracingRoot=repo root in next.config.ts, server.js lands at
