@@ -1,18 +1,13 @@
+import { captureRemixErrorBoundaryError, withSentry } from "@sentry/remix";
 import type { LinksFunction } from '@remix-run/node';
-import {
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from '@remix-run/react';
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteError } from '@remix-run/react';
 
 export const links: LinksFunction = () => [
   { rel: 'preconnect', href: 'https://cdn.shopify.com' },
   { rel: 'icon', type: 'image/svg+xml', href: '/icon.svg' },
 ];
 
-export default function App() {
+function App() {
   return (
     <html lang="en">
       <head>
@@ -29,3 +24,11 @@ export default function App() {
     </html>
   );
 }
+
+export const ErrorBoundary = () => {
+  const error = useRouteError();
+  captureRemixErrorBoundaryError(error);
+  return <div>Something went wrong</div>;
+};
+
+export default withSentry(App);

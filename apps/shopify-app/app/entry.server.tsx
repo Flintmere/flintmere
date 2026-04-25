@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/remix";
 import { PassThrough } from 'stream';
 import type { AppLoadContext, EntryContext } from '@remix-run/node';
 import { createReadableStreamFromReadable } from '@remix-run/node';
@@ -5,6 +6,10 @@ import { RemixServer } from '@remix-run/react';
 import { isbot } from 'isbot';
 import { renderToPipeableStream } from 'react-dom/server';
 import { addDocumentResponseHeaders } from './shopify.server';
+
+export const handleError = Sentry.wrapHandleErrorWithSentry((error, { request }) => {
+  // Custom handleError implementation
+});
 
 const ABORT_DELAY = 5_000;
 
