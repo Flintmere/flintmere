@@ -1,6 +1,14 @@
 # motion.md
 
-Motion spec + `prefers-reduced-motion` contract. **Idris** owns this file. **Noor (#8, veto)** blocks any animation without a reduced-motion branch.
+Motion spec + `prefers-reduced-motion` contract. **Idris** owns this file. **Noor (#8, veto)** blocks any animation without a reduced-motion branch on in-scope surfaces.
+
+## Scope (corrected 2026-04-25)
+
+This contract applies to **marketing surfaces** (`flintmere.com`) and the **scanner** (`audit.flintmere.com`) — surfaces where Flintmere designs the chrome end-to-end and owns the motion language.
+
+It explicitly does **NOT** apply to the **Shopify app** (`app.flintmere.com`). Inside Shopify admin's iframe, Polaris owns the chrome and handles motion defaults (including reduced-motion) per Shopify's own accessibility commitments. Adding a custom Flintmere motion contract on top would (a) duplicate Polaris's behaviour, (b) confuse merchants who expect Shopify-admin-native motion patterns, and (c) violate the design-app-surface island rule ("Polaris primitives stay untouched"). The reduced-motion contract carried over from a different project and was wrong to apply to Shopify-app surfaces.
+
+Brand-island components inside the Shopify app (ScoreRing fill, IssueRow, etc.) MAY have their own micro-motion, but they inherit Polaris's `prefers-reduced-motion` propagation rather than declaring their own contract.
 
 ## Principles
 
