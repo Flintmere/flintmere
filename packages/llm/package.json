@@ -2,7 +2,7 @@
   "name": "@flintmere/llm",
   "version": "0.0.1",
   "private": true,
-  "description": "Flintmere LLM provider abstraction. Vertex AI primary + Azure OpenAI fallback per ADRs 0005 + 0006. Provider swapped via env var; no SDK imports in apps.",
+  "description": "Flintmere LLM provider abstraction. Vertex AI primary + OpenAI Platform fallback per ADRs 0005, 0006, 0007. Provider swapped via env var; no SDK imports in apps.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",

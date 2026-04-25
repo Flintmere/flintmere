@@ -88,14 +88,32 @@ Sections are ordered roughly by **when you need them**. Do Stage 1 first; Stage 
   - [ ] Local dev: save as `apps/shopify-app/.secrets/vertex-sa.json` (gitignored via `.secrets/`)
 - [ ] Note the project ID for `GOOGLE_CLOUD_PROJECT` env var
 
-### Azure OpenAI (fallback)
+### OpenAI Platform (fallback) — ADR 0010
 
-- [ ] Create an **Azure account** at [portal.azure.com](https://portal.azure.com)
-- [ ] Request **Azure OpenAI Service access** (takes 1–3 business days — do early)
-- [ ] Once approved: create an Azure OpenAI resource in `swedencentral` or `francecentral`
-- [ ] Deploy the `gpt-4o-mini` model in that resource
-- [ ] Copy the endpoint URL + API key
-- [ ] Paste into `apps/shopify-app/.env.local` (and scanner if you decide scanner needs fallback)
+> Privacy-by-minimization posture replaces formal EU residency on this path. Read `decisions/0010-fallback-pivot-openai-platform.md` before changing anything here.
+
+- [ ] Create an **OpenAI Platform account** at [platform.openai.com](https://platform.openai.com)
+  - Org name: **Eazy Access Ltd** (parent co. of Flintmere)
+  - Verify the org (Persona — driver's licence or passport)
+  - Add billing + a hard monthly limit (start at £200; the fallback path is rare-hit)
+- [ ] **Sign the DPA** at Settings → Organization → Data processing addendum **before generating any key**
+- [ ] Create a project named `flintmere-fallback`. Project ID format: `proj_…`
+- [ ] **Org-level data control**: Settings → Data controls → Data retention → API call logging → either **Disabled** org-wide, or **Enabled for selected projects** with `flintmere-fallback` left unchecked. **This is NOT Zero Data Retention** — it only hides the dashboard log view; OpenAI's underlying abuse-monitoring retention of prompts + completions still applies for up to 30 days. Set it anyway as defence in depth (operator can't accidentally read merchant catalog data later in the dashboard). True ZDR is sales-gated and bundled with EU residency; both are deferred per ADR 0010.
+- [ ] Generate a **project-scoped API key** (must be `sk-proj-…`; user keys are rejected by `OpenAIProvider`)
+- [ ] Hand off to engineering via local file path **only**:
+  ```bash
+  printf '%s' 'sk-proj-...' > /tmp/openai_key && chmod 600 /tmp/openai_key
+  ```
+  Then tell Claude the project ID (`proj_...`) — never paste the key in chat.
+- [ ] Env vars (Coolify at deploy time, `.env.local` for dev):
+  - `OPENAI_API_KEY` (the `sk-proj-…` key)
+  - `OPENAI_PROJECT_ID` (the `proj_…` id)
+  - `OPENAI_MODEL` (defaults to `gpt-4o-mini`; leave unset)
+- [ ] **Do not** generate or use the key against any project that does not have logging disabled at the org/project level. Calls before logging is disabled will be retained in OpenAI's dashboard.
+
+**EU residency upgrade path** (deferred to enterprise procurement):
+- Trigger conditions: enterprise prospect requires EU-pinned sub-processor; fallback traffic exceeds 5% of LLM volume; sanitizer redaction rate exceeds 5%.
+- Re-evaluation routes through ADR 0012 — likely targets are OpenAI Enterprise EU residency or Anthropic Claude Haiku via AWS Bedrock EU (Frankfurt).
 
 ### Stripe
 
@@ -199,7 +217,7 @@ Assumes the droplet already has Coolify installed (you said it does).
   - `REDIS_URL` — Coolify Redis
   - `GOOGLE_APPLICATION_CREDENTIALS` — path to Vertex AI service-account JSON (mount as a secret file)
   - `LLM_PRIMARY_PROVIDER=vertex` / `LLM_PRIMARY_MODEL=gemini-2.5-flash` / `LLM_HARDCASE_MODEL=gemini-2.5-pro` / `LLM_PRIMARY_REGION=europe-west1`
-  - `LLM_FALLBACK_PROVIDER=azure-openai` + Azure env vars when available
+  - `LLM_FALLBACK_PROVIDER=openai` + `OPENAI_API_KEY` + `OPENAI_PROJECT_ID` (ADR 0010)
   - `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET`
   - `RESEND_API_KEY`
   - `SENTRY_DSN`
@@ -344,24 +362,6 @@ Miss 2+ gates → pause. Reposition before writing more code.
 - When a stage triggers a new ADR (e.g. SOC 2 posture decision), write the ADR first; don't ad-hoc it.
 - Operator owns this file. Claude proposes additions but does not tick items on your behalf.
 
-## Current state (updated 2026-04-20)
+## Current state
 
-**Code complete**:
-
-- `packages/scoring` — six-pillar engine, unit-tested, scanner-mode pillars live
-- `packages/llm` — Vertex (Gemini Flash + Pro) + Azure OpenAI (GPT-4o-mini) + circuit breaker + mock for tests (ADRs 0005 + 0006)
-- `apps/scanner` — Next.js 15, full scanner flow + marketing home + `/pricing` + `/research` + `/audit` + `/audit/success` + `/unsubscribe`; API routes: `/api/scan`, `/api/scan/:id`, `/api/lead` (Resend), `/api/unsubscribe`, `/api/concierge/checkout` (Stripe), `/api/webhooks/stripe`, `/api/healthz`
-- `apps/shopify-app` — Remix + OAuth + Polaris + mandatory GDPR webhooks + product drift webhooks + Prisma app schema + AES-256-GCM token encryption + BullMQ queues + streaming JSONL bulk-catalog-sync + three Tier 2 enrichment paths (alt text, title rewrite, attribute inference) + `/healthz` + `/api/rescan` + `/api/enrichment/preview`
-
-**Operator-blocked (can't progress without you)**:
-
-- Any Stage 2 account creation (domains, Shopify, Google, Azure, Stripe, Resend, Sentry, BetterStack)
-- Any Stage 3 Coolify deploy (needs you to paste credentials)
-- Any Stage 5 business/legal work
-
-**Not yet built (code, next up)**:
-
-- Fix History UI + `/api/fix/:id/revert` endpoint (SPEC §5.2.1 — schema + fix_batches table exist)
-- Shareable badge + share-for-trial loop (SPEC §2.1.2 + §2.1.3)
-- Worker Dockerfile for separate Coolify service (BullMQ worker currently bundled with web)
-- Legal pages (Privacy / Terms / DPA / Cookie Policy)
+Lives in `STATUS.md` — `## Infra state` (what's provisioned right now), `## Phase` (where we are), `## Changelog` (what changed when). This file is the staged runbook (Stages 1–6, one-time) + ops calendar (Stage 7, recurring). One source of truth per question — see `memory/PROCESS.md` §Logging discipline.

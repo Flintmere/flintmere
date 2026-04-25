@@ -16,6 +16,12 @@ export interface RouterOptions {
   /** Internal-only workloads. See `packages/llm/src/customer` vs internal boundary note. */
   internal?: LLMProvider;
   breaker?: Partial<CircuitBreakerOptions>;
+  /**
+   * Whether to fall over vision requests to the fallback provider.
+   * Default false per ADR 0010 — image bytes cannot be sanitized, so the
+   * OpenAI fallback path stays catalog-text only.
+   */
+  allowVisionFallback?: boolean;
   /** Optional cost + latency sink. Called after every successful call. */
   onCompletion?: (event: CompletionEvent) => void;
 }
@@ -44,12 +50,14 @@ const DEFAULT_BREAKER: CircuitBreakerOptions = {
  */
 export class LLMRouter {
   private readonly breaker: CircuitBreaker;
+  private readonly allowVisionFallback: boolean;
 
   constructor(private readonly options: RouterOptions) {
     this.breaker = new CircuitBreaker({
       ...DEFAULT_BREAKER,
       ...(options.breaker ?? {}),
     });
+    this.allowVisionFallback = options.allowVisionFallback ?? false;
   }
 
   async completeBulk(opts: CompletionOpts): Promise<CompletionResult> {
@@ -91,14 +99,14 @@ export class LLMRouter {
       this.emit(tier, result, false, opts);
       return result;
     } catch (err) {
-      if (shouldFailover(err)) {
-        const result = images
-          ? await this.options.fallback.completeVision(opts as VisionOpts)
-          : await this.options.fallback.complete(opts);
-        this.emit(tier, result, true, opts);
-        return result;
-      }
-      throw err;
+      if (!shouldFailover(err)) throw err;
+      if (images && !this.allowVisionFallback) throw err;
+
+      const result = images
+        ? await this.options.fallback.completeVision(opts as VisionOpts)
+        : await this.options.fallback.complete(opts);
+      this.emit(tier, result, true, opts);
+      return result;
     }
   }
 

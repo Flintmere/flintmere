@@ -88,8 +88,20 @@ Specialist groups convened **in addition to** the Standing Council for their dom
 6. The minimum council size is 17. The current size is 36.
 7. Sub-councils do not replace the Standing Council. The Design, Copy, and Legal Councils operate *in addition to* it for their domains.
 
+## Logging discipline
+
+Infrastructure changes (Coolify, DNS, Stripe, Vertex, Resend, BetterStack, OpenAI, Shopify Partner, etc.) live outside the repo by default — third-party dashboards. Without discipline, the next session's Claude has no way to know what's provisioned. Four rules:
+
+1. **Same-session Changelog entry** in `projects/flintmere/STATUS.md` — one line per infra event, prefixed with surface (`Coolify:` / `DNS:` / `Stripe:` …), with timestamp, action, object, result. Cross-reference commit SHA when applicable; `(no SHA, dashboard-only)` when not.
+2. **Update `## Infra state`** at the top of `STATUS.md` whenever a status flips (✅ live / ⏸ pending / ⚠️ degraded). It is the at-a-glance "is this provisioned?" answer for every external dependency.
+3. **Never log secret values.** State entries reference env-var names ("captured in Coolify dashboard"), never values. Applies to Postgres URLs (contain passwords), API keys, service-account JSON, encryption keys, signing secrets.
+4. **Session-start ritual** for any infra-touching task: read `STATUS.md` `## Infra state` first, before reasoning about next steps.
+
+The four-file separation (do not collapse): state (`STATUS.md`) ≠ runbook (`projects/flintmere/OPERATOR-TASKS.md`) ≠ decision log (`projects/flintmere/decisions/`) ≠ code events (`git log`). Each file answers one question. Mixing roles produces a mega-document no one maintains.
+
 ## Changelog
 
 - 2026-04-14: Split from `CLAUDE.md`. No content change.
 - 2026-04-14: Added council members #32 Blockchain engineer (EVM), #33 Backend engineer (Node.js/Next.js), #34 Full-stack debugging engineer. Current size: 34. (Merged from main commit `31e6556`.)
 - 2026-04-16: Added #35 Product analyst and #36 Operations manager. Current size: 36. Added for pilot of data-intelligence and admin-ops departments; council members ship before the departments they own.
+- 2026-04-25: Added `## Logging discipline` section. Council convened (#10, #15, #11, #4, #34, #35, #36, #1) after operator question "why has none of our progress being logged" — gap was that third-party infra state (Coolify, DNS, Stripe, Vertex, Resend, BetterStack) lives outside the repo and had no canonical home. Codifies four rules (same-session Changelog entry, Infra-state checklist update, never-log-secrets, session-start read-state-first) + the four-file separation (STATUS / OPERATOR-TASKS / decisions / git log) as a "do not collapse" invariant. STATUS.md gained `## Infra state` section; OPERATOR-TASKS.md `Current state` block deduped to a pointer. No automation built — volume (1–3 events/week) doesn't justify hooks; revisit if discipline slips.

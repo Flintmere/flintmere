@@ -58,7 +58,7 @@ export interface CompletionResult {
 
 // ---- Providers ----
 
-export type ProviderId = 'vertex' | 'azure-openai' | 'mock';
+export type ProviderId = 'vertex' | 'openai' | 'mock';
 
 export interface LLMProvider {
   readonly id: ProviderId;

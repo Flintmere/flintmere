@@ -20,17 +20,29 @@ COPY --from=deps /repo/node_modules ./node_modules
 COPY --from=deps /repo/apps/scanner/node_modules ./apps/scanner/node_modules
 COPY --from=deps /repo/packages ./packages
 COPY . .
-RUN pnpm -F scanner prisma generate
+# Build workspace packages first — both @flintmere/scoring and @flintmere/llm
+# resolve via their package.json `exports` map to ./dist/index.js, which only
+# exists after their tsc build runs.
+RUN pnpm -r --filter "@flintmere/*" build
+# pnpm v9 requires `exec` to invoke a binary; bare `pnpm prisma generate`
+# is parsed as "run a script named prisma" and silently no-ops.
+RUN pnpm -F scanner exec prisma generate
 RUN pnpm -F scanner build
 
 # ---- runtime ----
 FROM node:22-alpine AS runtime
 RUN addgroup -S flintmere && adduser -S flintmere -G flintmere
+# Install Prisma CLI globally so `prisma migrate deploy` runs without an npx
+# network fetch at boot. Version pinned to match @prisma/client in lockfile.
+RUN npm install -g prisma@5.22.0
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Next.js standalone output ships its own minimal node_modules
+# Next.js standalone output ships its own minimal node_modules. With
+# outputFileTracingRoot=repo root in next.config.ts, server.js lands at
+# /app/apps/scanner/server.js and traces the @flintmere/scoring dist tree
+# + the @prisma/client engine binaries into .next/standalone/.
 COPY --from=build /repo/apps/scanner/.next/standalone ./
 COPY --from=build /repo/apps/scanner/.next/static ./apps/scanner/.next/static
 COPY --from=build /repo/apps/scanner/public ./apps/scanner/public
@@ -40,4 +52,4 @@ USER flintmere
 EXPOSE 3000
 
 # Migrations at container start, not build time (build container can't reach DB)
-CMD ["sh", "-c", "cd apps/scanner && npx prisma migrate deploy && node server.js"]
+CMD ["sh", "-c", "cd apps/scanner && prisma migrate deploy && node server.js"]

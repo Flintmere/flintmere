@@ -1,12 +1,14 @@
 import type { NextConfig } from 'next';
+import path from 'node:path';
 
 const config: NextConfig = {
   output: 'standalone',
+  // Repo root — without this, standalone tracing roots at apps/scanner/ and
+  // misses pnpm-symlinked workspace packages (@flintmere/scoring/dist),
+  // server.js path, static assets, and public dir all break in production.
+  outputFileTracingRoot: path.join(import.meta.dirname, '../../'),
   reactStrictMode: true,
   poweredByHeader: false,
-  experimental: {
-    // Transpile the workspace scoring package
-  },
   transpilePackages: ['@flintmere/scoring'],
   async headers() {
     return [

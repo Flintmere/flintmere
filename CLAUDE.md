@@ -168,10 +168,10 @@ Single DigitalOcean droplet with Coolify. Three subdomains routed via Traefik. S
 
 - Primary bulk: Gemini 2.5 Flash (Vertex AI EU)
 - Hard cases: Gemini 2.5 Pro (Vertex AI EU)
-- Fallback: GPT-4o-mini (Azure OpenAI EU)
+- Fallback: GPT-4o-mini (OpenAI Platform — privacy-by-minimization per ADR 0010: `store: false`, project-scoped key, PII sanitizer, vision fallback disabled. No formal EU residency on this account tier.)
 - Abstraction: `packages/llm/`
 
-See `projects/flintmere/decisions/0005-llm-provider-strategy.md` + `0006-hardcase-llm-lock-gemini-pro.md`.
+See `projects/flintmere/decisions/0005-llm-provider-strategy.md` + `0006-hardcase-llm-lock-gemini-pro.md` + `0010-fallback-pivot-openai-platform.md`.
 
 ## Changelog
 

@@ -2,6 +2,45 @@
 
 Current phase, what's shipped, what's next. Update as state changes so Claude's advice stays grounded in the real timeline.
 
+## Infra state
+
+What's provisioned right now. Source of truth for "is this live?" questions. Update on every infra change. Secret values never live here — references point to env-var names captured in Coolify or `.env.local` only.
+
+### Compute & data
+- **DigitalOcean droplet** ✅ live — `134.122.102.159` (existing droplet, Coolify installed per ADR 0002)
+- **Coolify Postgres** ✅ live — `flintmere-pg` (postgres:18-alpine, Running:Healthy, internal-only, no public ports)
+- **Coolify Redis** ⏸ deferred — provisions alongside `apps/shopify-app/Dockerfile.worker` (next stage); scanner does not need it
+- **Coolify GitHub source** ✅ connected — private GitHub App `flintmere-coolify-deploy` (App ID `3446415`, Installation ID `125652053`), org `Flintmere`, Resources empty (no apps wired yet)
+- **Coolify scanner app** ⏸ pending — Source ready, DNS ready, awaiting Application create + env-var paste + build + migrate + smoke
+- **Coolify shopify-app web** ⏸ pending
+- **Coolify shopify-app worker** ⏸ pending — separate service per `apps/shopify-app/Dockerfile.worker`
+- **DO Spaces backups** (`flintmere-backups`, `lon1`) ⏸ pending — schedule nightly Postgres → Spaces
+
+### DNS (Namecheap, all → `134.122.102.159`)
+- `app.flintmere.com` ✅ A
+- `audit.flintmere.com` ✅ A
+- `status.flintmere.com` ✅ A
+- `app-staging.flintmere.com` ✅ A
+- `audit-staging.flintmere.com` ✅ A
+- `flintmere.com` apex ✅ A → `134.122.102.159` (added 2026-04-25)
+- Resend domain auth (SPF + DKIM + DMARC `p=none`) ✅ live
+
+### LLM stack (ADRs 0005 + 0006 + 0010)
+- **OpenAI Platform fallback** ✅ live — project `flintmere-fallback`, project-scoped key (`sk-proj-…`), model `gpt-4o-mini`, `store: false`, smoke test passed 2026-04-25 (874ms)
+- **Vertex AI primary** ⏸ pending — service account JSON not yet provisioned in `flintmere-production` GCP project, region `europe-west1`
+
+### Email & payments
+- **Resend** ✅ live — `flintmere.com` verified, region `eu-west-1`, Pro plan
+- **Stripe** ✅ live — verification cleared, live keys (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_CONCIERGE_PRICE_ID`) pasted into Coolify scanner env (2026-04-25). Webhook endpoint to point at `https://audit.flintmere.com/api/webhooks/stripe` once scanner is publicly reachable
+
+### Observability
+- **Sentry** ⏸ pending — two projects (`flintmere-scanner`, `flintmere-shopify-app`)
+- **BetterStack Uptime** ⏸ pending — monitors for `audit.flintmere.com/api/healthz`, `app.flintmere.com`, `app.flintmere.com/auth`; status page at `status.flintmere.com`
+- **PostHog** ⏸ decision deferred — self-hosted (data-residency story) vs cloud free tier; settle once Coolify stack is up
+
+### Shopify
+- **Shopify Partner account** ⏸ pending — app draft, dev store, client id/secret
+
 ## Phase
 
 **Pre-launch build — code scaffolding complete across both apps and both packages. Operator-gated for launch.** Scanner + Shopify app + packages all shipped in code. Validation week (SPEC §2) not yet started — blocked on operator account setup (Stage 2 of `OPERATOR-TASKS.md`) and Coolify deploy (Stage 3).
@@ -26,6 +65,7 @@ Current phase, what's shipped, what's next. Update as state changes so Claude's 
 - **0004** — Prisma over Drizzle.
 - **0005** — LLM provider strategy (Gemini 2.5 Flash primary + GPT-4o-mini fallback; DeepSeek + Qwen rejected by Legal Council).
 - **0006** — Gemini 2.5 Pro locked as hard-case model (benchmark deferred to month 3 / 50 concierge audits).
+- **0010** — Fallback pivot from Azure OpenAI EU to OpenAI Platform with privacy-by-minimization (`store: false`, project-scoped key, PII sanitizer, no vision). EU residency upgrade deferred to enterprise procurement.
 
 ### Project anchor docs (`projects/flintmere/`)
 
@@ -38,9 +78,10 @@ Seven-pillar scoring engine. Scanner-mode pillars live (identifiers, titles, con
 ### `packages/llm/`
 
 Provider abstraction per ADRs 0005 + 0006. Shipped:
-- `LLMProvider` interface + `LLMRouter` (primary → fallback on circuit break)
+- `LLMProvider` interface + `LLMRouter` (primary → fallback on circuit break; vision fallback disabled by default per ADR 0010)
 - `VertexProvider` (Gemini 2.5 Flash + Pro, `europe-west1`)
-- `AzureOpenAIProvider` (GPT-4o-mini)
+- `OpenAIProvider` (GPT-4o-mini, `store: false`, project-scoped key only, PII sanitizer pre-transmission, vision throws — see ADR 0010)
+- `sanitizeMessages` / `sanitizeText` — email/phone/card pattern redactor used by the OpenAI fallback
 - `MockProvider` for tests
 - `CircuitBreaker` with per-provider error thresholds + cooldown
 
@@ -102,7 +143,7 @@ Provider abstraction per ADRs 0005 + 0006. Shipped:
 - **SPEC.md is 640 lines** — over the 600-line limit (`PROCESS.md` §2). Inherited document, supersede header added 2026-04-20. Decision: keep as historical-intent canonical; truth lives in STATUS + ADRs.
 - **Skill body content**: ~10 skills still have "wallet / approval / Permit2 / Sentinel / SIWE" in example prose. Descriptions are Flintmere; body gets rewritten lazily on first Flintmere invocation.
 - **`projects/allowanceguard/`** — legacy reference from kit inheritance. Safe to remove.
-- **Coolify not yet configured for this repo.** Deploy path unverified end-to-end. Operator task (Stage 3).
+- **Coolify Stage 3 in progress.** Postgres provisioned 2026-04-25 (`flintmere-pg`, postgres:18-alpine, Running:Healthy on the existing DO droplet). Scanner app provisioning, DNS A-records, env-var paste, and first deploy still ahead. Redis intentionally not provisioned for scanner — lands with the shopify-app worker deploy (next stage). Deploy path unverified end-to-end.
 - **Vertex AI service account not yet provisioned.** Blocks LLM integration test + Tier 2 enrichment in production.
 - **BetterStack + Sentry + Resend + Stripe accounts not yet connected.** Apps gracefully degrade (503 on missing Stripe; log-warn on missing Resend) — no crashes, just disabled features.
 - **Fix History UI not yet built** — schema + fix_batches table exist; `/fix-history` Remix route + revert endpoint still to ship.
@@ -116,6 +157,17 @@ Provider abstraction per ADRs 0005 + 0006. Shipped:
 
 ## Changelog
 
+- **2026-04-25** (council audit — pre-deploy attempt #3): Operator called for council audit after three iterate-fix-iterate cycles. Two parallel `code-reviewer` agents (build pipeline + runtime/boot sequence) audited `apps/scanner/Dockerfile`, `next.config.ts`, `schema.prisma`, all `src/lib/*.ts`, all API route handlers, both workspace package.jsons, `.dockerignore`, and `pnpm-lock.yaml`. Both agents converged on **5 P0/P1 blockers beyond what we'd already fixed**: (1) **untracked `packages/llm/src/providers/openai.ts` + `sanitize.ts`** — Coolify clones from git, won't see them, `@flintmere/llm` build will hard-fail; (2) **`pnpm-lock.yaml` out of sync** with modified `packages/llm/package.json` — `--frozen-lockfile` will hard-fail; (3) **`outputFileTracingRoot` missing in `next.config.ts`** — without it standalone output for monorepo breaks 4 things at once (server.js path wrong, workspace package symlinks not traced, static assets path wrong, public dir path wrong); (4) **Prisma CLI absent at runtime** — CMD's `npx prisma` would fetch ~50MB from npm at every cold start; (5) **`binaryTargets` missing from `schema.prisma`** — Alpine musl target not generated, every DB query throws at runtime. Fixes applied: `next.config.ts` gained `outputFileTracingRoot: path.join(import.meta.dirname, '../../')`; `schema.prisma` generator gained `binaryTargets = ["native", "linux-musl-openssl-3.0.x"]`; `Dockerfile` runtime stage gained `RUN npm install -g prisma@5.22.0` and CMD changed `npx prisma` → `prisma`. Operator-side actions still required: commit untracked llm files + run `pnpm install` to regenerate lockfile + ensure `UNSUBSCRIBE_SECRET` set in Coolify env (would 500 every `/api/lead` POST). Process gap: this audit should have run BEFORE attempt #1 — codify in `coolify-deploy` skill that first-deploy of any new app gets a parallel-agent pre-flight audit. (no SHA — fixes not yet committed)
+- **2026-04-25** (Coolify deploy attempt #2 — FAILED, two Dockerfile bugs found + fixed): Path issue from attempt #1 resolved (Dockerfile Location field corrected to `apps/scanner/Dockerfile`). New failure surfaced at `pnpm -F scanner build`: `Module not found: Can't resolve '@flintmere/scoring'`. Two bugs in `apps/scanner/Dockerfile`: (1) workspace packages `@flintmere/scoring` + `@flintmere/llm` are built packages (`main: "./dist/index.js"`) but the Dockerfile never ran their `tsc` build step before the scanner build — Next.js webpack resolved the import to a non-existent `dist/index.js` and threw module-not-found; (2) `RUN pnpm -F scanner prisma generate` was silently no-op'ing because pnpm v9 parses it as "run a script named `prisma`" (none exists in `scanner/package.json`) — prisma client was not being generated, would have crashed at runtime once past the build error. Fix: inserted `RUN pnpm -r --filter "@flintmere/*" build` before the prisma+app build steps; changed `RUN pnpm -F scanner prisma generate` → `RUN pnpm -F scanner exec prisma generate`. **Same bugs exist in `apps/shopify-app/Dockerfile`** — flag for fix before that deploy stage. (no SHA — fix not yet committed)
+- **2026-04-25** (Coolify deploy attempt #1 — FAILED): First scanner deploy via Coolify failed at the build step. Error: `failed to solve: failed to read dockerfile: open Dockerfile: no such file or directory` — Coolify looked for `./Dockerfile` in repo root; ours lives at `apps/scanner/Dockerfile`. Root cause: Build Pack settings (Dockerfile Location + Base Directory) not configured for the pnpm-monorepo layout where the Dockerfile is nested but the build context must be repo root (workspace `COPY` commands depend on it). NOT a Nixpacks issue (the leftover `NIXPACKS_NODE_VERSION` env var was auto-detect noise). Remediation: Configuration → General → Build Pack `Dockerfile` + Base Directory `/` + Dockerfile Location `apps/scanner/Dockerfile` → Redeploy. Council audit performed (see §Process gap closed below). (no SHA, dashboard-only)
+- **2026-04-25** (Stripe live): Stripe business verification cleared. Live keys pasted into Coolify scanner env. Stripe Infra-state line flipped ⏸ → ✅. Webhook endpoint to register with Stripe pointing at `https://audit.flintmere.com/api/webhooks/stripe` once scanner deploy is green. (no SHA, dashboard-only)
+- **2026-04-25** (Coolify Stage 3 cont.): Scanner Application created in Coolify (project `e12g10ahts651txrmpuz4cs2c`, app `bbjhn12jicwxbrmifmpgu555`). Env vars populated — required block (`DATABASE_URL` buildtime+runtime, `NEXT_PUBLIC_APP_URL`, `RESEND_API_KEY` (literal), `RESEND_FROM_ADDRESS`, `RESEND_REPLY_TO`, `UNSUBSCRIBE_SECRET`, `IP_HASH_SALT`, `NODE_ENV`, `PORT`) + Stripe block (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_CONCIERGE_PRICE_ID`) + Calendly fallback URL all set. Coolify auto-injected `NIXPACKS_NODE_VERSION` + `NODE_OPTIONS` defaults — Build Pack confirmation needed before deploy (see §Pre-deploy yellow flag). (no SHA, dashboard-only)
+- **2026-04-25** (Coolify Stage 3 cont.): GitHub source connected in Coolify — private GitHub App `flintmere-coolify-deploy` (App ID `3446415`, Installation ID `125652053`) authorised against the `Flintmere` org. No resources wired to it yet. Apex DNS A-record (`flintmere.com` → `134.122.102.159`) added at Namecheap; all five subdomains (`app`, `audit`, `status`, `app-staging`, `audit-staging`) plus apex now resolve. (no SHA, dashboard-only)
+- **2026-04-25** (logging discipline): Added `## Infra state` section to top of STATUS.md (state-now answer for every external dependency). Deduped OPERATOR-TASKS.md `Current state` block — now points to STATUS.md. Added `## Logging discipline` section to `memory/PROCESS.md` codifying the four rules (same-session Changelog, Infra-state update, never-log-secrets, session-start read-state-first) + the four-file separation invariant. Council unanimous (#10, #15, #11, #4, #34, #35, #36, #1) on KEEP-OPERATOR-TASKS-SEPARATE — different artefacts (state ≠ runbook ≠ decision log ≠ code events). No automation built; manual discipline at current event volume.
+- **2026-04-25** (Coolify Stage 3 begin): Postgres provisioned in Coolify. `flintmere-pg` (postgres:18-alpine, no public port mapping, internal Postgres URL captured in Coolify dashboard) running:healthy on the existing DigitalOcean droplet per ADR 0002. Pre-flight grep verified scanner does not import `redis`/`bullmq`/`ioredis` (only matches in `apps/scanner/src/` were copy-strings — "support queue", "report is queued") and `apps/scanner/.env.example` has `REDIS_URL` commented out — Redis intentionally skipped for scanner; will be provisioned alongside `apps/shopify-app/Dockerfile.worker` in the next stage where BullMQ actually needs it. Still ahead in this stage: scanner app resource in Coolify, DNS A-records for `audit.flintmere.com` + `flintmere.com` + `status.flintmere.com`, env-var paste (incl. fresh `UNSUBSCRIBE_SECRET` + `IP_HASH_SALT`), first build, `prisma migrate deploy`, smoke test against `allbirds.com`, nightly DO Spaces backup schedule.
+- **2026-04-25** (later): Smoke test passed live against OpenAI Platform (`flintmere-fallback`, key `sk-proj-…`, model `gpt-4o-mini`): basic completion 874ms / 25+4 tokens, sanitizer warn-log fires correctly on PII (2 redactions on email + phone test), vision rejected with `LLMError('invalid-input')` per ADR 0010, user-key (non-`sk-proj-`) validation rejects at construction. Provider hot-fix: project-scoped keys (`sk-proj-…`) self-bind to their project at the auth layer; passing `OpenAI-Project` header alongside is 403'd as cross-project — the OpenAI SDK auto-reads `OPENAI_PROJECT_ID` from env, so `OpenAIProvider` now passes `project: null` to suppress the header. Documented in `packages/llm/src/providers/openai.ts` constructor comment. Smoke test script committed at `packages/llm/scripts/smoke-openai.mjs`. Env vars wired into `apps/shopify-app/.env.local` (gitignored).
+- **2026-04-25** (later): ADR 0011 written — EU-default Vertex pinning rationale + multi-region trigger conditions. Clarifies ADR 0005's residency framing (was "GDPR Chapter V transfer requirement," corrected to "sales-narrative + edge-case PII insurance + free + reversibility-cheap"). No code change; the EU default stays. Multi-region routing is deferred to a future ADR triggered by US-merchant friction, US enterprise residency demand, synchronous LLM calls in request paths, regional pricing divergence, or regulatory shift. Number-shift cleanup: ADR 0010's previously-reserved "ADR 0011 = future fallback EU residency upgrade" reference is now ADR 0012; updated across `decisions/0010`, OPERATOR-TASKS.md, and vendor-register.md.
+- **2026-04-25**: LLM fallback pivot — `AzureOpenAIProvider` deleted, replaced with `OpenAIProvider` against OpenAI Platform direct API per ADR 0010. Posture: `store: false` hard-coded, project-scoped key only (`sk-proj-…`), PII sanitizer (`sanitizeMessages`) on every transmission, vision fallback disabled by default at the router level. `ProviderId` union: `'azure-openai'` → `'openai'`. Env contract change: `AZURE_OPENAI_*` retired, `OPENAI_API_KEY` + `OPENAI_PROJECT_ID` added. Trigger: operator's self-serve OpenAI account tier does not expose EU Geography on project creation; pivoting to Azure-EU would have cost ~1h of setup vs ~10min for OpenAI direct, with the fallback being a rare-hit path (<1% of LLM volume). Residency upgrade routes through ADR 0011 when an enterprise prospect requires EU-pinned sub-processor or fallback traffic exceeds 5%. Sub-processor list update + DPA signature pending operator action.
 - **2026-04-24**: Shareable score page shipped — `/score/[normalisedDomain]` live at both `audit.flintmere.com` and `flintmere.com`, canonical-tagged to the latter. SPEC §2.1.2 bullet 1. Consent-model decision: new `publish_public_page` column added via migration `20260424120000_scan_publish_public_page`, **independent** from the existing `published_to_benchmark` flag. Existing benchmark opt-ins carry an explicit "we never publish your domain" consent (see scan Results screen line 449); retcon-ing them to also publish a public page would violate #24 Data Protection. New Results-screen section `PublicPageOptIn` collects a separate, explicit consent; merchants can toggle off via DELETE on the same endpoint, which removes the page immediately. ISR `revalidate=3600`, dynamic OG image (bracket signature + amber under-tick), hostname-regex validation on the `[shop]` segment (20 unit tests in `lib/badge-url.test.ts`). Also shipped: `app/sitemap.ts` (static routes + every `publishPublicPage=true` domain). Deferred to share-for-trial milestone: verification endpoint + trial-unlock token + PDF certificate + embeddable badge widget. Also 2026-04-24: `apps/shopify-app/Dockerfile.worker` landed for the BullMQ worker Coolify service; marketing/pricing SectionAnchor × 6 removed + home-page pillar `[ 01 ]–[ 07 ]` numerals culled (bracket cap now trivially respected).
 - **2026-04-22** (previous): Benchmark widened — pool jumped 134 → **253 scored stores across 35 verticals**, headline finding now **98% below ceiling** (D+F). New `/research` breadth grid surfaces every scanned vertical (flagships first, remainder by sample size). Display-weight pass applied across home + pricing + research + `/for/*` — giant median/score moments at `clamp(88px, 14vw, 220px)` with amber under-tick; bracket cap enforced (≤2 per page). 2-stage benchmark pipeline proven end-to-end: `compile-store-list` validates candidates kindness-compliantly, `batch-scan` runs success-only resume at PACE_MS=4000/CONCURRENCY=1 to respect Shopify's edge CDN per-IP pool. Per-vertical cells below publish-floor render as "early sample".
 - **2026-04-20**: Seventh pillar landed — `crawlability` (weight 15%). Scores `/llms.txt` presence + well-formedness, `/robots.txt` AI-agent access (GPTBot/ClaudeBot/Google-Extended/PerplexityBot/Applebot-Extended/cohere-ai/Bytespider/CCBot/OAI-SearchBot/ChatGPT-User), `/sitemap.xml` discoverability, and sitemap reference in robots. Scanner route fetches all three with 5s timeouts in parallel, fails soft on missing. Attributes weight rebalanced 25 → 20 to keep composite at 100. 9 new unit tests in `packages/scoring/test/crawlability.test.ts`. Driven by xgentech/Nimstrata/Rankfirms industry research — llms.txt is the emerging agent-manifest standard and Shopify storefronts overwhelmingly omit it.

@@ -1,4 +1,4 @@
-import { AzureOpenAIProvider } from './providers/azure-openai.js';
+import { OpenAIProvider } from './providers/openai.js';
 import { VertexProvider } from './providers/vertex.js';
 import { LLMRouter } from './router.js';
 import { LLMError, type LLMProvider } from './types.js';
@@ -13,25 +13,30 @@ export interface FactoryEnv {
   LLM_HARDCASE_MODEL?: string;
   LLM_HARDCASE_REGION?: string;
 
-  // Azure OpenAI (fallback)
+  // OpenAI Platform (fallback) — ADR 0010
   LLM_FALLBACK_PROVIDER?: string;
-  AZURE_OPENAI_ENDPOINT?: string;
-  AZURE_OPENAI_API_KEY?: string;
-  AZURE_OPENAI_DEPLOYMENT?: string;
-  AZURE_OPENAI_API_VERSION?: string;
+  OPENAI_API_KEY?: string;
+  OPENAI_PROJECT_ID?: string;
+  OPENAI_MODEL?: string;
+  OPENAI_BASE_URL?: string;
 }
 
 /**
  * Construct an LLMRouter from environment variables.
  *
- * Canonical defaults per ADRs 0005 + 0006:
+ * Canonical defaults per ADRs 0005 + 0006 + 0010:
  *  - Primary: Vertex AI, gemini-2.5-flash, europe-west1
  *  - Hard case: Vertex AI, gemini-2.5-pro, europe-west1
- *  - Fallback: Azure OpenAI, gpt-4o-mini, EU region
+ *  - Fallback: OpenAI Platform, gpt-4o-mini, project-scoped key, store: false,
+ *    PII sanitizer, vision fallback disabled
+ *
+ * `onRedactions` fires on every non-zero sanitizer redaction at the OpenAI
+ * fallback boundary — wire your warn-log / Sentry breadcrumb here.
  */
 export function createRouter(
   env: FactoryEnv = process.env,
   onCompletion?: Parameters<typeof createRouterFromProviders>[3],
+  onRedactions?: (count: number) => void,
 ): LLMRouter {
   const project = requireEnv(env.GOOGLE_CLOUD_PROJECT, 'GOOGLE_CLOUD_PROJECT');
   const region = env.LLM_PRIMARY_REGION ?? 'europe-west1';
@@ -40,8 +45,7 @@ export function createRouter(
     project,
     location: region,
     model: env.LLM_PRIMARY_MODEL ?? 'gemini-2.5-flash',
-    // Indicative prices (verify current at `memory/admin-ops/vendor-register.md`)
-    inputPriceTenthPencePerMillion: 120, // £0.0012 / 1K tokens
+    inputPriceTenthPencePerMillion: 120,
     outputPriceTenthPencePerMillion: 480,
   });
 
@@ -54,23 +58,14 @@ export function createRouter(
     outputPriceTenthPencePerMillion: 4000,
   });
 
-  const fallbackEndpoint = env.AZURE_OPENAI_ENDPOINT;
-  const fallbackKey = env.AZURE_OPENAI_API_KEY;
-  const fallbackDeployment = env.AZURE_OPENAI_DEPLOYMENT ?? 'gpt-4o-mini';
-  if (!fallbackEndpoint || !fallbackKey) {
-    throw new LLMError(
-      'auth',
-      'AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_API_KEY required for fallback provider',
-    );
-  }
-
-  const fallback = new AzureOpenAIProvider({
-    endpoint: fallbackEndpoint,
-    apiKey: fallbackKey,
-    deploymentName: fallbackDeployment,
-    apiVersion: env.AZURE_OPENAI_API_VERSION,
+  const fallback = new OpenAIProvider({
+    apiKey: requireEnv(env.OPENAI_API_KEY, 'OPENAI_API_KEY'),
+    projectId: requireEnv(env.OPENAI_PROJECT_ID, 'OPENAI_PROJECT_ID'),
+    model: env.OPENAI_MODEL ?? 'gpt-4o-mini',
+    baseURL: env.OPENAI_BASE_URL,
     inputPriceTenthPencePerMillion: 120,
     outputPriceTenthPencePerMillion: 480,
+    onRedactions,
   });
 
   return createRouterFromProviders(primary, hardcase, fallback, onCompletion);

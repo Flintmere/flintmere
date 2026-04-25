@@ -72,7 +72,7 @@ Workspace commands use `-F <name>` or `--filter <name>`. Root package has conven
 See each app's `.env.example`. Canonical keys:
 
 - **Shared:** `DATABASE_URL`, `REDIS_URL`, `SENTRY_DSN`, `POSTHOG_KEY`
-- **LLM:** `LLM_PRIMARY_PROVIDER=vertex`, `LLM_PRIMARY_MODEL=gemini-2.5-flash`, `LLM_HARDCASE_MODEL=gemini-2.5-pro`, `LLM_FALLBACK_PROVIDER=azure-openai`, `LLM_REGION=europe-west1`, `GOOGLE_APPLICATION_CREDENTIALS` (service account JSON path), `AZURE_OPENAI_*`
+- **LLM:** `LLM_PRIMARY_PROVIDER=vertex`, `LLM_PRIMARY_MODEL=gemini-2.5-flash`, `LLM_HARDCASE_MODEL=gemini-2.5-pro`, `LLM_PRIMARY_REGION=europe-west1`, `GOOGLE_CLOUD_PROJECT`, `GOOGLE_APPLICATION_CREDENTIALS` (Vertex service-account JSON path); fallback: `LLM_FALLBACK_PROVIDER=openai`, `OPENAI_API_KEY` (project-scoped `sk-proj-…`), `OPENAI_PROJECT_ID` (`proj_…`), `OPENAI_MODEL=gpt-4o-mini` — see ADR 0010
 - **Scanner:** `RESEND_API_KEY`, `STRIPE_SECRET_KEY` (concierge audit only)
 - **Shopify app:** `SHOPIFY_API_KEY`, `SHOPIFY_API_SECRET`, `SHOPIFY_SCOPES`, `SHOPIFY_TOKEN_ENCRYPTION_KEY` (32 bytes base64), `SHOPIFY_APP_URL`
 

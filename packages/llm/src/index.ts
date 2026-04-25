@@ -28,8 +28,11 @@ export type { CircuitBreakerOptions, CircuitState } from './circuit-breaker.js';
 export { VertexProvider } from './providers/vertex.js';
 export type { VertexProviderOptions } from './providers/vertex.js';
 
-export { AzureOpenAIProvider } from './providers/azure-openai.js';
-export type { AzureOpenAIProviderOptions } from './providers/azure-openai.js';
+export { OpenAIProvider } from './providers/openai.js';
+export type { OpenAIProviderOptions } from './providers/openai.js';
+
+export { sanitizeText, sanitizeMessages } from './sanitize.js';
+export type { SanitizeResult, SanitizeMessagesResult } from './sanitize.js';
 
 export { createRouter, createRouterFromProviders } from './factory.js';
 export type { FactoryEnv } from './factory.js';

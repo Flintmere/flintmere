@@ -80,14 +80,19 @@ Single source of truth for vendor relationships. `vendor-review` reads this; `fi
 - Last reviewed: 2026-04-19
 - Notes: region pinning enforced. See `decisions/0005-llm-provider-strategy.md` + `0006-hardcase-llm-lock-gemini-pro.md`.
 
-### Azure OpenAI (fallback)
-- Service: GPT-4o-mini (fallback behind circuit breaker). Region `swedencentral` or `francecentral`.
-- Plan: pay-per-use enterprise
-- Monthly cost: ~£15–30 (fallback traffic only)
-- Lock-in: **medium**
-- Data processor: yes
-- DPA in place: yes (Microsoft Enterprise DPA)
-- Notes: triggered only on primary outage.
+### OpenAI Platform (fallback) — ADR 0010
+- Service: GPT-4o-mini direct API, fallback behind circuit breaker
+- Region: Global (US-routed by default; **no formal EU residency on this account tier**)
+- Posture: code-level data minimization — `store: false` hard-coded (suppresses 30-day app-state retention; does NOT exempt from abuse-monitoring retention), project-scoped key (`sk-proj-…`) only, PII sanitizer pre-transmission, vision fallback disabled. True Zero Data Retention is sales-gated (bundled with EU residency) and not in effect on this account tier — abuse-monitoring retention of prompts + completions applies for up to 30 days.
+- Plan: pay-per-use, hard £200/mo cap configured at platform.openai.com
+- Monthly cost: ~£15–30 (fallback traffic only; expected <1% of LLM volume)
+- Lock-in: **low** — SDK already in deps, swap is env-flip + provider class instance
+- Data processor: yes — must appear on Flintmere DPA sub-processor list with US-routing disclosure
+- DPA in place: yes (org-level OpenAI DPA, signed before key activation per ADR 0010)
+- Org: Eazy Access Ltd; Project: `flintmere-fallback` (`proj_tm1F1hYtq8pfQXdjPMut18Dw`)
+- Re-open triggers (escalate to ADR 0012): enterprise prospect requires EU-pinned sub-processor; fallback traffic >5% of LLM volume sustained; sanitizer redaction rate >5%; OpenAI exposes self-serve EU residency on this org tier
+- Last reviewed: 2026-04-25
+- Notes: residency upgrade path is procurement-only (no code rewrite). See `decisions/0010-fallback-pivot-openai-platform.md`.
 
 ## Payments
 

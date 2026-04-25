@@ -2,7 +2,7 @@
  * LLM router singleton for the Shopify app.
  *
  * Apps never import @google-cloud/vertexai or openai directly; they go through
- * @flintmere/llm per ADRs 0005 + 0006. This module owns the single router
+ * @flintmere/llm per ADRs 0005 + 0006 + 0010. This module owns the single router
  * instance + the cost/latency telemetry sink.
  */
 
@@ -14,7 +14,23 @@ declare global {
 }
 
 function buildRouter(): LLMRouter {
-  return createRouter(process.env, onCompletion);
+  return createRouter(process.env, onCompletion, onSanitizerRedaction);
+}
+
+// Every non-zero redaction is a near-miss per ADR 0010 §Audit trail —
+// investigate the upstream catalog source rather than tolerate the count.
+function onSanitizerRedaction(count: number): void {
+  if (count <= 0) return;
+  // eslint-disable-next-line no-console
+  console.warn(
+    JSON.stringify({
+      ts: new Date().toISOString(),
+      event: 'llm_sanitizer_redaction',
+      provider: 'openai',
+      count,
+      hint: 'Investigate upstream catalog source — PII pattern reached the LLM boundary',
+    }),
+  );
 }
 
 function onCompletion(event: CompletionEvent): void {

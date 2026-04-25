@@ -87,6 +87,45 @@ describe('LLMRouter', () => {
     expect(event.requestId).toBe('req-1');
   });
 
+  it('does not fail over vision requests by default (ADR 0010)', async () => {
+    const primary = new MockProvider({
+      error: new LLMError('provider-error', 'boom', 'vertex'),
+    });
+    const hard = new MockProvider();
+    const fb = new MockProvider({ text: 'fb' });
+    const router = createRouterFromProviders(primary, hard, fb);
+
+    await expect(
+      router.completeVisionBulk({
+        ...opts,
+        images: [{ data: 'b64', mimeType: 'image/png' }],
+      }),
+    ).rejects.toThrow('boom');
+    expect(fb.calls).toHaveLength(0);
+  });
+
+  it('does fail over vision when allowVisionFallback=true (opt-in)', async () => {
+    const { LLMRouter } = await import('../src/router.js');
+    const primary = new MockProvider({
+      error: new LLMError('provider-error', 'boom', 'vertex'),
+    });
+    const hard = new MockProvider();
+    const fb = new MockProvider({ text: 'fb-vision' });
+    const router = new LLMRouter({
+      primary,
+      hardcase: hard,
+      fallback: fb,
+      allowVisionFallback: true,
+    });
+
+    const r = await router.completeVisionBulk({
+      ...opts,
+      images: [{ data: 'b64', mimeType: 'image/png' }],
+    });
+    expect(r.text).toBe('fb-vision');
+    expect(fb.calls).toHaveLength(1);
+  });
+
   it('internal route uses the internal provider when provided', async () => {
     const primary = new MockProvider({ text: 'primary' });
     const hard = new MockProvider();

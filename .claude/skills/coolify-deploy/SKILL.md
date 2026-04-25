@@ -91,7 +91,7 @@ Canonical env vars (Flintmere):
 | `SHOPIFY_TOKEN_ENCRYPTION_KEY` | shopify-app | 32 bytes base64; rotation schedule |
 | `LLM_PRIMARY_PROVIDER`, `_MODEL`, `_REGION` | both apps | `vertex`, `gemini-2.5-flash`, `europe-west1` |
 | `GOOGLE_APPLICATION_CREDENTIALS` | both apps | Path to service-account JSON (mounted, not in env value) |
-| `AZURE_OPENAI_*` | both apps (fallback) | EU region |
+| `OPENAI_API_KEY`, `OPENAI_PROJECT_ID`, `OPENAI_MODEL` | both apps (fallback) | Project-scoped key (`sk-proj-…`) only; ADR 0010 posture: `store: false` + PII sanitizer + no vision fallback |
 | `RESEND_API_KEY` | scanner (for reports) | |
 | `STRIPE_SECRET_KEY` | scanner (concierge) + shopify-app (Agency/Enterprise direct) | Live vs test keys per env |
 | `SENTRY_DSN` | both apps | Per-app project |
