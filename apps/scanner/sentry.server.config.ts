@@ -2,7 +2,10 @@ import * as Sentry from '@sentry/nextjs';
 
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN ?? process.env.SENTRY_DSN;
 
-if (dsn) {
+if (!dsn) {
+  console.warn('[sentry] no DSN — server-side init SKIPPED');
+} else {
+  console.log('[sentry] initializing server-side, env=' + (process.env.NODE_ENV ?? 'unknown'));
   Sentry.init({
     dsn,
     tracesSampleRate: 0.1,
@@ -30,4 +33,5 @@ if (dsn) {
       return event;
     },
   });
+  console.log('[sentry] server-side init COMPLETE');
 }
