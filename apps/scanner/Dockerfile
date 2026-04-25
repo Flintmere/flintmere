@@ -4,6 +4,10 @@
 
 # ---- deps ----
 FROM node:22-alpine AS deps
+# OpenSSL required for Prisma engine binary detection on Alpine. Without this,
+# prisma postinstall warns "failed to detect libssl version, defaulting to
+# openssl-1.1.x" and downloads the wrong query engine binary.
+RUN apk add --no-cache openssl
 RUN corepack enable
 WORKDIR /repo
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -14,6 +18,7 @@ RUN pnpm install --frozen-lockfile
 
 # ---- build ----
 FROM node:22-alpine AS build
+RUN apk add --no-cache openssl
 RUN corepack enable
 WORKDIR /repo
 COPY --from=deps /repo/node_modules ./node_modules
@@ -31,6 +36,7 @@ RUN pnpm -F scanner build
 
 # ---- runtime ----
 FROM node:22-alpine AS runtime
+RUN apk add --no-cache openssl
 RUN addgroup -S flintmere && adduser -S flintmere -G flintmere
 # Install Prisma CLI globally so `prisma migrate deploy` runs without an npx
 # network fetch at boot. Version pinned to match @prisma/client in lockfile.

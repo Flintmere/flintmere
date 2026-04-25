@@ -7,6 +7,9 @@ import {
 
 export const runtime = 'nodejs'
 export const revalidate = 3600
+// Skip build-time prerender. Postgres may not be reachable from the build
+// container; the cache-control header below still gives the CDN a 1h TTL.
+export const dynamic = 'force-dynamic'
 
 /**
  * Public read-only aggregate endpoint. Reads every completed bot scan

@@ -1,6 +1,11 @@
 import type { MetadataRoute } from 'next';
 import { prisma } from '@/lib/db';
 
+// Skip build-time prerender. Sitemap queries the live publicPublicPage
+// allowlist; safer to regenerate on demand than bake at build.
+export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
+
 const BASE = 'https://flintmere.com';
 
 const STATIC_ROUTES: Array<{ path: string; changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency']; priority: number }> = [
