@@ -84,8 +84,10 @@ Index: `memory/README.md`.
 | Components, primitives, Shopify-app island rules | `components.md` |
 | Accessibility floors, Noor's veto rules | `accessibility.md` |
 | Motion, reduced-motion contract | `motion.md` |
+| Canonical design flow + stage gates | `process.md` |
+| Performance budget for design choices | `performance-budget.md` |
 
-Skills: `design-surface`, `design-component`, `design-token`, `design-motion`, `design-system-audit`, `design-critique`.
+Skills: `grill-requirement` (stage 1 — interrogate the requirement), `design-information-architecture` (stage 3 — multi-page IA), `design-marketing-surface`, `design-app-surface`, `design-component`, `design-token`, `design-motion`, `design-system-audit`, `design-critique`.
 
 ### Product & Engineering department — `memory/product-engineering/`
 
