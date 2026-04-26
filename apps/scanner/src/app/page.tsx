@@ -265,17 +265,16 @@ export default async function MarketingHome() {
         </h2>
 
         <div className="mt-12 grid md:grid-cols-[1.4fr_1fr] gap-12 items-start">
-          {/* Audit screenshot anchor — placeholder until asset lands */}
+          {/* Audit screenshot anchor — proof of the £97 audit deliverable */}
           <figure className="audit-figure">
-            <div
-              className="audit-image-placeholder"
-              role="img"
-              aria-label="Flintmere scanner results screenshot — pending recapture after pluralisation fix."
-            >
-              <span className="eyebrow text-[color:var(--color-mute-2)]">
-                Audit screenshot · pending recapture
-              </span>
-            </div>
+            <Image
+              src="/marketing/proof/audit-scan.avif"
+              alt="Flintmere scanner results: a 49-out-of-100 score for a Shopify catalog where 1,000 of 1,000 products fail at least one AI-agent readiness check, with three top issues including missing barcodes."
+              width={1200}
+              height={638}
+              sizes="(min-width: 768px) 60vw, 100vw"
+              className="audit-image"
+            />
             <figcaption className="audit-caption mt-3">
               A real Shopify catalog. The free scan in 60 seconds.
             </figcaption>

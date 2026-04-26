@@ -58,8 +58,12 @@ ENV HOSTNAME=0.0.0.0
 # + the @prisma/client engine binaries into .next/standalone/.
 COPY --from=build /repo/apps/scanner/.next/standalone ./
 COPY --from=build /repo/apps/scanner/.next/static ./apps/scanner/.next/static
-# No apps/scanner/public/ dir — favicon/og-image/icon are handled by file-based
-# routing in src/app/ (icon.svg, apple-icon, opengraph-image, score/[shop]/opengraph-image).
+# Public dir holds the marketing raster assets (hero photoreal +
+# audit-result proof screenshots). Next.js standalone tracing does NOT
+# bundle public/ — must be copied explicitly. File-based routes in
+# src/app/ (icon.svg, apple-icon, opengraph-image) remain handled by the
+# standalone server alongside.
+COPY --from=build /repo/apps/scanner/public ./apps/scanner/public
 COPY --from=build /repo/apps/scanner/prisma ./apps/scanner/prisma
 
 USER flintmere
