@@ -351,17 +351,13 @@ export default async function MarketingHome() {
       <section aria-labelledby="different-heading" className="mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">Who builds Flintmere</p>
         <h2 id="different-heading" className="max-w-[22ch]">
-          One founder. One focus. Read every reply.
+          John reads every email. John writes every audit.
         </h2>
-        <p
-          className="mt-8 max-w-[54ch] text-[color:var(--color-ink-2)]"
-          style={{ fontSize: 17, lineHeight: 1.55 }}
-        >
-          Flintmere is built by John Morris. If you book the £97 concierge
-          audit, John does it — he reads your store product by product and
-          writes the audit letter and per-product CSV himself. If you email
-          hello@flintmere.com with a question, John replies. No operator
-          team, no pitch, no sales call.
+        <p className="founder-copy mt-8 max-w-[54ch] text-[color:var(--color-ink-2)]">
+          If you book the £97 audit, John writes the letter and the
+          per-product CSV himself. If you email hello@flintmere.com,
+          John replies — usually within two working days. No operator
+          team. No pitch. No sales call.
         </p>
       </section>
 
@@ -369,32 +365,24 @@ export default async function MarketingHome() {
       <section aria-labelledby="compare-heading" className="grid md:grid-cols-2 border-y border-[color:var(--color-line)]">
         <div className="p-12 md:p-16 border-b md:border-b-0 md:border-r border-[color:var(--color-line)]">
           <p className="eyebrow mb-6">What other tools do</p>
-          <ul
-            className="list-none p-0 m-0 space-y-4 text-[color:var(--color-mute)]"
-            style={{
-              fontSize: 20,
-              letterSpacing: '-0.01em',
-              textDecoration: 'line-through',
-              textDecorationColor: 'var(--color-line-soft)',
-            }}
-          >
-            <li>Retrofit a Google-SEO scanner and rebrand it for AI</li>
+          <span className="sr-only">
+            What other tools do — items struck through:
+          </span>
+          <ul className="compare-list compare-list--struck list-none p-0 m-0 space-y-4 text-[color:var(--color-mute)]">
+            <li>Repurpose a Google-ranking tool for AI agents</li>
             <li>Sell you barcodes that aren&rsquo;t issued by GS1 UK</li>
-            <li>Charge by the credit, so a big catalog triples your bill</li>
+            <li>Charge per-product, so a big catalog triples your bill</li>
             <li>One-time audit, then silence</li>
             <li>Hide the founder behind a support queue</li>
           </ul>
         </div>
         <div className="p-12 md:p-16 bg-[color:var(--color-paper-2)]">
           <p className="eyebrow mb-6" id="compare-heading">What Flintmere does</p>
-          <ul
-            className="list-none p-0 m-0 space-y-4"
-            style={{ fontSize: 20, letterSpacing: '-0.01em' }}
-          >
+          <ul className="compare-list list-none p-0 m-0 space-y-4">
             <li>Built from the first line for ChatGPT, Perplexity and Claude — not Google</li>
             <li>Honest barcode guidance: buy GS1 barcodes from GS1 UK, we help you import them</li>
-            <li>Every change is previewed before it ships, and reversible for 7 days</li>
             <li>Flat monthly price. Scan as often as you like. No credits.</li>
+            <li>We re-scan your catalog nightly and alert you when something slips</li>
             <li>John reads every reply — usually within two working days</li>
           </ul>
         </div>

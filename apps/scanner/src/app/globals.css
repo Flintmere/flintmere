@@ -373,6 +373,27 @@
   line-height: 1.55;
 }
 
+/* --- Founder section copy (refactored from inline styles) --- */
+.founder-copy {
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+/* --- Comparison list (refactored from inline styles) ---
+   .compare-list--struck adds line-through at --mute weight (per Council
+   2026-04-26 — bumped from --line-soft for visibility; the negation is
+   the whole psychological device of the column and must be unmistakable). */
+.compare-list {
+  font-size: 20px;
+  letter-spacing: -0.01em;
+}
+
+.compare-list--struck {
+  text-decoration: line-through;
+  text-decoration-color: var(--color-mute);
+  text-decoration-thickness: 1px;
+}
+
 /* --- Skip-to-content link (a11y canon §Keyboard — long marketing pages) ---
    Hidden until keyboard focus, then ink-on-paper inverted pill in top-left.
    Inherits the global prefers-reduced-motion scale-to-zero from line 99. */
