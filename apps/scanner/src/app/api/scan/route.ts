@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { scoreCatalog } from '@flintmere/scoring';
+import { estimateSuppression, scoreCatalog } from '@flintmere/scoring';
 import { prisma } from '@/lib/db';
 import { fetchCrawlability } from '@/lib/crawlability-fetcher';
 import { fetchCatalog, ShopifyFetchError } from '@/lib/shopify-fetcher';
@@ -61,6 +61,9 @@ export async function POST(req: NextRequest) {
       catalog,
       crawlability ? { crawlability } : {},
     );
+    // Dead-inventory wedge — v2 strategic report §7. Computed from the
+    // already-loaded catalog; no new fetches, no LLM, no OAuth.
+    const suppressionEstimate = estimateSuppression(catalog);
 
     await prisma.scan.update({
       where: { id: scan.id },
@@ -85,6 +88,7 @@ export async function POST(req: NextRequest) {
         gtinlessCeiling: score.gtinlessCeiling,
         productCount: score.productCount,
         variantCount: score.variantCount,
+        suppressionEstimate,
         pillars: score.pillars.map((p) => ({
           pillar: p.pillar,
           score: p.score,

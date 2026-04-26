@@ -257,6 +257,81 @@ export function verdictHeader(args: {
   }
 }
 
+// ----------------------------------------------------------------------
+// Suppression-estimate (dead-inventory wedge) — v2 strategic report §7
+// ----------------------------------------------------------------------
+// The lede the scan results page uses to surface the suppression range
+// AHEAD of the score + pillar breakdown. Range copy is deliberately
+// scoped to this module so Copy Council can polish it later — this is
+// the seam, per the wedge build plan.
+//
+// Constraints (#11 + #37 + claim-review):
+//   - Range expressed as low–high; never a point estimate.
+//   - "Likely suppressed" — never "are suppressed" without verification.
+//   - Mention the three signals so the merchant can audit the claim.
+//   - No banned-jargon words from BANNED_JARGON above.
+//   - No revenue-impact framing in this MVP — that comes Phase 2 with AOV.
+
+export const SUPPRESSION_LEDE_EYEBROW = 'Likely suppressed in Google Shopping'
+
+export const SUPPRESSION_LEDE_SUBHEAD =
+  'Estimate based on missing GTINs, ambiguous allergen text, and missing GMC categories. Install Flintmere to confirm exact figures against your Google Merchant Center account.'
+
+/**
+ * The lede headline for the scan results page.
+ *
+ * Returns a single sentence stating the modelled range. Wrapping
+ * component handles the Bracket signature on key nouns.
+ */
+export function suppressionLede(args: {
+  low: number
+  high: number
+  productCount: number
+}): string {
+  const { low, high, productCount } = args
+
+  if (productCount === 0) {
+    return 'No public products found, so we have nothing to estimate against.'
+  }
+  if (high === 0) {
+    return 'We see no clear suppression signals on this catalog. Every product carries a barcode, a category, and (for food items) an allergen statement.'
+  }
+  if (low === high) {
+    return `We estimate ${low.toLocaleString()} of your ${productCount.toLocaleString()} products are likely suppressed in Google Shopping today.`
+  }
+  return `We estimate ${low.toLocaleString()}–${high.toLocaleString()} of your ${productCount.toLocaleString()} products are likely suppressed in Google Shopping today.`
+}
+
+/**
+ * One-line per-signal breakdown shown beneath the lede headline. Plain
+ * factual counts; no severity language.
+ */
+export function suppressionSignalLine(args: {
+  missingGtin: number
+  ambiguousAllergen: number
+  missingGmcCategory: number
+}): string {
+  const { missingGtin, ambiguousAllergen, missingGmcCategory } = args
+  const parts: string[] = []
+  if (missingGtin > 0) {
+    parts.push(
+      `${missingGtin.toLocaleString()} ${missingGtin === 1 ? 'product' : 'products'} with no barcode`,
+    )
+  }
+  if (ambiguousAllergen > 0) {
+    parts.push(
+      `${ambiguousAllergen.toLocaleString()} food ${ambiguousAllergen === 1 ? 'product' : 'products'} with no allergen statement`,
+    )
+  }
+  if (missingGmcCategory > 0) {
+    parts.push(
+      `${missingGmcCategory.toLocaleString()} ${missingGmcCategory === 1 ? 'product' : 'products'} with no Google Shopping category`,
+    )
+  }
+  if (parts.length === 0) return ''
+  return parts.join(' · ')
+}
+
 // Grade badge anchor. Live median from scanner_scans table when n≥50;
 // otherwise falls back to a copy that does not over-claim.
 export function gradeBadgeAnchor(args: {

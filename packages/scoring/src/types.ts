@@ -122,3 +122,21 @@ export interface ScoreOptions {
   locked?: readonly PillarId[];
   crawlability?: CrawlabilityInput;
 }
+
+// ---- Suppression-estimate (dead-inventory wedge) ----
+// Per v2 strategic report §7: a probabilistic estimate of how many
+// products in the catalog are likely suppressed in Google Shopping today,
+// expressed as a low/high RANGE — not a point estimate. Computed from
+// existing per-product signals (no new fetches, no LLM, no OAuth).
+export interface SuppressionEstimate {
+  /** Lower bound of likely-suppressed product count (stricter probabilities). */
+  low: number;
+  /** Upper bound of likely-suppressed product count (looser probabilities). */
+  high: number;
+  /** Per-signal counts driving the estimate (transparency, not aggregation maths). */
+  signals: {
+    missingGtin: number;
+    ambiguousAllergen: number;
+    missingGmcCategory: number;
+  };
+}

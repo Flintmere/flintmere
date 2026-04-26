@@ -12,9 +12,13 @@ import {
   issueCodeToFounderSpeak,
   pillarExplanationCustomerFacing,
   pillarLabelCustomerFacing,
+  SUPPRESSION_LEDE_EYEBROW,
+  SUPPRESSION_LEDE_SUBHEAD,
+  suppressionLede,
+  suppressionSignalLine,
   verdictHeader,
 } from '@/lib/copy';
-import type { PillarId } from '@flintmere/scoring';
+import type { PillarId, SuppressionEstimate } from '@flintmere/scoring';
 
 type ScanState =
   | { phase: 'idle' }
@@ -29,6 +33,11 @@ interface ScanResult {
   grade: string;
   gtinlessCeiling: number;
   productCount: number;
+  /**
+   * Optional for backwards compatibility — older scans persisted before
+   * the dead-inventory wedge shipped won't carry this field.
+   */
+  suppressionEstimate?: SuppressionEstimate;
   pillars: Array<{
     pillar: string;
     score: number;
@@ -197,6 +206,58 @@ function useLiveSample(): LiveSample {
   return sample;
 }
 
+/**
+ * The lead result block — surfaces the dead-inventory suppression
+ * estimate ahead of the score + pillar breakdown. Renders nothing if
+ * the scan response did not include a `suppressionEstimate` (older
+ * persisted scans, or future opt-out scans).
+ *
+ * Per v2 strategic report §7: range, not a point. Three signals named.
+ * No revenue-impact framing in this MVP — that comes Phase 2 with AOV.
+ */
+function SuppressionLede({
+  estimate,
+  productCount,
+}: {
+  estimate: SuppressionEstimate | undefined;
+  productCount: number;
+}) {
+  if (!estimate) return null;
+  const headline = suppressionLede({
+    low: estimate.low,
+    high: estimate.high,
+    productCount,
+  });
+  const signalLine = suppressionSignalLine(estimate.signals);
+  return (
+    <div className="mb-12 pb-12 border-b border-[color:var(--color-line)]">
+      <p className="eyebrow mb-4">
+        <Bracket>{SUPPRESSION_LEDE_EYEBROW}</Bracket>
+      </p>
+      <h2 className="max-w-[34ch]">{headline}</h2>
+      {signalLine ? (
+        <p
+          className="mt-6 max-w-[58ch] text-[color:var(--color-ink-2)]"
+          style={{ fontSize: 16, lineHeight: 1.55 }}
+        >
+          {signalLine}.
+        </p>
+      ) : null}
+      <p
+        className="mt-4 max-w-[58ch]"
+        style={{
+          fontSize: 14,
+          lineHeight: 1.55,
+          color: 'var(--color-mute)',
+          fontFamily: 'var(--font-mono)',
+        }}
+      >
+        {SUPPRESSION_LEDE_SUBHEAD}
+      </p>
+    </div>
+  );
+}
+
 function Results({ result }: { result: ScanResult }) {
   const sample = useLiveSample();
   const criticalAndHigh = result.issues.filter(
@@ -219,6 +280,17 @@ function Results({ result }: { result: ScanResult }) {
 
   return (
     <section className="mx-auto max-w-[1280px] px-8 py-16 border-t border-[color:var(--color-line)]">
+      {/*
+        Dead-inventory wedge — v2 strategic report §7. Surface the
+        suppression estimate as the LEAD result, ahead of the score +
+        pillar breakdown. The score block remains below as the deeper
+        detail; this is the headline a merchant should see first.
+      */}
+      <SuppressionLede
+        estimate={result.suppressionEstimate}
+        productCount={result.productCount}
+      />
+
       <div className="grid md:grid-cols-[300px_1fr] gap-12 items-center">
         <div>
           <ScoreRing
