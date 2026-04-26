@@ -37,7 +37,7 @@ Flintmere scores Shopify product catalogs for AI-agent readiness and fixes what'
 - `audit.flintmere.com` — public scanner (Next.js)
 - `app.flintmere.com` — Shopify embedded app (Remix)
 
-Target users: Shopify merchants (100–5,000 SKUs, £500K–£20M revenue) and agencies (5–50 client stores). Pricing: Free / Growth £59 / Scale £159 / Agency £499 / Enterprise £599+ + £97 concierge audit (one-off). Canonical source: `projects/flintmere/BUSINESS.md` + `apps/scanner/src/app/pricing/page.tsx`.
+Target users: **UK food merchants first** per ADR 0015 (100–5,000 SKUs, £500K–£20M revenue, pushing to GMC + Amazon Fresh + Ocado + Deliveroo + emerging AI shopping channels). Beauty + apparel pages stay live but no public standard cadence. Agencies via vertical-bundle agency tiers. **Pricing in transition** per ADR 0016: existing Growth £79 / Scale £249 / Agency £499 grandfathered; new sign-ups land on the vertical ladder (Food single £99, Food agency £349, Food+Beauty bundle £159/£499, Concierge retainer £349) with WTP study calibrating Month 1–2. Plus tier in private beta per ADR 0017 — anchor "from £1,200/mo on enquiry," public floor withdrawn until embedded app ships first installable food build. £97 concierge audit holds. Canonical sources: `projects/flintmere/BUSINESS.md` + ADRs 0015–0019 + `apps/scanner/src/lib/pricing.ts` (pricing.ts shape change lands Phase 3).
 
 ## The canon in one line
 
@@ -74,6 +74,7 @@ Index: `memory/README.md`.
 | Pricing, tiers, positioning, voice rules | `BUSINESS.md` |
 | Current phase, shipped, next | `STATUS.md` |
 | Original product + GTM intent | `SPEC.md` |
+| Long-form strategy + 12-month proof gates | `strategy/` |
 | "Why is it this way?" | `decisions/` (ADRs 0001–0006) |
 
 ### Design department — `memory/design/`

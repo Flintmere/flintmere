@@ -4,11 +4,19 @@ Pricing, positioning, revenue model. Claude reads this on pricing-page edits, ma
 
 ## Positioning
 
-- **For:** Shopify merchants with 100–5,000 SKUs and £500K–£20M revenue; Shopify agencies (Plus Partner or growing) managing 5–50 client stores.
-- **Against:** generic SEO apps retrofitted for AI, fake-GTIN resellers, black-box AI-fix vendors, one-time consulting audits. See `SPEC.md` §11 for the named competitor list.
-- **Wedge:** the only tool combining a scoring system, automated fix engine, honest GTIN guidance, and real AI-visibility measurement (Channel Health, SPEC §11.2). Agency-friendly by default.
+- **For:** UK food merchants (100–5,000 SKUs, £500K–£20M revenue) pushing to Google Merchant Center, Amazon Fresh, Ocado, Deliveroo, ChatGPT shopping, Perplexity. Food-first per ADR 0015. Beauty + apparel pages remain live (in development) and earn organic interest. Agencies managing 5–50 client stores supported via vertical-bundle agency tiers (per ADR 0016).
+- **Against:** generic SEO apps retrofitted for AI, fake-GTIN resellers, black-box AI-fix vendors, one-time consulting audits, generic catalog tools that price on store count rather than regulatory complexity. See `SPEC.md` §11 for the named competitor list.
+- **Wedge:** the only tool combining vertical regulatory taxonomy depth (`standards.flintmere.com/food/v1` per ADR 0018), an automated fix engine, honest GTIN guidance, and real AI-visibility measurement (Channel Health, SPEC §11.2). The standards publication is the artifact a third party can cite — no other Shopify-adjacent tool maintains a citable, dated, regulator-grounded catalog standard.
 - **One-line promise:** "ChatGPT lists you and every competitor. Yours ranks `[ last ]`. We show why and fix it." (Updated 2026-04-26 post-Shopify Agentic Storefronts announcement; "invisible" framing retired — see `context/compliance/reviews/2026-04-26-homepage-hero-post-agentic-storefronts.md`.)
 - **Canonical positioning frame:** We don't sell SEO. We make your catalog legible to the agents that will decide your next sale.
+
+## Decision-making framework
+
+Flintmere does not ship through one person's instinct. Every non-trivial decision — product, design, copy, legal, regulatory, pricing — passes through the **Flintmere Standing Council**, a 39-role specialist review framework with codified veto holders documented in `memory/PROCESS.md`. Sub-councils convene by domain: Copy Council (4 voices) reviews every customer-facing sentence; Legal Council (3 voices) gates every legal page; Design Council (6 voices, Noor's accessibility veto) gates every visual surface. Council seat #39 (Regulatory Affairs, added 2026-04-26) holds veto on standards publication accuracy.
+
+This is unusual at our scale. Most SaaS tools at Flintmere's stage ship on one engineer's gut. Flintmere ships through reviewed lenses with explicit, named vetoes. It's why the standards publication is citable, why our claims survive `claim-review`, and why a sophisticated buyer can rely on what's on the site.
+
+**Public framing rule (council, 2026-04-26):** customer-facing surfaces never use single-named-individual framing ("John," "founder," "I"). Phrasing is "we" / "the Flintmere team" / specific council seats by function. Procurement and `/about` surfaces name the legal entity (Eazy Access Ltd), the accountable director (John Morris), AND the council operating model — three separate questions, three separate answers.
 
 ## Revenue goal
 
@@ -27,6 +35,8 @@ Per-100-merchant unit economics summary (full math in conversation memory, summa
 The cost side is controlled. The bet is on acquisition.
 
 ## Tiers
+
+> **Pricing model in transition.** Per ADR 0016 (2026-04-26), the canonical pricing axis is shifting from volume (Free / Growth / Scale / Agency / Plus) to **vertical standard licensed × distribution mode** (Food / Beauty / Apparel × Self-serve / Concierge / Embedded). Existing Growth / Scale / Agency / Plus customers are **grandfathered** at current prices. New sign-ups from Phase 3 onwards see the vertical ladder. The new launch ladder lives in ADR 0016 §Launch ladder, calibrated by the Month 1–2 willingness-to-pay study with 20+ food merchants. The Plus tier is in private beta per ADR 0017 — public price withdrawn, anchor "from £1,200/mo on enquiry."
 
 ### Free
 
@@ -57,13 +67,14 @@ The cost side is controlled. The bet is on acquisition.
 - **Billing:** direct Stripe invoicing (not Shopify Managed Pricing — agencies own the relationship).
 - **Economic significance:** SPEC §8.2 — Agency tier is the economic engine. One sale = 25 stores on the platform. Ratio of revenue to acquisition cost is 8–10× better than direct merchant sales.
 
-### Plus — from £1,500/month
+### Plus — private beta (anchor: from £1,200/month on enquiry)
 
-- **Price:** £1,500/month floor. Custom pricing above. (Renamed from Enterprise + price floor raised 2026-04-26 — operator confirmed restructure post-Agentic-Storefronts. The £599 floor underpriced the work and signalled "not enterprise-ready" against Klevu / Nosto / Yotpo at £1,500–3,000+/mo. The Plus name aligns with Shopify's own "Plus" tier and is more honest at this price point.)
-- **Target:** Shopify Plus (£500K/mo+ platform fee tier), 10,000+ SKUs.
+- **Price:** *No public floor displayed.* Anchor only: "from £1,200/mo on enquiry." (Per ADR 0017, 2026-04-26: public £1,500+ floor withdrawn. Reason: the public scanner — Flintmere's dominant conversion path — cannot reach Shopify Plus stores behind enterprise bot-management, per `/research`. Listing a tier the conversion path can't fulfil is a credibility gap. Plus re-lists with verified pricing once the embedded Shopify app's first installable food-vertical build ships.)
+- **Target:** Shopify Plus (£500K/mo+ platform fee tier), 10,000+ SKUs. Vertical-specialised — food first.
 - **Scope additions:** 50,000 SKU support (custom rate limits). Custom attribute templates per vertical. Dedicated Slack support channel. Monthly strategy call. Per-contract SLAs. SOC 2 posture review (when needed).
 - **Billing:** direct Stripe invoicing, contract-based, annual pre-pay available at 15% discount.
-- **Model:** "Contact sales" — published floor price, gated behind a booked call. Operator critique 2026-04-26: anchor pricing matters even at zero conversion; keep visible-but-gated. First 2–3 deals teach what belongs above the floor.
+- **Model:** Direct enquiry. The `/for/plus` page reframes as "Plus is in private beta — talk to the Flintmere team before signing with a £2k/mo discovery platform." Enquiry routes to the team inbox; sales call replaces self-serve checkout. Council pricing review 2026-04-26 confirmed the anchor: visible-but-not-committed. First 2–3 deals teach what belongs above the floor.
+- **Existing £1,500-floor reference customers:** none yet. No grandfathering exposure on this tier.
 
 ## Payment stack
 

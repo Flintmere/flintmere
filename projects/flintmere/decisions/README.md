@@ -15,6 +15,16 @@ One file per significant decision. Name them `NNNN-slug.md` (4-digit zero-padded
 | [0007](0007-canon-amber-signature.md) | Amber signature + asymmetric wordmark | Accepted | Glowing Amber `#F8BF24` as sole accent; sulphur retired |
 | [0008](0008-merchant-store-identity.md) | Merchant / store identity model | Accepted | Shop-as-PK Phase 1; additive agency overlay deferred to Phase 2 |
 | [0009](0009-billing-api-shape.md) | Billing API shape | Accepted | Shopify Billing for Growth/Scale; Stripe Payment Element for Agency/Enterprise; flat-rate, no usage metering |
+| [0010](0010-fallback-pivot-openai-platform.md) | Fallback pivot to OpenAI Platform | Accepted | Privacy-by-minimization (`store: false`, project-scoped key, PII sanitizer, no vision); EU residency upgrade deferred to enterprise procurement |
+| [0011](0011-eu-default-vertex-rationale.md) | EU-default Vertex pinning rationale | Accepted | EU stays the default; multi-region routing deferred to a later ADR triggered by US-merchant friction or enterprise residency demand |
+| 0012 | (reserved — fallback EU residency upgrade) | Reserved | Triggered when enterprise procurement requires EU-pinned fallback or volume exceeds 5% |
+| [0013](0013-analytics-plausible-self-host.md) | Analytics: Plausible (Cloud, EU) | Accepted | Cookieless, EU residency, no consent banner; ADR amendment 1 pivoted self-host → Cloud after droplet resource check |
+| 0014 | (reserved — tiered-infrastructure strategy) | Reserved | Codifies Tier 1 (paying-customer projects on dedicated droplet) / Tier 2 (shared) / Tier 3 (PaaS free tiers) per 2026-04-25 council session |
+| [0015](0015-food-first-vertical-strategy.md) | Food-first vertical strategy | Accepted | Food spearhead per liability + channel-surface + standard-authority math; beauty + apparel pages stay live, no public cadence |
+| [0016](0016-pricing-axis-vertical-distribution.md) | Pricing axis: vertical × distribution mode | Accepted | Two orthogonal axes; council launch ladder leads with food single-store £99; existing customers grandfathered; WTP study Month 1–2 calibrates |
+| [0017](0017-plus-tier-private-beta-gate.md) | Plus tier private-beta gate + price-on-enquiry | Accepted | Public £1,500+ floor withdrawn; anchor "from £1,200/mo on enquiry"; re-list when embedded app's first installable food-vertical build ships |
+| [0018](0018-standards-subdomain-and-cadence.md) | `standards.flintmere.com` + half-yearly food cadence + AI-assisted diff log | Accepted | Q3c at ~£200/yr (recalibrated from infeasible £20–25k/yr contractor); #39 Regulatory Affairs review; upgrade to Q3d on first volunteer reviewer landing |
+| [0019](0019-strategic-gate-window-six-month.md) | Strategic gate: 6-month window, 2026-10-26 | Accepted | Latest-by date; earlier qualifying citation passes early; mid-window check 2026-07-26 |
 
 ## Template
 
