@@ -11,6 +11,11 @@ const config: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   transpilePackages: ['@flintmere/scoring'],
+  images: {
+    // Marketing surfaces ship AVIF as primary, WebP as fallback.
+    // See memory/design/tokens.md §Imagery weight budgets.
+    formats: ['image/avif', 'image/webp'],
+  },
   async headers() {
     return [
       {

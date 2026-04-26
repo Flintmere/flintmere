@@ -325,7 +325,8 @@ function Results({ result }: { result: ScanResult }) {
                     </p>
                   </div>
                   <p className="eyebrow text-right max-md:text-left">
-                    {issue.affectedCount.toLocaleString()} products
+                    {issue.affectedCount.toLocaleString()}{' '}
+                    {issue.affectedCount === 1 ? 'product' : 'products'}
                   </p>
                 </li>
               );

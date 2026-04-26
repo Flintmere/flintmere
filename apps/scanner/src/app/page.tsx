@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { Bracket } from '@/components/Bracket';
 import { SiteFooter } from '@/components/SiteFooter';
@@ -52,6 +53,7 @@ export default async function MarketingHome() {
   const sample = await loadLiveSample();
   return (
     <main id="main">
+      <a href="#hero" className="skip-link">Skip to content</a>
       {/* Nav */}
       <header className="border-b border-[color:var(--color-line)]">
         <div className="mx-auto max-w-[1280px] px-8 h-[56px] flex items-center justify-between">
@@ -76,49 +78,58 @@ export default async function MarketingHome() {
       </header>
 
       {/* Hero */}
-      <section className="mx-auto max-w-[1280px] px-8 py-24 md:py-32">
-        <p className="eyebrow text-[color:var(--color-ink-2)] mb-8">
-          Free scan · 60 seconds · No install
-        </p>
-        <ViewportReveal>
-          <h1 className="max-w-[14ch]">
-            Your product catalog is{' '}
-            <Bracket>
-              <span aria-hidden="true" className="text-outlined text-outlined--reveal">
-                invisible
-              </span>
-              <span className="sr-only">invisible</span>
-            </Bracket>{' '}
-            to ChatGPT.
-          </h1>
-        </ViewportReveal>
-        <p
-          className="mt-10 max-w-[52ch] text-[color:var(--color-ink-2)]"
-          style={{ fontSize: 19, lineHeight: 1.5 }}
-        >
-          Shoppers are starting to buy through ChatGPT, Perplexity and Claude instead of Google. Those agents skip stores whose product data doesn&rsquo;t match Shopify, GS1 UK and Google Merchant Center rules. Paste your URL — we show you exactly where you disappear.
-        </p>
-        <div className="mt-12 flex flex-wrap gap-3">
-          <Link href="/scan" className="btn btn-accent">
-            Run the free scan →
-          </Link>
-          <Link href="/audit" className="btn">
-            Or book the £97 concierge audit →
-          </Link>
+      <section id="hero" className="mx-auto max-w-[1280px] px-8 py-24 md:py-32">
+        <div className="grid md:grid-cols-[1.2fr_1fr] gap-16 items-center">
+          <div>
+            <p className="eyebrow text-[color:var(--color-ink-2)] mb-8">
+              Free scan · 60 seconds · No install
+            </p>
+            <ViewportReveal>
+              <h1 className="max-w-[18ch]">
+                Your product catalog is{' '}
+                <Bracket>
+                  <span aria-hidden="true" className="text-outlined text-outlined--reveal">
+                    invisible
+                  </span>
+                  <span className="sr-only">invisible</span>
+                </Bracket>{' '}
+                to ChatGPT, Perplexity and Claude.
+              </h1>
+            </ViewportReveal>
+            <p className="hero-lede mt-10 max-w-[40ch] text-[color:var(--color-ink-2)]">
+              Shoppers are buying through AI agents now — ChatGPT, Perplexity, Claude. Those agents skip stores with broken catalog data. Paste your URL; we show exactly where you disappear.
+            </p>
+            <div className="mt-12 flex flex-wrap gap-3">
+              <Link href="/scan" className="btn btn-accent">
+                Run the free scan →
+              </Link>
+              <Link href="/audit" className="btn">
+                Or book the £97 concierge audit →
+              </Link>
+            </div>
+            <p className="hero-fineprint mt-6 max-w-[52ch] text-[color:var(--color-mute)]">
+              Prefer to talk first? Email{' '}
+              <a href="mailto:hello@flintmere.com" className="underline">
+                hello@flintmere.com
+              </a>{' '}
+              — John usually replies within two working days.
+            </p>
+          </div>
+          <figure className="hero-figure">
+            <Image
+              src="/marketing/hero/jar.avif"
+              alt="A jar of loose-leaf tea on a real shelf, with brass lid and warm window light behind."
+              width={1200}
+              height={1500}
+              priority
+              sizes="(min-width: 768px) 40vw, 100vw"
+              className="hero-image"
+            />
+            <figcaption className="hero-caption mt-4 max-w-[40ch]">
+              A jar of loose-leaf tea on a real shelf. The agent extracts grade, origin, steep time — only if the data is there.
+            </figcaption>
+          </figure>
         </div>
-        <p
-          className="mt-6 max-w-[52ch] text-[color:var(--color-mute)]"
-          style={{ fontSize: 13, lineHeight: 1.55 }}
-        >
-          Prefer to talk first? Email{' '}
-          <a
-            href="mailto:hello@flintmere.com"
-            className="underline"
-          >
-            hello@flintmere.com
-          </a>{' '}
-          — John usually replies within two working days.
-        </p>
       </section>
 
       <hr className="rule" />
@@ -151,38 +162,16 @@ export default async function MarketingHome() {
           </p>
           <div className="grid md:grid-cols-[auto_1fr] gap-12 items-end">
             <div>
-              <p
-                style={{
-                  fontSize: 'clamp(88px, 14vw, 220px)',
-                  fontWeight: 500,
-                  letterSpacing: '-0.045em',
-                  lineHeight: 0.92,
-                }}
-              >
+              <p className="live-sample-numeral">
                 {sample.median}
-                <span
-                  aria-hidden="true"
-                  className="inline-block align-baseline ml-2"
-                  style={{
-                    width: '0.22em',
-                    height: '2px',
-                    background: 'var(--color-accent)',
-                    transform: 'translateY(-0.22em)',
-                  }}
-                />
+                <span aria-hidden="true" className="live-sample-undertick" />
               </p>
-              <p
-                className="eyebrow mt-4 text-[color:var(--color-mute)]"
-                style={{ fontSize: 12 }}
-              >
+              <p className="live-sample-meta eyebrow mt-4 text-[color:var(--color-mute)]">
                 / 100 · median
               </p>
             </div>
             <div className="pb-4">
-              <p
-                className="max-w-[40ch]"
-                style={{ fontSize: 22, lineHeight: 1.4, letterSpacing: '-0.01em' }}
-              >
+              <p className="live-sample-lede max-w-[40ch]">
                 The median score across {sample.n.toLocaleString()} mid-market
                 Shopify catalogs in our rolling sample. Most fall short on the
                 structured fields AI shopping agents actually filter on.
@@ -200,10 +189,13 @@ export default async function MarketingHome() {
       {/* Seven checks */}
       <section id="pillars" className="mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">What we check</p>
-        <h2 className="max-w-[22ch] mb-12">
+        <h2 className="max-w-[22ch] mb-4">
           Seven things an AI shopping agent looks for before it will recommend your product.
         </h2>
-        <ol className="list-none p-0 m-0 divide-y divide-[color:var(--color-line)] border-y border-[color:var(--color-line)]">
+        <p className="pillars-intro max-w-[60ch] text-[color:var(--color-mute)]">
+          Each pillar carries the weight shown. Your final score is a weighted average across the seven.
+        </p>
+        <ol className="mt-12 list-none p-0 m-0 divide-y divide-[color:var(--color-line)] border-y border-[color:var(--color-line)]">
           <Pillar
             name="Product IDs"
             weight="20%"
@@ -215,7 +207,7 @@ export default async function MarketingHome() {
             desc="Whether size, colour, material and other fields exist as structured data — not hidden inside the description."
           />
           <Pillar
-            name="Title &amp; description quality"
+            name="Title & description quality"
             weight="15%"
             desc="Whether titles and descriptions read like spec sheets an agent can parse — not marketing copy."
           />
@@ -262,26 +254,77 @@ export default async function MarketingHome() {
         </div>
       </section>
 
-      {/* Three-chapter narrative */}
-      <section className="mx-auto max-w-[1280px] px-8 py-24">
-        <p className="eyebrow mb-6">How Flintmere works</p>
-        <h2 className="max-w-[20ch]">Audit. Fix. Watch. In that order, forever.</h2>
-        <div className="mt-12 grid md:grid-cols-3 gap-12">
-          <Chapter
-            num="01"
-            name="Audit"
-            copy="Enter a URL. We read your public catalog in 60 seconds and show you the top issues, ranked by how many products they affect."
-          />
-          <Chapter
-            num="02"
-            name="Fix"
-            copy="Safe changes apply with one click. Anything judgement-based previews on five sample products before you roll it out. Every batch is reversible for 7 days."
-          />
-          <Chapter
-            num="03"
-            name="Watch"
-            copy="We re-scan nightly and tell you if something slips — a competitor passes you, a new requirement lands, or a plugin breaks your structured data."
-          />
+      {/* What you get with the £97 audit */}
+      <section
+        aria-labelledby="audit-deep-heading"
+        className="mx-auto max-w-[1280px] px-8 py-24"
+      >
+        <p className="eyebrow mb-6">What you get with the £97 audit</p>
+        <h2 id="audit-deep-heading" className="max-w-[24ch]">
+          A real scan. A real letter. A 30-day re-scan to prove it stuck.
+        </h2>
+
+        <div className="mt-12 grid md:grid-cols-[1.4fr_1fr] gap-12 items-start">
+          {/* Audit screenshot anchor — placeholder until asset lands */}
+          <figure className="audit-figure">
+            <div
+              className="audit-image-placeholder"
+              role="img"
+              aria-label="Flintmere scanner results screenshot — pending recapture after pluralisation fix."
+            >
+              <span className="eyebrow text-[color:var(--color-mute-2)]">
+                Audit screenshot · pending recapture
+              </span>
+            </div>
+            <figcaption className="audit-caption mt-3">
+              A real Shopify catalog. The free scan in 60 seconds.
+            </figcaption>
+          </figure>
+
+          {/* Deliverables list */}
+          <div>
+            <p className="eyebrow mb-6 text-[color:var(--color-mute)]">
+              For your <Bracket>£97</Bracket> — within three working days
+            </p>
+            <ul className="list-none p-0 m-0 space-y-8">
+              <li>
+                <p className="audit-item-name">A written audit letter</p>
+                <p className="audit-item-copy">
+                  One PDF. Plain English. The seven checks for your catalog,
+                  ranked by how many products each one affects, with the exact
+                  fix for each.
+                </p>
+              </li>
+              <li>
+                <p className="audit-item-name">A per-product fix CSV</p>
+                <p className="audit-item-copy">
+                  Every product that needs work, with the field that&rsquo;s
+                  wrong and the value that should replace it. Import into
+                  Shopify in one paste.
+                </p>
+              </li>
+              <li>
+                <p className="audit-item-name">A 30-day re-scan</p>
+                <p className="audit-item-copy">
+                  We rescan after you&rsquo;ve applied the fixes and tell you
+                  what landed and what didn&rsquo;t — so you know the work
+                  actually moved the score.
+                </p>
+              </li>
+            </ul>
+            <p className="mt-10">
+              <Link href="/audit" className="btn btn-accent">
+                Book the £97 audit →
+              </Link>
+            </p>
+            <p className="audit-fineprint mt-4 text-[color:var(--color-mute)]">
+              Or{' '}
+              <Link href="/pricing" className="underline">
+                see monthly Pro tiers
+              </Link>{' '}
+              for 100+ stores or recurring scans.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -319,7 +362,7 @@ export default async function MarketingHome() {
             }}
           >
             <li>Retrofit a Google-SEO scanner and rebrand it for AI</li>
-            <li>Sell you fake barcodes that fail the first checksum test</li>
+            <li>Sell you barcodes that aren&rsquo;t issued by GS1 UK</li>
             <li>Charge by the credit, so a big catalog triples your bill</li>
             <li>One-time audit, then silence</li>
             <li>Hide the founder behind a support queue</li>
@@ -419,28 +462,18 @@ function Stat({ big, label }: { big: string; label: string }) {
 }
 
 function Pillar({ name, weight, desc }: { name: string; weight: string; desc: string }) {
+  const weightLabel = `${weight.replace('%', ' percent')} of total score weight`;
   return (
-    <li className="grid grid-cols-[280px_1fr_100px] gap-6 py-7 items-baseline max-md:grid-cols-1 max-md:gap-2">
-      <span style={{ fontSize: 22, letterSpacing: '-0.01em' }} dangerouslySetInnerHTML={{ __html: name }} />
-      <span className="text-[color:var(--color-mute)] text-[15px] leading-[1.45]" dangerouslySetInnerHTML={{ __html: desc }} />
-      <span className="eyebrow text-right max-md:text-left">{weight}</span>
+    <li className="pillar-row grid grid-cols-[280px_1fr_100px] gap-6 py-7 items-baseline max-md:grid-cols-1 max-md:gap-2">
+      <span className="pillar-name">{name}</span>
+      <span className="pillar-desc text-[color:var(--color-mute)]">{desc}</span>
+      <span
+        className="eyebrow text-right max-md:text-left"
+        aria-label={weightLabel}
+      >
+        {weight}
+      </span>
     </li>
-  );
-}
-
-function Chapter({ num, name, copy }: { num: string; name: string; copy: string }) {
-  return (
-    <div>
-      <p aria-hidden="true" style={{ fontFamily: 'var(--font-mono)', fontSize: 12, letterSpacing: '0.14em', color: 'var(--color-mute)' }}>
-        [&nbsp;{num}&nbsp;]
-      </p>
-      <h3 className="mt-3" style={{ fontSize: 28, letterSpacing: '-0.02em' }}>
-        {name}
-      </h3>
-      <p className="mt-4 text-[color:var(--color-mute)] max-w-[34ch]" style={{ fontSize: 15, lineHeight: 1.55 }}>
-        {copy}
-      </p>
-    </div>
   );
 }
 

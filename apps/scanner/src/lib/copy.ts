@@ -223,8 +223,7 @@ export const issueCodeToFounderSpeak: Record<string, FounderSpeak> = {
 }
 
 // Verdict templates for the top of the report email and the scan
-// results page. Pick one based on the grade. #22 conversion + #37
-// consumer-psych approved.
+// results page. Pick one based on the grade.
 export function verdictHeader(args: {
   grade: string
   invisibleCount: number

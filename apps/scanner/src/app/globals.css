@@ -40,6 +40,22 @@
   /* --- Typography --- */
   --font-sans: var(--geist-sans), system-ui, -apple-system, sans-serif;
   --font-mono: var(--geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* --- Motion tokens (per memory/design/motion.md §Easing tokens) ---
+     Soft contract on marketing/scanner: global @media (prefers-reduced-motion)
+     block scales these to 0.01ms. No per-component reduced variants needed. */
+  --ease-sharp: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-signature: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-instant: 100ms;
+  --duration-short: 220ms;
+  --duration-medium: 360ms;
+  --duration-signature: 600ms;
+
+  /* --- Imagery treatment (per memory/design/tokens.md §Imagery) ---
+     CSS-filter approximation of the warm tonal grade applied at asset-prep
+     time. Final grading happens in Lightroom; this is a runtime fallback. */
+  --image-treatment-warm: saturate(0.88) contrast(1.03) sepia(0.04);
 }
 
 @layer base {
@@ -208,13 +224,163 @@
   -webkit-text-stroke-width: 0;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .text-outlined,
-  .text-outlined--reveal {
-    color: var(--color-ink);
-    -webkit-text-stroke: 0;
-    transition: none;
-  }
+/* Per-component prefers-reduced-motion block removed 2026-04-26 — the global
+   block on lines 115–122 scales transition-duration to 0.01ms across the board,
+   making this redundant. Soft contract per memory/design/motion.md §The
+   reduced-motion contract (two tiers). */
+
+/* --- Hero typography (refactored from inline styles) --- */
+.hero-lede {
+  font-size: 19px;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+}
+
+.hero-fineprint {
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* --- Hero photoreal figure (per memory/design/tokens.md §Imagery) ---
+   Adobe Stock candidate (tea jar / brass lid / warm window light).
+   Treatment applied via --image-treatment-warm CSS filter as a runtime
+   fallback for any future un-graded source. */
+.hero-figure {
+  margin: 0;
+}
+
+.hero-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--color-line);
+  filter: var(--image-treatment-warm);
+}
+
+.hero-caption {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--color-mute);
+}
+
+/* --- Live-sample numeral (refactored from inline styles) --- */
+.live-sample-numeral {
+  font-size: clamp(88px, 14vw, 220px);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+}
+
+.live-sample-undertick {
+  display: inline-block;
+  width: 0.22em;
+  height: 2px;
+  background: var(--color-accent);
+  transform: translateY(-0.22em);
+  margin-left: 0.5rem;
+}
+
+.live-sample-meta {
+  font-size: 12px;
+}
+
+.live-sample-lede {
+  font-size: 22px;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+/* --- Pillars section typography --- */
+.pillars-intro {
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.pillar-name {
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+.pillar-desc {
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+/* --- Audit-deep section ("What you get with the £97 audit") ---
+   Anchored by the recaptured Audit screenshot. Image lands in commit 7. */
+.audit-figure {
+  margin: 0;
+}
+
+.audit-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--color-line);
+}
+
+.audit-image-placeholder {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border: 1px dashed var(--color-line-soft);
+  background: var(--color-paper-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.audit-caption {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--color-mute);
+}
+
+.audit-item-name {
+  font-size: 22px;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.audit-item-copy {
+  margin-top: 0.5rem;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--color-mute);
+  max-width: 38ch;
+}
+
+.audit-fineprint {
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* --- Skip-to-content link (a11y canon §Keyboard — long marketing pages) ---
+   Hidden until keyboard focus, then ink-on-paper inverted pill in top-left.
+   Inherits the global prefers-reduced-motion scale-to-zero from line 99. */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0.75rem 1rem;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  transform: translateY(-100%);
+  z-index: 100;
+  transition: transform 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 /* --- Screen-reader-only (accessibility helper for outlined text pairs) --- */
