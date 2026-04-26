@@ -1,27 +1,34 @@
 import type { Job } from 'bullmq';
 import type { DriftRescoreJob } from '../types';
-import { enqueueScore } from '../queues.server';
+import { enqueueSync } from '../queues.server';
 
 /**
- * Drift rescore — fired from webhooks/products handler on product create / update / delete.
- * Debounce is handled at enqueue time (30s bucket per shop+product); this handler just
- * coalesces the re-score by triggering the scoring queue with a shop-level token.
+ * Drift rescore — fired from webhooks/products handler on product
+ * create / update / delete. Triggers a fresh catalog SYNC (which chains
+ * to a score on completion). Earlier rev enqueued a score directly — but
+ * score reads from the local Postgres mirror; without a sync first, the
+ * mirror still holds the pre-edit product. The merchant would edit a
+ * product, the score wouldn't move, and the loop would feel broken.
  *
- * For v1 we re-score the whole shop. A future refinement: score-diff the one touched
- * product and only bump the pillar aggregates.
+ * Debounce is shop-level (see enqueueDriftRescore in queues.server.ts):
+ * 50 products edited in a 30s window collapse into one sync.
+ *
+ * For v1 we re-sync the whole catalog on any drift. A future refinement:
+ * single-product fetch + targeted score-diff.
  */
 export async function handleDriftRescore(
   job: Job<DriftRescoreJob>,
 ): Promise<void> {
   const { shopDomain } = job.data;
-  await enqueueScore({
+  await enqueueSync({
     shopDomain,
-    syncCompletedAt: new Date().toISOString(),
+    enqueuedAt: new Date().toISOString(),
+    trigger: 'rescan',
   });
   // eslint-disable-next-line no-console
   console.log(
     JSON.stringify({
-      event: 'drift-rescore-enqueued',
+      event: 'drift-sync-enqueued',
       shopDomain,
       productId: job.data.productId,
       topic: job.data.topic,

@@ -108,11 +108,15 @@ export async function enqueueSync(job: SyncCatalogJob) {
 }
 
 export async function enqueueDriftRescore(job: DriftRescoreJob) {
-  // Debounce: 30s window per (shop, product). BullMQ treats same jobId as duplicate.
+  // Shop-level debounce: 30s window per shop. BullMQ treats same jobId as
+  // duplicate. Earlier rev keyed by (shop, product) which collapsed only
+  // the same-product edits — N products edited in window = N syncs. The
+  // handler now triggers a full-catalog sync, so per-shop is the right
+  // granularity: 50 products edited in 30s = 1 sync.
   const debounceWindow = 30_000;
   const bucket = Math.floor(Date.now() / debounceWindow);
   return driftQueue.add('drift-rescore', job, {
-    jobId: `drift:${job.shopDomain}:${job.productId}:${bucket}`,
+    jobId: `drift:${job.shopDomain}:${bucket}`,
     delay: debounceWindow,
   });
 }
