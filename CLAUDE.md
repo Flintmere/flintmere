@@ -137,7 +137,7 @@ Skills: `support-triage`, `docs-coherence-audit`, `finance-snapshot`, `vendor-re
 3. **Conserve tokens.** Terse. No re-reads. Batch independent tool calls. Prefer `Edit` over `Write` on existing files.
 4. **Convene the Standing Council.** Reason through every non-trivial change through the relevant 36-member lenses.
 
-## Five anti-waste rules (added 2026-04-25 after the Sentry-integration arc cost ~4h of iterate-fix-iterate)
+## Six anti-waste rules (added 2026-04-25 after the Sentry-integration arc cost ~4h of iterate-fix-iterate; rule 6 added 2026-04-26 after Plausible env-var detour)
 
 These bind. If a rule conflicts with my instinct, the rule wins.
 
@@ -146,6 +146,7 @@ These bind. If a rule conflicts with my instinct, the rule wins.
 3. **Read response bodies, not just headers.** Headers can be misread; the body is ground truth. (Cost of violating this: I confused `not-found.tsx`'s prerender headers for a "prerender bug" on a route that didn't exist for a different reason entirely.)
 4. **Three failed hypotheses on the same symptom = full reset.** Stop iterating. Ask the operator for the SINGLE specific artifact that produces ground truth (deployment log, file contents on the box, screenshot of the actual UI state). No more "let me try one more thing."
 5. **Use canonical naming. Never prefix or suffix without verifying framework semantics.** Underscore-prefixed directories in Next.js App Router are private and excluded from routing. I cost ~2 hours fighting a routing problem because I named a folder `_sentry-test`. Always read framework docs for naming conventions before introducing a new path.
+6. **Don't abstract public values.** Public client-side URLs (Plausible script src, public-key DSNs that vendors design as public, Stripe publishable keys, OG image paths) belong hardcoded in source. Wrapping them in env vars adds zero security benefit + a Coolify variable to manage + a conditional render path that fails silently if mis-set. Only abstract values that are (a) genuinely secret, (b) environment-specific (URLs that differ between dev/staging/prod), or (c) operator-rotated (auth tokens, API keys). The "is this a secret?" test: would I write it on a postcard? Public-by-design vendor URLs pass that test.
 
 ## Active vetos
 
