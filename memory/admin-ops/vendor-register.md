@@ -139,14 +139,23 @@ Single source of truth for vendor relationships. `vendor-review` reads this; `fi
 - DPA in place: yes
 - Notes: PII scrubbing verified before send. Never Shopify access tokens to Sentry.
 
-### PostHog
-- Service: product analytics (self-hosted on droplet)
-- Plan: self-hosted open source
-- Monthly cost: £0 (runs on droplet) or cloud free tier
-- Lock-in: **low**
-- Data processor: yes (aggregated product events)
-- DPA in place: N/A if self-hosted
-- Notes: no client-side PII. Server-side events only.
+### Plausible (Cloud, EU)
+- Service: product analytics (cookieless)
+- Plan: Growth ($9/mo, 10K monthly pageviews)
+- Monthly cost: ~£7/mo (USD-billed)
+- Renewal: monthly
+- Lock-in level: **low** — open source; Plausible CE self-host migration possible; PostHog migration via re-instrumentation if triggers in ADR 0013 fire
+- Data processor: yes (aggregated product events; no IP storage by design)
+- DPA in place: yes (Plausible DPA — Estonia / EU; UK→EU adequacy)
+- Sub-processors: AWS EU
+- Alternatives evaluated: PostHog (cloud + self-host), Umami, Plausible self-host — see ADR 0013
+- Last reviewed: 2026-04-26
+- Notes: cookieless by design; no consent banner needed; supersedes the
+  earlier PostHog plan (see ADR 0013 §Amendment 1 — droplet resource
+  pressure forced Cloud over self-host; council pivoted from PostHog to
+  Plausible for the cookieless story + measurement quality). Migration
+  triggers to PostHog: cohort retention need, 3+ A/B tests/quarter
+  consistently, session replay need, enterprise prospect ask, Series A.
 
 ### BetterStack Uptime
 - Service: uptime monitoring + status page

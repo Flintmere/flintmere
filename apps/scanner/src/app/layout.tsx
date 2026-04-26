@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import './globals.css';
@@ -55,6 +56,17 @@ export default function RootLayout({
           Skip to main content
         </a>
         {children}
+        {/* Plausible analytics — cookieless, EU-hosted (Plausible Cloud).
+            ADR 0013. Event helper at apps/scanner/src/lib/plausible.ts. */}
+        <Script
+          defer
+          data-domain="audit.flintmere.com"
+          src="https://plausible.io/js/script.js"
+          strategy="afterInteractive"
+        />
+        <Script id="plausible-init" strategy="afterInteractive">
+          {`window.plausible = window.plausible || function() {(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()`}
+        </Script>
       </body>
     </html>
   );

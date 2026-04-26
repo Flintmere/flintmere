@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { track } from '@/lib/plausible';
 
 export interface ScanFormProps {
   initialUrl?: string;
@@ -24,6 +25,7 @@ export function ScanForm({
       return;
     }
     setError(null);
+    track('scan_started', { domain: trimmed });
     onSubmit(trimmed);
   };
 

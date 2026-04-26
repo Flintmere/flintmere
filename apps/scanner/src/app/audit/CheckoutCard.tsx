@@ -24,6 +24,7 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js';
+import { track } from '@/lib/plausible';
 
 const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
@@ -104,6 +105,7 @@ export function CheckoutCard() {
     e.preventDefault();
     setState({ kind: 'loading' });
     telemetry('concierge-checkout-start');
+    track('concierge_clicked', { shop: shopUrl.trim() });
 
     try {
       const res = await fetch('/api/concierge/checkout', {

@@ -76,11 +76,9 @@ export default function Cookies() {
           or scanner surfaces.
         </p>
         <p className="mt-4">
-          Within the app we use <strong>PostHog (self-hosted, EU)</strong> for
-          product analytics. PostHog is loaded only after authentication,
-          IPs are truncated at ingestion, and no cross-site tracking is
-          enabled. Merchants on paid tiers can opt out from Settings →
-          Privacy.
+          For product analytics we use <strong>Plausible (EU, cookieless)</strong>.
+          No cookies are set, no cross-site tracking is performed, no IPs are
+          stored. Per ADR 0013.
         </p>
       </Clause>
 

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Bracket } from './Bracket';
 import { REPLY_SLA } from '@/lib/copy';
+import { track } from '@/lib/plausible';
 
 export interface EmailGateProps {
   scanId: string;
@@ -53,6 +54,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
         return;
       }
       setState({ phase: 'success', reportSent: Boolean(body.reportSent) });
+      track('email_captured', { scan_id: scanId, shop: shopDomain });
     } catch (err) {
       setState({
         phase: 'error',

@@ -142,8 +142,9 @@ export default function Privacy() {
             source.
           </li>
           <li>
-            <strong>PostHog</strong> (self-hosted EU) — product analytics.
-            IPs truncated, no cross-site tracking.
+            <strong>Plausible Analytics</strong> (Plausible Insights OÜ,
+            Estonia · EU) — cookieless product analytics. No IP storage, no
+            cross-site tracking, no advertising profile. Per ADR 0013.
           </li>
           <li>
             <strong>BetterStack</strong> (EU) — uptime monitoring (no user
