@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef } from 'react';
+import * as React from 'react';
 
 /**
  * ViewportReveal — toggles `.is-visible` on children when they scroll into view.
@@ -19,7 +20,7 @@ import { useEffect, useRef, type ReactNode } from 'react';
  */
 
 interface ViewportRevealProps {
-  children: ReactNode;
+  children: React.ReactNode;
   /** IntersectionObserver root-margin (when to trip the reveal). */
   rootMargin?: string;
   /** Class name to toggle. Default: is-visible. */

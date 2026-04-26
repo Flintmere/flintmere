@@ -11,10 +11,10 @@
  *   Use <Bracket interactive> in that case.
  */
 
-import type { ReactNode } from 'react';
+import * as React from 'react';
 
 export interface BracketProps {
-  children: ReactNode;
+  children: React.ReactNode;
   size?: 'default' | 'display' | 'micro';
   interactive?: boolean;
   className?: string;

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Bracket } from '@/components/Bracket';
 import { SectionAnchor } from '@/components/SectionAnchor';
 import { SiteFooter } from '@/components/SiteFooter';
-import type { ReactNode } from 'react';
+import * as React from 'react';
 
 /**
  * LegalShell — shared chrome for /privacy, /terms, /security, /cookies, /dpa, /support.
@@ -16,10 +16,10 @@ import type { ReactNode } from 'react';
 
 export interface LegalShellProps {
   eyebrow: string;
-  title: ReactNode;
+  title: React.ReactNode;
   summary: string;
   lastUpdated: string; // ISO yyyy-mm-dd
-  children: ReactNode;
+  children: React.ReactNode;
   anchorNumeral?: string;
 }
 
@@ -77,7 +77,7 @@ export function LegalShell({
 interface ClauseProps {
   n: string;
   heading: string;
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export function Clause({ n, heading, children }: ClauseProps) {
