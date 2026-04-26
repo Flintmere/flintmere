@@ -10,7 +10,7 @@ const config: NextConfig = {
   outputFileTracingRoot: path.join(import.meta.dirname, '../../'),
   reactStrictMode: true,
   poweredByHeader: false,
-  transpilePackages: ['@flintmere/scoring'],
+  transpilePackages: ['@flintmere/scoring', '@flintmere/ui'],
   images: {
     // Marketing surfaces ship AVIF as primary, WebP as fallback.
     // See memory/design/tokens.md §Imagery weight budgets.

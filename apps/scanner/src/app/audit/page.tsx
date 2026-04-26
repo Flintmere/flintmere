@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { Bracket } from '@/components/Bracket';
-import { SiteFooter } from '@/components/SiteFooter';
+import { Bracket, SiteFooter } from '@flintmere/ui';
 import { CheckoutCard } from './CheckoutCard';
 import { CONCIERGE_DELIVERABLE_LIST } from '@/lib/copy';
 
@@ -14,32 +12,6 @@ export const metadata: Metadata = {
 export default function Audit() {
   return (
     <main id="main">
-      <header className="border-b border-[color:var(--color-line)]">
-        <div className="mx-auto max-w-[1280px] px-8 h-[56px] flex items-center justify-between">
-          <Link
-            href="/"
-            aria-label="Flintmere home"
-            className="text-[18px] font-medium tracking-tight"
-          >
-            Flintmere
-            <span className="font-mono font-bold" aria-hidden="true">
-              ]
-            </span>
-          </Link>
-          <nav className="hidden md:flex gap-8" aria-label="Primary">
-            <Link href="/pricing" className="eyebrow">
-              Pricing
-            </Link>
-            <Link href="/research" className="eyebrow">
-              Research
-            </Link>
-          </nav>
-          <Link href="/scan" className="btn">
-            Run a free scan →
-          </Link>
-        </div>
-      </header>
-
       <section className="mx-auto max-w-[640px] px-6 pt-20 pb-10 text-center">
         <p className="eyebrow mb-6">
           Concierge audit · £97 one-off · three working days

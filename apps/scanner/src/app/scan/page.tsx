@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Bracket } from '@/components/Bracket';
+import { Bracket } from '@flintmere/ui';
 import { EmailGate } from '@/components/EmailGate';
 import { ScanForm } from '@/components/ScanForm';
 import { ScoreRing } from '@/components/ScoreRing';
@@ -76,17 +76,6 @@ export default function ScanPage() {
 
   return (
     <main id="main">
-      <header className="border-b border-[color:var(--color-line)]">
-        <div className="mx-auto max-w-[1280px] px-8 h-[56px] flex items-center justify-between">
-          <Link href="/" aria-label="Flintmere home" className="text-[18px] font-medium tracking-tight">
-            Flintmere<span className="font-mono font-bold" aria-hidden="true">]</span>
-          </Link>
-          <Link href="/contact" className="btn">
-            Book a demo
-          </Link>
-        </div>
-      </header>
-
       <section className="mx-auto max-w-[1280px] px-8 py-20 md:py-24">
         <p className="eyebrow mb-6">
           Free scan · No signup · 60 seconds

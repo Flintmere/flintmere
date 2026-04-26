@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Bracket } from '@/components/Bracket';
-import { SiteFooter } from '@/components/SiteFooter';
+import { Bracket, SiteFooter } from '@flintmere/ui';
 import { prisma } from '@/lib/db';
 import {
   pillarExplanationCustomerFacing,
@@ -100,35 +99,6 @@ export default async function ScorePage({ params }: PageProps) {
 
   return (
     <main id="main">
-      <header className="border-b border-[color:var(--color-line)]">
-        <div className="mx-auto max-w-[1280px] px-8 h-[56px] flex items-center justify-between">
-          <Link
-            href="/"
-            aria-label="Flintmere home"
-            className="text-[18px] font-medium tracking-tight"
-          >
-            Flintmere
-            <span className="font-mono font-bold" aria-hidden="true">
-              ]
-            </span>
-          </Link>
-          <nav className="hidden md:flex gap-8" aria-label="Primary">
-            <Link href="/#pillars" className="eyebrow">
-              Checks
-            </Link>
-            <Link href="/pricing" className="eyebrow">
-              Pricing
-            </Link>
-            <Link href="/research" className="eyebrow">
-              Research
-            </Link>
-          </nav>
-          <Link href="/scan" className="btn btn-accent">
-            Scan your store →
-          </Link>
-        </div>
-      </header>
-
       <section className="mx-auto max-w-[1280px] px-8 py-24 md:py-28">
         <p className="eyebrow text-[color:var(--color-ink-2)] mb-8">
           AI-readiness score · Public by merchant opt-in

@@ -1,28 +1,9 @@
 import Link from 'next/link';
-import { Bracket } from '@/components/Bracket';
-import { SiteFooter } from '@/components/SiteFooter';
+import { Bracket, SiteFooter } from '@flintmere/ui';
 
 export default function ScoreNotFound() {
   return (
     <main id="main">
-      <header className="border-b border-[color:var(--color-line)]">
-        <div className="mx-auto max-w-[1280px] px-8 h-[56px] flex items-center justify-between">
-          <Link
-            href="/"
-            aria-label="Flintmere home"
-            className="text-[18px] font-medium tracking-tight"
-          >
-            Flintmere
-            <span className="font-mono font-bold" aria-hidden="true">
-              ]
-            </span>
-          </Link>
-          <Link href="/scan" className="btn btn-accent">
-            Run a free scan →
-          </Link>
-        </div>
-      </header>
-
       <section className="mx-auto max-w-[1280px] px-8 py-24 md:py-32">
         <p className="eyebrow text-[color:var(--color-ink-2)] mb-8">
           No public score yet

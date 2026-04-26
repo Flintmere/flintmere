@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Bracket } from '@/components/Bracket';
-import { SiteFooter } from '@/components/SiteFooter';
+import { Bracket, SiteFooter } from '@flintmere/ui';
 import { TIERS } from '@/lib/pricing';
 
 export const metadata: Metadata = {
@@ -36,20 +35,6 @@ const FAQS = [
 export default function Pricing() {
   return (
     <main id="main">
-      <header className="border-b border-[color:var(--color-line)]">
-        <div className="mx-auto max-w-[1280px] px-8 h-[56px] flex items-center justify-between">
-          <Link href="/" aria-label="Flintmere home" className="text-[18px] font-medium tracking-tight">
-            Flintmere<span className="font-mono font-bold" aria-hidden="true">]</span>
-          </Link>
-          <nav className="hidden md:flex gap-8" aria-label="Primary">
-            <Link href="/#pillars" className="eyebrow">Pillars</Link>
-            <Link href="/pricing" className="eyebrow" aria-current="page" style={{ color: 'var(--color-ink)' }}>Pricing</Link>
-            <Link href="/research" className="eyebrow">Research</Link>
-          </nav>
-          <Link href="/scan" className="btn btn-accent">Run a free scan →</Link>
-        </div>
-      </header>
-
       <section className="mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">Pricing</p>
         <h1 className="max-w-[20ch]">

@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { Bracket } from '@/components/Bracket';
-import { SiteFooter } from '@/components/SiteFooter';
+import { Bracket, SiteFooter } from '@flintmere/ui';
 import { prisma } from '@/lib/db';
 import {
   summariseBenchmark,
@@ -154,33 +153,6 @@ export default async function FlintmereForApparel() {
 
   return (
     <main id="main">
-      <header className="border-b border-[color:var(--color-line)]">
-        <div className="mx-auto max-w-[1280px] px-8 h-[56px] flex items-center justify-between">
-          <Link
-            href="/"
-            aria-label="Flintmere home"
-            className="text-[18px] font-medium tracking-tight"
-          >
-            Flintmere
-            <span className="font-mono font-bold" aria-hidden="true">]</span>
-          </Link>
-          <nav className="hidden md:flex gap-8" aria-label="Primary">
-            <Link href="/#pillars" className="eyebrow hover:text-[color:var(--color-ink)]">
-              Pillars
-            </Link>
-            <Link href="/pricing" className="eyebrow hover:text-[color:var(--color-ink)]">
-              Pricing
-            </Link>
-            <Link href="/research" className="eyebrow hover:text-[color:var(--color-ink)]">
-              Research
-            </Link>
-          </nav>
-          <Link href="/scan" className="btn btn-accent">
-            Run a free scan →
-          </Link>
-        </div>
-      </header>
-
       <section className="mx-auto max-w-[1280px] px-8 py-20 md:py-28">
         <p className="eyebrow mb-6">
           For apparel brands · 50–5,000 SKUs · £1M–£50M revenue

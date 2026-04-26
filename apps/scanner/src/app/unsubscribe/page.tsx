@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Bracket } from '@/components/Bracket';
+import { Bracket } from '@flintmere/ui';
 
 interface Props {
   searchParams: Promise<{ status?: string }>;
@@ -11,14 +11,6 @@ export default async function UnsubscribePage({ searchParams }: Props) {
 
   return (
     <main id="main">
-      <header className="border-b border-[color:var(--color-line)]">
-        <div className="mx-auto max-w-[1280px] px-8 h-[56px] flex items-center justify-between">
-          <Link href="/" aria-label="Flintmere home" className="text-[18px] font-medium tracking-tight">
-            Flintmere<span className="font-mono font-bold" aria-hidden="true">]</span>
-          </Link>
-        </div>
-      </header>
-
       <section className="mx-auto max-w-[720px] px-8 py-24">
         <p className="eyebrow mb-6">Email preferences</p>
         {isOk ? (

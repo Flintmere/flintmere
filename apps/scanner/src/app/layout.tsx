@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
+import { SiteHeader } from '@/components/SiteHeader';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -55,6 +56,7 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
+        <SiteHeader />
         {children}
         {/* Privacy-friendly analytics by Plausible — cookieless, EU-hosted.
             ADR 0013. Event helper at apps/scanner/src/lib/plausible.ts.

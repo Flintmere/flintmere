@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Bracket } from './Bracket';
+import { Bracket } from '@flintmere/ui';
 import { REPLY_SLA } from '@/lib/copy';
 import { track } from '@/lib/plausible';
 
