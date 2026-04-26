@@ -1,4 +1,5 @@
 import { Worker } from 'bullmq';
+import * as Sentry from '@sentry/remix';
 import { getRedis } from './connection.server';
 import { QUEUE_NAMES } from './types';
 import { handleSyncCatalog } from './jobs/sync-catalog.server';
@@ -39,6 +40,29 @@ export function createWorkers(): { close: () => Promise<void> } {
   const workers = [sync, score, drift, fixTier1];
   for (const worker of workers) {
     worker.on('failed', (job, err) => {
+      // BullMQ catches the throw and emits 'failed'; Sentry's
+      // uncaughtException hook never fires. Capture explicitly here so
+      // worker errors reach Sentry with queue/job context. Only on the
+      // FINAL attempt — earlier attempts will be retried per backoff.
+      const finalAttempt =
+        job?.attemptsMade !== undefined &&
+        job.opts?.attempts !== undefined &&
+        job.attemptsMade >= job.opts.attempts;
+
+      if (finalAttempt) {
+        Sentry.withScope((scope) => {
+          scope.setTag('queue', worker.name);
+          scope.setTag('job_name', job?.name ?? 'unknown');
+          scope.setExtras({
+            jobId: job?.id ?? null,
+            attempt: job?.attemptsMade ?? null,
+            maxAttempts: job?.opts?.attempts ?? null,
+            data: job?.data ?? null,
+          });
+          Sentry.captureException(err);
+        });
+      }
+
       // eslint-disable-next-line no-console
       console.error(
         JSON.stringify({
@@ -47,6 +71,7 @@ export function createWorkers(): { close: () => Promise<void> } {
           jobId: job?.id,
           name: job?.name,
           attempt: job?.attemptsMade,
+          finalAttempt,
           error: err.message,
         }),
       );

@@ -1,4 +1,5 @@
 import type { Job } from 'bullmq';
+import * as Sentry from '@sentry/remix';
 import { prisma } from '../../db.server';
 import shopify from '../../shopify.server';
 import {
@@ -23,11 +24,27 @@ export async function handleApplyFix(job: Job<ApplyFixJob>): Promise<{
 }> {
   const { shopDomain, fixId, op } = job.data;
 
+  // Tag the Sentry scope so any failure inside this handler is attributed
+  // to the right fix + shop + op without grepping breadcrumbs.
+  Sentry.getCurrentScope()
+    .setTag('fix_id', fixId)
+    .setTag('fix_op', op)
+    .setTag('shop_domain', shopDomain);
+
+  Sentry.addBreadcrumb({
+    category: 'fix',
+    message: `apply-fix worker dispatched`,
+    level: 'info',
+    data: { fixId, op, shopDomain },
+  });
+
   const fix = await prisma.fix.findUnique({ where: { id: fixId } });
   if (!fix) throw new Error(`fix-not-found:${fixId}`);
   if (fix.shopDomain !== shopDomain) {
     throw new Error(`fix-shop-mismatch:${fixId}`);
   }
+
+  Sentry.getCurrentScope().setTag('fix_type', fix.fixType);
 
   if (op === 'apply' && fix.status !== 'pending') {
     throw new Error(`fix-not-pending:${fixId}:${fix.status}`);
@@ -43,6 +60,13 @@ export async function handleApplyFix(job: Job<ApplyFixJob>): Promise<{
       throw new Error(`fix-revert-window-closed:${fixId}`);
     }
   }
+
+  Sentry.addBreadcrumb({
+    category: 'fix',
+    message: `fix row validated, resolving admin context`,
+    level: 'info',
+    data: { fixType: fix.fixType, status: fix.status },
+  });
 
   const { admin } = await shopify.unauthenticated.admin(shopDomain);
 
@@ -68,7 +92,28 @@ async function handleBrandApply(
   const before = fix.beforeState as { productIds: string[] };
   const productIds = before.productIds ?? [];
 
+  Sentry.addBreadcrumb({
+    category: 'fix',
+    message: 'planning brand-from-vendor',
+    level: 'info',
+    data: { candidateCount: productIds.length },
+  });
+
   const plan = await planBrandFromVendor(admin, shopDomain, productIds);
+
+  Sentry.addBreadcrumb({
+    category: 'fix',
+    message: 'plan built',
+    level: 'info',
+    data: {
+      planned: plan.items.length,
+      skippedNoVendor: plan.skipped.filter((s) => s.reason === 'no-vendor').length,
+      skippedHasBrand: plan.skipped.filter(
+        (s) => s.reason === 'has-brand-metafield',
+      ).length,
+    },
+  });
+
   const result = await applyBrandFromVendor(admin, plan);
 
   await prisma.fix.update({
