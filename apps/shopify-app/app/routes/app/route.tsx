@@ -3,7 +3,9 @@ import { Link, Outlet, useLoaderData, useRouteError } from '@remix-run/react';
 import { boundary } from '@shopify/shopify-app-remix/server';
 import { AppProvider } from '@shopify/shopify-app-remix/react';
 import { NavMenu } from '@shopify/app-bridge-react';
+import { AppProvider as PolarisAppProvider } from '@shopify/polaris';
 import polarisStyles from '@shopify/polaris/build/esm/styles.css?url';
+import enTranslations from '@shopify/polaris/locales/en.json';
 
 import { authenticate } from '../../shopify.server';
 
@@ -30,17 +32,19 @@ export default function App() {
 
   return (
     <AppProvider isEmbeddedApp apiKey={apiKey}>
-      <NavMenu>
-        <Link to="/app" rel="home">
-          Dashboard
-        </Link>
-        <Link to="/app/issues">Issues</Link>
-        <Link to="/app/fixes">Fix history</Link>
-        <Link to="/app/channel-health">Channel Health</Link>
-        <Link to="/app/gtin">GTIN guidance</Link>
-        <Link to="/app/settings">Settings</Link>
-      </NavMenu>
-      <Outlet />
+      <PolarisAppProvider i18n={enTranslations}>
+        <NavMenu>
+          <Link to="/app" rel="home">
+            Dashboard
+          </Link>
+          <Link to="/app/issues">Issues</Link>
+          <Link to="/app/fixes">Fix history</Link>
+          <Link to="/app/channel-health">Channel Health</Link>
+          <Link to="/app/gtin">GTIN guidance</Link>
+          <Link to="/app/settings">Settings</Link>
+        </NavMenu>
+        <Outlet />
+      </PolarisAppProvider>
     </AppProvider>
   );
 }

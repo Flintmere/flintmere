@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
+import { Link, useLoaderData, useSearchParams } from '@remix-run/react';
 import {
   Banner,
   BlockStack,
@@ -15,17 +15,7 @@ import { prisma } from '../../db.server';
 import { IslandFrame } from '../../components/island/IslandFrame';
 import { ScoreRing } from '../../components/island/ScoreRing';
 import { PillarGrid, type Pillar } from '../../components/island/PillarGrid';
-
-// Static pillar names + weights. Scores fold in from the latest scan row
-// once the P1 schema (task #56) lands and real scoring writes pillarScores.
-const PILLAR_TEMPLATE: Array<Omit<Pillar, 'score'>> = [
-  { n: '01', name: 'Product IDs', weight: '20%' },
-  { n: '02', name: 'Structured attributes', weight: '20%' },
-  { n: '03', name: 'Title & description quality', weight: '15%' },
-  { n: '04', name: 'Google category match', weight: '15%' },
-  { n: '05', name: 'Data consistency', weight: '15%' },
-  { n: '06', name: 'AI agent access', weight: '15%' },
-];
+import { PILLAR_META, parsePillarsJson } from '../../lib/pillars';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { session } = await authenticate.admin(request);
@@ -41,15 +31,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
     },
   });
 
+  const latestScore = shop?.scores[0] ?? null;
+  const parsed = latestScore ? parsePillarsJson(latestScore.pillars) : null;
+
   return {
     shopDomain: session.shop,
-    latestScore: shop?.scores[0] ?? null,
+    latestScore,
+    pillarsParse: parsed,
     planTier: shop?.planTier ?? 'free',
   };
 }
 
 export default function Dashboard() {
-  const { shopDomain, latestScore } = useLoaderData<typeof loader>();
+  const { shopDomain, latestScore, pillarsParse } = useLoaderData<typeof loader>();
+  const [searchParams] = useSearchParams();
+  const fixApplied = searchParams.get('fix-applied');
 
   return (
     <Page
@@ -68,6 +64,20 @@ export default function Dashboard() {
       }}
     >
       <Layout>
+        {fixApplied ? (
+          <Layout.Section>
+            <Banner
+              title="Fix queued"
+              tone="success"
+            >
+              <p>
+                Your fix is being applied in the background. The score will
+                refresh once it lands.
+              </p>
+            </Banner>
+          </Layout.Section>
+        ) : null}
+
         {!latestScore ? (
           <Layout.Section>
             <Banner
@@ -75,10 +85,39 @@ export default function Dashboard() {
               tone="info"
             >
               <p>
-                We&rsquo;re analysing {shopDomain}&rsquo;s catalog against six
-                pillars. First scorecard will appear here within a few minutes
-                for small catalogs, or we&rsquo;ll email you when it&rsquo;s
-                ready for catalogs over 5,000 products.
+                We&rsquo;re analysing {shopDomain}&rsquo;s catalog against
+                seven pillars. First scorecard will appear here within a few
+                minutes for small catalogs, or we&rsquo;ll email you when
+                it&rsquo;s ready for catalogs over 5,000 products.
+              </p>
+            </Banner>
+          </Layout.Section>
+        ) : null}
+
+        {latestScore && pillarsParse?.legacyShape ? (
+          <Layout.Section>
+            <Banner
+              title="Re-scan to populate the seventh pillar"
+              tone="warning"
+            >
+              <p>
+                Your last scan ran before AI Agent Access (crawlability)
+                became part of the score. Click <em>Re-scan catalog</em> to
+                refresh.
+              </p>
+            </Banner>
+          </Layout.Section>
+        ) : null}
+
+        {latestScore && pillarsParse && !pillarsParse.ok ? (
+          <Layout.Section>
+            <Banner
+              title="Pillar breakdown unavailable"
+              tone="warning"
+            >
+              <p>
+                We could not parse the latest pillar data. Re-scan to
+                regenerate it.
               </p>
             </Banner>
           </Layout.Section>
@@ -143,16 +182,13 @@ export default function Dashboard() {
               </IslandFrame>
             </Layout.Section>
 
-            <Layout.Section>
-              <IslandFrame eyebrow="Six pillars">
-                <PillarGrid
-                  pillars={PILLAR_TEMPLATE.map((p, i) => ({
-                    ...p,
-                    score: derivePillarScore(latestScore.composite, i),
-                  }))}
-                />
-              </IslandFrame>
-            </Layout.Section>
+            {pillarsParse?.ok ? (
+              <Layout.Section>
+                <IslandFrame eyebrow="Seven pillars">
+                  <PillarGrid pillars={buildPillarRows(pillarsParse.pillars)} />
+                </IslandFrame>
+              </Layout.Section>
+            ) : null}
 
             <Layout.Section>
               <Text variant="headingSm" as="h3">
@@ -161,16 +197,22 @@ export default function Dashboard() {
               <Box paddingBlockStart="300">
                 <BlockStack gap="200">
                   {latestScore.issues.map((issue) => (
-                    <Card key={issue.id}>
-                      <BlockStack gap="100">
-                        <Text as="p" fontWeight="medium">
-                          {issue.title}
-                        </Text>
-                        <Text as="p" tone="subdued" variant="bodySm">
-                          {issue.description}
-                        </Text>
-                      </BlockStack>
-                    </Card>
+                    <Link
+                      key={issue.id}
+                      to={`/app/issues/${issue.id}`}
+                      style={{ textDecoration: 'none', color: 'inherit' }}
+                    >
+                      <Card>
+                        <BlockStack gap="100">
+                          <Text as="p" fontWeight="medium">
+                            {issue.title}
+                          </Text>
+                          <Text as="p" tone="subdued" variant="bodySm">
+                            {issue.description}
+                          </Text>
+                        </BlockStack>
+                      </Card>
+                    </Link>
                   ))}
                 </BlockStack>
               </Box>
@@ -214,15 +256,23 @@ export default function Dashboard() {
   );
 }
 
-// Placeholder until pillarScores JSON lands on the scores row (task #56).
-// Spreads the composite across the six pillars deterministically so the
-// art spike has something to render. Remove once real pillar scores exist.
-function derivePillarScore(composite: number, index: number): number {
-  const spread = [6, -4, 2, -2, 4, -6];
-  return Math.max(0, Math.min(100, composite + (spread[index] ?? 0)));
+function buildPillarRows(
+  parsed: NonNullable<ReturnType<typeof parsePillarsJson>>['pillars'],
+): Pillar[] {
+  return PILLAR_META.map((meta) => {
+    const row = parsed.find((p) => p.pillar === meta.id);
+    return {
+      n: meta.numeral,
+      name: meta.name,
+      weight: meta.weightLabel,
+      score: row?.score ?? 0,
+      locked: row?.locked ?? true,
+      lockedReason: row?.lockedReason ?? 'crawlability-not-fetched',
+    };
+  });
 }
 
-function timeAgo(date: Date): string {
+function timeAgo(date: Date | string): string {
   const diff = Date.now() - new Date(date).getTime();
   const hours = Math.floor(diff / (1000 * 60 * 60));
   if (hours < 1) return 'less than an hour ago';
