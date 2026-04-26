@@ -5,7 +5,7 @@ export const cleanProduct: ProductInput = {
   handle: 'matte-black-coffee-grinder',
   title: 'Meridian Matte Black Manual Coffee Grinder',
   bodyHtml:
-    '<p>Ideal for pour-over and espresso. Stainless steel burr, 20 grind settings.</p><ul><li>Capacity: 40g</li><li>Burr: stainless steel</li><li>Weight: 480g</li></ul>',
+    '<p>Ideal for pour-over and espresso. Hardened stainless-steel conical burr with 20 click-stop grind settings spanning fine espresso through coarse French press. Holds calibration over thousands of grinds with no wobble.</p><ul><li>Capacity: 40g hopper</li><li>Burr: hardened stainless steel, conical</li><li>Settings: 20 click-stops</li><li>Weight: 480g</li><li>Country of origin: Germany</li></ul>',
   vendor: 'Meridian',
   productType: 'Coffee Grinder',
   tags: ['coffee', 'manual', 'burr'],

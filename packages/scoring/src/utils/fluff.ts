@@ -1,5 +1,8 @@
 const FLUFF_PATTERNS: readonly RegExp[] = [
-  /\b(best|greatest|amazing|awesome|incredible|unbelievable)\s+ever\b/i,
+  // Superlative-with-ever: matches "best ever", "BEST PRODUCT EVER",
+  // "amazing new product ever". Allows up to 3 words between superlative
+  // and "ever" to catch the common shouty-title pattern.
+  /\b(best|greatest|amazing|awesome|incredible|unbelievable)\b(\s+\w+){0,3}\s+ever\b/i,
   /\b100\s*%\s*(guaranteed|safe|authentic)/i,
   /\blimited\s*(time|edition|offer|stock)/i,
   /\bhurry\b/i,
