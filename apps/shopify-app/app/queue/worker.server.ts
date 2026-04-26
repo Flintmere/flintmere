@@ -4,6 +4,7 @@ import { QUEUE_NAMES } from './types';
 import { handleSyncCatalog } from './jobs/sync-catalog.server';
 import { handleScoreCatalog } from './jobs/score-catalog.server';
 import { handleDriftRescore } from './jobs/drift-rescore.server';
+import { handleApplyFix } from './jobs/apply-fix.server';
 
 /**
  * Starts all Flintmere workers. Call from scripts/worker.ts for standalone-process
@@ -30,7 +31,12 @@ export function createWorkers(): { close: () => Promise<void> } {
     concurrency: 8,
   });
 
-  const workers = [sync, score, drift];
+  const fixTier1 = new Worker(QUEUE_NAMES.fixTier1, async (job) => handleApplyFix(job), {
+    connection,
+    concurrency: 2,
+  });
+
+  const workers = [sync, score, drift, fixTier1];
   for (const worker of workers) {
     worker.on('failed', (job, err) => {
       // eslint-disable-next-line no-console

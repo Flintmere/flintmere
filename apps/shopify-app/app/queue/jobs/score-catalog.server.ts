@@ -47,6 +47,7 @@ export async function handleScoreCatalog(
           title: issue.title,
           description: issue.description,
           affectedCount: issue.affectedCount,
+          affectedProductIds: issue.affectedProductIds,
           revenueImpactScore: issue.revenueImpactScore,
         })),
       },

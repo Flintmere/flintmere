@@ -6,6 +6,7 @@ export const QUEUE_NAMES = {
   sync: 'sync',
   score: 'score',
   enrich: 'fix-tier2',
+  fixTier1: 'fix-tier1',
   drift: 'drift',
   alerts: 'alerts',
 } as const;
@@ -41,6 +42,15 @@ export interface EnrichBatchJob {
   productIds: string[];
   /** 0..1 — skip products whose proposed change lands below this floor. */
   minConfidence: number;
+  requestId?: string;
+}
+
+// ---- Apply / Revert Tier 1 fix ----
+
+export interface ApplyFixJob {
+  shopDomain: string;
+  fixId: string;
+  op: 'apply' | 'revert';
   requestId?: string;
 }
 

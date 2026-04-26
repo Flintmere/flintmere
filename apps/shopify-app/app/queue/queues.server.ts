@@ -3,6 +3,7 @@ import { getRedis } from './connection.server';
 import {
   QUEUE_NAMES,
   type AlertJob,
+  type ApplyFixJob,
   type DriftRescoreJob,
   type EnrichBatchJob,
   type ScoreCatalogJob,
@@ -41,6 +42,16 @@ export const enrichQueue = new Queue<EnrichBatchJob>(QUEUE_NAMES.enrich, {
     attempts: 3,
     backoff: { type: 'exponential', delay: 15_000 },
     removeOnComplete: { age: 3600, count: 200 },
+  },
+});
+
+export const fixTier1Queue = new Queue<ApplyFixJob>(QUEUE_NAMES.fixTier1, {
+  connection: connection(),
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: { type: 'exponential', delay: 10_000 },
+    removeOnComplete: { age: 86_400 * 7, count: 1000 },
+    removeOnFail: { age: 86_400 * 14 },
   },
 });
 
@@ -109,5 +120,11 @@ export async function enqueueDriftRescore(job: DriftRescoreJob) {
 export async function enqueueScore(job: ScoreCatalogJob) {
   return scoreQueue.add('score-catalog', job, {
     jobId: `score:${job.shopDomain}:${job.syncCompletedAt}`,
+  });
+}
+
+export async function enqueueFixTier1(job: ApplyFixJob) {
+  return fixTier1Queue.add(`fix-${job.op}`, job, {
+    jobId: `fix:${job.op}:${job.fixId}`,
   });
 }
