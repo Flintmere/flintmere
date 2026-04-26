@@ -57,16 +57,22 @@ export default function RootLayout({
         </a>
         {children}
         {/* Plausible analytics — cookieless, EU-hosted (Plausible Cloud).
-            ADR 0013. Event helper at apps/scanner/src/lib/plausible.ts. */}
-        <Script
-          defer
-          data-domain="audit.flintmere.com"
-          src="https://plausible.io/js/script.js"
-          strategy="afterInteractive"
-        />
-        <Script id="plausible-init" strategy="afterInteractive">
-          {`window.plausible = window.plausible || function() {(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()`}
-        </Script>
+            ADR 0013. Event helper at apps/scanner/src/lib/plausible.ts.
+            URL set via NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC in Coolify env;
+            Plausible's modern snippet uses a hashed per-site URL. The fallback
+            `script.js` is generic (won't track until env var is set). */}
+        {process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC ? (
+          <>
+            <Script
+              async
+              src={process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC}
+              strategy="afterInteractive"
+            />
+            <Script id="plausible-init" strategy="afterInteractive">
+              {`window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()`}
+            </Script>
+          </>
+        ) : null}
       </body>
     </html>
   );
