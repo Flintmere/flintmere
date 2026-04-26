@@ -1,4 +1,4 @@
-import type { PrismaClient, Prisma } from '@prisma/client';
+import type { PrismaClient, Prisma } from '../../generated/prisma';
 import type { ParsedProductBlock } from './streaming-parser.server';
 
 /**
@@ -71,7 +71,10 @@ export async function writeChunk(
             inventoryQuantity: row.inventoryQuantity,
             rawPayload: row.rawPayload as Prisma.InputJsonValue,
           },
-          create: row as Prisma.VariantCreateInput,
+          create: {
+            ...row,
+            rawPayload: row.rawPayload as Prisma.InputJsonValue,
+          } as Prisma.VariantUncheckedCreateInput,
         });
         variantsUpserted += 1;
       }

@@ -35,6 +35,8 @@ COPY --from=build /repo/apps/shopify-app/build ./apps/shopify-app/build
 COPY --from=build /repo/apps/shopify-app/public ./apps/shopify-app/public
 COPY --from=build /repo/apps/shopify-app/package.json ./apps/shopify-app/package.json
 COPY --from=build /repo/apps/shopify-app/prisma ./apps/shopify-app/prisma
+# Per-app generated Prisma client (output path set in prisma/schema.prisma)
+COPY --from=build /repo/apps/shopify-app/app/generated ./apps/shopify-app/app/generated
 COPY --from=build /repo/packages ./packages
 
 USER flintmere

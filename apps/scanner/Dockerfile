@@ -65,6 +65,10 @@ COPY --from=build /repo/apps/scanner/.next/static ./apps/scanner/.next/static
 # standalone server alongside.
 COPY --from=build /repo/apps/scanner/public ./apps/scanner/public
 COPY --from=build /repo/apps/scanner/prisma ./apps/scanner/prisma
+# Per-app generated Prisma client (output path set in prisma/schema.prisma).
+# Next.js standalone tracing follows the explicit relative import in
+# src/lib/db.ts → src/generated/prisma; we mirror it for safety.
+COPY --from=build /repo/apps/scanner/src/generated ./apps/scanner/src/generated
 
 USER flintmere
 EXPOSE 3000

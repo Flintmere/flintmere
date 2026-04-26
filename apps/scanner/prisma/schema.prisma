@@ -4,6 +4,11 @@
 
 generator client {
   provider      = "prisma-client-js"
+  // Per-app output so the scanner's generated client and the shopify-app's
+  // can coexist in pnpm's hoisted node_modules. Without `output`, both apps
+  // race over the same `.prisma/client/` location and only the most recently
+  // generated schema is type-visible.
+  output        = "../src/generated/prisma"
   // `linux-musl-openssl-3.0.x` is the runtime target (node:22-alpine uses musl).
   // `native` covers the build host. Both must be present or PrismaClient throws
   // at first query with `Failed to load query engine`.

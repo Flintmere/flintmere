@@ -3,7 +3,16 @@
 // This schema owns the `app_*` namespace; scanner owns `scanner_*` in its own schema.
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // Per-app output so the scanner's generated client and the shopify-app's
+  // can coexist in pnpm's hoisted node_modules. Without `output`, both apps
+  // race over the same `.prisma/client/` location and only the most recently
+  // generated schema is type-visible.
+  output        = "../app/generated/prisma"
+  // `linux-musl-openssl-3.0.x` is the runtime target (node:22-alpine uses musl).
+  // `native` covers the build host. Both must be present or PrismaClient throws
+  // at first query with `Failed to load query engine`.
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -45,6 +54,12 @@ model Shop {
   lastScoreComposite     Int?      @map("last_score_composite")
   countryCode            String?   @map("country_code")
   primaryDomain          String?   @map("primary_domain")
+  // Merchant-controlled settings (Settings page). Defaults preserve current
+  // behaviour: no notifications, no auto-apply. Email is opt-in for sends.
+  notificationsEmail     String?   @map("notifications_email")
+  weeklyDigestEnabled    Boolean   @default(false) @map("weekly_digest_enabled")
+  driftAlertsEnabled     Boolean   @default(false) @map("drift_alerts_enabled")
+  autoApplyTier1Enabled  Boolean   @default(false) @map("auto_apply_tier1_enabled")
 
   products  Product[]
   scores    Score[]
@@ -115,18 +130,20 @@ model Score {
 }
 
 model Issue {
-  id                String @id @default(cuid())
-  scoreId           String @map("score_id")
-  score             Score  @relation(fields: [scoreId], references: [id], onDelete: Cascade)
-  pillar            String
-  code              String
-  severity          String
-  title             String
-  description       String
-  affectedCount     Int     @map("affected_count")
-  revenueImpactScore Int    @map("revenue_impact_score")
+  id                  String   @id @default(cuid())
+  scoreId             String   @map("score_id")
+  score               Score    @relation(fields: [scoreId], references: [id], onDelete: Cascade)
+  pillar              String
+  code                String
+  severity            String
+  title               String
+  description         String
+  affectedCount       Int      @map("affected_count")
+  affectedProductIds  String[] @map("affected_product_ids")
+  revenueImpactScore  Int      @map("revenue_impact_score")
 
   @@index([scoreId])
+  @@index([code])
   @@map("app_issues")
 }
 

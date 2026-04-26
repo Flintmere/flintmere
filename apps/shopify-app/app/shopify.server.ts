@@ -5,7 +5,14 @@ import {
   shopifyApp,
 } from '@shopify/shopify-app-remix/server';
 import { PrismaSessionStorage } from '@shopify/shopify-app-session-storage-prisma';
+import type { PrismaClient as VendorPrismaClient } from '@prisma/client';
 import { prisma } from './db.server';
+
+// PrismaSessionStorage's signature pins to the vendor `@prisma/client`'s
+// PrismaClient. Our generated client is structurally identical but
+// nominally distinct (per-app output path — see prisma/schema.prisma).
+// Cast at the boundary; runtime behaviour is unchanged.
+const sessionStoragePrisma = prisma as unknown as VendorPrismaClient;
 
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY!,
@@ -14,7 +21,7 @@ const shopify = shopifyApp({
   scopes: process.env.SHOPIFY_SCOPES?.split(',') ?? [],
   appUrl: process.env.SHOPIFY_APP_URL!,
   authPathPrefix: '/auth',
-  sessionStorage: new PrismaSessionStorage(prisma),
+  sessionStorage: new PrismaSessionStorage(sessionStoragePrisma),
   distribution: AppDistribution.AppStore,
   isEmbeddedApp: true,
   future: {

@@ -21,7 +21,10 @@ export const AttributeInferInputSchema = z.object({
   vertical: VerticalSchema.default('default'),
   requestId: z.string().optional(),
 });
-export type AttributeInferInput = z.infer<typeof AttributeInferInputSchema>;
+// `z.input` (not `z.infer`) so callers can omit fields that have Zod
+// `.default(...)` — the parse inside `inferAttributes` fills them in.
+export type AttributeInferInput = z.input<typeof AttributeInferInputSchema>;
+export type AttributeInferInputParsed = z.infer<typeof AttributeInferInputSchema>;
 
 export interface InferredAttribute {
   key: string;
