@@ -9,7 +9,11 @@ import { PrismaSessionStorage } from '@shopify/shopify-app-session-storage-prism
 import type { PrismaClient as VendorPrismaClient } from '@prisma/client';
 import { prisma } from './db.server';
 import { encryptToken } from './lib/encryption.server';
-import { enqueueSync } from './queue/queues.server';
+// NOTE: queues.server.ts is imported lazily inside afterAuth (see below).
+// Static import would throw at app boot when REDIS_URL is missing because
+// queue constructors call getRedis() synchronously — and shopify.server.ts
+// is imported by every route (via `authenticate`). Lazy import isolates
+// the Redis dependency to actual OAuth completion.
 
 // PrismaSessionStorage's signature pins to the vendor `@prisma/client`'s
 // PrismaClient. Our generated client is structurally identical but
@@ -102,6 +106,7 @@ const shopify = shopifyApp({
         existing.lastSyncAt === null;
 
       if (isFreshInstall) {
+        const { enqueueSync } = await import('./queue/queues.server');
         await enqueueSync({
           shopDomain,
           enqueuedAt: new Date().toISOString(),
