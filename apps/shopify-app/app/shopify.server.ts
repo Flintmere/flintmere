@@ -7,6 +7,7 @@ import {
 } from '@shopify/shopify-app-remix/server';
 import { PrismaSessionStorage } from '@shopify/shopify-app-session-storage-prisma';
 import type { PrismaClient as VendorPrismaClient } from '@prisma/client';
+import * as Sentry from '@sentry/remix';
 import { prisma } from './db.server';
 import { encryptToken } from './lib/encryption.server';
 // NOTE: queues.server.ts is imported lazily inside afterAuth (see below).
@@ -94,7 +95,48 @@ const shopify = shopifyApp({
 
       // Register webhooks AFTER the Shop row is in place, so the webhook
       // handlers (which read prisma.shop) don't race the install.
-      await shopify.registerWebhooks({ session });
+      // The result is per-topic; partial failures don't fail the install
+      // (re-auth re-tries) but we MUST surface them — a silently failed
+      // PRODUCTS_UPDATE registration means drift detection is dead.
+      try {
+        const webhookResults = await shopify.registerWebhooks({ session });
+        const failures = Object.entries(webhookResults ?? {}).flatMap(
+          ([topic, results]) =>
+            (results ?? [])
+              .filter((r) => !r.success)
+              .map((r) => ({
+                topic,
+                result: r.result as unknown,
+              })),
+        );
+        if (failures.length > 0) {
+          Sentry.withScope((scope) => {
+            scope.setTag('shop_domain', shopDomain);
+            scope.setTag('phase', 'webhook-registration');
+            scope.setExtras({ failures });
+            Sentry.captureMessage(
+              `webhook registration: ${failures.length} topic(s) failed`,
+              'warning',
+            );
+          });
+          // eslint-disable-next-line no-console
+          console.warn(
+            JSON.stringify({
+              event: 'afterAuth-webhook-registration-failures',
+              shopDomain,
+              failures,
+            }),
+          );
+        }
+      } catch (err) {
+        // Total registration failure (e.g., admin call refused). Capture
+        // but don't fail the install — merchant can re-auth to retry.
+        Sentry.withScope((scope) => {
+          scope.setTag('shop_domain', shopDomain);
+          scope.setTag('phase', 'webhook-registration');
+          Sentry.captureException(err);
+        });
+      }
 
       // Fresh install OR reinstall after uninstall OR install that never
       // completed its first sync: kick off the initial bulk-op sync.
