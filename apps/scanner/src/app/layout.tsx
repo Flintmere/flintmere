@@ -56,23 +56,20 @@ export default function RootLayout({
           Skip to main content
         </a>
         {children}
-        {/* Plausible analytics — cookieless, EU-hosted (Plausible Cloud).
+        {/* Privacy-friendly analytics by Plausible — cookieless, EU-hosted.
             ADR 0013. Event helper at apps/scanner/src/lib/plausible.ts.
-            URL set via NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC in Coolify env;
-            Plausible's modern snippet uses a hashed per-site URL. The fallback
-            `script.js` is generic (won't track until env var is set). */}
-        {process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC ? (
-          <>
-            <Script
-              async
-              src={process.env.NEXT_PUBLIC_PLAUSIBLE_SCRIPT_SRC}
-              strategy="afterInteractive"
-            />
-            <Script id="plausible-init" strategy="afterInteractive">
-              {`window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()`}
-            </Script>
-          </>
-        ) : null}
+            URL is the per-site hashed identifier from Plausible's dashboard;
+            it's a public client-side script URL (visible in DevTools to any
+            visitor), not a secret — hardcode is fine and matches Plausible's
+            documented integration pattern. */}
+        <Script
+          async
+          src="https://plausible.io/js/pa-aNNKaQAfbNXDVydWZBFmj.js"
+          strategy="afterInteractive"
+        />
+        <Script id="plausible-init" strategy="afterInteractive">
+          {`window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()`}
+        </Script>
       </body>
     </html>
   );
