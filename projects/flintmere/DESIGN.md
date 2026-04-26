@@ -45,10 +45,10 @@ The Shopify app embeds inside Shopify admin. Polaris is non-negotiable for Built
 
 Five rules that apply to every Flintmere surface. #8 Accessibility (Noor) holds veto on any breach of law 3.
 
-1. **Type is the image.** No stock photography, no AI gradient hero, no decorative illustration. Large Geist display carries the visual weight.
+1. **Type leads, imagery proves** (revised 2026-04-26). Geist display carries the rhythm of every surface. On marketing surfaces, imagery is permitted in two modes — **photoreal** for emotional anchors (hero, blog feature image, pricing-page anchor) and **product screenshots** for proof (how-it-works, feature pages, trust sections). The bracket signature must co-occur with every photoreal moment within the same viewport. Line-art remains an option, no longer a mandate. Stock-photo SaaS tropes (team-in-office, abstract handshake, AI gradient hero) and AI-generated imagery are still banned. See `memory/design/tokens.md` §Imagery.
 2. **One accent per section.** Amber is the sole colour accent. On marketing: amber appears as display-scale `StatNumber`, bracket under-tick, icon fills, or one amber-fill CTA (ink-on-amber). On scanner + Shopify-app island: amber is the live-diagnostic colour — score-ring, severity-high dot, warn rows, `prompt` marker. Amber is never body text, meta text, or small-label text on `--paper`. See ADR 0007.
 3. **WCAG AA on every text surface. AAA on primary CTAs.** `--mute-2` is metadata only (below body-text contrast on paper). Noor veto on any regression.
-4. **`prefers-reduced-motion` honoured everywhere.** Every animation has a reduced-motion branch that disables movement while preserving meaning.
+4. **`prefers-reduced-motion` honoured everywhere — two tiers** (revised 2026-04-26). Marketing + scanner: a single global `@media` block in `globals.css` scales motion durations to near-zero; individual components inherit it without per-component reduced variants. Shopify app: strict per-animation contract retained for Built-for-Shopify submission. See `memory/design/motion.md` §The reduced-motion contract (two tiers).
 5. **Sharp corners. No shadows. No glass.** Separation is 1px ink hairline. If a surface looks weak, it's the layout, not the missing shadow.
 
 ## The bracket (signature)
@@ -102,7 +102,9 @@ Canonical: `../../memory/design/tokens.md`. Highlights for quick reference:
 - Sulphur `#D9E05A` (retired 2026-04-20, ADR 0007 — amber replaces it everywhere).
 - Amber on body text, meta text, eyebrows, small labels, or inline links on `--paper` (fails AA at ≈1.7:1).
 - Amber on Polaris primary buttons (they stay Polaris green `#008060` — amber lives inside the Flintmere island only).
-- Stock photography. AI-generated gradient heroes. Emojis as decoration.
+- **Emojis as decoration** — anywhere. UI labels, headings, status indicators, marketing copy, social posts, blog headers, error states, button labels. Zero exceptions. Abstract typographic dots (`●`, `◆`, `▸`) are not emojis and are permitted per token rules.
+- **Stock-photo SaaS tropes** — the recognisable genre: team-in-glass-office, abstract-handshake-over-contract, hands-typing-laptop-with-blurred-phone, three-monitor-golden-hour-desk, dashboard-mocked-onto-MacBook-on-white-desk, hex-grid-with-neon-data-flow, skyline-with-network-node-overlay, finger-touching-glowing-AR-icon, robot-hand-meets-human-hand, sticky-note-wall-as-agility-signal, coffee-cup-laptop-plant-flat-lay, server-room-with-blue-LED-glow, headshot-grid-of-fake-testimonials, post-purchase-shopper-with-paper-bag-smiling, box-on-doorstep-with-cute-dog. Pattern saturation makes them invisible. **Imagery must be specific to product truth** — real product cards, real Shopify admin captures, real catalog detail, real merchant context — not generic commerce signal.
+- **AI-generated imagery on marketing surfaces** — photoreal, gradient, illustrative, all banned. Trust-risk on a security-adjacent product; pattern-stale within months of any model release; defensibility-zero in a copyright dispute.
 - Drop-cap or other editorial ornaments that aren't the bracket.
 - Logomarks, cube icons, isometric or 3D brand renders. The wordmark is the mark. See `../../memory/design/tokens.md` §Wordmark + §Rejected brand-asset patterns.
 - Tagline lockups inside the wordmark. "AI-agent readiness platform" is page copy, never mark.

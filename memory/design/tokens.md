@@ -155,13 +155,68 @@ The bilateral `[ word ]` signature still applies to every other bracket moment o
 - Not gradient, shaded, or rendered — flat type on flat canvas.
 - Not amber-filled — the wordmark is monochrome. Amber under-tick is a separate optional motion on hero moments.
 
+## Imagery (added 2026-04-26)
+
+The line-art-only imagery mandate is **retired** (carried over from AllowanceGuard's Ledger aesthetic; not load-bearing in Flintmere's neutral-bold canon). Two image modes are now permitted on marketing surfaces, governed by a rotation rule.
+
+### Rotation rule: emotion → photoreal, proof → screenshot
+
+| Mode | Use for | Treatment |
+|---|---|---|
+| **Photoreal** | Hero moments, blog feature images, pricing-page emotional anchors | Single editorial-quality image, warm tonal grade (`--image-treatment-warm`), bracket signature co-occurs as overlay or adjacent typography |
+| **Product / agent screenshot** | "How it works" sections, feature pages, trust sections, case studies | Real Shopify admin captures or annotated UI mocks; annotated callouts in Geist Mono (`--image-caption-mono`) — never raw stills |
+| **Inline SVG line-art** | Diagrams, hairline illustrations, optional decorative motifs | Still permitted via `image-direction` skill — demoted from mandate to one option among three |
+
+### Sourcing
+
+- **Photoreal**: Adobe Stock (operator licence) is the default. No Unsplash free tier (over-used by every SaaS). No AI-generated imagery on marketing surfaces — trust-risk on a security-adjacent product.
+- **Screenshots**: real Shopify admin captures (anonymised — no real merchant names without permission) or Figma mocks rendered to PNG.
+- **Identifiable humans**: prohibited until model releases secured. Objects, environments, product surfaces, hands-only shots are fine.
+
+### Treatment tokens
+
+| Token | Definition | Use |
+|---|---|---|
+| `--image-treatment-warm` | `filter: saturate(0.85) contrast(1.02) sepia(0.04);` (CSS approximation; final grade applied at asset-prep time, not runtime) | Default treatment on every photoreal hero — pulls cool stock toward Flintmere's warm-paper canvas |
+| `--image-overlay-bracket-color` | `var(--ink)` at 100% opacity | The 1px hairline bracket overlay on photoreal heros — bracket signature co-occurs with imagery |
+| `--image-caption-mono` | Geist Mono 11–13px, `var(--mute)` on paper, `var(--mute-inv)` on ink | Annotated callouts on screenshots; image captions; figure labels |
+
+### Weight budgets (Noor + Thane veto)
+
+- Hero photoreal: **≤ 100KB** AVIF/WebP, with a low-weight blur placeholder.
+- Product screenshots: **≤ 40KB** each, AVIF/WebP, max 5 per page.
+- All images served via `next/image` with explicit width/height to prevent CLS.
+- LCP must remain **≤ 2.5s** on Coolify (current scanner droplet baseline).
+
+### Bracket co-occurrence rule (Noor's veto, #8 + Hina #1)
+
+Every photoreal moment **must** carry the bracket signature within the same viewport — either as a 1px hairline bracket overlaid on the image (using `--image-overlay-bracket-color`) or as adjacent display typography that contains a bracketed token. The image alone never carries the brand. The bracket does.
+
+### What imagery is NOT (hard bans, no exceptions)
+
+**The specificity principle.** Every image on a Flintmere marketing surface must be specific to product truth — real product cards, real Shopify admin, real catalog detail, real merchant context. Generic commerce signal is banned because it lands as forgettable wallpaper and contradicts the product's own claim (catalog specificity).
+
+**Banned at sourcing time** (do not even shortlist these from Adobe Stock):
+
+- **Stock-photo SaaS tropes** — the genre includes: team-in-glass-office, abstract-handshake-over-contract, hands-typing-laptop-with-blurred-phone, three-monitor-golden-hour-desk, dashboard-mocked-onto-MacBook-on-white-desk, hex-grid-with-neon-data-flow, skyline-with-network-node-overlay, finger-touching-glowing-AR-icon, robot-hand-meets-human-hand, sticky-note-wall-as-agility-signal, coffee-cup-laptop-plant-flat-lay, server-room-with-blue-LED-glow, headshot-grid-of-fake-testimonials, post-purchase-shopper-with-paper-bag-smiling, box-on-doorstep-with-cute-dog. If an Adobe Stock candidate fits any of these descriptions, reject without further review. Pattern saturation across SaaS marketing makes them invisible.
+- **Emojis as decoration** — anywhere. UI labels, headings, status indicators, marketing copy, social posts, blog headers, error states, button labels. Zero exceptions. Abstract typographic dots (`●`, `◆`, `▸`) are not emojis and remain permitted per existing token rules.
+- **AI-generated imagery on marketing surfaces** — photoreal, gradient, illustrative, all banned. Trust-risk on a security-adjacent product; pattern-stale within months of model release; defensibility-zero in a copyright dispute.
+- **Decorative imagery without product purpose** — if a section can lose its image without losing comprehension, the image was decoration, not proof. Type carries the moment instead.
+- **Autoplay video** — banned in §Motion §Bans, repeated here for sourcing clarity.
+
+If an image is challenged at review and cannot answer "what specific product truth does this prove?", it fails. The bracket signature has nothing to land on if the image is generic — and the bracket-co-occurrence rule above will fail by construction.
+
+### Migration note
+
+Pre-2026-04-26 surfaces shipped under the line-art-only mandate. They remain valid — line-art is now one option, not the only one. New surfaces designed after this date may use any of the three modes per the rotation rule. No retroactive purge required.
+
 ## Corners, surfaces, motion floors
 
 - **Corners sharp.** No `border-radius` except on circular gauges (score-ring), avatars (if introduced), toggle handles.
 - **No shadows.** Separation via 1px `--line` hairline. Apple-bold does not use drop shadows.
 - **No gradients** except the conic-gradient that renders score rings.
 - **No blur, no glass.** Opaque surfaces only.
-- **Motion:** opacity + transform only. Never animate `width/height/top/left`. Every animation has a `prefers-reduced-motion` branch that disables movement and preserves meaning.
+- **Motion:** opacity + transform only. Never animate `width/height/top/left`. Marketing + scanner surfaces use a single global `prefers-reduced-motion` block in `globals.css` to scale durations to zero (soft contract, 2026-04-26). Shopify-app island components retain the per-animation strict contract for Built-for-Shopify submission. See `motion.md` §The reduced-motion contract (two tiers).
 
 ## Inversion
 
@@ -225,8 +280,15 @@ Everything from the inherited allowanceguard Ledger canon is **retired**. Do not
 - **Bilateral dark-form wordmark `Flint[ mere ]`** — replaced by the asymmetric `Flintmere]` (both canvases).
 - **"Sulphur on scanner only / zero sulphur on marketing" rule** — replaced by the amber surface-specific rules above. Amber is one palette on all three surfaces, governed by Noor's contrast floor rather than surface assignment.
 
+### Retired 2026-04-26 (Standing Council canon shift)
+
+- **Line-art-only imagery mandate** — replaced by the three-mode imagery rotation in §Imagery. Photoreal + product screenshots now permitted on marketing surfaces; line-art demoted to one option. Heritage from AllowanceGuard Ledger; not load-bearing in Flintmere's neutral-bold canon.
+- **"Designed reduced-motion variant per surface" rule** — replaced by the soft contract on marketing/scanner (single global `@media` block in `globals.css`). Shopify app retains strict contract for BFS. See `motion.md` §The reduced-motion contract (two tiers).
+- **DESIGN.md law #1 "Type is the image"** — replaced by "Type leads, imagery proves." Type still carries hero rhythm; imagery now permitted to anchor emotion (photoreal) and demonstrate proof (screenshots) on marketing surfaces only.
+
 ## Changelog
 
+- 2026-04-26: Standing Council voted 10–0 (with conditions) to lift the line-art-only imagery mandate and soften the `prefers-reduced-motion` contract on marketing/scanner. New §Imagery section added with three image modes (photoreal, screenshot, line-art), a rotation rule (emotion → photoreal, proof → screenshot), three new tokens (`--image-treatment-warm`, `--image-overlay-bracket-color`, `--image-caption-mono`), weight budgets, and a bracket co-occurrence rule. `motion.md` updated to a two-tier contract: marketing/scanner soft (global `globals.css` block), Shopify app strict (per-animation, retained for BFS). DESIGN.md law #1 reframed from "Type is the image" to "Type leads, imagery proves."
 - 2026-04-20 (later): ADR 0007 accepted — Glowing Amber `#F8BF24` adopted as portfolio signature and sole accent across all three surfaces. Sulphur `#D9E05A` retired. Wordmark changed from bilateral dark-form `Flint[ mere ]` to asymmetric `Flintmere]` (both canvases, monochrome). Palette, §Signature under-tick, §Wordmark, §Inversion, §Surface-specific, §Rejected patterns, §Retired all reconciled to 0007. The bracket signature, neutral-bold structure, and Geist type stack from 0003 remain authoritative.
 - 2026-04-20: Added §Wordmark and §Rejected brand-asset patterns after Standing Council review of an external (Gemini-generated) brand-assets sheet. Wordmark converted from §Signature example into a formal rule: the mark is the type, no logomark, no tagline lockup. (Rules refined later the same day by 0007 — the wordmark form became asymmetric; amber was accepted as the brand colour.)
 - 2026-04-19: Canon selected — **neutral-bold (Apple-bold structure) with the legibility-bracket signature**. Palette: warm near-white + near-black, sulphur demoted to scanner-only. Fonts: Geist Sans + Geist Mono. Council decision: Maren/Kael/Noor approved signature; #12 Ecosystem endorsed neutral-bold over sulphur-everywhere for Shopify Plus buyer context; #22 Conversion cross-referenced bracket-as-emphasis A/B data. First authoritative statement.

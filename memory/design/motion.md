@@ -2,13 +2,16 @@
 
 Motion spec + `prefers-reduced-motion` contract. **Idris** owns this file. **Noor (#8, veto)** blocks any animation without a reduced-motion branch on in-scope surfaces.
 
-## Scope (corrected 2026-04-25)
+## Scope (revised 2026-04-26)
 
-This contract applies to **marketing surfaces** (`flintmere.com`) and the **scanner** (`audit.flintmere.com`) — surfaces where Flintmere designs the chrome end-to-end and owns the motion language.
+Two contracts run side-by-side, by surface:
 
-It explicitly does **NOT** apply to the **Shopify app** (`app.flintmere.com`). Inside Shopify admin's iframe, Polaris owns the chrome and handles motion defaults (including reduced-motion) per Shopify's own accessibility commitments. Adding a custom Flintmere motion contract on top would (a) duplicate Polaris's behaviour, (b) confuse merchants who expect Shopify-admin-native motion patterns, and (c) violate the design-app-surface island rule ("Polaris primitives stay untouched"). The reduced-motion contract carried over from a different project and was wrong to apply to Shopify-app surfaces.
+- **Marketing surfaces** (`flintmere.com`) and the **scanner** (`audit.flintmere.com`) — soft contract. `prefers-reduced-motion` is honored via opacity/duration scaling at the global stylesheet level (one `@media` block in `globals.css` does most of the work). Individual animations do **not** require a separately-designed reduced variant. Motion budget is generous: Emil-Kowalski-spare physics, scroll-reveal sequences, hover scale, micro-interactions with weight. WCAG 2.3.3 still met.
+- **Shopify app** (`app.flintmere.com`) — strict contract retained for Built-for-Shopify submission. Polaris owns most motion; Flintmere island components inherit Polaris's `prefers-reduced-motion` propagation. Brand-island micro-motion (ScoreRing fill, IssueRow state changes) MUST have an explicit reduced-motion branch that disables movement and preserves end-state meaning.
 
-Brand-island components inside the Shopify app (ScoreRing fill, IssueRow, etc.) MAY have their own micro-motion, but they inherit Polaris's `prefers-reduced-motion` propagation rather than declaring their own contract.
+Why the split: BFS reviewers actively check reduced-motion behaviour inside the iframe. Marketing/scanner audiences are not gated on that submission. A blanket strict contract over-burdened design throughput on the conversion-critical surfaces; the soft contract reclaims that budget without dropping the WCAG floor.
+
+The 2026-04-25 "wrong to apply to Shopify-app surfaces" note is **superseded** — the app keeps strict; only marketing + scanner soften.
 
 ## Principles
 
@@ -17,18 +20,31 @@ Brand-island components inside the Shopify app (ScoreRing fill, IssueRow, etc.) 
 - **Choreographed entrances.** Elements arrive in an order that reads top-to-bottom, left-to-right, primary-then-secondary.
 - **Scroll as revelation.** Content earns the scroll; the scroll doesn't scrub the content.
 - **One signature motion per surface.** Not three.
-- **Less is more.** Flintmere's neutral-bold posture demands restrained motion. No hero parallax. No ambient "breathing" UI. Motion fires when state changes, not as decoration.
+- **Restrained, not absent.** Flintmere's neutral-bold posture demands considered motion — Emil-Kowalski-spare physics, type-led hierarchy, micro-interactions with weight (the sonner/vaul "everything has weight" quality). Hero parallax is still out. Ambient "breathing" UI is still out. Motion fires on state change or scroll-reveal, not on decoration. The marketing budget is generous; the bar for shipping a motion is "does this earn its frame?", not "is it possible to animate?".
 
-## The reduced-motion contract (mandatory)
+## The reduced-motion contract (two tiers)
 
-Every animation, transition, entrance, and progress indicator must have a `@media (prefers-reduced-motion: reduce)` branch that:
+### Tier 1 — Marketing + scanner (soft contract)
+
+A single global `@media (prefers-reduced-motion: reduce)` block in `globals.css` scales animation/transition durations toward zero (`0.01ms`). Individual components do **not** ship a hand-designed reduced variant. The end state remains visible because durations approach zero rather than the animation being suppressed.
+
+What this still requires:
+- End state must be visible (the post-animation frame is what `reduce` users land on — there is no "blank" or "loading-forever" trap).
+- No component-level `@media (prefers-reduced-motion: reduce)` exception that overrides the global scale-to-zero. If a component animates, it inherits the global rule.
+- No autoplay video, no infinite animations, no parallax (still banned — see §Bans). Those are independent of the soft contract.
+
+### Tier 2 — Shopify app (strict contract, retained)
+
+Every animation inside the Flintmere island must have a `@media (prefers-reduced-motion: reduce)` branch that:
 
 - Disables or drastically shortens the animation.
 - Keeps the end state visible. The reduced-motion user sees the final frame, never a blank.
 - Does not remove functionality. Scan progress still shows current state; the transition is instant, not animated.
 - Preserves meaning. A pill that transitions between states under reduced motion still changes colour/text, just without the fade.
 
-Non-negotiable. Noor rejects any PR that animates without this branch.
+Polaris primitives are exempt from the strict contract because Polaris ships its own `prefers-reduced-motion` handling.
+
+Noor rejects any island-component PR that animates without this branch. Marketing/scanner PRs only need to confirm the global block in `globals.css` is intact.
 
 ## Easing tokens
 
@@ -88,15 +104,17 @@ Reduced-motion variant: halves the duration at most; often sets to 0ms.
 
 ## Bans (non-negotiable)
 
-- No animation that moves more than 40px without a reduced-motion alternative.
 - No horizontal scroll-jacking (pinning a section while scroll scrubs content).
 - No parallax on any surface.
 - No infinite animations (ambient "breathing" UI, pulsing dots, spinning logos outside of genuine loading states).
 - No animating `width`, `height`, `top`, `left`. Use `transform` + `opacity`.
-- No spring physics exceeding one oscillation.
 - No autoplay video.
-- No motion under `prefers-reduced-motion` except instant transitions between end states.
-- No "demo mode" animations that play on the landing page just because the page loaded.
+- No motion under `prefers-reduced-motion` except instant transitions between end states (enforced globally in `globals.css` for marketing/scanner; per-component for Shopify app).
+- No "demo mode" animations that play on the landing page just because the page loaded — every motion has a trigger (mount, scroll-into-view, hover, focus, state change).
+
+Lifted from the previous bans (intentional change 2026-04-26):
+- ~~No animation that moves more than 40px without a reduced-motion alternative.~~ — superseded by the soft contract; marketing/scanner inherit global `reduce` scaling instead of per-animation alternatives.
+- ~~No spring physics exceeding one oscillation.~~ — Emil-Kowalski spring physics permitted on marketing surfaces. Still no rubber-band, still no bouncy. One subtle overshoot is fine.
 
 ## Specifying new motion
 

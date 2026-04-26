@@ -12,8 +12,8 @@ This budget exists so every new design choice pays for itself or is paid for els
 
 | Surface | JS budget (gzipped per route) | Image budget | Fonts |
 |---|---|---|---|
-| Marketing (`flintmere.com` inside scanner app) | ≤ 100KB | Inline SVG only; no raster above fold | Geist Sans (400/500/700) + Geist Mono (400/500), self-hosted, Latin subset |
-| Scanner (`audit.flintmere.com`) | ≤ 100KB | Inline SVG for score ring + pillar marks; line-art SVG < 18KB if used | Same |
+| Marketing (`flintmere.com` inside scanner app) | ≤ 100KB | Photoreal hero ≤ 100KB AVIF; product screenshots ≤ 40KB AVIF each; inline SVG for diagrams. Total raster ≤ 220KB per page. (Updated 2026-04-26 — line-art-only mandate retired; see `tokens.md` §Imagery.) | Geist Sans (400/500/700) + Geist Mono (400/500), self-hosted, Latin subset |
+| Scanner (`audit.flintmere.com`) | ≤ 100KB | Inline SVG for score ring + pillar marks; raster screenshots permitted on results / score pages within marketing budget if used. | Same |
 | Shopify app (`app.flintmere.com` — Flintmere-island-only) | ≤ 60KB on top of Polaris | Inline SVG; no image-based icons | Same |
 | Shopify app (Polaris baseline, shared budget ceiling) | ≤ 200KB (including Polaris itself) | — | — |
 
@@ -80,4 +80,5 @@ The budget is a forcing function, not a sacred number. Re-argue via ADR:
 
 ## Changelog
 
+- 2026-04-26: Marketing surface raster image budget added (hero ≤ 100KB AVIF, product screenshots ≤ 40KB AVIF, total ≤ 220KB per page). Aligns with the 2026-04-26 canon shift in `tokens.md` §Imagery and DESIGN.md law #1 ("type leads, imagery proves"). Line-art-only rule retired.
 - 2026-04-19: Rewritten for Flintmere. Replaced allowanceguard font list (Fraunces + Plex + Mono) with Geist Sans + Geist Mono (five weight files total). Three-surface bundle table (marketing / scanner / Shopify app) replacing the two-canon (homepage / docs) allowanceguard split. Noted Polaris as the shared Shopify-app budget baseline.

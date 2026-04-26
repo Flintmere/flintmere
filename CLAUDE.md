@@ -157,9 +157,9 @@ These bind. If a rule conflicts with my instinct, the rule wins.
 
 ## Surface-specific reminders
 
-- **Marketing site**: zero stock photos, one bracket per section, Geist display. Amber as display-scale accent + under-tick + amber-fill CTA; never body text on paper.
-- **Scanner**: amber is the live-diagnostic colour (score-ring, severity-high, warn rows). Score ring is the signature motion.
-- **Shopify app**: Polaris chrome + Flintmere island. Never restyle Polaris primitives.
+- **Marketing site**: type leads, imagery proves. Photoreal hero (Adobe Stock, warm-treated, ≤100KB AVIF/WebP) or annotated product screenshot permitted per `memory/design/tokens.md` §Imagery. Bracket signature must co-occur with every photoreal moment in the same viewport. No SaaS stock tropes, no AI-generated imagery, no identifiable humans without releases. One bracket per section, two per page max. Geist display. Amber as display-scale accent + under-tick + amber-fill CTA; never body text on paper. Soft `prefers-reduced-motion` contract (single global `globals.css` block).
+- **Scanner**: amber is the live-diagnostic colour (score-ring, severity-high, warn rows). Score ring is the signature motion. Soft `prefers-reduced-motion` contract (same global block as marketing).
+- **Shopify app**: Polaris chrome + Flintmere island. Never restyle Polaris primitives. Strict `prefers-reduced-motion` contract retained on island components for Built-for-Shopify submission.
 
 ## Canon hygiene
 
@@ -170,6 +170,9 @@ If you encounter any of these in code or copy, they are retired — migrate or d
 - `.paper-card`, `.ledger-rule`, `.deckle-*`, `.grain`, `.glass-*` (retired utilities)
 - `bg-white`, `bg-slate-*`, `bg-gray-*`, `bg-neutral-*`, `dark:*` (banned)
 - The word "approved." as a protected moment (allowanceguard heritage)
+- The line-art-only imagery mandate (retired 2026-04-26 — see `memory/design/tokens.md` §Imagery; photoreal + product screenshots now permitted)
+- The "designed reduced-motion variant per surface" rule (retired 2026-04-26 — marketing/scanner inherit a single global `globals.css` `prefers-reduced-motion` block; only Shopify app retains the per-component strict contract)
+- DESIGN.md law #1 phrased as "Type is the image" (retired 2026-04-26 — replaced by "Type leads, imagery proves")
 
 ## Deployment
 
@@ -186,4 +189,5 @@ See `projects/flintmere/decisions/0005-llm-provider-strategy.md` + `0006-hardcas
 
 ## Changelog
 
+- 2026-04-26: Standing Council canon shift — line-art imagery mandate retired (photoreal + product screenshots now permitted on marketing per `memory/design/tokens.md` §Imagery), `prefers-reduced-motion` softened to a two-tier contract (soft global block on marketing/scanner; strict per-component on Shopify app for BFS), DESIGN.md law #1 reframed from "Type is the image" to "Type leads, imagery proves." Surface-specific reminders + Canon hygiene updated.
 - 2026-04-19: Rewritten for Flintmere. Replaced kit-template CLAUDE.md with a Flintmere-specific load map, canon summary, signature reminder, active vetos, and surface-specific reminders. References all 7 departments and ADRs 0001–0006.
