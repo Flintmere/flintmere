@@ -68,7 +68,7 @@ async function handleBrandApply(
   const before = fix.beforeState as { productIds: string[] };
   const productIds = before.productIds ?? [];
 
-  const plan = await planBrandFromVendor(shopDomain, productIds);
+  const plan = await planBrandFromVendor(admin, shopDomain, productIds);
   const result = await applyBrandFromVendor(admin, plan);
 
   await prisma.fix.update({
