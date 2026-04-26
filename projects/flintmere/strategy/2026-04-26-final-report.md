@@ -1,438 +1,579 @@
-# Flintmere — Final Strategic Report
+# Flintmere — Final Strategic Report (v2)
+
+> ## ⚠ COUNCIL RATIFICATION BLOCK — 2026-04-26 evening (binds over conflicting language below)
+>
+> Standing Council convened on the v2 report (39 seats; relevant lenses #15 + #18 + #4 + #24 + #11 + #22 + #39 + #37 + #7 + #5 + #36 + #34 + #38 + #1). The moat reframe (workflow > taxonomy) ratified. The following adjustments bind every reading of this document:
+>
+> 1. **Engineering timeline correction (#15 + #18).** §4 §"The honest cost" + §9.7 phasing both say 5–7 months for the ingestion engine. Realistic end-to-end (PDF heuristics for 3 supplier formats + multimodal back-of-pack + Shopify metafield writeback + drift detection + BFS-grade verification UX) is **9–12 months solo**. Internal planning binds the longer figure; the §12 phase structure holds.
+> 2. **Privacy posture binds Phase 2 (#4 + #24 VETO).** Supplier PDF + photo upload introduces PII handling the current Privacy Policy + DPA don't cover. Phase 2 of the ingestion engine MUST NOT ship without a parallel `legal-page-draft` skill pass covering: (a) DPA addendum for upload artefacts; (b) upload-bucket retention schedule + deletion-on-request flow; (c) photo-PII handling for incidental humans in backgrounds; (d) new Shopify scope `write_products` disclosure.
+> 3. **Pricing magnitudes are HYPOTHESES (#22 + #11).** §5's £99 base + £50/channel + £40/£70 vertical bundles are PROPOSALS, not commitments. ADR 0016 already committed a WTP study Month 1–2 to calibrate; v2 effectively bypassed that commitment. The structural axis change (per-channel) ratifies; the magnitudes wait on WTP. Public copy must not name specific magnitudes until WTP lands.
+> 4. **"Plaid of commerce data" tagged ASPIRATIONAL (#11 + #1).** Strategic-cornerstone framing in §6 is overclaim — the report itself admits "if it doesn't [land], it's a slide in a deck." Treat as aspirational long-arc bet, not load-bearing strategy.
+> 5. **Standards publication framing risk (#39 VETO).** v2 demotes standards from "moat" to "marketing artifact." Operationally fine, but the framing risks operator under-investment in regulatory monitor + #39 review cadence over time. **Standards remain operationally first-class** — half-yearly publication + #39 weekly review per ADR 0018 hold without exception. Citation gate (Gate 2) DEPENDS on this.
+>
+> **Architectural conflicts resolved:**
+>
+> - **Conflict A (#5 Kael):** v2 §9.5 puts standards publication in `apps/scanner/src/app/standards/food/v1/page.tsx`. This contradicts ADR 0018 + the standards IA spec (`context/design/ia/2026-04-26-standards-flintmere-com.md`) which pre-bound a STANDALONE app at `apps/standards/` on the standards.flintmere.com subdomain. **Resolution: honour ADR 0018; standards lives at `apps/standards/` standalone, NOT in `apps/scanner/`.**
+> - **Conflict B (#5 Kael):** v2 §9.6 proposes a new `/company` route. This duplicates the `/about` route already specced in `context/design/specs/2026-04-26-about-food-first.md` (which covers Eazy Access Ltd + Companies House + the John Morris single-mention per BUSINESS.md procurement disclosure rule). **Resolution: retire `/company`; ship the existing `/about` spec.**
+>
+> **ADR amendment chain triggered (follow-up commits, not tonight):**
+>
+> - **ADR 0020 (NEW):** per-channel pricing axis change. Layers on top of ADR 0016 (vertical-distribution axis); 0016 stays valid; 0020 adds the channel-multiplier dimension.
+> - **ADR 0019 (AMENDED in place):** 6-month strategic gate proof-condition changes from "third-party citation of food standard" to "30-day cohort retention ≥ 70% on ingestion engine." Same calendar (2026-10-26). The original citation gate becomes Gate 2 (12-month, 2027-04-26).
+>
+> **Sequencing decision (council 5-2-2 split):** finish HOMEPAGE-only Phase D web-implementation (per-vertical content slot copy + retire legacy 5-tier strip) sequentially; dispatch dead-inventory wedge engineering in parallel. `/pricing` tier-strip rebuild on legacy SKU-volume model is DROPPED as throwaway (lands inside §9.2 with new pricing axis). `/about` + `/methodology` + `/for/plus` surface composition DEFERRED until post-wedge.
+>
+> All other v2 content stands as written. Where this ratification block conflicts with the body below, this block wins.
+
+---
 
 **Author:** External review (Claude, working session 2026-04-26)
 **Status:** Final. Actionable. Repo-ready.
-**Suggested location:** `memory/strategy/2026-04-26-final-report.md`
-**Cross-link from:** `CLAUDE.md` precedence table, just above `context/`.
+**Suggested location:** `projects/flintmere/strategy/2026-04-26-final-report.md` (per council: strategic reports are PROJECT documents, not global behaviour rules in `memory/`).
+**Cross-link from:** `CLAUDE.md` product snapshot (updated 2026-04-26 evening to reflect ingestion-engine centrality).
+**Supersedes:** v1 (2026-04-26 morning, same path; visible via git history). v1 framed the moat as "regulatory taxonomies you maintain." v2 corrects this: the taxonomy alone is not the moat. The *ingestion workflow* is the moat. This shifts the codebase priorities and the 90-day plan.
 
 ---
 
 ## 0. How to use this document
 
-This report converts the strategic conversation, the site review, the critique of the three external strategy documents, and the codebase walkthrough into a single source of truth. It is structured for action, not for reading top-to-bottom.
-
+- **Read the council ratification block above first.** It binds every reading of the body below.
 - **§1 Executive verdict** — read first.
-- **§2 The 12-month gate** — the only number that decides whether the strategy is working.
+- **§2 The two gates** — what you measure to know if it's working.
 - **§3–6** — what to do, ordered by leverage.
-- **§7** — codebase changes with file paths.
-- **§8** — what to stop.
-- **§9** — risks the strategy assumes you can survive.
-- **§10** — 90-day plan with decision gates.
+- **§7** — the dead-inventory wedge. The keystone. Build first.
+- **§8** — codebase changes with file paths.
+- **§9** — what to stop.
+- **§10** — risks the strategy assumes you can survive.
+- **§11** — sequenced 9-month plan with decision gates.
 
-If you only have 15 minutes: read §1, §2, §7, §8.
+If you only have 15 minutes: read the ratification block, §1, §2, §7, §8.
 
 ---
 
 ## 1. Executive verdict
 
-**Flintmere is a candidate standards business wearing the clothes of a commodity scanner.** The strongest, rarest, least-replaceable work in the codebase is the vertical regulatory taxonomies in `apps/scanner/src/app/for/{apparel,beauty,food-and-drink}/page.tsx`. The most replaceable surface — the seven-pillar framing, the public scanner, the store-count pricing question — is what the homepage leads with.
+**Flintmere's moat is the ingestion workflow, not the taxonomy.**
 
-The single sentence that summarises the strategic problem: **the homepage sells the part that competitors can copy in a quarter; the vertical pages sell the part that takes 0.5–1.0 FTE per vertical to maintain and that nobody else has built.**
+A competitor can scrape your food standard in a weekend. They cannot easily replicate the workflow that takes a supplier PDF, a back-of-pack photo, or a messy spreadsheet, runs it through multimodal extraction, maps it against your proprietary regulatory taxonomy, flags gaps, and writes structured data to Shopify metafields with merchant verification. That pipeline is the product. The taxonomy is the input. The standards publication is the marketing artifact.
 
-The fix is not a redesign. It's a re-prioritisation:
+This reframes everything in v1 of this report. v1 said "publish the standard, the maintenance is the moat." That's still true, but it's *secondary* to the workflow. The hierarchy is:
 
-1. **Lead with the vertical, demote the seven pillars to methodology.** The vertical pages are the moat; surface them first.
-2. **Pick food and drink as the spearhead.** The liability-to-visibility ratio favours it decisively over beauty and apparel — see §3.
-3. **Stop pricing on store count. Price on regulatory complexity.** The line "Five tiers. One question: how many stores?" is the single highest-stakes copy on the entire site, and it prices the wrong axis.
-4. **Either ship the embedded Shopify app or delist the £1,500+ Plus tier.** The public crawl cannot reach Plus stores (they sit behind enterprise bot-management — your own `/research` page admits this). You cannot sell a tier whose target buyer your conversion path cannot reach.
-5. **Set a single 12-month proof condition for the moat.** A third party citing the Flintmere food standard in their own documentation, unprompted. If that hasn't happened by April 2027, the standards business is a story you're telling yourself, not a fact.
+1. **Primary moat:** ingestion engine (supplier-mess → Shopify metafield) with merchant-verified LLM extraction
+2. **Secondary moat:** maintained, dated, regulator-tracked standard, openly published
+3. **Reinforcing moat:** retention via switching cost (leaving Flintmere = manual re-entry of N SKUs)
 
-The codebase is in good shape. The strategic positioning is not. This report is about the second problem.
+The single sentence that summarises the strategic problem: **the homepage sells a generic seven-check scanner, the vertical pages sell a regulatory specialist, but neither sells the ingestion engine that's actually the defensible product.**
+
+Five structural moves make this work:
+
+1. **Build the ingestion engine as the centrepiece product.** Multimodal extraction (supplier PDF / back-of-pack photo / spreadsheet) → proprietary taxonomy mapping → Shopify metafield writeback. The merchant verifies the LLM draft in one pass; you don't promise full automation, you promise a 30-second confirmation flow.
+2. **Pick food and drink as the spearhead vertical.** The liability-to-visibility ratio favours it decisively over beauty and apparel — see §3.
+3. **Lead with the dead-inventory pitch, not "AI-readiness."** "You have ~45 SKUs likely suppressed in Google Shopping at your AOV that's £12k/mo of uncaptured demand" converts. "Your catalog is invisible to ChatGPT" doesn't. See §7.
+4. **Price per outbound channel, not per store or per SKU.** Base platform fee + per-channel multipliers (GMC, TikTok Shop, Amazon, Perplexity). The merchant's distribution surface area is the value-metric, not their catalog size. **Per ratification block #3: magnitudes are HYPOTHESES pending WTP study.**
+5. **Ship the full Shopify embedded app.** This strategy requires it — the ingestion engine writes to metafields, and you need OAuth for that. There is no Path B version of this strategy. Budget **9–12 months** of engineering accordingly (corrected from v2's optimistic 5–7 per ratification block #1).
+
+The codebase is in good shape for this. The strategic positioning is not. The current homepage actively understates what Flintmere is becoming. This report is about closing that gap.
 
 ---
 
-## 2. The 12-month gate
+## 2. The two gates
 
-> **Proof condition:** A third party (a Shopify Plus brand, a vertical PIM, a regulatory consultant, a trade body, or a journalist) citing the *Flintmere food catalog standard* in their own documentation, blog post, RFP, or onboarding guide, without being prompted by you.
+The earlier version of this report had one gate: third-party citation of the Flintmere food standard within 12 months. That gate is still useful but is *secondary* under the moat reframe. The primary signal is now retention.
 
-**Why this and not anything else.**
+### Gate 1 (primary, retention) — month 6 check
 
-- "Stores scanned" measures bot reach, not standard adoption.
-- "Revenue" measures consulting demand, not standard authority.
-- "GitHub stars on the standard repo" measures developer interest, not industry adoption.
-- A third-party unprompted citation is the only signal that the *thing you maintain* has become a thing *they reference*. That's what a standard is.
+> **30-day cohort retention on the ingestion engine ≥ 70%.**
 
-**Calendar:** April 26, 2027.
+If merchants who use the ingestion engine to land their first 10+ products as structured data continue using it 30 days later, the switching-cost moat is real. If they churn, the workflow isn't valuable enough to lock them in, and the rest of the strategy needs revisiting.
 
-**What happens if it doesn't land:** You revert to the consulting business (£97 audits scaled to £200–500), kill the standards positioning, and the SaaS tiers become the support layer for a person-led service. That is not a failure mode — it's a viable business — but it is a different business, and the brand canon, pricing, hiring, and capital plan all change.
+Why retention not revenue: revenue lags 6+ months from ingestion-engine adoption (audit → trial → install → integration → expansion). Retention shows up immediately.
 
-**Build this in:** Add a quarterly self-review section to `STATUS.md` titled "Standard adoption check". Each quarter, list every external reference to the Flintmere food/beauty/apparel standard you can find. If by Q3 2026 the count is still zero from sources you didn't seed, treat it as a yellow flag. If by Q1 2027 it's still zero, the strategy needs revisiting before you spend more capital on standards maintenance.
+**ADR 0019 amendment per ratification block:** this gate replaces the v1 citation gate at the 2026-10-26 calendar moment. Citation gate becomes Gate 2.
+
+### Gate 2 (secondary, authority) — month 12 check
+
+> **A third party citing the Flintmere food standard in their own documentation, blog post, RFP, or onboarding guide, without being prompted by you.**
+
+Calendar: April 26, 2027.
+
+This is the same gate as v1 of this report. It still matters because it's the public proof that the standard has authority — which feeds GTM, partnership conversations, and the eventual "Plaid of commerce data" positioning (see §6 — and per ratification block #4, treat that framing as aspirational, not load-bearing).
+
+### What happens if gates don't pass
+
+- **Gate 1 fails (retention):** the ingestion engine isn't producing real switching cost. Most likely cause: the multimodal extraction quality is too low and merchants don't trust the output. Fix the extraction quality before scaling. If after another 90 days it still doesn't, revert to consulting-led (Path A from the Shopify-app discussion) — the strategy is not viable.
+- **Gate 2 fails (authority):** you have a working SaaS but not a standards business. Fine — keep running the SaaS, drop the standards publication maintenance, focus on workflow improvements. This is still a viable business, just a smaller one.
+
+**Build this in:** Add a quarterly self-review section to `STATUS.md` titled "Strategy gates." Each quarter, list (a) ingestion-engine 30-day cohort retention, (b) external references to the standard. Both numbers in plain sight, no rounding.
 
 ---
 
 ## 3. Vertical strategy: pick food and drink
 
-The earlier conversation correctly identified that beauty and food are the two strong candidates and that apparel is the weakest. The unresolved question was beauty *or* food. Food wins on three dimensions:
+Food wins on three dimensions over beauty and apparel:
 
-**Liability-to-visibility ratio.** Allergen mislabelling is a recall event with FSA involvement and direct retailer liability. PAO mistakes in beauty are paperwork issues. The food vertical creates a buyer who has *already been told by their compliance officer* that catalog data correctness matters; the beauty vertical creates a buyer who has been told it's a marketing nice-to-have. The first kind of buyer pays.
+**Liability-to-visibility ratio.** Allergen mislabelling is a recall event with FSA involvement and direct retailer liability. PAO mistakes in beauty are paperwork. The food vertical creates a buyer who has *already been told by their compliance officer* that catalog data correctness matters; the beauty vertical creates a buyer who's been told it's a marketing nice-to-have. The first kind of buyer pays.
 
-**Channel surface.** Every UK food retailer pushes data to Google Merchant Center, Amazon Fresh, Ocado, Deliveroo, and increasingly to ChatGPT-shopping and Perplexity. Every channel that delists for missing allergen data is a separate revenue stream you can quantify in the audit letter. Beauty pushes to Sephora-style channels but lacks the same regulatory-data-blocked-the-listing pattern.
+**Channel surface — and this matters more under per-channel pricing (§5).** Every UK food retailer pushes data to Google Merchant Center, Amazon Fresh, Ocado, Deliveroo, and increasingly to ChatGPT-shopping and Perplexity. A food merchant on five channels pays five channel multipliers. A beauty merchant typically syndicates to two or three. Per-channel pricing therefore captures more revenue per food customer than per beauty customer at the same SKU count.
 
 **Standard authority.** UK FSA Big-14 allergens, ISO 3166-1, PDO designations, certifications taxonomy — these are *already* recognised authorities. You're standardising the *encoding* of established regulatory taxonomies into Shopify metafields. The beauty INCI/PAO/skin-type story has the same shape but smaller liability stakes per merchant.
 
 **Action items for food-first positioning:**
 
-- `apps/scanner/src/app/page.tsx`: Reorder the IA so the vertical picker (Food / Beauty / Apparel) appears in the hero, not the seven pillars. The pillars become a "Methodology" section linked from the footer. Specific change: replace the seven-pillar `<ol>` block (lines ~177–245 of `page.tsx`) with a three-card vertical picker. The seven pillars move to `/methodology` (new page).
-- Build out food first as the deepest vertical. Apparel and beauty stay on the site but are clearly second-tier. The food page already has the strongest mistakes list in the codebase — make it deeper, not different.
-- `BUSINESS.md` / `BRAND.md`: rewrite the target-customer paragraph to lead with food. The current "Shopify merchants (100–5,000 SKUs, £500K–£20M revenue)" framing in CLAUDE.md is too generic to drive a vertical strategy.
+- `apps/scanner/src/app/page.tsx`: Reorder the IA so the vertical picker (Food / Beauty / Apparel) appears in the hero, not the seven pillars. The pillars become a "Methodology" section linked from the footer. **Status as of ratification: substantially DONE via Phase A + B + C of the food-first restructure (commits 81b0556, 50edc7b, b5f33c0).** Per-vertical content slot copy on `PickerDrivenContentBlock` + tier-strip retirement is the Phase D-homepage finish dispatched alongside the wedge.
+- Build out food first as the deepest vertical. Apparel and beauty stay on the site but are clearly second-tier.
+- Replace the homepage hero pitch with the dead-inventory pitch (§7), framed for food.
+- `BUSINESS.md` / CLAUDE.md product snapshot: rewrite the target-customer paragraph to lead with food. Already partially landed via ADR 0015 + tonight's CLAUDE.md product-snapshot update.
 
-**Watch this risk.** Picking food doesn't mean killing beauty/apparel pages — they earn SEO, they catch in-bound interest, and they hedge if food doesn't compound. It means concentrating maintenance investment, content output, and outbound effort on food first. You can revisit at the 12-month gate.
+**Watch this risk.** Picking food doesn't mean killing beauty/apparel pages — they earn SEO and they hedge if food doesn't compound. It means concentrating maintenance investment, content output, and outbound effort on food first. Revisit at the 12-month gate.
 
 ---
 
-## 4. The pricing restructure
+## 4. The ingestion engine — the centrepiece product
 
-Your `apps/scanner/src/lib/pricing.ts` is the canonical source. The current ladder is:
+This is the single biggest shift from v1 of this report. The ingestion engine is not a feature; it's the product. Everything else (the public scanner, the standards publication, the audit, the embedded app) is in service of it.
+
+### What the ingestion engine does
+
+The merchant has a new product line to add. They have:
+
+- A supplier spec sheet (PDF, often 2–6 pages, mixed text + tables)
+- A back-of-pack photo (sometimes the only allergen source)
+- An internal spreadsheet (their own SKU list, often messy)
+
+They drop any combination of those into Flintmere. The system:
+
+1. Runs multimodal extraction (Vertex Gemini 2.5 Pro for vision per ADR 0006, with OpenAI gpt-4o-mini fallback per ADR 0010 — but vision fallback stays disabled, so failed extractions queue rather than cross the residency boundary)
+2. Maps the extracted fields against the Flintmere food taxonomy (allergens to FSA Big-14, country-of-origin to ISO 3166-1, certifications to controlled vocabulary, etc.)
+3. Surfaces a *draft* with confidence scores per field
+4. Merchant verifies in a single pass — 30-second flow per SKU, not full automation
+5. Approved data writes to Shopify metafields via OAuth
+
+### What it deliberately does not do
+
+- **It does not promise full automation.** Multimodal extraction on real UK back-of-pack labels is realistically 80–88% precision in best cases, with a long tail of poor categories (multilingual, supplements, ethnic food). Promising automation produces NPS damage when extraction misses; promising "draft + 30-second verify" delivers consistent value.
+- **It does not write to the catalog without merchant approval.** Every write is logged and reversible. The privacy and security pages already commit to this; honour it.
+- **It does not require the merchant to learn Flintmere's data model.** The verification UI shows them the *Shopify metafield* they're populating, not "Flintmere field 47."
+
+### Why this is the moat
+
+A competitor can read your food standard. They cannot easily replicate:
+
+- 6+ months of prompt tuning for back-of-pack OCR across UK label conventions
+- The supplier-PDF format heuristic library (each major UK food wholesaler has its own PDF layout)
+- The merchant verification UX that makes 30-second confirmation feel low-friction
+- The OAuth metafield-write infrastructure that survives Shopify API version changes
+- The retention loop where leaving Flintmere = manual re-entry of every SKU
+
+The first of those is months of engineering. The fifth is the actual lock-in. Together they compound.
+
+### The honest cost
+
+**Per ratification block #1: 9–12 months solo end-to-end (corrected from v2's 5–7).**
+
+Phase 1 (1–2 months): Spec extraction working at 80%+ on the three most common UK food supplier PDF formats. Manual mapping UI working end-to-end for one merchant.
+
+Phase 2 (2–3 months): Multimodal back-of-pack extraction. Confidence scoring. Merchant verification flow polished. **Per ratification block #2: cannot ship without parallel privacy-posture review (DPA addendum + upload-bucket retention + photo-PII handling + Shopify scope disclosure).**
+
+Phase 3 (1–2 months): Shopify metafield writeback. OAuth flow. Drift detection on subsequent product updates. App Store submission for Built for Shopify.
+
+Plus realistic prompt-tuning and quality-iteration overhead → **9–12 months end-to-end is the binding figure.**
+
+This is your engineering roadmap for the next 9–12 months. Everything else (standards publication, vertical content, pricing restructure) competes for *non-engineering* hours and is faster. Sequence accordingly — see §11.
+
+---
+
+## 5. The pricing restructure
+
+Your `apps/scanner/src/lib/pricing.ts` is the canonical source. The current ladder prices on volume (SKUs and stores). Volume is the wrong axis. The right axis is **outbound channel surface area**.
+
+**Per ratification block #3: every magnitude in the structure below is a HYPOTHESIS pending the WTP study committed by ADR 0016 Month 1–2. Public copy must not name specific magnitudes until WTP lands. The structural axis change (per-channel) ratifies; the prices wait.**
+
+### The new structure (proposed magnitudes — pending WTP)
 
 ```
-Free       £0
-Growth     £79/mo    SMB <500 SKUs
-Scale      £249/mo   Mid-market 500–5,000 SKUs
-Agency     £499/mo   5–50 client stores
-Plus       £1,500+   Shopify Plus 10,000+ SKUs
+Free                                                  £0/mo
+   Public scanner. Single vertical. Dead-inventory estimate.
+
+Base platform fee (1 vertical, Shopify-only)          £99/mo  [HYPOTHESIS]
+   Includes ingestion engine for one vertical, writing
+   structured data to Shopify metafields.
+
+Per-channel syndication                               +£50/mo per channel  [HYPOTHESIS]
+   For each outbound channel where Flintmere keeps the
+   merchant's data syndication-ready: GMC, TikTok Shop,
+   Amazon Fresh, Perplexity Shopping, Ocado, Deliveroo.
+
+Vertical bundle (Food + Beauty)                       +£40/mo on top of base  [HYPOTHESIS]
+Vertical bundle (Food + Beauty + Apparel)             +£70/mo on top of base  [HYPOTHESIS]
+
+Concierge audit (one-off)                             £97 (existing — keep)
+Concierge monthly retainer (one vertical)             £249/mo  [HYPOTHESIS]
+   Includes ingestion engine + monthly review + standard
+   updates surfaced to the merchant + 30-day re-scan.
+
+Enterprise (GMV >£20M)                                From £1,500/mo  [HYPOTHESIS]
+   Custom supplier-ingestion workflows, named contact,
+   monthly strategy call. Embedded app required.
 ```
 
-This prices on volume (SKUs and stores). Volume is the wrong axis when the value is regulatory complexity. A 200-SKU artisan food brand pushing to four marketplaces with ten allergen profiles is a higher-value customer than a 4,000-SKU apparel brand pushing to one channel — but your current ladder charges the apparel brand more.
+### Why per-channel works
 
-**Replace the volume axis with two orthogonal axes:**
+- It captures upside without punishing catalog growth (current per-SKU pricing actively penalises the merchant for adding products, which is the wrong behaviour for a tool whose value compounds with catalog size).
+- The internal upsell pitch writes itself: a merchant on Shopify + GMC + Amazon, paying £99 base + 0 channels initially, can self-justify £249 (£99 + £50×3) by activating syndication for channels they're already pushing to manually.
+- It scales with the merchant's success without the awkward "you grew, now we charge you more" conversation that per-SKU triggers.
 
-- **Axis 1 — vertical standard licensed:** Food / Beauty / Apparel / (later) Supplements / Pet / Children's products. Each vertical is priced separately because each requires separate regulatory maintenance.
-- **Axis 2 — distribution mode:** Self-serve (Shopify App Store) / Concierge (your existing £97 expanding into a recurring £200–500/mo) / Embedded enterprise (the Plus tier, only sold once the embedded app ships).
+### What "per-channel syndication" actually delivers
 
-**Suggested restructure (illustrative; real numbers need market test):**
+This needs to be honest. Two options:
 
-```
-Free                                           £0/mo
-   Scanner-only. Single vertical. Public.
-Food standard — single store                   £49/mo
-Food standard — agency (5 stores)              £179/mo
-Food + Beauty bundle (single store)            £89/mo
-Food + Beauty bundle (agency)                  £299/mo
-Concierge food audit + 30-day re-scan          £97 one-off (existing)
-Concierge monthly retainer (1 vertical)        £249/mo
-Embedded enterprise (vertical-specific)        From £1,200/mo, named contact
-```
+- **Option A — Flintmere syndicates the feed itself.** Bigger product surface. Competes directly with DataFeedWatch, GoDataFeed, Channable. Probably wrong.
+- **Option B — Flintmere keeps the merchant's data *syndication-ready* for each channel.** They use their existing feed manager to push; Flintmere ensures the data passes that channel's spec. Narrower scope. Honest with the value metric.
 
-Note: the lower self-serve numbers reflect that the *vertical* is the value, not the SKU count. The Plus tier is parked until the embedded app ships (see §6).
+**Recommendation: Option B for launch, with a clear roadmap toward Option A for select channels (GMC + TikTok Shop) by month 12.** Frame it as "Flintmere keeps your data ready for GMC, TikTok Shop, Amazon, and Perplexity. Your existing feed manager does the push; we make sure it doesn't get rejected." Channel multipliers reflect the spec-coverage work per channel, which is real engineering effort even when you're not running the syndication itself.
 
-**Why "Five tiers. One question: how many stores?" is corrosive copy:**
+### Codebase actions
 
-It signals to a sophisticated buyer that you don't understand what you're selling. A food merchant reading that line concludes: "they're a generic catalog tool, not a food specialist." It actively contradicts the vertical pages two clicks away. Replace it on the homepage with: *"Pick the standard your catalog needs. We maintain it. You stay compliant."* — or similar. The exact wording is for the Copy Council; the structural point is that the question stops being "how many stores" and becomes "which standard."
-
-**Codebase actions:**
-
-- `apps/scanner/src/lib/pricing.ts`: Rewrite the `TIERS` array entirely. Add a `vertical` field to each tier so the homepage can render either "all tiers" (current behaviour) or "tiers for this vertical" (new behaviour driven by the vertical picker).
-- `apps/scanner/src/app/pricing/page.tsx`: Either rebuild around the two-axis grid or — interim step — add a vertical selector at the top of the page so the existing tier cards filter down to "Food", "Beauty", "Apparel", "All".
-- `apps/scanner/src/app/page.tsx`: The "Five tiers. One question: how many stores?" h2 (around line 393) is the single highest-priority copy change in the codebase. Replace it before anything else.
+- `apps/scanner/src/lib/pricing.ts`: Rewrite the `TIERS` array. Add fields: `baseFee`, `channelMultiplier`, `verticalBundleAdditions`, `betaGated`. The `Tier` interface evolves from "name + price" to "base + per-channel + per-vertical-bundle." **Sequencing: lands inside the wedge phase, not Phase D-homepage finish (per ratification block sequencing decision).**
+- `apps/scanner/src/app/pricing/page.tsx`: Rebuild around the new model. Show a small calculator: "1 vertical × Shopify only = £99. Add GMC + TikTok = £199." Make the math visible. Sophisticated buyers want to see the formula.
+- `apps/scanner/src/app/page.tsx` lines ~393–398: Replace `<h2>Five tiers. One question: how many stores?</h2>` with the new framing. Suggested: `<h2>Pay for the channels you sell on. Not for SKUs. Not for stores.</h2>`. Final wording is for Copy Council; the structural change is mandatory.
 
 ---
 
-## 5. The Plus tier reality fix
+## 6. The Plus tier and the embedded Shopify app
 
-This is the most uncomfortable point in the report. The current `/for/plus` page describes a tier targeting Shopify Plus brands at £1,500+/mo. Your own `/research` page says:
+The earlier conversation asked whether you still need a Shopify app. Under the v1 strategy (publish standards, sell consulting), the answer was "minimal app or none." Under this v2 strategy, **yes, you need the full embedded Shopify app, because the ingestion engine writes to Shopify metafields and you can't do that without OAuth.**
 
-> A meaningful share of the Shopify market — mostly the larger catalogs sitting behind enterprise bot-management — returns a block before any product page loads.
+This is Path C from the earlier conversation. Budget accordingly.
 
-Those are the same brands. The free-scan-without-install model that is the dominant conversion path on the homepage *cannot reach the customers the Plus tier is priced for*. This is structural, not a bug. There are two clean ways out:
+### Three things this means
 
-**Option A — Ship the embedded app to Plus reach.** The `apps/shopify-app/` Remix app is in the repo. Get it through Built for Shopify certification, get a few Plus brands installed, and Plus reach via embedded scanning becomes the primary conversion path for that tier. The public crawl becomes a marketing demo for Free/Growth.
+**The £1,500+ Plus tier still gets delisted publicly until the embedded app is BFS-approved.** Listing a tier you cannot fulfil through your conversion path is brand-damaging. Mark `betaGated: true` in `pricing.ts`. The full enterprise tier comes back online when the embedded app passes Built for Shopify review. **(Already partially landed via ADR 0017.)**
 
-**Option B — Delist Plus until the embedded app exists.** Move the `/for/plus` page to a "Coming soon — talk to John" gated state. Cap the published price ceiling at Agency (£499/mo) until the embedded path ships. This is honest. Listing a tier you cannot fulfil through your own conversion path is worse than not listing it.
+**Plus reach via embedded scan unblocks the bot-blocked TAM.** Your own `/research` page admits enterprise stores behind bot-management can't be reached publicly. The embedded app doesn't have that constraint — once installed, it reads the catalog directly. So the path to selling Plus is "Plus brand installs the embedded app for the food vertical" not "Plus brand uses the public scanner first."
 
-**Option C is not a real option.** Currently the site is doing C: list the tier, rely on inbound to convert. Inbound from Plus brands does not happen because the conversion surface is the public scanner that cannot read their store. You're paying SEO and design cost for a tier that converts at near-zero.
+**The "Plaid of commerce data" framing — ASPIRATIONAL only per ratification block #4.** Genuinely possible but a 12–18 month execution. Treat as long-arc bet, not load-bearing strategy. It requires either platform-coverage scale or a named partnership with a downstream platform. Pick one platform (TikTok Shop is the strongest target — fastest growing, weakest existing data quality, most willing to engage) and aim for one named partnership where they publicly endorse Flintmere verification. If that lands, the Plaid framing becomes credible. If it doesn't, it's a slide in a deck, not a strategy.
 
-**Recommendation:** Option B for the next 90 days, then Option A. Specifically:
+### Distribution
 
-- `apps/scanner/src/app/for/plus/page.tsx`: Reframe to "Plus is in private beta — talk to John before signing with a £2k/mo discovery platform." Remove the £1,500+ pricing display until the embedded app is installable. This is closer to honest.
-- `apps/scanner/src/lib/pricing.ts`: Mark the `plus` tier `featured: false` and add a `betaGated: true` field. Don't render it in the homepage strip until embedded is live.
-- Add a 90-day target to ship the embedded Shopify app's first installable build with food-vertical scoring active. That unlocks both Plus reach *and* the bot-blocked TAM.
+**Single Shopify App Store listing.** Position around food-and-drink, with Beauty and Apparel mentioned as additional verticals. App Store policy prohibits duplicate apps under different vertical positionings.
 
----
+**Public quarterly "State of Shopify Catalogs" report.** You already have this scaffolded: `apps/scanner/src/app/research/page.tsx` plus `apps/scanner/src/app/api/benchmark/summary/route.ts`. The piece that's missing is the **commitment to publish quarterly with a fixed date** so journalists, trade bodies, and Shopify ecosystem people learn to expect it. Add a "Next refresh: [date]" line to `/research` and honour it.
 
-## 6. Distribution
+**Leaderboard SEO play.** Your `/score/[shop]` page is already well-designed: opt-in, indexable when published, robots-noindex when not. As more merchants opt in, you accumulate hundreds of high-quality URLs that rank for "[store] reviews / catalog quality." Real SEO moat that Shopify won't build because they won't grade their own merchants. Keep it.
 
-The conversation correctly flagged that Shopify App Store policy prohibits duplicate listings, so the "list the same app under three vertical positionings" idea is out. What is in:
-
-**Single Shopify App Store listing.** Position it around food-and-drink (because that's the spearhead), with Beauty and Apparel mentioned as additional verticals supported. This is a single listing with vertical specialisations, not three listings. App Store SEO favours specificity in screenshots and the app description over generic positioning.
-
-**Public quarterly "State of Shopify Catalogs" report.** You already have this scaffolded: `apps/scanner/src/app/research/page.tsx` plus `apps/scanner/src/app/api/benchmark/summary/route.ts`. The piece that's missing isn't the surface — it's the **commitment to publish quarterly with a fixed date** so journalists, trade bodies, and Shopify ecosystem people learn to expect it. Add a "Next refresh: [date]" line to `/research` and honour it. Quarterly cadence beats annual because four chances/year to land in trade press is materially better than one.
-
-**Leaderboard SEO play.** Your `/score/[shop]` page is a publish-by-merchant-opt-in shareable score. It's currently configured to be `index: false` in metadata when not published, which is correct, and indexable when published. As more merchants opt in, you accumulate hundreds of high-quality `flintmere.com/score/<store>` URLs that rank for `<store> reviews / catalog quality / AI-readiness`. This is a real SEO moat that Shopify won't build because they won't grade their own merchants. Keep it. The opt-in design is also defensible — you cannot grade someone publicly without their consent.
-
-**The standards publication.** This is the centrepiece of the moat thesis. See §7.
-
-**What you do NOT need:**
-
-- Paid ads on the Shopify App Store. Wait until Built for Shopify is achieved; then maybe.
-- A YouTube channel. Founder time is the bottleneck; YouTube doesn't earn out at this stage.
-- A Discord/Slack community. Ditto. Concentrate community in your inbox until you have 50 paying customers per vertical.
+**The standards publication.** Publish openly but maintain proprietarily. **Per ratification block Conflict A: lives at standards.flintmere.com (standalone `apps/standards/` per ADR 0018), NOT in `apps/scanner/`.** Per ratification block #5: operationally first-class despite "marketing artifact" framing.
 
 ---
 
-## 7. The standards publication — the single most important strategic move
+## 7. The dead-inventory wedge — the keystone
 
-The earlier critique correctly refined "open-source the standard" into "publish schemas and definitions, keep scoring logic and remediation proprietary." This is right. The maintenance is the moat, not the snapshot.
+This is the single most important GTM mechanism in the strategy. Without it, none of the rest converts.
 
-**What to publish (open):**
+### Why it's load-bearing
 
-- The *definition* of the Flintmere Food Catalog Standard as a versioned, dated, machine-readable document.
-- Field definitions: every Shopify metafield with regulatory mapping (UK FSA Big-14, ISO 3166-1, PDO list, certifications taxonomy).
-- Examples: structured JSON examples of "good" products by archetype.
-- Migration notes: when the standard changes (e.g., FSA precautionary allergen rule update), publish a dated diff.
-- A public changelog. W3C-style. Dated, signed, stable URLs.
+The reason most merchants don't structure their catalog data isn't lack of tools. It's:
 
-**What stays proprietary:**
+1. They don't know structured data matters
+2. They know but haven't prioritised it
+3. They tried, hit friction, gave up
+4. Their Shopify dev/agency hasn't prioritised it either
 
-- The scoring rubric (how each gap maps to a points deduction).
-- The remediation prompts (how Flintmere generates the fix CSV).
-- The benchmark dataset (who scored what).
-- The fix-quality LLM evaluation.
+The ingestion engine fixes (3). The audit and standards publication address (1). But (2) and (4) — the prioritisation problem — are the dominant blockers in the food mid-market. Any merchant who hasn't prioritised structured data won't drop PDFs into a tool to fix it. They'll keep deferring.
 
-**Suggested location:** `standards.flintmere.com` (new subdomain) or `flintmere.com/standards/food/v1` (path on the marketing site). The former is more authoritative; the latter is faster to ship.
+**The dead-inventory pitch makes the cost of *not* using Flintmere visible and immediate.** That's the only mechanism that solves the prioritisation problem.
 
-**The publishing cadence is what makes it a standard.**
+### The pitch
 
-A snapshot is a document. A maintained, dated, diffed, versioned, regulator-tracked living document is a standard. The maintenance commitment is what compounds. This is also why it's not free to do — see §9 on the FTE cost.
+> "We scanned your catalog against the seven AI-shopping checks plus public Google Shopping suppression signals. We estimate 30–60 of your beauty SKUs are currently suppressed in Google Shopping due to missing GTINs, invalid PAO formats, or unstructured allergen data. At your AOV, that's £8,000–£14,000 in uncaptured monthly demand. Install Flintmere and we'll auto-extract the missing data from your supplier sheets in 3 minutes."
 
-**Codebase action:**
+### The honest version of the pitch
 
-- Create `apps/scanner/src/app/standards/food/v1/page.tsx`. First version is the food standard as it exists in your scoring engine, written in human-readable form with ISO/FSA references.
-- Create a JSON-LD machine-readable version at `apps/scanner/src/app/standards/food/v1/spec.json/route.ts` (or similar).
-- Add a "Published standard" link to the homepage footer and to `/for/food-and-drink`.
-- Add a `STANDARDS-CHANGELOG.md` to the repo root. Every standard update is a dated entry.
+The actual implementation is more nuanced than the strategy reads. To say "you have 45 SKUs suppressed in GMC" with confidence requires either:
 
-**Why this matters more than anything else in §6:** the standards publication is the artifact a third party can cite *unprompted*. It is the only thing on your site that someone else can reference in their own documentation and create the proof condition in §2. Without it, the 12-month gate cannot pass, because there is no canonical document for them to cite.
+- OAuth-level GMC access (4–6 weeks of engineering, ongoing rate-limit management)
+- The merchant's GMC error CSV upload (manual, defeats the "3 minutes" claim)
+- A statistical model estimating suppression from public catalog signals (fast, probabilistic, less authoritative)
 
----
+**Ship the probabilistic version first.** Frame it: "Flintmere estimates 30–60 of your beauty SKUs are likely suppressed in GMC based on missing GTINs and unstructured allergen data. Install to confirm exact figures." This is honest, ships in 2–3 weeks, and converts.
 
-## 8. Founder and entity verifiability
+After conversion, *then* do the GMC OAuth integration to convert "estimated" into "verified" — and use that as a Phase 2 upsell ("you've installed Flintmere, now connect GMC for exact suppression counts").
 
-The earlier conversation flagged that "Eazy Access Ltd doesn't surface cleanly on Companies House" and that there's no public footprint tying John Morris to Flintmere. This isn't a strategy issue — it's a procurement gate.
+### Why this changes the homepage
 
-Any £499+/mo or £1,500+/mo buyer with functioning legal review will run three checks in the first 10 minutes of due diligence:
+The current homepage hero is:
 
-1. **Companies House lookup on Eazy Access Ltd** — confirms registration, address, accounts status.
-2. **LinkedIn lookup on John Morris + Flintmere** — confirms the founder is a real person publicly associated with the brand.
-3. **Trade-name lookup** — confirms "Flintmere is a trading name of Eazy Access Ltd" is registered as a trade name (it's a UK soft requirement, not strict, but it surfaces on legitimacy checks).
+> "ChatGPT lists you and every competitor. Yours ranks last."
 
-Your `/security` page is unusually candid about being a small team — this helps. But the Companies House gap and the LinkedIn gap are the two specific things that will block a procurement reviewer.
+This is honest but generic. It treats every Shopify catalog the same. The dead-inventory pitch personalises it:
 
-**Action items:**
+> "Your catalog is losing roughly £X/month to suppression and demotion across Google Shopping, ChatGPT, and Amazon. Run the free scan. We'll show you which products and how to fix them."
 
-- Add a footer link to the Companies House page for Eazy Access Ltd. Make it prominent. Procurement reviewers actively look for this; not having it is a yellow flag.
-- Make sure John Morris's LinkedIn explicitly lists Flintmere / Eazy Access Ltd as the current role with a public profile.
-- Add a "Company information" block to `/support` or `/security` listing: registered company name, company number, registered address, VAT status (or the explicit "not VAT-registered" note that's currently on `/audit`), and the Companies House link.
-- If Eazy Access Ltd has any history that's awkward to surface (different former trade names, different industry), get ahead of it on `/about` (new page). Procurement that finds discrepancies independently rejects faster than procurement that reads them on your own site.
+The hero number (£X) is computed from the merchant's URL during the 60-second scan. Public catalog → product count + visible quality signals → suppression estimate → AOV-modulated revenue estimate. Real product engineering: 3–4 weeks.
 
-This is a cheap fix that unblocks the Agency and Plus tiers. Do it before any of the §10 90-day items.
+### Codebase actions for the dead-inventory wedge (priority 1 — ship before anything else in §8)
+
+- `packages/scoring/`: Add a `suppressionEstimate` module that computes likely-suppression counts from existing scoring signals. Logic: products with missing GTIN + ambiguous allergen text + missing GMC category → estimated suppressed. Products with all three pass; the rest fall on a probability gradient. Output: estimated suppression count with a 30–60 range, not a point estimate (honesty about precision).
+- `apps/scanner/src/app/api/scan/route.ts`: Add the suppression estimate to the scan result payload.
+- `apps/scanner/src/app/scan/page.tsx`: Surface the suppression estimate as the lead result, not a side metric. Frame as monthly revenue impact at the merchant's apparent AOV (estimated from catalog signals).
+- `apps/scanner/src/app/page.tsx`: Update the hero pitch from "ranks last" to dead-inventory framing. This is a copy change conditional on the engineering above being live.
+- New: `apps/scanner/src/lib/suppression-estimate.ts` — the model.
+
+This is a 3–4 week project. **Ship it before the ingestion engine, before the standards publication, before everything else.** If it converts, the rest of the strategy has a foundation. If it doesn't, you've learned something cheap.
 
 ---
 
-## 9. Codebase change list — ordered by leverage
+## 8. Internal LLM operations — the regulatory monitor
 
-This section converts the strategy above into specific files. Numbers are approximate impact-per-effort. **1 = highest priority.**
+The strategy depends on keeping the food taxonomy current. Manual monitoring by a regulatory affairs contractor costs 0.5–1.0 FTE per vertical. Internal LLM agents reduce this to ~0.2 FTE per vertical (review-and-merge work only).
 
-### 9.1 Pricing axis change (priority 1)
+### What to build
 
-**File:** `apps/scanner/src/lib/pricing.ts`
-**Change:** Add `vertical` and `betaGated` fields to the `Tier` interface. Restructure `TIERS` array to lead with vertical-licensed tiers, not store-count tiers. Mark `plus` as `betaGated: true`.
+A single internal-tools repo (or `apps/regulatory-monitor/`) that runs:
 
-**File:** `apps/scanner/src/app/page.tsx` lines ~393–398
-**Change:** Replace `<h2>Five tiers. One question: how many stores?</h2>` with a vertical-led h2. Suggested: `<h2>Pick the standard your catalog needs. We maintain it.</h2>`. The exact wording is for Copy Council; the structural change is mandatory.
+1. **Source watchers.** UK FSA precautionary allergen guidance, Defra labelling guidance, Trading Standards bulletins, EU Cosmetic Regulation Annex amendments published in OJEU, BRC/BSI standards updates. Some are RSS, some require scraping with login (BRC), some are PDFs that drop on irregular schedules (FSA).
+2. **LLM extraction.** Use the existing `packages/llm/` abstraction via `router.completeInternal` (the internal customer-data-boundary route per ADR 0010). The agent reads each source, identifies whether the update changes any field in the Flintmere taxonomy, and drafts the diff.
+3. **Human-in-the-loop merge.** The drafted diff lands in a private review queue. Your domain expert (likely a regulatory affairs contractor for the first 12 months) reviews, edits if needed, and merges. The merge produces a versioned update to the published standard plus a `STANDARDS-CHANGELOG.md` entry.
 
-**File:** `apps/scanner/src/app/pricing/page.tsx`
-**Change:** Add a vertical selector above the tier grid. Render filtered tier cards based on selection.
+### The honest cost
 
-### 9.2 Homepage IA reorder (priority 1)
+The strategy makes this sound like a 2-week project. It's not. The actual sources for UK food regulatory updates are:
 
-**File:** `apps/scanner/src/app/page.tsx`
-**Change:** Replace the seven-pillar `<ol>` (the `id="pillars"` section, roughly lines 175–245) with a three-card vertical picker (Food / Beauty / Apparel). The seven pillars become a "Methodology" link in the footer or a `/methodology` page.
+- FSA precautionary allergen guidance (PDFs on FSA's website, not RSS-distributed)
+- Defra labelling guidance (quarterly, sometimes only via gov.uk press releases)
+- Trading Standards bulletins (regional, fragmented)
+- EU Cosmetic Regulation Annex amendments (OJEU, structured but irregular)
+- BRC/BSI standards updates (paywalled)
 
-**Why this matters:** Currently the homepage tells a buyer "we're a generic seven-check tool." Two clicks deep, the buyer would discover you're a regulatory taxonomy specialist. The reorder closes that gap.
+Source-list curation for these takes 6–8 weeks of your domain expert's time *before* the LLM agent has anything useful to monitor. After that, the LLM monitoring runs at modest cost (~£50/month in Vertex inference) and produces 5–15 candidate diffs per quarter, of which 2–5 are real updates worth merging.
 
-### 9.3 Plus tier honesty (priority 2)
+Budget: 2 months of engineering + 6–8 weeks of domain-expert curation upfront, then £50/mo + 0.2 FTE ongoing. Worth doing in month 4 of the plan, after the dead-inventory wedge and the ingestion engine MVP are live.
 
-**File:** `apps/scanner/src/app/for/plus/page.tsx`
-**Change:** Add a private-beta gate. Remove the £1,500+ pricing claim until the embedded app is installable. Position as "talk to John before buying a £2k/mo discovery platform."
+### Codebase actions
 
-**File:** `apps/scanner/src/lib/pricing.ts`
-**Change:** Mark `plus` tier `betaGated: true`. Hide from homepage strip rendering.
+- New folder: `apps/regulatory-monitor/` with its own Dockerfile, similar shape to `apps/scanner/`
+- Use `packages/llm/` for inference (already abstracted)
+- Outputs flow into a private review queue (Postgres table, simple Remix admin UI in `apps/shopify-app/admin/regulatory-queue/`)
+- Merges flow into `STANDARDS-CHANGELOG.md` and bump versioned standard URLs
 
-### 9.4 Standards publication (priority 2)
+---
 
-**Files (new):**
-- `apps/scanner/src/app/standards/food/v1/page.tsx`
-- `apps/scanner/src/app/standards/food/v1/spec.json/route.ts`
-- `apps/scanner/src/app/standards/page.tsx` (index)
-- `STANDARDS-CHANGELOG.md` (repo root)
+## 9. Codebase change list — sequenced for the new strategy
 
-**Change:** First-version food standard published as human-readable HTML and machine-readable JSON. Reference UK FSA Big-14, ISO 3166-1, PDO list, certifications taxonomy. Add a "Published standard" link to the homepage footer and the `/for/food-and-drink` page.
+The v1 report had 11 priorities sorted by leverage. Under the moat reframe, the order changes significantly. Numbered by *when* to ship, not just by importance.
 
-### 9.5 Companies House and founder verification (priority 2)
+### 9.1 — Suppression-estimate module + dead-inventory hero (priority: ship first, weeks 1–4)
 
-**File:** `apps/scanner/src/components/SiteFooter.tsx`
-**Change:** Add a "Company information" link in the Legal column pointing to a new `/about` or `/company` page that lists: Eazy Access Ltd, company number, registered address, Companies House link, VAT status, founder.
+**Files affected:**
+- `packages/scoring/src/pillars/suppression-estimate.ts` (new)
+- `apps/scanner/src/app/api/scan/route.ts` (add suppression estimate to response)
+- `apps/scanner/src/app/scan/page.tsx` (lead with suppression estimate)
+- `apps/scanner/src/app/page.tsx` line ~98 hero h1 (dead-inventory framing)
+- `apps/scanner/src/lib/copy.ts` (new copy strings for suppression framing)
 
-**External:** Update John Morris's LinkedIn to publicly list Flintmere / Eazy Access Ltd.
+**Why first:** This is the keystone wedge per §7. Without it, every other improvement is shouting into a crowded market. Ship this first; let it convert; *then* invest in the bigger projects.
 
-### 9.6 The "five tiers" copy line (priority 1, but tracked separately because it's a one-line fix)
+### 9.2 — Pricing axis change to base + per-channel (priority: weeks 2–4, parallel)
 
-Already covered in 9.1. Calling it out again because it's the single highest-stakes line on the entire site.
+**Files affected:**
+- `apps/scanner/src/lib/pricing.ts` (rewrite Tier interface and TIERS array)
+- `apps/scanner/src/app/pricing/page.tsx` (calculator UI showing the formula)
+- `apps/scanner/src/app/page.tsx` lines ~393–398 (replace "Five tiers. One question." with channel-axis framing)
 
-### 9.7 Crawlability weight is already correct — leave it (priority N/A)
+**Why early:** Cheap engineering, high leverage. Doesn't depend on the ingestion engine. **Magnitudes await WTP per ratification block #3.** Triggers ADR 0020 (per-channel pricing axis).
 
-`packages/scoring/src/types.ts` already has `crawlability: 5`. The dropping from 15 → 5 is done. The strategic question is whether to drop further, e.g., to 0% (i.e., remove the pillar). The case for removing entirely:
+### 9.3 — Homepage IA reorder, vertical-led (priority: weeks 4–6)
 
-- 90-day log studies show ~0.1% of AI bot traffic looks at llms.txt.
-- It's a maintenance burden in copy and scoring.
-- Keeping it suggests Flintmere believes in it, which dilutes the strategic message.
+**Files affected:**
+- `apps/scanner/src/app/page.tsx` (vertical picker in hero, pillars demoted to /methodology)
+- `apps/scanner/src/app/methodology/page.tsx` (new — the seven-pillar deep dive moves here)
+- Footer links updated across all marketing pages
 
-The case for keeping it at 5%:
+**Status:** **Substantially DONE via Phase A + B + C of the food-first restructure (commits 81b0556, 50edc7b, b5f33c0).** Per-vertical content slot copy on `PickerDrivenContentBlock` + tier-strip retirement + `/methodology` composition is the Phase D-homepage finish, dispatched alongside the wedge.
 
-- It's a leading indicator. If llms.txt adoption rises (it might), early-removed scoring creates a "we have to add it back" cycle.
-- Removing a pillar is a bigger marketing move than reducing one.
+### 9.4 — Plus tier honesty, mark betaGated (priority: weeks 4–6, parallel with 9.3)
 
-**Recommendation:** Keep at 5% for now, but don't promote it on the homepage. Surface the seven pillars *only* on `/methodology`. Revisit the pillar count in 6 months — if llms.txt adoption is still 0.1%, drop to four pillars (identifiers, attributes, titles, mapping) plus consistency. Crawlability gets folded into "Discoverability hygiene" as a sub-check rather than a top-level pillar.
+**Files affected:**
+- `apps/scanner/src/app/for/plus/page.tsx` (private-beta gate, no public £1,500+ price)
+- `apps/scanner/src/lib/pricing.ts` (add `betaGated: true` to plus tier)
 
-### 9.8 Add review density and inventory freshness as scored signals (priority 3)
+**Status:** Already partially landed via ADR 0017. Page composition is part of Phase D-deferred surface composition.
 
-The earlier conversation suggested replacing crawlability weight with review density and inventory freshness. This is the right *direction* but the wrong *moment*.
+### 9.5 — Standards publication, food v1 (priority: weeks 5–8)
 
-**Why not now:** Review density signals depend on third-party data sources (Trustpilot, Google reviews, Judge.me, Yotpo) — each is a separate integration with separate auth, rate limits, and data quality. Inventory freshness needs the embedded app to be reading live inventory. Both are 4–8 weeks of engineering each.
+**Files affected (per ratification block Conflict A — corrected):**
+- `apps/standards/src/app/food/v1/page.tsx` (new, human-readable; **standalone app per ADR 0018, NOT in apps/scanner**)
+- `apps/standards/src/app/food/v1/spec.json/route.ts` (new, machine-readable)
+- `apps/standards/src/app/page.tsx` (new, index)
+- `STANDARDS-CHANGELOG.md` (new, repo root)
+- Footer + `/for/food-and-drink` updated to link the standard at `https://standards.flintmere.com/food/v1`
 
-**Why later:** Once the embedded app is shipped (§5), inventory freshness is a 1-week add. Review density is a Q3 2026 project — bundle with the second-vertical work.
+**Why now:** This is the public artifact for Gate 2 (citation). Doesn't gate ingestion engine work. Coolify standalone service deploys per ADR 0018 Phase 4.
 
-### 9.9 Reposition messaging from "invisible" to "ranked last" (priority 2)
+### 9.6 — Companies House and founder verification (priority: week 1, one-day project)
 
-**File:** `apps/scanner/src/app/page.tsx` line ~98 (the hero h1)
+**Files affected (per ratification block Conflict B — corrected):**
+- `apps/scanner/src/app/about/page.tsx` (new — already specced at `context/design/specs/2026-04-26-about-food-first.md`; covers Eazy Access Ltd registration + Companies House link + VAT status + John Morris as accountable director per BUSINESS.md procurement disclosure rule)
 
-Current: *"ChatGPT lists you and every competitor. Yours ranks last."*
+**Why first:** Cheap, unblocks procurement at higher tiers, no engineering dependencies. **The v2-original `/company` proposal is RETIRED**; ship the existing `/about` spec (defers to Phase D-deferred per ratification block sequencing).
 
-This is actually correct — it's already the right framing. The "invisible" language survives in `/scan` (`Is your Shopify catalog invisible to ChatGPT?` at line ~80). Update `/scan` to match the homepage frame. Consistency wins; right now you have two different positioning lines.
+### 9.7 — Embedded Shopify app: ingestion engine MVP (priority: weeks 6–48)
 
-### 9.10 CI/CD framing fix (priority 3)
+This is the big one. **Per ratification block #1: 9–12 months end-to-end is the binding figure.** Sequenced into three phases per §4.
 
-The earlier critique flagged that pitching Flintmere as "CI/CD for catalogs" is technically wrong (Shopify webhooks fire after write-commit, can't pre-block publish). The honest framing is "continuous validation with auto-revert." Where this matters in the codebase:
+**Phase 1 — Spec extraction (weeks 6–14):**
+- `apps/shopify-app/app/routes/ingestion.upload.tsx` (file upload UI)
+- `apps/shopify-app/app/lib/extraction/supplier-pdf.ts` (PDF parsing for top 3 UK food supplier formats)
+- `apps/shopify-app/app/lib/extraction/spreadsheet.ts` (CSV/XLSX ingestion)
+- `apps/shopify-app/app/lib/taxonomy/food-mapping.ts` (extracted-field → Flintmere taxonomy)
+- `apps/shopify-app/app/routes/ingestion.review.tsx` (verification flow)
+- Uses `packages/llm/` for extraction inference
 
-**File:** marketing copy on `/for/plus` and any future B2B sales materials.
-**Change:** Phrases like "block bad products from publishing" become "detect bad products within seconds and revert via Flow alerts." This is closer to what the embedded app actually does.
+**Phase 2 — Multimodal back-of-pack (weeks 14–22):**
+- `apps/shopify-app/app/lib/extraction/back-of-pack.ts` (vision extraction via Vertex Gemini 2.5 Pro)
+- Confidence scoring per field
+- UI updates to show confidence in the verification flow
+- **Per ratification block #2: cannot ship without parallel `legal-page-draft` skill pass on DPA + retention + photo-PII + Shopify scope disclosure.**
 
-Not urgent because the current copy mostly avoids the CI/CD framing. Worth catching when it surfaces.
+**Phase 3 — Shopify metafield writeback (weeks 22–48):**
+- `apps/shopify-app/app/lib/shopify/metafield-writeback.ts` (OAuth metafield writes)
+- `apps/shopify-app/app/lib/shopify/drift-detection.ts` (webhook-driven drift)
+- App Store submission for Built for Shopify
 
-### 9.11 Benchmark publish floor (priority 3) — already correct
+**Why this timing:** The ingestion engine is the moat but takes 9–12 months. Doing it before the dead-inventory wedge means launching without an acquisition mechanism. Sequence after the cheap wins.
 
-`BENCHMARK_FLOOR=1` and `BENCHMARK_PUBLISH_FLOOR=100` in `apps/scanner/src/lib/copy.ts` are honest. Until the publish floor is hit per vertical, the page correctly frames it as "early sample." Leave this alone — the design is already tight.
+### 9.8 — Regulatory monitor (priority: weeks 16–20, parallel with ingestion engine Phase 2)
+
+Per §8. Internal tooling. Not customer-facing. Can lag the ingestion engine slightly because the standards work in 9.5 produces a static v1 standard that doesn't need automated updates for the first 6 months.
+
+### 9.9 — Crawlability weight (no change needed)
+
+Already correct at 5%. Don't promote it on the homepage; surface only on `/methodology`.
+
+### 9.10 — Hero copy unification
+
+Currently `/scan` says "invisible to ChatGPT" and `/` will say (after 9.1) the dead-inventory framing. Consolidate. Pick the dead-inventory framing for both.
 
 ---
 
 ## 10. What to stop doing
 
-A short list. These are decisions, not aspirations.
-
-1. **Stop pricing on store count.** "How many stores?" is the wrong question. Replace with vertical complexity.
-2. **Stop selling the £1,500+ Plus tier publicly until the embedded app exists.** Listing a tier you can't fulfil is brand-damaging.
-3. **Stop leading with seven pillars on the homepage.** The pillars are methodology, not the product.
-4. **Stop using "invisible to ChatGPT" framing.** "Ranked last" is the honest, sharper, current-truth positioning. Pick one and consistent across all surfaces.
-5. **Stop claiming attribution as a moat.** Shopify will ship attribution dashboards within 18–24 months. Catalog-data correctness is the moat; attribution is the value-add.
-6. **Stop promising features in marketing that the embedded app would deliver.** The `/for/plus` page promises bulk-fix, drift control, mapping coverage — those features depend on the embedded app being live. Until it is, these are aspirational, and a sophisticated reader will spot it.
-7. **Stop calling Plus a "vertical."** Per the earlier critique, Plus is a *deployment mode*. The site IA should reflect that — verticals on one axis, deployment tier on another.
-8. **Stop framing benchmark data with median language until the publish floor is hit per vertical.** This is already correctly handled in code. Don't regress.
-9. **Stop adding new pages on top of the existing structure.** The current site has 19 routes (11 marketing + 8 system). Until the §9 changes ship, every new page makes the IA worse.
-10. **Stop maintaining all three verticals at the same depth.** Concentrate on food. Beauty and apparel get lighter touch until the food story compounds.
+1. **Stop pricing on store count.** "How many stores?" is the wrong question. Replace with channel multipliers.
+2. **Stop selling the £1,500+ Plus tier publicly until the embedded app is BFS-approved.** Listing a tier you can't fulfil is brand-damaging.
+3. **Stop leading with seven pillars on the homepage.** The pillars are methodology. The vertical and the dead-inventory hook are the product.
+4. **Stop using "invisible to ChatGPT" framing.** "Dead inventory at £X/month" is sharper, more current, and converts.
+5. **Stop claiming attribution as a moat.** Shopify will ship attribution dashboards within 18–24 months. Catalog-data correctness — specifically, the *ingestion workflow* — is the moat.
+6. **Stop framing the moat as "the taxonomy."** It's the workflow. The taxonomy is the input.
+7. **Stop calling Plus a "vertical."** Plus is a deployment mode. Verticals on one axis, deployment tier on another.
+8. **Stop framing benchmark data with median language until the publish floor is hit per vertical.** Already correctly handled in code. Don't regress.
+9. **Stop adding new pages on top of the existing structure.** Until the §9 changes ship, every new page makes the IA worse. Exception: the standards pages, `/methodology`, and `/about`, which are part of the §9 plan.
+10. **Stop maintaining all three verticals at the same depth.** Concentrate on food. Beauty and apparel get lighter touch until the food story compounds at the 6-month gate.
+11. **Stop promising features in marketing that the embedded app would deliver.** Until the app ships, the `/for/plus` page promises (bulk-fix, drift control, mapping coverage) are aspirational. A sophisticated reader will spot it.
+12. **Stop treating the standards publication as the moat.** It's the marketing artifact in the moat hierarchy — but per ratification block #5, operationally first-class.
 
 ---
 
 ## 11. Risks the strategy assumes you can survive
 
-The earlier review correctly flagged that the strategy doesn't address what kills the business if you execute correctly. Five real risks, in rough order of probability:
+**Risk 1 — Shopify ships native multimodal ingestion in Shopify Magic.** Probability: medium-high over 18 months. They've already shipped product-description generation. Catalog-data extraction from supplier docs is a logical extension. Mitigation: the *vertical regulatory mapping* is too specific for Shopify's generic Magic offering. Shopify ships the 80% generic version; the 20% regulatory tail (FSA Big-14, ISO 3166-1, PDO drift) is what merchants actually pay for. But: get the food-vertical ingestion engine to market *before* Shopify ships its generic version. First-mover advantage in vertical-specialist tooling is real.
 
-**Risk 1 — Shopify ships vertical-aware Catalog Mapping for free.** Probability: medium-high over 18 months. Mitigation: the regulatory taxonomy depth (FSA precautionary allergens, EU Cosmetic Regulation 1223/2009 amendments, PDO drift) is too vertical-specific for Shopify to invest in. Shopify's pattern is to ship the 80% generic version. The 20% regulatory tail is your moat. But: get the food standard published *before* Shopify ships its mapping update. First-mover authority compounds; second-mover authority doesn't.
+**Risk 2 — A vertical PIM (TraceGains in food, Centric in beauty/fashion) ships a Shopify connector.** Probability: medium over 24 months. These are the apex predators, not Salsify or Akeneo or Klevu. They already have the regulatory taxonomies, the enterprise compliance certifications, and the customer base. Mitigation: the *cheap mid-market* (£250K–£25M revenue) is too small for them to chase profitably. Stay focused on that band; don't try to compete upmarket against TraceGains-grade enterprise PIMs.
 
-**Risk 2 — A vertical PIM (TraceGains in food, Centric in beauty/fashion) extends downward into Shopify-mid-market.** Probability: medium over 24 months. These are the apex predators, not Salsify or Akeneo. They already have the regulatory taxonomies, the enterprise compliance certifications, and the customer base. Their threat is they could ship a Shopify connector for £500–1,500/mo that catches everyone above 5,000 SKUs. Mitigation: the *cheap mid-market* (£250K–£20M revenue) is too small for them to chase profitably. Stay focused on that band; don't try to compete upmarket.
+**Risk 3 — Multimodal extraction quality stays at 80–88% precision and merchants don't trust it.** Probability: real. Mitigation: design the verification flow around the assumption that LLM output is a draft, not a final answer. Make the merchant feel like they're catching the LLM's mistakes (which they are), not doing manual data entry (which they're not). NPS depends on this UX choice.
 
-**Risk 3 — Regulatory taxonomy maintenance debt compounds.** Probability: high if you don't budget for it. Maintaining FSA + EU regulatory updates per vertical is roughly 0.5–1.0 FTE per vertical. Three verticals = 1.5–3 FTE of regulatory affairs work, ongoing. This is not optional — it's the cost of being a standards business. Mitigation: budget it as a line item from day one. Expect to hire a regulatory affairs contractor before you hire a second engineer.
+**Risk 4 — Built for Shopify certification doesn't materialise.** Probability: medium. The certification gate has tightened. Without it, the App Store distribution path is materially weaker. Mitigation: get the embedded app through certification within 12 months of starting; if blocked, pivot to direct outbound for Plus (slow, capital-intensive, but works for a verticalised play).
 
-**Risk 4 — Built for Shopify certification doesn't materialise.** Probability: medium. The certification gate has tightened over the last 18 months. Without it, the App Store distribution path is materially weaker. Mitigation: get the embedded app through certification within 12 months; if blocked, pivot to direct outbound for Plus (slow, capital-intensive, but works for a verticalised play).
+**Risk 5 — The dead-inventory pitch doesn't convert.** Probability: real but testable cheaply. Mitigation: §9.1 is a 3–4 week project specifically designed to test this hypothesis fast. If suppression-estimate framing doesn't lift conversion vs current "invisible to ChatGPT" framing, the strategy needs revisiting before the bigger investments. Don't commit to the 9–12 month ingestion engine before the wedge tests positive.
 
-**Risk 5 — The 12-month gate doesn't pass.** Probability: unknown. Mitigation: §2 already covers this. The strategy reverts to consulting-led with SaaS as support. Plan capital expenditure with that downside scenario survivable.
+**Risk 6 — Gate 1 (retention) fails at month 6.** The ingestion engine doesn't produce real switching cost. Most likely cause: extraction quality too low. Fix extraction first; if after another 90 days retention still doesn't hit ≥70%, revert to Path A (consulting + standards, no app). Both businesses are viable, just different.
 
 ---
 
-## 12. The 90-day plan with decision gates
+## 12. The 9-month plan with decision gates
 
-Three months. Three gates. If a gate doesn't pass, stop and replan rather than continuing.
+Three phases. Three gates. If a gate doesn't pass, stop and replan.
 
-### Month 1 (May 2026): Foundation
+### Phase 1 — Foundation (months 1–2, May–June 2026)
 
-**Ship:**
+**Ship in month 1:**
+- Suppression-estimate module + dead-inventory hero (§9.1) — the keystone wedge
+- Pricing restructure to base + per-channel (§9.2 — magnitudes pending WTP)
+- Homepage IA reorder, vertical-led (§9.3 — substantially DONE via Phase A+B+C)
+- Plus tier honesty fix (§9.4 — already partially landed via ADR 0017)
+- Companies House + founder verification block (§9.6 — via existing /about spec, NOT new /company)
 
-- Pricing restructure (§7.1) — `pricing.ts` and `/pricing` page rebuilt around vertical axis.
-- Homepage IA reorder (§7.2) — vertical picker leads, pillars demoted.
-- Plus tier honesty fix (§7.3) — beta gate, no public £1,500+ price.
-- Companies House + founder verification (§7.5) — footer block, LinkedIn alignment.
-- The hero copy line: "Five tiers. One question: how many stores?" → replaced.
+**Ship in month 2:**
+- Standards publication, food v1 (§9.5 — at standards.flintmere.com via standalone apps/standards/)
+- Quarterly research refresh cadence committed publicly on `/research`
 
-**Gate (end of Month 1):** Has the pricing page conversion rate held or improved? If it dropped >30% with the new structure, the messaging didn't carry — fix the copy before continuing. If it held, proceed.
+**Gate 1 (end of month 2):** Has the dead-inventory pitch lifted scan-to-email conversion vs the previous "invisible" framing? Target: ≥30% lift. If yes, the wedge works — proceed to Phase 2 with confidence. If no, fix the pitch (test variants of the framing, the number range, the call-to-action) before committing to the ingestion-engine engineering.
 
-### Month 2 (June 2026): Standards publication
+### Phase 2 — Build the engine (months 3–9, July 2026 – January 2027)
 
-**Ship:**
+**Per ratification block #1: extended from v2's "months 3–6" to months 3–9 to reflect realistic 9–12 month total ingestion-engine ship time.**
 
-- Food standard v1 published at `/standards/food/v1` (§7.4).
-- `STANDARDS-CHANGELOG.md` live in repo.
-- Quarterly research refresh cadence committed publicly on `/research`.
-- Embedded Shopify app first installable build with food-vertical scoring (start of §5 Option A).
+**Ship across these months:**
+- Ingestion engine Phase 1 (spec extraction, months 3–5)
+- Ingestion engine Phase 2 (multimodal back-of-pack, months 5–7) **WITH parallel privacy-posture review per ratification block #2**
+- Ingestion engine Phase 3 (Shopify metafield writeback + BFS submission, months 7–9)
+- Regulatory monitor MVP (month 5–6, parallel)
+- First three "design partner" food merchants onboarded to early beta of the ingestion engine
 
-**Gate (end of Month 2):** Has any external party referenced the food standard within 30 days of publication? If yes, you have early signal that the moat is forming. If no, *that's expected at this stage* — but track outreach: did journalists in food trade press receive the standard via personal pitch? Aim for 5+ unprompted views from outside your follower graph by end of Month 2.
+**Gate 2 (end of month 6 — 2026-10-26 calendar, per ADR 0019 amendment):** Two checks.
+1. Does the ingestion engine work end-to-end on three real merchant catalogs? Not "demo polish" — does a real merchant land 10+ products as structured data without abandoning the flow?
+2. Has 30-day cohort retention on the ingestion engine hit ≥70% on the design partners?
 
-### Month 3 (July 2026): Distribution
+If both pass: the moat is forming. Proceed.
+If one passes: the engine works but doesn't lock in. Spend month 7 on UX/quality fixes to lift retention before scaling.
+If zero pass: the engine isn't viable in current form. Revert to Path A — consulting + standards, no app. The strategy has failed; the business hasn't.
 
-**Ship:**
+### Phase 3 — Distribution and authority (months 10–12, February–April 2027)
 
-- Built for Shopify submission for the embedded app.
-- First quarterly "State of Shopify Catalogs — Food Edition" report, with at least 100 food stores in the dataset.
-- One outbound pitch to a UK food trade publication (The Grocer, Food Manufacture, Speciality Food magazine) referencing the standard.
-- First three Plus customers in private beta on the embedded app.
+**Ship across these months:**
+- Built for Shopify certification approval
+- Public launch of the ingestion engine to the wider Shopify food-vertical market
+- Quarterly "State of Shopify Catalogs — Food Edition" report with 100+ stores in dataset
+- One outbound pitch to UK food trade publication (The Grocer, Food Manufacture, Speciality Food magazine)
+- First TikTok Shop conversation about Flintmere verification payload (the Plaid-of-commerce-data starter — aspirational only per ratification block #4)
 
-**Gate (end of Month 3 / 90 days):** Three checks.
+**Gate 3 (month 12, 2027-04-26 — same calendar as v1's citation gate):** Three checks.
+1. Has the food vertical landed at least 10 paying customers at base + channel multipliers (magnitudes per WTP outcome)?
+2. Has the embedded app passed Built for Shopify review?
+3. Is one external party (journalist, trade body, agency, vertical PIM, downstream platform) referencing the food standard or the verification payload, unprompted? **(This is the v1 citation gate; survives as Gate 3.)**
 
-1. Has the food vertical landed at least one customer at £200+/mo (paid concierge retainer or App Store)?
-2. Has the embedded app passed first-round BFS review?
-3. Has at least one external party (journalist, trade body, agency, vertical PIM) referenced the food standard?
+If all three pass: you have validated product-market fit on the standards-plus-ingestion business. Continue building.
 
-If all three pass: you have early product-market fit on the standards business. Continue.
+If two pass: signal but not enough. Keep going for another 90 days; revisit at month 15.
 
-If two pass: you have signal but not enough. Keep going for another 90 days; revisit at month 6.
-
-If one or zero pass: stop. The strategy needs revisiting. The fallback (consulting-led with SaaS support) is real and financeable.
+If one or zero pass: the strategy isn't compounding. Revert to Path A. The £97 audit business plus the standards publication is still real — just smaller.
 
 ---
 
 ## 13. What this report deliberately does not cover
 
-To keep the report honest, here are the things this report did *not* address and why:
-
-- **Detailed copy rewrites.** Copy is a Copy Council job, not a strategy job. The structural points (h2 line on homepage, vertical picker on hero) are flagged; the exact wording is for the copywriting cycle.
-- **Specific go-to-market channels for food.** This needs market research and is Month 2–3 work, not Month 1. The right outbound channel for UK artisan food is different from the right channel for UK packaged food, and that's a research project.
-- **Pricing test design.** The numbers in §7 are illustrative. The actual prices need a willingness-to-pay study with 20+ food merchants — which is itself a Month 1 project.
-- **Hiring plan.** Regulatory affairs contractor is the next hire. After that depends on whether the 12-month gate passes.
+- **Detailed copy rewrites.** Copy is a Copy Council job. The structural points (h2 line on homepage, hero pitch, vertical picker placement) are flagged; exact wording is for the copywriting cycle.
+- **Specific extraction-quality benchmarks.** The 80–88% precision range is industry-typical; your actual numbers depend on which UK food supplier formats you target first and how much prompt-tuning you invest. Plan to spend month 3 of Phase 2 establishing a baseline against three real supplier PDF formats before scaling.
+- **Detailed acquisition channels for the food vertical.** The dead-inventory wedge is the conversion mechanism. The acquisition mechanism — Shopify App Store SEO + content + outbound + partnership — is Phase 3 work and needs market research before commitment.
+- **Hiring plan.** Regulatory affairs contractor is the next hire. After that depends on Gate 2 outcome.
 - **Capital strategy.** Out of scope. The strategy survives on bootstrap if the £97 audit volume and the food-vertical SaaS conversion both grow as planned.
-- **Detailed competitive positioning vs Klevu, Nosto, Profound, etc.** The earlier conversation covered the apex-predator framing (TraceGains/Centric/Specright are the real competitors, not Salsify/Akeneo or Klevu/Nosto). The customer-facing positioning is "vertical regulatory specialist," not a comparison-chart battle.
+- **Detailed competitive positioning vs Klevu, Nosto, Profound.** The apex-predator framing (TraceGains/Centric/Specright are the real competitors, not Salsify/Akeneo or Klevu/Nosto) holds. Customer-facing positioning is "vertical regulatory specialist with the workflow that makes compliance frictionless," not a comparison-chart battle.
+- **The "Plaid of commerce data" execution plan.** Real possibility but a 12–18 month project — **and per ratification block #4, ASPIRATIONAL only.** Phase 3 starts the conversation with TikTok Shop; productisation of the verification API and partnership terms are post-month-12 work.
 
 ---
 
 ## 14. The final paragraph
 
-Flintmere has good engineering hygiene, sharp design canon, and one genuinely defensible idea — the vertical regulatory taxonomies — buried under generic positioning. The strategic problem is not that the moat doesn't exist. It's that the moat isn't visible from the homepage, isn't published as a citable artifact, and isn't priced as the thing customers are buying.
+The earlier version of this report had the right vertical (food) and the right tactical moves but the wrong moat. The moat isn't the taxonomy — anyone with a regulatory affairs contractor can build a taxonomy. The moat is the *workflow that takes a supplier PDF and lands it as structured data in a Shopify metafield in 30 seconds of merchant time.* That workflow is months of engineering, prompt-tuning, format heuristics, and verification UX. It's the kind of thing nobody builds in a quarter. Combined with the standards publication for authority, the per-channel pricing for revenue capture, and the dead-inventory wedge for conversion, this is a defensible business.
 
-The 90-day plan above corrects all three of those failures. The 12-month gate tells you whether the correction worked. If it did, you're a vertical standards business. If it didn't, you have a financeable consulting business with SaaS support. Both are real. The risk to avoid is the third path: a generic catalog scanner with vertical pages buried two clicks deep, priced on the wrong axis, with a tier nobody can buy.
+The 9-month plan in §12 corrects the v1 report's assumptions and reflects the moat reframe. The two gates in §2 — retention at month 6, citation at month 12 — tell you whether it's working. If both pass, you have a vertical-specialist standards-plus-ingestion business with real switching cost and real authority. If gate 1 fails, you have a smaller consulting business plus a published standard, which is still a real business. The strategy has a defined fallback either way.
 
-Pick food. Publish the standard. Reorder the homepage. Fix the pricing line. Ship the embedded app. Verify the founder publicly. Set the gate. Run the 90 days.
+The single highest-priority change in the entire codebase: **ship the dead-inventory wedge first.** Three weeks of engineering, immediate conversion test, foundation for everything else. Don't commit to the 9–12 month ingestion engine before the wedge converts. If it does, you have a moat worth building. If it doesn't, you've learned something cheap before the big spend.
+
+Pick food. Ship the wedge. Test conversion. If it lifts, build the ingestion engine. Publish the standard. Restructure the pricing. Verify the founder publicly. Run the 9 months.
 
 Everything else is detail.
 
 ---
 
-*End of report.*
+*End of report v2.*
 
-*If anything in here contradicts something earlier in the strategic conversation, this document is the canonical version. Cross-link from CLAUDE.md if you want it referenced from the load map.*
+*If anything in here contradicts something earlier in the strategic conversation, this document — including its council ratification block — is the canonical version. v1 of this report is superseded; visible via git history at this same path.*

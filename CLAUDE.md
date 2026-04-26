@@ -31,7 +31,7 @@ Project-specific always beats global. Current turn always wins.
 
 ## Product snapshot (for every task)
 
-Flintmere scores Shopify product catalogs for AI-agent readiness and fixes what's broken. Three surfaces:
+Flintmere is a vertical-specialist commerce-data platform. The centrepiece product is the **ingestion engine** — multimodal extraction from supplier PDFs, back-of-pack photos, and spreadsheets, mapped against the proprietary food regulatory taxonomy, merchant-verified in a 30-second confirmation flow, written to Shopify metafields under OAuth. The **public food catalog standard** at standards.flintmere.com is the secondary moat (authority + citation). The **public scanner** at audit.flintmere.com is the acquisition surface — its dead-inventory wedge ("£X/month suppressed in Google Shopping") is the conversion mechanic. Per the v2 strategic report (`projects/flintmere/strategy/2026-04-26-final-report.md`), the moat is the workflow, not the taxonomy. Three surfaces:
 
 - `flintmere.com` — marketing site
 - `audit.flintmere.com` — public scanner (Next.js)
