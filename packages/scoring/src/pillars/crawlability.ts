@@ -138,7 +138,7 @@ export function scoreCrawlability(input: CrawlabilityInput): PillarResult {
 
   return {
     pillar: 'crawlability',
-    weight: 15,
+    weight: 5,
     score,
     maxScore: 100,
     locked: false,

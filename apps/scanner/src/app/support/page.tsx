@@ -77,11 +77,11 @@ export default function Support() {
             <p>Reply within 1 working day. Best-effort.</p>
           </div>
           <div className="grid grid-cols-[180px_1fr] gap-4 p-4 border-b border-[color:var(--color-line-soft)]">
-            <p><strong>Growth £59/mo</strong></p>
+            <p><strong>Growth £79/mo</strong></p>
             <p>Reply same working day during UK office hours.</p>
           </div>
           <div className="grid grid-cols-[180px_1fr] gap-4 p-4 border-b border-[color:var(--color-line-soft)]">
-            <p><strong>Scale £159/mo</strong></p>
+            <p><strong>Scale £249/mo</strong></p>
             <p>Reply same working day. Priority queue.</p>
           </div>
           <div className="grid grid-cols-[180px_1fr] gap-4 p-4 border-b border-[color:var(--color-line-soft)]">
@@ -91,7 +91,7 @@ export default function Support() {
             </p>
           </div>
           <div className="grid grid-cols-[180px_1fr] gap-4 p-4 border-b border-[color:var(--color-line-soft)]">
-            <p><strong>Enterprise £599+/mo</strong></p>
+            <p><strong>Plus from £1,500/mo</strong></p>
             <p>
               Contractual SLA per order form. Named contact with mobile
               number. Monthly review call.

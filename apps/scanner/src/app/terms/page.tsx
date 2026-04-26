@@ -36,8 +36,8 @@ export default function Terms() {
           <li>
             <strong>Shopify app</strong> at <code>app.flintmere.com</code>: a
             catalog scoring and fixing tool installed from the Shopify App
-            Store. Plans are Free, Growth (£59/mo), Scale (£159/mo), Agency
-            (£499/mo), and Enterprise (£599+/mo).
+            Store. Plans are Free, Growth (£79/mo), Scale (£249/mo), Agency
+            (£499/mo), and Plus (from £1,500/mo).
           </li>
           <li>
             <strong>Concierge audits</strong>: a £97 one-off written audit
@@ -68,7 +68,7 @@ export default function Terms() {
             only.
           </li>
           <li>
-            <strong>Agency and Enterprise</strong> are direct-invoiced via
+            <strong>Agency and Plus</strong> are direct-invoiced via
             Stripe under a separate order form.
           </li>
           <li>
@@ -111,7 +111,7 @@ export default function Terms() {
           </li>
           <li>
             Resell, sublicense, or white-label Flintmere output as your own
-            scoring methodology without an Agency or Enterprise agreement.
+            scoring methodology without an Agency or Plus agreement.
           </li>
           <li>
             Use Flintmere to generate content that breaches Shopify&rsquo;s
@@ -157,7 +157,7 @@ export default function Terms() {
           Features marked <em>beta</em> or <em>preview</em> may change,
           regress, or be withdrawn without notice. We aim for 99.5% monthly
           uptime on production features but do not offer a contractual SLA
-          below Enterprise.
+          below Plus.
         </p>
         <p className="mt-4">
           Material changes to these terms are emailed to Shopify app users at

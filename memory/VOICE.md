@@ -88,7 +88,7 @@ Use instead: "improves catalog readability for AI agents", "raises AI-readiness 
 
 ## Preferred positioning language
 
-- "Your product catalog is `[ invisible ]` to ChatGPT." (hero)
+- "ChatGPT lists you and every competitor. Yours ranks `[ last ]`." (hero — updated 2026-04-26 post-Shopify Agentic Storefronts; "invisible" retired)
 - "We score it, fix what's broken, and show you what changed."
 - "Built for Shopify merchants and the agencies who serve them."
 - "Honest GTIN guidance — buy them from GS1, we'll help you import them."

@@ -59,6 +59,17 @@ If a claim isn't in this register, it either needs adding or it shouldn't be shi
 - **Classification:** factual
 - **Last verified:** <to be set by first claim-review pass>
 - **Risk if wrong:** every surface out of sync; merchant trust erosion.
+- **Status:** retired (replaced by "Pillar count — 7" on 2026-04-26 — SPEC.md and homepage already shipped seven; this entry was stale).
+
+### Pillar count — 7
+
+- **Claim text:** "Seven pillars: identifiers, structured attributes, titles, Google category match, data consistency, AI agent access (crawlability), agent checkout readiness."
+- **Surfaces:** marketing site (`apps/scanner/src/app/page.tsx` pillars section), scanner results, Shopify app dashboard, email reports.
+- **Source of truth:** `projects/flintmere/SPEC.md` ("seven weighted pillars"); `packages/scoring/src/types.ts` `PILLAR_WEIGHTS` (sum 100); `apps/scanner/src/app/page.tsx` pillar list.
+- **Weights:** identifiers 20, attributes 20, titles 15, mapping 15, consistency 15, checkout-eligibility 10, crawlability 5. Sum 100.
+- **Classification:** factual
+- **Last verified:** 2026-04-26 by `claim-review` (sweep at `context/compliance/reviews/2026-04-26-homepage-hero-post-agentic-storefronts.md`).
+- **Risk if wrong:** every surface out of sync; merchant trust erosion. Weight column on the homepage must always sum to 100 — Claim 9 in the 2026-04-26 review found a 110% bug shipped to production.
 - **Status:** active
 
 ### Pricing — Growth £49 / Scale £149 / Agency £399 / Enterprise £499+
@@ -69,7 +80,27 @@ If a claim isn't in this register, it either needs adding or it shouldn't be shi
 - **Classification:** commercial
 - **Last verified:** <>
 - **Risk if wrong:** mismatched copy vs checkout → trust loss + ASA/FTC exposure on advertising.
-- **Status:** active
+- **Status:** retired (replaced by "Pricing — Growth £59 / Scale £159 / Agency £499 / Enterprise £599+" on 2026-04-26 — register was stale relative to `apps/scanner/src/lib/pricing.ts`).
+
+### Pricing — Growth £59 / Scale £159 / Agency £499 / Enterprise £599+
+
+- **Claim text:** Free £0 · Growth £59/mo · Scale £159/mo · Agency £499/mo · Enterprise £599+/mo. Plus £97 one-off concierge audit.
+- **Surfaces:** marketing homepage `/#pricing`, pricing page `/pricing`, scanner CTA, Shopify app upgrade flow, Shopify Managed Pricing config (Growth + Scale), Stripe product configuration (Agency + Enterprise + £97).
+- **Source of truth:** `projects/flintmere/BUSINESS.md` §Tiers; canonical TIERS array in `apps/scanner/src/lib/pricing.ts`.
+- **Classification:** commercial
+- **Last verified:** 2026-04-26 by `claim-review`.
+- **Risk if wrong:** mismatched copy vs checkout → trust loss + ASA/FTC exposure on advertising.
+- **Status:** retired (replaced by "Pricing — Growth £79 / Scale £249 / Agency £499 / Plus from £1,500" on 2026-04-26 — operator-confirmed restructure post-Agentic-Storefronts; Enterprise renamed Plus + price floor raised).
+
+### Pricing — Growth £79 / Scale £249 / Agency £499 / Plus from £1,500
+
+- **Claim text:** Free £0 · Growth £79/mo · Scale £249/mo · Agency £499/mo · Plus from £1,500/mo. Plus £97 one-off concierge audit.
+- **Surfaces:** marketing homepage `/#pricing`, pricing page `/pricing`, scanner CTA, Terms of Service, Privacy Policy, DPA, Support page, Shopify app upgrade flow (when shipped), Shopify Managed Pricing config (Growth + Scale), Stripe product configuration (Agency + Plus + £97).
+- **Source of truth:** `projects/flintmere/BUSINESS.md` §Tiers; canonical TIERS array in `apps/scanner/src/lib/pricing.ts`; spec at `context/requirements/2026-04-26-pricing-restructure.md`.
+- **Classification:** commercial
+- **Last verified:** 2026-04-26 by `claim-review` post-pricing-restructure.
+- **Risk if wrong:** mismatched copy vs checkout → trust loss + ASA/FTC exposure on advertising. Pre-launch state means no grandfathering risk; first paid signup anchors prices.
+- **Status:** active. Stripe + Shopify Managed Pricing dashboard config to be updated by operator before first paid signup. Pricing restructure success metric: month-6 MRR ≥ 1.30× modeled-baseline at same paying-customer count (per requirements spec §3).
 
 ### AI visibility uplift — "3–4× at 99%+ attribute completion"
 

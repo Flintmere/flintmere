@@ -58,6 +58,14 @@ export type PillarId =
   | 'checkout-eligibility'
   | 'crawlability';
 
+// Weights sum to 100. Crawlability dropped from 15 → 5 on 2026-04-26 after
+// claim-review found the public weights summing to 110% (load-bearing
+// factual error on a diagnostic-positioning page). Strategic intent — see
+// Task #7 grill-requirement (methodology reweight) — is to de-emphasise the
+// llms.txt-adjacent signal (90-day log study: 0.1% of AI bot traffic) and
+// reallocate freed weight to review-density + inventory-freshness pillars.
+// This 15 → 5 step is the interim factual-correctness fix; the proper
+// restructure follows the methodology grill.
 export const PILLAR_WEIGHTS: Readonly<Record<PillarId, number>> = Object.freeze({
   identifiers: 20,
   attributes: 20,
@@ -65,7 +73,7 @@ export const PILLAR_WEIGHTS: Readonly<Record<PillarId, number>> = Object.freeze(
   mapping: 15,
   consistency: 15,
   'checkout-eligibility': 10,
-  crawlability: 15,
+  crawlability: 5,
 });
 
 export type Severity = 'critical' | 'high' | 'medium' | 'low';

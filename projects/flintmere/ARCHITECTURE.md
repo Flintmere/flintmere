@@ -6,11 +6,11 @@ System-level design — API routes, DB schema, integrations, data flow, feature 
 
 ### Scanner (`apps/scanner/`, Next.js → audit.flintmere.com)
 
-Public, no auth. Merchant enters a Shopify store URL; app scrapes the public feed, sitemap, and sample JSON-LD; returns a partial score (3 of 6 pillars: identifiers, titles, consistency); gates the full report behind email. Also hosts the £97 concierge audit landing page.
+Public, no auth. Merchant enters a Shopify store URL; app scrapes the public feed, sitemap, and sample JSON-LD; returns a partial score (4 of 7 pillars: identifiers, titles, consistency, crawlability); gates the full report behind email. Also hosts the £97 concierge audit landing page.
 
 ### Shopify app (`apps/shopify-app/`, Remix → app.flintmere.com)
 
-OAuth-installed via `@shopify/shopify-app-remix`. Bulk catalog sync via `bulkOperationRunQuery`. All six pillars scored. Auto-fix engine (Tier 1 safe, Tier 2 approved, Tier 3 detect-and-guide). Polaris chrome with Flintmere islands per `DESIGN.md`.
+OAuth-installed via `@shopify/shopify-app-remix`. Bulk catalog sync via `bulkOperationRunQuery`. All seven pillars scored. Auto-fix engine (Tier 1 safe, Tier 2 approved, Tier 3 detect-and-guide). Polaris chrome with Flintmere islands per `DESIGN.md`.
 
 ### Shared `packages/`
 
@@ -95,7 +95,7 @@ Full schema lives in each app's `prisma/schema.prisma`. **#18 DBA** reviews ever
 User enters store URL
   → POST /api/scan
   → BullMQ job: fetch /products.json + sitemap + JSON-LD samples
-  → scoring/packages engine computes 3-of-6 pillars
+  → scoring/packages engine computes 4-of-7 pillars
   → scanner_scans updated with result
   → UI polls /api/scan/:id for completion
   → Email gate form submission → scanner_leads + Resend report send
@@ -109,7 +109,7 @@ Merchant installs from App Store
   → Enqueue initial bulk sync job
   → bulkOperationRunQuery (streaming JSONL — see shopify-api-rules.md)
   → Products + variants + metafields written in 500-row chunks
-  → Scoring job reads from app_products, computes all 6 pillars
+  → Scoring job reads from app_products, computes all 7 pillars
   → app_scores + app_issues populated
   → Webhooks registered
   → Dashboard ready, merchant sees first scorecard

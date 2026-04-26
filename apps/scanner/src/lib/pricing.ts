@@ -4,19 +4,24 @@
 // the two surfaces can never drift. If you change a price, a blurb, a
 // feature line, or a CTA, change it here and both surfaces update.
 //
-// Price ladder (2026-04 revision — see commit history):
-//   Free       £0       Scanner only, no signup.
-//   Growth    £59/mo   SMB, <500 SKUs.
-//   Scale    £159/mo   Mid-market, 500–5,000 SKUs.
-//   Agency   £499/mo   5–50 client stores.
-//   Enterprise £599+   Shopify Plus, 10,000+ SKUs.
+// Price ladder (2026-04-26 revision — operator-confirmed restructure
+// post-Agentic-Storefronts; spec at
+// context/requirements/2026-04-26-pricing-restructure.md):
+//   Free       £0         Scanner only, no signup.
+//   Growth    £79/mo     SMB, <500 SKUs. Auto-fixes + monthly re-scan included.
+//   Scale    £249/mo     Mid-market, 500–5,000 SKUs. Competitor benchmarking.
+//   Agency   £499/mo     5–50 client stores. Unchanged — economic engine.
+//   Plus     £1,500+/mo  Shopify Plus, 10,000+ SKUs. Replaces Enterprise.
+//
+// Plus tier rename (Enterprise → Plus) lands 2026-04-26: aligns with
+// Shopify's own "Plus" tier and is more honest at this price point.
 //
 // CTA wiring is PARKED until ADR 0009 (Billing API shape) lands.
 // We keep CTA metadata here so the data is council-approved and ready
 // to wire the moment the billing rail is decided — do not render these
 // in UI yet. See task #52 (parked, blocked by #55).
 
-export type TierSlug = 'free' | 'growth' | 'scale' | 'agency' | 'enterprise'
+export type TierSlug = 'free' | 'growth' | 'scale' | 'agency' | 'plus'
 
 export type TierCTAKind = 'link' | 'waitlist' | 'mailto'
 
@@ -75,15 +80,16 @@ export const TIERS: Tier[] = [
   {
     slug: 'growth',
     name: 'Growth',
-    price: '£59',
+    price: '£79',
     unit: '/mo',
     scope: 'SMB, <500 SKUs',
     blurb:
-      'Under 500 SKUs. Unlimited audits, safe auto-fixes, LLM enrichments for catalogs up to 500 SKUs/month. 14-day trial.',
+      'Under 500 SKUs. Auto-fixes included by default, monthly re-scan, LLM enrichments for catalogs up to 500 SKUs/month. 14-day trial.',
     featured: true,
     features: [
       'Unlimited audits',
-      'Safe (Tier 1) auto-fixes',
+      'Safe (Tier 1) auto-fixes — included',
+      'Monthly automated re-scan',
       'LLM enrichments included for catalogs up to 500 SKUs/month',
       'Weekly drift alerts',
       '14-day trial',
@@ -97,15 +103,16 @@ export const TIERS: Tier[] = [
   {
     slug: 'scale',
     name: 'Scale',
-    price: '£159',
+    price: '£249',
     unit: '/mo',
     scope: 'Mid-market, 500–5,000 SKUs',
     blurb:
-      '500–5,000 SKUs. LLM enrichments for your full catalog monthly, competitor benchmarking, bulk-sync SLA.',
+      '500–5,000 SKUs. Competitor benchmarking, full-catalog LLM enrichments monthly, bulk-sync SLA.',
     features: [
       'Everything in Growth',
-      'LLM enrichments included for catalogs up to 5,000 SKUs/month',
       'Competitor benchmarking',
+      'LLM enrichments included for catalogs up to 5,000 SKUs/month',
+      'Daily drift alerts',
       'Priority support',
       'Bulk sync SLA: 1K products within 2h',
     ],
@@ -138,25 +145,26 @@ export const TIERS: Tier[] = [
     },
   },
   {
-    slug: 'enterprise',
-    name: 'Enterprise',
-    price: '£599+',
+    slug: 'plus',
+    name: 'Plus',
+    price: '£1,500+',
     unit: '/mo',
     scope: 'Shopify Plus, 10,000+ SKUs',
     blurb:
-      'Shopify Plus, 10,000+ SKUs. Custom attribute templates, dedicated support, monthly strategy call. Contact sales.',
+      'Shopify Plus, 10,000+ SKUs. Custom attribute templates, dedicated support, monthly strategy call. Talk to John before buying a £2k/mo discovery platform — Plus is the diagnostic layer beneath it.',
     features: [
+      'Everything in Scale',
       'Custom attribute templates per vertical',
       'Dedicated support channel',
       'Monthly strategy call',
       'Per-contract SLAs',
-      'Contact sales',
+      '50K SKU support',
     ],
     cta: {
       kind: 'mailto',
       label: 'Talk to John →',
-      href: mailtoLink('Flintmere Enterprise — enquiry'),
-      note: 'Direct-invoice via Stripe. John usually replies within two working days.',
+      href: mailtoLink('Flintmere Plus — enquiry'),
+      note: 'From £1,500/mo. Direct-invoice via Stripe. John replies within two working days.',
     },
   },
 ]

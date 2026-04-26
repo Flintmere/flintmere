@@ -135,7 +135,7 @@ export default function Privacy() {
           </li>
           <li>
             <strong>Stripe</strong> (UK/Ireland) — payment processing for
-            concierge audits, Agency, and Enterprise tiers.
+            concierge audits, Agency, and Plus tiers.
           </li>
           <li>
             <strong>Sentry</strong> (EU) — error tracking. PII scrubbed at

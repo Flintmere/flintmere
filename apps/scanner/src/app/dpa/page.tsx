@@ -180,7 +180,7 @@ export default function DPA() {
       <Clause n="09" heading="Audit">
         <p>
           Flintmere will make available on request the information necessary
-          to demonstrate compliance with this DPA. Enterprise customers may
+          to demonstrate compliance with this DPA. Plus customers may
           conduct an audit no more than once per year on 30 days&rsquo; notice,
           during business hours, at their own cost, and subject to
           confidentiality. Flintmere may substitute independent third-party
@@ -223,7 +223,7 @@ export default function DPA() {
         <p>
           Installing the Shopify app or accepting a paid subscription is
           treated as acceptance of this DPA on behalf of the Controller.
-          Enterprise customers who require a countersigned copy should email{' '}
+          Plus customers who require a countersigned copy should email{' '}
           <a href="mailto:legal@flintmere.com" className="underline">
             legal@flintmere.com
           </a>

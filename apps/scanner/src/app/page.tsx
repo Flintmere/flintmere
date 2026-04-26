@@ -86,19 +86,19 @@ export default async function MarketingHome() {
               Free scan · 60 seconds · No install
             </p>
             <ViewportReveal>
-              <h1 className="max-w-[18ch]">
-                Your product catalog is{' '}
+              <h1 className="max-w-[22ch]">
+                ChatGPT lists you and every competitor. Yours ranks{' '}
                 <Bracket>
                   <span aria-hidden="true" className="text-outlined text-outlined--reveal">
-                    invisible
+                    last
                   </span>
-                  <span className="sr-only">invisible</span>
-                </Bracket>{' '}
-                to ChatGPT, Perplexity and Claude.
+                  <span className="sr-only">last</span>
+                </Bracket>
+                .
               </h1>
             </ViewportReveal>
-            <p className="hero-lede mt-10 max-w-[40ch] text-[color:var(--color-ink-2)]">
-              Shoppers are buying through AI agents now — ChatGPT, Perplexity, Claude. Those agents skip stores with broken catalog data. Paste your URL; we show exactly where you disappear.
+            <p className="hero-lede mt-10 max-w-[44ch] text-[color:var(--color-ink-2)]">
+              Shopify enrolled millions of catalogs in ChatGPT, Perplexity and Claude this March. You&rsquo;re already in. So is every competitor. The agents pass over stores with broken catalog data — paste your URL; we show what&rsquo;s costing you the sale.
             </p>
             <div className="mt-12 flex flex-wrap gap-3">
               <Link href="/scan" className="btn btn-accent">
@@ -231,7 +231,7 @@ export default async function MarketingHome() {
             },
             {
               name: 'AI agent access',
-              weight: '15%',
+              weight: '5%',
               desc: 'Whether AI shopping agents are allowed to read your site at all — robots rules, sitemap, llms.txt.',
             },
             {
@@ -370,7 +370,7 @@ export default async function MarketingHome() {
           </span>
           <ul className="compare-list compare-list--struck list-none p-0 m-0 space-y-4 text-[color:var(--color-mute)]">
             <li>Repurpose a Google-ranking tool for AI agents</li>
-            <li>Sell you barcodes that aren&rsquo;t issued by GS1 UK</li>
+            <li>Resell barcodes from non-GS1 sources</li>
             <li>Charge per-product, so a big catalog triples your bill</li>
             <li>One-time audit, then silence</li>
             <li>Hide the founder behind a support queue</li>
@@ -382,7 +382,7 @@ export default async function MarketingHome() {
             <li>Built from the first line for ChatGPT, Perplexity and Claude — not Google</li>
             <li>Honest barcode guidance: buy GS1 barcodes from GS1 UK, we help you import them</li>
             <li>Flat monthly price. Scan as often as you like. No credits.</li>
-            <li>We re-scan your catalog nightly and alert you when something slips</li>
+            <li>We re-scan your catalog nightly. Drift alerts on the cadence your tier specifies — weekly on Growth, daily on Scale and above</li>
             <li>John reads every reply — usually within two working days</li>
           </ul>
         </div>
@@ -391,7 +391,7 @@ export default async function MarketingHome() {
       {/* Pricing */}
       <section id="pricing" className="mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">Pricing</p>
-        <h2 className="max-w-[20ch] mb-12">Four tiers. One question: how many stores?</h2>
+        <h2 className="max-w-[20ch] mb-12">Five tiers. One question: how many stores?</h2>
         <div className="grid grid-cols-2 md:grid-cols-5 border-y border-[color:var(--color-line)]">
           {TIERS.map((tier) => (
             <Tier

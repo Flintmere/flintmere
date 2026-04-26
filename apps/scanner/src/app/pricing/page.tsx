@@ -7,7 +7,7 @@ import { TIERS } from '@/lib/pricing';
 export const metadata: Metadata = {
   title: 'Pricing',
   description:
-    'Flintmere pricing — Free, Growth £59, Scale £159, Agency £499, Enterprise £599+. 14-day trial on Growth and Scale.',
+    'Flintmere pricing — Free, Growth £79, Scale £249, Agency £499, Plus from £1,500. 14-day trial on Growth and Scale.',
 };
 
 const FAQS = [
@@ -25,7 +25,7 @@ const FAQS = [
   },
   {
     q: 'Are Shopify revenue-share fees included in the price?',
-    a: 'Yes. Prices are what you pay. Shopify takes its revenue share from us, not from you. Enterprise is direct-invoiced via Stripe; Growth and Scale bill through Shopify.',
+    a: 'Yes. Prices are what you pay. Shopify takes its revenue share from us, not from you. Agency and Plus are direct-invoiced via Stripe; Growth and Scale bill through Shopify.',
   },
   {
     q: 'What about fake GTINs from third-party sellers?',
@@ -53,7 +53,7 @@ export default function Pricing() {
       <section className="mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">Pricing</p>
         <h1 className="max-w-[20ch]">
-          Four tiers. One <Bracket>question</Bracket>: how many stores?
+          Five tiers. One <Bracket>question</Bracket>: how many stores?
         </h1>
         <p
           className="mt-8 max-w-[52ch] text-[color:var(--color-ink-2)]"
