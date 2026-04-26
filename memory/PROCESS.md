@@ -101,6 +101,16 @@ Infrastructure changes (Coolify, DNS, Stripe, Vertex, Resend, BetterStack, OpenA
 
 The four-file separation (do not collapse): state (`STATUS.md`) ≠ runbook (`projects/flintmere/OPERATOR-TASKS.md`) ≠ decision log (`projects/flintmere/decisions/`) ≠ code events (`git log`). Each file answers one question. Mixing roles produces a mega-document no one maintains.
 
+## Architectural escalation
+
+Structural changes accumulate silently when no one is looking. Three rules to keep the codebase coherent without inviting an audit-skill backlog:
+
+1. **Every package extraction or cross-app primitive movement triggers a `code-reviewer` agent pass before commit.** Phase A (`@flintmere/ui` extraction) is the canonical pattern. Don't ship the extraction on the same commit unreviewed.
+2. **Every architectural decision with a 1-day-or-greater blast radius lands as an ADR.** Examples that count: choosing standalone-vs-colocated app (ADR 0018 standards subdomain), package factoring (next: any split of `packages/scoring` into rules vs core), choosing a state container, retiring a primitive. Examples that don't: renaming a function, moving a file within an existing package, fixing a bug.
+3. **The "second consumer = extract" trigger is binding** (per `memory/design/components.md`). When a primitive is needed by a second app/route, extract first, then implement the second consumer. Never copy-paste between apps; the copy will diverge and the divergence will become a bug.
+
+These three rules replace a recurring `improve-codebase-architecture` audit skill. Reactive structural discipline at the moment a change is made beats a proactive periodic audit that produces a backlog faster than the operator can act on it. Re-evaluate the recurring-audit posture at: post-strategic-gate (2026-10-26), first dedicated engineer hire, or LOC > 50k — whichever first.
+
 ## Changelog
 
 - 2026-04-14: Split from `CLAUDE.md`. No content change.

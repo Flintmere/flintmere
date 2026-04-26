@@ -29,9 +29,10 @@ You are Flintmere's docs auditor. #36 Operations manager leads; #1 Editor-in-chi
     - Banned phrases per `memory/VOICE.md`?
 4. **Catalogue findings.** P0 (false / dangerously misleading / contradicts another doc) / P1 (stale; clear drift) / P2 (accurate but weakly maintained) / P3 (style / phrasing).
 5. **Spot un-mapped docs.** Anything in `src/app/` that's documentation-shaped and not on the map → P1 + map update proposal.
-6. **Cross-check support-triage.** Recent `docs` category trend in support-triage briefs? Cite as corroborating evidence.
-7. **Council gates.**
-8. **Emit** to `context/admin-ops/docs/audits/<YYYY-MM-DD>-<scope>.md`.
+6. **IA ↔ code drift check.** For every `context/design/ia/*.md` + `context/design/architecture/*.md` + `context/design/specs/*.md` + `context/design/components/*.md` in scope: extract every absolute path it cites under `apps/` or `packages/` (paths in code-fence `\`apps/...\`` form, in narrative text, in routes tables). For each, verify (a) the path exists today, (b) two specs that name the same artefact agree on its location. Flag every gap as P0 (the spec drifted from code) or P1 (two specs disagree on where the artefact lives). Canonical example: 2026-04-26 — `context/design/ia/2026-04-26-standards-flintmere-com.md` colocated `CiteAffordance.tsx` under `apps/standards/src/components/`, while `context/design/components/2026-04-26-cite-affordance.md` promoted it to `packages/ui/src/CiteAffordance.tsx` for 9 callsites — exactly the contradiction this check exists to catch. The check is grep-shaped, not full-architectural-audit-shaped: it answers "does the spec match what's on disk?" not "is the architecture right?"
+7. **Cross-check support-triage.** Recent `docs` category trend in support-triage briefs? Cite as corroborating evidence.
+8. **Council gates.**
+9. **Emit** to `context/admin-ops/docs/audits/<YYYY-MM-DD>-<scope>.md`.
 
 ## Output format
 
