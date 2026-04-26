@@ -1,11 +1,13 @@
 import type { LoaderFunctionArgs } from '@remix-run/node';
 import { Link, useLoaderData, useSearchParams } from '@remix-run/react';
 import {
+  Badge,
   Banner,
   BlockStack,
   Box,
   Card,
   InlineGrid,
+  InlineStack,
   Layout,
   Page,
   Text,
@@ -16,6 +18,7 @@ import { IslandFrame } from '../../components/island/IslandFrame';
 import { ScoreRing } from '../../components/island/ScoreRing';
 import { PillarGrid, type Pillar } from '../../components/island/PillarGrid';
 import { PILLAR_META, parsePillarsJson } from '../../lib/pillars';
+import { fixTypeForIssueCode } from '../../lib/fixes/registry';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { session } = await authenticate.admin(request);
@@ -26,7 +29,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
       scores: {
         orderBy: { scoredAt: 'desc' },
         take: 1,
-        include: { issues: { orderBy: { revenueImpactScore: 'desc' }, take: 5 } },
+        // Mirror /app/issues ordering: severity first, then revenue impact.
+        // Surfaces critical issues at the top of the dashboard's homepage view
+        // even when their revenue-impact score happens to be lower.
+        include: {
+          issues: {
+            orderBy: [{ severity: 'asc' }, { revenueImpactScore: 'desc' }],
+            take: 5,
+          },
+        },
       },
     },
   });
@@ -34,16 +45,28 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const latestScore = shop?.scores[0] ?? null;
   const parsed = latestScore ? parsePillarsJson(latestScore.pillars) : null;
 
+  const issuesWithFixMeta = latestScore
+    ? latestScore.issues.map((i) => ({
+        id: i.id,
+        title: i.title,
+        description: i.description,
+        severity: i.severity,
+        hasTier1Fix: !!fixTypeForIssueCode(i.code),
+      }))
+    : [];
+
   return {
     shopDomain: session.shop,
     latestScore,
+    issuesWithFixMeta,
     pillarsParse: parsed,
     planTier: shop?.planTier ?? 'free',
   };
 }
 
 export default function Dashboard() {
-  const { shopDomain, latestScore, pillarsParse } = useLoaderData<typeof loader>();
+  const { shopDomain, latestScore, pillarsParse, issuesWithFixMeta } =
+    useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
   const fixApplied = searchParams.get('fix-applied');
 
@@ -192,11 +215,11 @@ export default function Dashboard() {
 
             <Layout.Section>
               <Text variant="headingSm" as="h3">
-                Top issues, ranked by revenue impact
+                Top issues, ranked by severity then revenue impact
               </Text>
               <Box paddingBlockStart="300">
                 <BlockStack gap="200">
-                  {latestScore.issues.map((issue) => (
+                  {issuesWithFixMeta.map((issue) => (
                     <Link
                       key={issue.id}
                       to={`/app/issues/${issue.id}`}
@@ -204,9 +227,19 @@ export default function Dashboard() {
                     >
                       <Card>
                         <BlockStack gap="100">
-                          <Text as="p" fontWeight="medium">
-                            {issue.title}
-                          </Text>
+                          <InlineStack align="space-between" blockAlign="start" wrap>
+                            <Box width="65%">
+                              <Text as="p" fontWeight="medium">
+                                {issue.title}
+                              </Text>
+                            </Box>
+                            <InlineStack gap="200">
+                              <SeverityBadge severity={issue.severity} />
+                              {issue.hasTier1Fix ? (
+                                <Badge tone="success">One-click fix</Badge>
+                              ) : null}
+                            </InlineStack>
+                          </InlineStack>
                           <Text as="p" tone="subdued" variant="bodySm">
                             {issue.description}
                           </Text>
@@ -270,6 +303,18 @@ function buildPillarRows(
       lockedReason: row?.lockedReason ?? 'crawlability-not-fetched',
     };
   });
+}
+
+function SeverityBadge({ severity }: { severity: string }) {
+  const tone =
+    severity === 'critical'
+      ? 'critical'
+      : severity === 'high'
+        ? 'warning'
+        : severity === 'medium'
+          ? 'attention'
+          : 'info';
+  return <Badge tone={tone}>{severity}</Badge>;
 }
 
 function timeAgo(date: Date | string): string {
