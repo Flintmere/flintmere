@@ -1,8 +1,17 @@
 import type { Job } from 'bullmq';
 import { prisma } from '../../db.server';
 import { decryptToken } from '../../lib/encryption.server';
-import { openBulkStream, parseJsonlStream, type ParsedProductBlock } from '../../lib/sync/streaming-parser.server';
+import {
+  openBulkStream,
+  parseJsonlStream,
+  type ParsedProductBlock,
+} from '../../lib/sync/streaming-parser.server';
 import { writeChunk } from '../../lib/sync/chunk-write.server';
+import {
+  pollBulkOp,
+  startBulkCatalogQuery,
+} from '../../lib/sync/bulk-op.server';
+import shopify from '../../shopify.server';
 import { enqueueScore } from '../queues.server';
 import type { SyncCatalogJob } from '../types';
 
@@ -27,16 +36,25 @@ export async function handleSyncCatalog(job: Job<SyncCatalogJob>): Promise<{
     throw new Error(`no-shop-token:${shopDomain}`);
   }
 
-  // The signed URL comes from the operator-run Shopify bulk-op flow. This job
-  // expects the URL to already exist (or the calling code to have invoked
-  // startBulkCatalogQuery + pollBulkOp upstream). In a worker process the
-  // current simplest orchestration is: caller invokes Shopify, stores the
-  // signed URL in job.data — refactor when wiring is complete.
-
-  const signedUrl = (job.data as SyncCatalogJob & { signedUrl?: string })
+  // Two-mode orchestration:
+  //   - Has signedUrl on job → /api/rescan path, where the request already
+  //     started the bulk-op + polled to COMPLETED (60s budget under HTTP).
+  //   - No signedUrl → install / nightly / weekly path. Worker starts the
+  //     bulk-op itself and polls up to 8 minutes (well below BullMQ's
+  //     stalled-job threshold). Worker has no HTTP timeout pressure.
+  let signedUrl = (job.data as SyncCatalogJob & { signedUrl?: string })
     .signedUrl;
+
   if (!signedUrl) {
-    throw new Error('sync-job-missing-signed-url');
+    const { admin } = await shopify.unauthenticated.admin(shopDomain);
+    await startBulkCatalogQuery(admin);
+    const result = await pollBulkOp(admin, { maxWaitMs: 8 * 60_000 });
+    if (result.status !== 'COMPLETED' || !result.url) {
+      throw new Error(
+        `bulk-op-${result.status.toLowerCase()}:${result.errorCode ?? 'no-error-code'}`,
+      );
+    }
+    signedUrl = result.url;
   }
 
   const stream = await openBulkStream(signedUrl);
