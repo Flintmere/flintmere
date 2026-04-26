@@ -5,18 +5,21 @@
  * the hero per context/design/specs/2026-04-26-homepage-food-first.md
  * §Section 3 (vertical picker) + §Section 4 (picker-driven content block).
  *
- * Responsibilities:
- *   - Render the 3-card VerticalRadiogroup primitive (food / beauty / apparel).
- *   - Bind selection to the ?vertical=… URL param via useHomepageVertical.
- *   - Render the picker-driven content block below the picker, with
- *     aria-live="polite" so screen readers announce vertical changes.
+ * Phase C — composes the revised VerticalRadiogroup (asymmetric layout
+ * default) with the new PickerDrivenContentBlock primitive. Both share
+ * the same `selectedId` (URL-coupled via useHomepageVertical), and the
+ * 200ms cross-fade choreography is honoured by both primitives.
  *
- * Bracket-cap discipline: vertical names are NOT bracketed (per spec §Section 3).
- * No brackets are added by this component. Page-level cap stays at 2.
+ * Bracket-cap discipline: vertical names are NOT bracketed (per spec
+ * §Section 3 + Phase-C amendment which CUT the dynamic-slot bracket).
+ * Page-level cap stays at 2 (hero `[ last ]` + audit `[ £97 ]`).
  */
 
-import Link from 'next/link';
-import { VerticalRadiogroup } from '@flintmere/ui';
+import {
+  PickerDrivenContentBlock,
+  VerticalRadiogroup,
+  type PickerDrivenContent,
+} from '@flintmere/ui';
 import { useHomepageVertical } from '@/lib/use-vertical';
 import {
   HOMEPAGE_VERTICALS,
@@ -24,9 +27,47 @@ import {
   type HomepageVerticalId,
 } from '@/lib/vertical';
 
+/**
+ * Adapter: map the per-app HomepageVerticalContent shape to the
+ * primitive's PickerDrivenContent shape (h2 + bullets + CTA).
+ *
+ * Why an adapter:
+ *  - The per-app content carries an `eyebrow` field used in the previous
+ *    inline render. The primitive does NOT carry an eyebrow (per
+ *    PickerDrivenContent type) — h2 is the load-bearing heading.
+ *  - The primitive normalises h2 wording to the spec direction
+ *    "What changes for {vertical}?" — Copy Council polish lands in
+ *    web-implementation; we ship the spec-direction-level placeholder.
+ */
+const PICKER_SLOTS: Readonly<Record<HomepageVerticalId, PickerDrivenContent>> = {
+  food: {
+    h2: 'What changes for food?',
+    bullets: HOMEPAGE_VERTICAL_CONTENT.food.bullets,
+    ctaLabel: HOMEPAGE_VERTICAL_CONTENT.food.ctaLabel,
+    ctaHref: HOMEPAGE_VERTICAL_CONTENT.food.ctaHref,
+  },
+  beauty: {
+    h2: 'What changes for beauty?',
+    bullets: HOMEPAGE_VERTICAL_CONTENT.beauty.bullets,
+    ctaLabel: HOMEPAGE_VERTICAL_CONTENT.beauty.ctaLabel,
+    ctaHref: HOMEPAGE_VERTICAL_CONTENT.beauty.ctaHref,
+  },
+  apparel: {
+    h2: 'What changes for apparel?',
+    bullets: HOMEPAGE_VERTICAL_CONTENT.apparel.bullets,
+    ctaLabel: HOMEPAGE_VERTICAL_CONTENT.apparel.ctaLabel,
+    ctaHref: HOMEPAGE_VERTICAL_CONTENT.apparel.ctaHref,
+  },
+};
+
+const VERTICAL_DISPLAY_LABEL: Readonly<Record<HomepageVerticalId, string>> = {
+  food: 'food',
+  beauty: 'beauty',
+  apparel: 'apparel',
+};
+
 export function HomepageVerticalPicker() {
   const { selected, setSelected } = useHomepageVertical();
-  const content = HOMEPAGE_VERTICAL_CONTENT[selected];
 
   return (
     <>
@@ -37,8 +78,12 @@ export function HomepageVerticalPicker() {
       >
         <p className="eyebrow mb-6">Verticals</p>
         <h2 className="max-w-[24ch] mb-3">Which catalog are we scoring?</h2>
-        <p className="max-w-[60ch] text-[color:var(--color-mute)] mb-12" style={{ fontSize: 15, lineHeight: 1.55 }}>
-          We score food-first today. Beauty and apparel are in development — see our spearhead.
+        <p
+          className="max-w-[60ch] text-[color:var(--color-mute)] mb-12"
+          style={{ fontSize: 15, lineHeight: 1.55 }}
+        >
+          We score food-first today. Beauty and apparel are in development — see
+          our spearhead.
         </p>
         <VerticalRadiogroup
           verticals={HOMEPAGE_VERTICALS}
@@ -49,32 +94,15 @@ export function HomepageVerticalPicker() {
         />
       </section>
 
-      {/* Picker-driven content block */}
-      <section
-        aria-live="polite"
-        aria-label={`What changes for ${selected}`}
-        className="mx-auto max-w-[1280px] px-8 py-20 border-t border-[color:var(--color-line)]"
-      >
-        <div className="grid lg:grid-cols-[1.6fr_1fr] gap-12 items-start">
-          <div>
-            <p className="eyebrow mb-6 text-[color:var(--color-mute-2)]">{content.eyebrow}</p>
-            <h2 className="max-w-[24ch] mb-8">{content.heading}</h2>
-            <ul className="list-none p-0 m-0 space-y-3 text-[color:var(--color-ink-2)]" style={{ fontSize: 15, lineHeight: 1.55 }}>
-              {content.bullets.map((bullet) => (
-                <li key={bullet} className="flex gap-3">
-                  <span aria-hidden="true" className="text-[color:var(--color-mute-2)]">—</span>
-                  <span>{bullet}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="lg:pt-12">
-            <Link href={content.ctaHref} className="btn">
-              {content.ctaLabel}
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Picker-driven content block — primitive (Phase C). aria-live="polite"
+          + 240ms cross-fade synchronised with the picker's selection signal. */}
+      <PickerDrivenContentBlock
+        selectedId={selected}
+        slots={PICKER_SLOTS}
+        ariaLabelTemplate={(id) =>
+          `What changes for ${VERTICAL_DISPLAY_LABEL[id as HomepageVerticalId] ?? id}`
+        }
+      />
     </>
   );
 }

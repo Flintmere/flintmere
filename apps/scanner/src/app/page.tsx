@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { Bracket, SiteFooter } from '@flintmere/ui';
+import { Bracket, SiteFooter, StatTriad, type Stat } from '@flintmere/ui';
 import { ViewportReveal } from '@/components/ViewportReveal';
 import { HomepageVerticalPicker } from '@/components/HomepageVerticalPicker';
 import { prisma } from '@/lib/db';
@@ -14,6 +14,38 @@ import { TIERS } from '@/lib/pricing';
 // Belt-and-braces: render per request so build never hits the DB. The
 // live-sample line stays fresh without depending on a build-time crawl.
 export const dynamic = 'force-dynamic';
+
+/**
+ * Homepage trust strip — Phase-C StatTriad data.
+ *
+ * Per amendment block in context/design/components/2026-04-26-stat-triad.md:
+ *  - Eyebrows render as plain Mono labels (no brackets).
+ *  - `60s` is the focal stat — gets the amber under-tick.
+ *  - `£97` renders in --paper (ink-slab variant), NOT amber. The strip's
+ *    single amber moment is the focal-numeral under-tick.
+ *  - `numeralAriaLabel` provided where SR pronunciation is uncertain.
+ *
+ * MicroLines kept tight + sentence-case per amendment §upgrade b.
+ */
+const HOMEPAGE_STATS: ReadonlyArray<Stat> = [
+  {
+    eyebrow: 'scan',
+    numeral: '7',
+    microLine: 'Checks we run on every scan.',
+  },
+  {
+    eyebrow: 'time',
+    numeral: '60s',
+    microLine: 'Time the free scan takes on a 5,000-product store.',
+    numeralAriaLabel: '60 seconds',
+  },
+  {
+    eyebrow: 'paid',
+    numeral: '£97',
+    microLine: 'One-off concierge audit. Fix CSV + 30-day re-scan.',
+    numeralAriaLabel: 'ninety-seven pounds',
+  },
+];
 
 async function loadLiveSample(): Promise<{
   show: boolean;
@@ -123,29 +155,17 @@ export default async function MarketingHome() {
 
       <hr className="rule" />
 
-      {/* Numbers strip — only verifiable claims */}
-      <section aria-label="Key facts" className="mx-auto max-w-[1280px] px-0">
-        <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[color:var(--color-line)] border-y border-[color:var(--color-line)]">
-          <Stat
-            big="7"
-            label="Checks we run on every scan — Shopify data, GS1 UK barcodes, Google Merchant Center, crawler rules, llms.txt, sitemap, checkout."
-            data-reveal
-            style={{ '--reveal-delay': '0ms' } as React.CSSProperties}
-          />
-          <Stat
-            big="60s"
-            label="Time the free scan takes on a store with 5,000 products. No signup."
-            data-reveal
-            style={{ '--reveal-delay': '100ms' } as React.CSSProperties}
-          />
-          <Stat
-            big="£97"
-            label="One-off concierge audit by John — written audit letter, per-product fix CSV, and 30-day re-scan, within three working days."
-            data-reveal
-            style={{ '--reveal-delay': '200ms' } as React.CSSProperties}
-          />
-        </div>
-      </section>
+      {/* Numbers strip — Phase-C StatTriad primitive (ink-slab + focal=1).
+          Per amendment: NO amber on £97; the strip's single amber moment is
+          the focal-numeral under-tick on `60s`. Eyebrows are plain Mono
+          labels (no brackets) — page bracket cap stays at 2.
+          Per-stat numeralAriaLabel where SR pronunciation is uncertain. */}
+      <StatTriad
+        surface="ink-slab"
+        focalIndex={1}
+        ariaLabel="Key facts"
+        stats={HOMEPAGE_STATS}
+      />
 
       {sample.show ? (
         <section
@@ -434,19 +454,6 @@ export default async function MarketingHome() {
       <SiteFooter />
       </ViewportReveal>
     </main>
-  );
-}
-
-function Stat({
-  big,
-  label,
-  ...rest
-}: { big: string; label: string } & React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div className="stat-block p-8" {...rest}>
-      <div className="stat-big">{big}</div>
-      <p className="mt-3 eyebrow max-w-[24ch]">{label}</p>
-    </div>
   );
 }
 
