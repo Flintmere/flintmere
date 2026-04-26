@@ -1,7 +1,12 @@
 import type { Job } from 'bullmq';
 import { scoreCatalog, type CatalogInput, type ProductInput } from '@flintmere/scoring';
 import { prisma } from '../../db.server';
+import { fixTypeForIssueCode } from '../../lib/fixes/registry';
+import { enqueueFixTier1 } from '../queues.server';
 import type { ScoreCatalogJob } from '../types';
+
+const AUTO_APPLY_DEDUPE_WINDOW_MS = 24 * 60 * 60 * 1000; // 24h
+const REVERT_WINDOW_DAYS = 7;
 
 /**
  * Score job — reads products + variants from Postgres, feeds @flintmere/scoring,
@@ -30,7 +35,7 @@ export async function handleScoreCatalog(
 
   const result = scoreCatalog(catalog);
 
-  await prisma.score.create({
+  const score = await prisma.score.create({
     data: {
       shopDomain,
       composite: result.score,
@@ -52,6 +57,7 @@ export async function handleScoreCatalog(
         })),
       },
     },
+    include: { issues: true },
   });
 
   await prisma.shop.update({
@@ -62,6 +68,8 @@ export async function handleScoreCatalog(
     },
   });
 
+  const autoApplied = await maybeAutoApplyTier1Fixes(shopDomain, score.issues);
+
   // eslint-disable-next-line no-console
   console.log(
     JSON.stringify({
@@ -70,6 +78,7 @@ export async function handleScoreCatalog(
       composite: result.score,
       grade: result.grade,
       issueCount: result.issues.length,
+      autoAppliedFixes: autoApplied,
       jobId: job.id,
     }),
   );
@@ -79,6 +88,73 @@ export async function handleScoreCatalog(
     grade: result.grade,
     issues: result.issues.length,
   };
+}
+
+/**
+ * If shop.autoApplyTier1Enabled is on, queue a Fix for every Tier 1 issue
+ * code that has no recent in-flight Fix of the same fixType. Returns the
+ * number of fixes queued.
+ *
+ * Dedupe: skip a fixType if any Fix of that type with status in
+ * (pending|applied) was created in the last 24h. Prevents the same fix
+ * being queued repeatedly across drift-triggered re-scores.
+ */
+async function maybeAutoApplyTier1Fixes(
+  shopDomain: string,
+  issues: Array<{ id: string; code: string; affectedProductIds: string[] }>,
+): Promise<number> {
+  const shop = await prisma.shop.findUnique({
+    where: { shopDomain },
+    select: { autoApplyTier1Enabled: true },
+  });
+
+  if (!shop?.autoApplyTier1Enabled) return 0;
+
+  const since = new Date(Date.now() - AUTO_APPLY_DEDUPE_WINDOW_MS);
+  const recent = await prisma.fix.findMany({
+    where: {
+      shopDomain,
+      appliedAt: { gte: since },
+      status: { in: ['pending', 'applied'] },
+    },
+    select: { fixType: true },
+  });
+  const recentTypes = new Set(recent.map((r) => r.fixType));
+
+  const revertableUntil = new Date();
+  revertableUntil.setDate(revertableUntil.getDate() + REVERT_WINDOW_DAYS);
+
+  let queued = 0;
+  for (const issue of issues) {
+    const meta = fixTypeForIssueCode(issue.code);
+    if (!meta || meta.tier !== 1) continue;
+    if (recentTypes.has(meta.fixType)) continue;
+    if (issue.affectedProductIds.length === 0) continue;
+
+    const fix = await prisma.fix.create({
+      data: {
+        shopDomain,
+        tier: 1,
+        status: 'pending',
+        fixType: meta.fixType,
+        productCount: issue.affectedProductIds.length,
+        beforeState: { productIds: issue.affectedProductIds } as unknown as object,
+        afterState: {} as unknown as object,
+        revertableUntil,
+      },
+    });
+
+    await enqueueFixTier1({
+      shopDomain,
+      fixId: fix.id,
+      op: 'apply',
+    });
+
+    recentTypes.add(meta.fixType);
+    queued += 1;
+  }
+
+  return queued;
 }
 
 // Minimal row → ProductInput mapping (matches scoring package schema)
