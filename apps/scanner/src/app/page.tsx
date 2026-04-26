@@ -9,7 +9,6 @@ import {
   summariseBenchmark,
   type BenchmarkRow,
 } from '@/lib/benchmark-summary';
-import { TIERS } from '@/lib/pricing';
 
 // Belt-and-braces: render per request so build never hits the DB. The
 // live-sample line stays fresh without depending on a build-time crawl.
@@ -396,24 +395,27 @@ export default async function MarketingHome() {
         </div>
       </section>
 
-      {/* Pricing */}
+      {/* Pricing — slim placeholder while the per-vertical / per-channel
+          pricing axis lands out-of-band per ADR 0016 + 2026-04-26 strategy
+          ratification. The legacy 5-tier strip on this surface is RETIRED;
+          /pricing keeps the legacy composition until the pricing-restructure
+          phase. Page bracket cap stays at 2 (hero `[ last ]` + audit `[ £97 ]`). */}
       <section id="pricing" className="mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">Pricing</p>
-        <h2 className="max-w-[20ch] mb-12">Five tiers. One question: how many stores?</h2>
-        <div className="grid grid-cols-2 md:grid-cols-5 border-y border-[color:var(--color-line)]">
-          {TIERS.map((tier) => (
-            <Tier
-              key={tier.slug}
-              name={tier.name}
-              price={tier.price}
-              unit={tier.unit}
-              blurb={tier.blurb}
-              featured={tier.featured}
-            />
-          ))}
-        </div>
-        <p className="mt-6 eyebrow">
-          <Link href="/pricing" className="underline">See full pricing →</Link>
+        <p
+          className="max-w-[60ch] text-[color:var(--color-ink)] mb-6"
+          style={{ fontSize: 16, lineHeight: 1.55, fontWeight: 500 }}
+        >
+          Per-vertical, per-channel. Magnitudes are calibrating.
+        </p>
+        <p>
+          <Link
+            href="/pricing"
+            className="text-[color:var(--color-ink)] underline"
+            style={{ fontSize: 16, fontWeight: 500 }}
+          >
+            See pricing →
+          </Link>
         </p>
       </section>
 
@@ -491,38 +493,3 @@ function Pillar({
   );
 }
 
-function Tier({
-  name,
-  price,
-  unit,
-  blurb,
-  featured,
-}: {
-  name: string;
-  price: string;
-  unit?: string;
-  blurb: string;
-  featured?: boolean;
-}) {
-  return (
-    <div
-      className="p-6 border-r border-[color:var(--color-line)] last:border-r-0 max-md:border-r-0 max-md:border-b max-md:last:border-b-0"
-      style={{
-        background: featured ? 'var(--color-paper-2)' : undefined,
-      }}
-    >
-      <p className="eyebrow">{name}</p>
-      <p className="mt-3" style={{ fontSize: 40, letterSpacing: '-0.04em', lineHeight: 1, fontWeight: 500 }}>
-        {price}
-        {unit ? (
-          <span className="text-[color:var(--color-mute)]" style={{ fontSize: 13, fontWeight: 400, marginLeft: 4 }}>
-            {unit}
-          </span>
-        ) : null}
-      </p>
-      <p className="mt-4 text-[color:var(--color-mute)]" style={{ fontSize: 13, lineHeight: 1.5 }}>
-        {blurb}
-      </p>
-    </div>
-  );
-}
