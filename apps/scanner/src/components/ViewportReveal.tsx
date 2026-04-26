@@ -4,9 +4,18 @@ import { useEffect, useRef, type ReactNode } from 'react';
 
 /**
  * ViewportReveal — toggles `.is-visible` on children when they scroll into view.
- * Pairs with `.text-outlined--reveal` for the [ invisible ] metaphor on the homepage.
- * Accessibility: IntersectionObserver only toggles a class; reduced-motion CSS
- * forces the visible state regardless, so SSR output is always legible.
+ *
+ * Two child patterns observed:
+ *   - `.text-outlined--reveal` — the hero [ invisible ] outlined-text reveal.
+ *   - `[data-reveal]` — generic reveal for sections (Numbers strip, Pillar rows,
+ *     Audit-deep figure + deliverables). Pairs with the [data-reveal] CSS
+ *     contract in globals.css (opacity + translateY transition with optional
+ *     --reveal-delay for stagger).
+ *
+ * Accessibility: IntersectionObserver only toggles a class; the global
+ * @media (prefers-reduced-motion: reduce) block in globals.css scales
+ * transition-duration to 0.01ms for reduced-motion users, who land on the
+ * end-state instantly. SSR output is always legible.
  */
 
 interface ViewportRevealProps {
@@ -31,7 +40,9 @@ export function ViewportReveal({
     const host = hostRef.current;
     if (!host) return;
 
-    const targets = host.querySelectorAll<HTMLElement>('.text-outlined--reveal');
+    const outlined = host.querySelectorAll<HTMLElement>('.text-outlined--reveal');
+    const generic = host.querySelectorAll<HTMLElement>('[data-reveal]');
+    const targets = [...Array.from(outlined), ...Array.from(generic)];
     if (targets.length === 0) return;
 
     const io = new IntersectionObserver(

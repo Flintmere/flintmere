@@ -54,6 +54,7 @@ export default async function MarketingHome() {
   return (
     <main id="main">
       <a href="#hero" className="skip-link">Skip to content</a>
+      <ViewportReveal>
       {/* Nav */}
       <header className="border-b border-[color:var(--color-line)]">
         <div className="mx-auto max-w-[1280px] px-8 h-[56px] flex items-center justify-between">
@@ -140,14 +141,20 @@ export default async function MarketingHome() {
           <Stat
             big="7"
             label="Checks we run on every scan — Shopify data, GS1 UK barcodes, Google Merchant Center, crawler rules, llms.txt, sitemap, checkout."
+            data-reveal
+            style={{ '--reveal-delay': '0ms' } as React.CSSProperties}
           />
           <Stat
             big="60s"
             label="Time the free scan takes on a store with 5,000 products. No signup."
+            data-reveal
+            style={{ '--reveal-delay': '100ms' } as React.CSSProperties}
           />
           <Stat
             big="£97"
             label="One-off concierge audit by John — written audit letter, per-product fix CSV, and 30-day re-scan, within three working days."
+            data-reveal
+            style={{ '--reveal-delay': '200ms' } as React.CSSProperties}
           />
         </div>
       </section>
@@ -196,41 +203,45 @@ export default async function MarketingHome() {
           Each pillar carries the weight shown. Your final score is a weighted average across the seven.
         </p>
         <ol className="mt-12 list-none p-0 m-0 divide-y divide-[color:var(--color-line)] border-y border-[color:var(--color-line)]">
-          <Pillar
-            name="Product IDs"
-            weight="20%"
-            desc="Whether each product carries the codes agents look it up by — barcode, brand, manufacturer part number."
-          />
-          <Pillar
-            name="Structured attributes"
-            weight="20%"
-            desc="Whether size, colour, material and other fields exist as structured data — not hidden inside the description."
-          />
-          <Pillar
-            name="Title & description quality"
-            weight="15%"
-            desc="Whether titles and descriptions read like spec sheets an agent can parse — not marketing copy."
-          />
-          <Pillar
-            name="Google category match"
-            weight="15%"
-            desc="Whether products carry a Google Merchant Center category, so agents know what you sell."
-          />
-          <Pillar
-            name="Data consistency"
-            weight="15%"
-            desc="Whether the catalog looks healthy — images load, active products have stock, alt text exists, prices match across pages."
-          />
-          <Pillar
-            name="AI agent access"
-            weight="15%"
-            desc="Whether AI shopping agents are allowed to read your site at all — robots rules, sitemap, llms.txt."
-          />
-          <Pillar
-            name="Agent checkout readiness"
-            weight="10%"
-            desc="Whether an AI agent can actually complete a purchase on your store without human intervention."
-          />
+          {[
+            {
+              name: 'Product IDs',
+              weight: '20%',
+              desc: 'Whether each product carries the codes agents look it up by — barcode, brand, manufacturer part number.',
+            },
+            {
+              name: 'Structured attributes',
+              weight: '20%',
+              desc: 'Whether size, colour, material and other fields exist as structured data — not hidden inside the description.',
+            },
+            {
+              name: 'Title & description quality',
+              weight: '15%',
+              desc: 'Whether titles and descriptions read like spec sheets an agent can parse — not marketing copy.',
+            },
+            {
+              name: 'Google category match',
+              weight: '15%',
+              desc: 'Whether products carry a Google Merchant Center category, so agents know what you sell.',
+            },
+            {
+              name: 'Data consistency',
+              weight: '15%',
+              desc: 'Whether the catalog looks healthy — images load, active products have stock, alt text exists, prices match across pages.',
+            },
+            {
+              name: 'AI agent access',
+              weight: '15%',
+              desc: 'Whether AI shopping agents are allowed to read your site at all — robots rules, sitemap, llms.txt.',
+            },
+            {
+              name: 'Agent checkout readiness',
+              weight: '10%',
+              desc: 'Whether an AI agent can actually complete a purchase on your store without human intervention.',
+            },
+          ].map((p, idx) => (
+            <Pillar key={p.name} {...p} idx={idx} />
+          ))}
         </ol>
       </section>
 
@@ -266,7 +277,11 @@ export default async function MarketingHome() {
 
         <div className="mt-12 grid md:grid-cols-[1.4fr_1fr] gap-12 items-start">
           {/* Audit screenshot anchor — proof of the £97 audit deliverable */}
-          <figure className="audit-figure">
+          <figure
+            className="audit-figure"
+            data-reveal
+            style={{ '--reveal-delay': '0ms' } as React.CSSProperties}
+          >
             <Image
               src="/marketing/proof/audit-scan.avif"
               alt="Flintmere scanner results: a 49-out-of-100 score for a Shopify catalog where 1,000 of 1,000 products fail at least one AI-agent readiness check, with three top issues including missing barcodes."
@@ -281,7 +296,10 @@ export default async function MarketingHome() {
           </figure>
 
           {/* Deliverables list */}
-          <div>
+          <div
+            data-reveal
+            style={{ '--reveal-delay': '200ms' } as React.CSSProperties}
+          >
             <p className="eyebrow mb-6 text-[color:var(--color-mute)]">
               For your <Bracket>£97</Bracket> — within three working days
             </p>
@@ -438,32 +456,46 @@ export default async function MarketingHome() {
 
       {/* Footer */}
       <SiteFooter />
+      </ViewportReveal>
     </main>
   );
 }
 
-function Stat({ big, label }: { big: string; label: string }) {
+function Stat({
+  big,
+  label,
+  ...rest
+}: { big: string; label: string } & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className="p-8">
-      <div
-        style={{
-          fontSize: 52,
-          fontWeight: 500,
-          letterSpacing: '-0.04em',
-          lineHeight: 1,
-        }}
-      >
-        {big}
-      </div>
+    <div className="stat-block p-8" {...rest}>
+      <div className="stat-big">{big}</div>
       <p className="mt-3 eyebrow max-w-[24ch]">{label}</p>
     </div>
   );
 }
 
-function Pillar({ name, weight, desc }: { name: string; weight: string; desc: string }) {
+function Pillar({
+  name,
+  weight,
+  desc,
+  idx,
+}: {
+  name: string;
+  weight: string;
+  desc: string;
+  idx?: number;
+}) {
   const weightLabel = `${weight.replace('%', ' percent')} of total score weight`;
+  const staggerStyle =
+    typeof idx === 'number'
+      ? ({ '--reveal-delay': `${idx * 80}ms` } as React.CSSProperties)
+      : undefined;
   return (
-    <li className="pillar-row grid grid-cols-[280px_1fr_100px] gap-6 py-7 items-baseline max-md:grid-cols-1 max-md:gap-2">
+    <li
+      className="pillar-row grid grid-cols-[280px_1fr_100px] gap-6 py-7 items-baseline max-md:grid-cols-1 max-md:gap-2"
+      data-reveal
+      style={staggerStyle}
+    >
       <span className="pillar-name">{name}</span>
       <span className="pillar-desc text-[color:var(--color-mute)]">{desc}</span>
       <span

@@ -229,6 +229,25 @@
    making this redundant. Soft contract per memory/design/motion.md §The
    reduced-motion contract (two tiers). */
 
+/* --- Generic viewport reveal contract (paired with ViewportReveal.tsx) ---
+   Sections opt-in via the [data-reveal] attribute. Stagger via --reveal-delay
+   custom property set inline on the element (canon-acceptable inline style:
+   it's a CSS variable, not arbitrary visual values).
+   The global prefers-reduced-motion block at line 115 scales transition-duration
+   to 0.01ms — reduced-motion users land on the end-state instantly. */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity var(--duration-short) var(--ease-sharp),
+              transform var(--duration-short) var(--ease-sharp);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* --- Hero typography (refactored from inline styles) --- */
 .hero-lede {
   font-size: 19px;
@@ -262,6 +281,14 @@
   font-size: 12px;
   letter-spacing: 0.04em;
   color: var(--color-mute);
+}
+
+/* --- Numbers strip Stat block (refactored from inline styles) --- */
+.stat-big {
+  font-size: 52px;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1;
 }
 
 /* --- Live-sample numeral (refactored from inline styles) --- */
