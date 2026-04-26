@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { Bracket, SiteFooter } from '@flintmere/ui';
+import { PricingVerticalTabs } from '@/components/PricingVerticalTabs';
 import { TIERS } from '@/lib/pricing';
 
 export const metadata: Metadata = {
@@ -37,8 +39,11 @@ export default function Pricing() {
     <main id="main">
       <section className="mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">Pricing</p>
+        {/* Phase B: bracket on `question` removed — verbs / fillers banned per
+            tokens.md §Signature. The page's bracket-2 (concierge £97) is
+            preserved below. Final hero copy lands in web-implementation. */}
         <h1 className="max-w-[20ch]">
-          Five tiers. One <Bracket>question</Bracket>: how many stores?
+          Five tiers. One question: how many stores?
         </h1>
         <p
           className="mt-8 max-w-[52ch] text-[color:var(--color-ink-2)]"
@@ -47,6 +52,16 @@ export default function Pricing() {
           Flat-rate subscriptions. No per-enrichment billing, no credit packs, no surprises. Start free, upgrade when the value&rsquo;s visible.
         </p>
       </section>
+
+      {/* Vertical selector (Phase B —
+          context/design/specs/2026-04-26-pricing-food-first.md §3).
+          4-tab radiogroup; URL ?vertical=food|beauty|apparel|bundle.
+          Tier-grid composition rebuild lands in web-implementation; for now
+          the selector announces the active vertical via aria-live and the
+          legacy 5-tier ladder below renders unchanged. */}
+      <Suspense fallback={null}>
+        <PricingVerticalTabs />
+      </Suspense>
 
       <section
         aria-label="Start here"

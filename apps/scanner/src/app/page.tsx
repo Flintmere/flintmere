@@ -1,7 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { Bracket, SiteFooter } from '@flintmere/ui';
 import { ViewportReveal } from '@/components/ViewportReveal';
+import { HomepageVerticalPicker } from '@/components/HomepageVerticalPicker';
 import { prisma } from '@/lib/db';
 import {
   summariseBenchmark,
@@ -108,6 +110,16 @@ export default async function MarketingHome() {
           </figure>
         </div>
       </section>
+
+      {/* Vertical picker + picker-driven content block (Phase B —
+          context/design/specs/2026-04-26-homepage-food-first.md §3 + §4).
+          Client component reads ?vertical= URL param and drives content swap
+          via aria-live. Vertical names are NOT bracketed (cap stays at 2:
+          hero h1 + audit £97). Suspense boundary required by Next.js 15 —
+          useSearchParams forces a CSR boundary. */}
+      <Suspense fallback={null}>
+        <HomepageVerticalPicker />
+      </Suspense>
 
       <hr className="rule" />
 
