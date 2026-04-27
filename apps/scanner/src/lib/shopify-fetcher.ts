@@ -32,6 +32,27 @@ export interface FetchOptions {
   sampleFraction?: number;
 }
 
+/**
+ * Wrapped catalog result with sampling-honesty metadata. Per BUSINESS.md:19
+ * council ruling 2026-04-27: never display the sampled-product count as if
+ * it were the merchant's actual total. UI uses `truncated` + `actualProductCount`
+ * to render "Sampled N of M products" rather than a misleading "N products".
+ *
+ * The cap is intentional (kindness contract on merchant Shopify CDN per
+ * #38 Data intake veto). Fix is honesty, not capacity.
+ */
+export interface FetchedCatalog {
+  catalog: CatalogInput;
+  /** True when the fetch hit the per-scan page cap and there are likely more products. */
+  truncated: boolean;
+  /**
+   * Merchant's true product count as reported by /products/count.json — null
+   * when the endpoint is blocked, returns non-numeric, or fails. UI renders
+   * "an estimated N+" fallback when null.
+   */
+  actualProductCount: number | null;
+}
+
 const DEFAULT_OPTIONS: Required<FetchOptions> = {
   timeoutMs: 55_000,
   maxPages: 4,
@@ -73,7 +94,7 @@ export function normaliseDomain(raw: string): string {
 export async function fetchCatalog(
   rawUrl: string,
   options: FetchOptions = {},
-): Promise<CatalogInput> {
+): Promise<FetchedCatalog> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const domain = normaliseDomain(rawUrl);
 
@@ -82,6 +103,7 @@ export async function fetchCatalog(
 
   try {
     const products: ProductInput[] = [];
+    let lastPageWasFull = false;
 
     for (let page = 1; page <= opts.maxPages; page += 1) {
       const pageUrl = `https://${domain}/products.json?limit=250&page=${page}`;
@@ -108,13 +130,17 @@ export async function fetchCatalog(
 
       const body = (await res.json()) as { products?: ShopifyRawProduct[] };
       const rawProducts = body.products ?? [];
-      if (rawProducts.length === 0) break;
+      if (rawProducts.length === 0) {
+        lastPageWasFull = false;
+        break;
+      }
 
       for (const raw of rawProducts) {
         products.push(toProductInput(raw));
       }
 
-      if (rawProducts.length < 250) break;
+      lastPageWasFull = rawProducts.length === 250;
+      if (!lastPageWasFull) break;
     }
 
     if (products.length === 0) {
@@ -124,10 +150,28 @@ export async function fetchCatalog(
       );
     }
 
+    // Truncation suspect when we exhausted the page budget AND the final
+    // page came back full. May be a false positive on an exact-1000 catalog
+    // (rare); the actualProductCount fetch confirms or refutes.
+    const provisionalTruncated =
+      products.length >= opts.maxPages * 250 && lastPageWasFull;
+
+    const actualProductCount = await fetchProductCount(domain, controller.signal);
+
+    // Refine: if actualProductCount is known and equals products.length, the
+    // catalog isn't truncated — false-positive caught.
+    const truncated =
+      provisionalTruncated &&
+      (actualProductCount === null || actualProductCount > products.length);
+
     return {
-      shopDomain: domain,
-      products,
-      scoredAt: new Date().toISOString(),
+      catalog: {
+        shopDomain: domain,
+        products,
+        scoredAt: new Date().toISOString(),
+      },
+      truncated,
+      actualProductCount,
     };
   } catch (err) {
     if (err instanceof ShopifyFetchError) throw err;
@@ -140,6 +184,46 @@ export async function fetchCatalog(
     );
   } finally {
     clearTimeout(timer);
+  }
+}
+
+/**
+ * Fetches the merchant's TRUE product count via the public
+ * /products/count.json endpoint. Returns null when the endpoint is blocked,
+ * times out, or the response is malformed. Most Shopify stores expose this;
+ * some Plus stores behind bot management return 401/403, hang, or rate-limit
+ * — null fall-back is intentional and the UI degrades gracefully to "1,000+".
+ *
+ * Hard 5s timeout on this single request — far shorter than the parent
+ * pipeline timeout — because product-count is a nice-to-have, not load-bearing
+ * for the scan itself. We'd rather emit `actualProductCount: null` after 5s
+ * than hold up the whole scan response.
+ */
+async function fetchProductCount(
+  domain: string,
+  parentSignal: AbortSignal,
+): Promise<number | null> {
+  const localController = new AbortController();
+  const localTimer = setTimeout(() => localController.abort(), 5_000);
+  // Forward parent abort to local — keeps both budgets honoured.
+  const onParentAbort = () => localController.abort();
+  parentSignal.addEventListener('abort', onParentAbort, { once: true });
+  try {
+    const res = await fetch(`https://${domain}/products/count.json`, {
+      signal: localController.signal,
+      headers: {
+        'user-agent': 'Flintmere-Scanner/0.1 (+https://flintmere.com/bot)',
+        accept: 'application/json',
+      },
+    });
+    if (!res.ok) return null;
+    const body = (await res.json()) as { count?: unknown };
+    return typeof body.count === 'number' && body.count >= 0 ? body.count : null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(localTimer);
+    parentSignal.removeEventListener('abort', onParentAbort);
   }
 }
 

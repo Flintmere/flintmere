@@ -15,6 +15,8 @@ import {
   REVENUE_LEDE_DISCLOSURE,
   REVENUE_LEDE_EYEBROW,
   revenueLede,
+  sampledRevenueDisclosure,
+  scanScopeLine,
   SUPPRESSION_LEDE_EYEBROW,
   SUPPRESSION_LEDE_SUBHEAD,
   suppressionLede,
@@ -42,10 +44,22 @@ interface ScanResult {
   gtinlessCeiling: number;
   productCount: number;
   /**
+   * Sampling-honesty fields per BUSINESS.md:19 council ruling 2026-04-27.
+   * Optional for backwards compatibility — pre-2026-04-27 scans missing.
+   */
+  truncated?: boolean;
+  actualProductCount?: number | null;
+  /**
    * Optional for backwards compatibility — older scans persisted before
    * the dead-inventory wedge shipped won't carry this field.
    */
   suppressionEstimate?: SuppressionEstimate;
+  /**
+   * Sample-projected suppression. Present when truncated AND actualProductCount
+   * is known and exceeds the sampled count. UI prefers this over raw when
+   * present. Null otherwise.
+   */
+  scaledSuppressionEstimate?: SuppressionEstimate | null;
   /**
    * AOV inference (wedge finish arc). Null for non-food catalogs and
    * below-sample-floor catalogs. Older persisted scans won't carry it.
@@ -56,6 +70,11 @@ interface ScanResult {
    * `aovEstimate` itself is null.
    */
   revenueEstimate?: RevenueEstimate | null;
+  /**
+   * Sample-projected revenue band. Same scaling logic as
+   * scaledSuppressionEstimate. Null when no scaling applies.
+   */
+  scaledRevenueEstimate?: RevenueEstimate | null;
   pillars: Array<{
     pillar: string;
     score: number;
@@ -228,6 +247,13 @@ interface SuppressionLedeProps {
   estimate: SuppressionEstimate | undefined;
   productCount: number;
   revenueEstimate?: RevenueEstimate | null;
+  /** Sampled-projected suppression — UI prefers this over `estimate` when present. */
+  scaledEstimate?: SuppressionEstimate | null;
+  /** Sampled-projected revenue — UI prefers this over `revenueEstimate` when present. */
+  scaledRevenueEstimate?: RevenueEstimate | null;
+  /** Sampling state for disclosure swap. */
+  truncated?: boolean;
+  actualProductCount?: number | null;
 }
 
 /**
@@ -243,22 +269,43 @@ interface SuppressionLedeProps {
  *           sample, or older scans persisted before AOV shipped.
  *   State 3 (no suppression signal): renders nothing — don't manufacture
  *           a "you're losing nothing" line (per requirement Q-G).
+ *
+ * Per BUSINESS.md:19 council ruling 2026-04-27: when truncated AND scaled
+ * estimates are present, prefer scaled (the merchant's full-catalog
+ * projection) and swap disclosure to `sampledRevenueDisclosure`.
  */
 function SuppressionLede({
   estimate,
   productCount,
   revenueEstimate,
+  scaledEstimate,
+  scaledRevenueEstimate,
+  truncated,
+  actualProductCount,
 }: SuppressionLedeProps) {
-  // State 3: no suppression to surface.
-  if (!estimate || estimate.high === 0) return null;
+  // Prefer scaled estimates when present (truncated catalogs with known total).
+  const effectiveSuppression = scaledEstimate ?? estimate;
+  const effectiveRevenue = scaledRevenueEstimate ?? revenueEstimate;
 
-  const signalLine = suppressionSignalLine(estimate.signals);
+  // State 3: no suppression to surface.
+  if (!effectiveSuppression || effectiveSuppression.high === 0) return null;
+
+  const signalLine = suppressionSignalLine(effectiveSuppression.signals);
+
+  // Disclosure: scaled-projection variant when sampling applied; raw otherwise.
+  const disclosure =
+    truncated && scaledRevenueEstimate
+      ? sampledRevenueDisclosure({
+          sampledCount: productCount,
+          actualProductCount: actualProductCount ?? null,
+        })
+      : REVENUE_LEDE_DISCLOSURE;
 
   // State 1: revenue band available — lead with the £-figure.
-  if (revenueEstimate) {
+  if (effectiveRevenue) {
     const headline = revenueLede({
-      low: revenueEstimate.low,
-      high: revenueEstimate.high,
+      low: effectiveRevenue.low,
+      high: effectiveRevenue.high,
     });
     return (
       <div className="mb-12 pb-12 border-b border-[color:var(--color-line)]">
@@ -283,17 +330,25 @@ function SuppressionLede({
             fontFamily: 'var(--font-mono)',
           }}
         >
-          {REVENUE_LEDE_DISCLOSURE}
+          {disclosure}
         </p>
       </div>
     );
   }
 
-  // State 2: SKU-count fallback (existing MVP lede unchanged).
+  // State 2: SKU-count fallback. Uses scaled estimate when truncated +
+  // scaled is present so a non-food catalog of 4,000 reads "Roughly 1,800
+  // of your 4,000 products" not "Roughly 449 of your 1,000 products".
+  // For the SKU-count lede, the full-catalog total is the merchant-facing
+  // denominator — sampled count would feel wrong here.
+  const ledeProductCount =
+    truncated && scaledEstimate
+      ? actualProductCount ?? productCount
+      : productCount;
   const headline = suppressionLede({
-    low: estimate.low,
-    high: estimate.high,
-    productCount,
+    low: effectiveSuppression.low,
+    high: effectiveSuppression.high,
+    productCount: ledeProductCount,
   });
   return (
     <div className="mb-12 pb-12 border-b border-[color:var(--color-line)]">
@@ -318,9 +373,40 @@ function SuppressionLede({
           fontFamily: 'var(--font-mono)',
         }}
       >
-        {SUPPRESSION_LEDE_SUBHEAD}
+        {truncated
+          ? sampledRevenueDisclosure({
+              sampledCount: productCount,
+              actualProductCount: actualProductCount ?? null,
+            })
+          : SUPPRESSION_LEDE_SUBHEAD}
       </p>
     </div>
+  );
+}
+
+interface ScanScopeLineProps {
+  sampledCount: number;
+  actualProductCount: number | null;
+  truncated: boolean;
+}
+
+/**
+ * Scope row above SuppressionLede — gives merchant calibration on the
+ * sample BEFORE the £-figure lands. Per BUSINESS.md:19 council ruling
+ * 2026-04-27 #3: trust-anchor sits ahead of the headline.
+ */
+function ScanScopeLine({
+  sampledCount,
+  actualProductCount,
+  truncated,
+}: ScanScopeLineProps) {
+  return (
+    <p
+      className="eyebrow mb-6 text-[color:var(--color-mute)]"
+      style={{ letterSpacing: '0.12em' }}
+    >
+      {scanScopeLine({ sampledCount, actualProductCount, truncated })}
+    </p>
   );
 }
 
@@ -347,6 +433,17 @@ function Results({ result }: { result: ScanResult }) {
   return (
     <section className="mx-auto max-w-[1280px] px-8 py-16 border-t border-[color:var(--color-line)]">
       {/*
+        Scan scope line — calibration row above the lede. Per BUSINESS.md:19
+        council ruling 2026-04-27: trust-anchor sits ahead of the headline so
+        the merchant absorbs the sampling story before the £-figure lands.
+      */}
+      <ScanScopeLine
+        sampledCount={result.productCount}
+        actualProductCount={result.actualProductCount ?? null}
+        truncated={result.truncated ?? false}
+      />
+
+      {/*
         Dead-inventory wedge — v2 strategic report §7. Surface the
         suppression estimate as the LEAD result, ahead of the score +
         pillar breakdown. The score block remains below as the deeper
@@ -356,6 +453,10 @@ function Results({ result }: { result: ScanResult }) {
         estimate={result.suppressionEstimate}
         productCount={result.productCount}
         revenueEstimate={result.revenueEstimate}
+        scaledEstimate={result.scaledSuppressionEstimate ?? null}
+        scaledRevenueEstimate={result.scaledRevenueEstimate ?? null}
+        truncated={result.truncated ?? false}
+        actualProductCount={result.actualProductCount ?? null}
       />
 
       <div className="grid md:grid-cols-[300px_1fr] gap-12 items-center">

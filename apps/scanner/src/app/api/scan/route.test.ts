@@ -89,7 +89,11 @@ const SUPPRESSION_RISK_CATALOG: CatalogInput = {
 };
 
 vi.mock('@/lib/shopify-fetcher', () => ({
-  fetchCatalog: vi.fn(async () => SUPPRESSION_RISK_CATALOG),
+  fetchCatalog: vi.fn(async () => ({
+    catalog: SUPPRESSION_RISK_CATALOG,
+    truncated: false,
+    actualProductCount: SUPPRESSION_RISK_CATALOG.products.length,
+  })),
   ShopifyFetchError: class ShopifyFetchError extends Error {
     code: string;
     constructor(code: string, message: string) {

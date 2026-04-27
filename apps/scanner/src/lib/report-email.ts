@@ -195,9 +195,9 @@ function renderHtml(input: ReportEmailInput): string {
               <!-- Door 1: concierge -->
               <div style="margin-top:24px;padding:20px;border:1px solid #F8BF24;background:rgba(248,191,36,0.06);">
                 <div style="font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#F8BF24;">Recommended · £97 one-off · three working days</div>
-                <div style="margin-top:8px;font-size:17px;font-weight:500;color:#F7F7F4;line-height:1.3;">Have John read your store for you.</div>
+                <div style="margin-top:8px;font-size:17px;font-weight:500;color:#F7F7F4;line-height:1.3;">Have us read your store for you.</div>
                 <p style="margin:8px 0 0 0;font-size:14px;color:#A8AAB2;line-height:1.5;">
-                  John reads your store product by product, writes a detailed audit letter pointing at exactly what to fix, and sends a per-product CSV with the worst 10 products already drafted. A 30-day re-scan is included. No video, no call — just the data.
+                  We read your store product by product, write a detailed audit letter pointing at exactly what to fix, and send a per-product CSV with the worst 10 products already drafted. A 30-day re-scan is included. No video, no call — just the data.
                 </p>
                 <a href="${esc(auditUrl)}" style="display:inline-block;margin-top:14px;background:#F8BF24;color:#0A0A0B;padding:12px 20px;font-family:ui-monospace,Menlo,monospace;font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;text-decoration:none;">Book the £97 audit →</a>
               </div>
@@ -316,8 +316,8 @@ ${unlocked}${lockedNote}
 What next — three ways to fix what we found
 
 1. Recommended · £97 one-off · three working days
-   Have John read your store for you. He reads every product, writes a
-   detailed audit letter pointing at exactly what to fix, and sends a
+   Have us read your store for you. We read every product, write a
+   detailed audit letter pointing at exactly what to fix, and send a
    per-product CSV with the worst 10 products already drafted. A 30-day
    re-scan is included. No video, no call — just the data.
    ${auditUrl}

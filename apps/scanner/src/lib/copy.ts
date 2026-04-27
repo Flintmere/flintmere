@@ -18,25 +18,27 @@ export const BENCHMARK_PUBLISH_FLOOR = 100
 export const AUTHORITY_LINE =
   'The checks map to Shopify product data requirements, GS1 UK identifier rules, and Google Merchant Center specs.'
 
-// Door 3 (soft reply link) in emails and on concierge page. Calibrated
-// with John: replying within two working days is realistic; "24 hours"
-// was rejected as an impossible SLA.
-export const REPLY_SLA = 'John usually replies within two working days.'
+// Door 3 (soft reply link) in emails and on concierge page. Per
+// BUSINESS.md:19 — customer-facing surfaces use team framing. Email
+// signatures (1:1 procurement) keep the named director.
+export const REPLY_SLA = 'The team usually replies within two working days.'
 
 // First-person sign-off for every customer-facing email. Founder
-// identity is John Morris; company legal entity is Eazy Access Ltd,
-// but signatures use the Flintmere brand.
+// identity is John Morris; company legal entity is Eazy Access Ltd.
+// Email is 1:1 procurement-disclosure surface per BUSINESS.md:19, so
+// the named director identity holds here even though marketing copy
+// flips to "we" / "the team."
 export const JOHN_SIGNATURE_NAME = 'John Morris'
 export const JOHN_SIGNATURE_TITLE = 'Flintmere founder'
-export const JOHN_SIGNATURE_REPLY_INVITE = 'Reply direct. I read every one.'
+export const JOHN_SIGNATURE_REPLY_INVITE = 'Reply direct. We read every one.'
 
 // The concierge deliverable. Written audit — no video, no call —
-// because John delivers at scale. Every customer-facing surface that
+// delivered by the Flintmere team. Every customer-facing surface that
 // describes what £97 buys must use this wording (or the list below).
 // If you change the deliverable shape, update all five surfaces in
 // the same commit.
 export const CONCIERGE_DELIVERABLE_SUMMARY =
-  'John reads every product, writes a detailed audit letter pointing at exactly what to fix, and sends a per-product CSV with the worst 10 products already drafted for you. A 30-day re-scan is included. Delivered within three working days.'
+  'We read every product, write a detailed audit letter pointing at exactly what to fix, and send a per-product CSV with the worst 10 products already drafted for you. A 30-day re-scan is included. Delivered within three working days.'
 
 // Five-item list used on the /audit page and in the report email
 // Door 1 expansion. Keep in this order — #37 sequenced it for
@@ -50,12 +52,12 @@ export const CONCIERGE_DELIVERABLE_LIST: Array<{
   {
     title: 'A written audit letter',
     body:
-      'John reads your store product by product, then writes a 1,500-word letter pointing at specific products by name with annotated screenshots. Not a generic template — a read of your store.',
+      'We read your store product by product, then write a 1,500-word letter pointing at specific products by name with annotated screenshots. Not a generic template — a read of your store.',
   },
   {
     title: 'A per-product fix CSV',
     body:
-      'Every product that has a problem, which problem, and the fix. For the worst 10 offenders, John drafts the full replacement text — title, description, metafield values — ready to paste into Shopify.',
+      'Every product that has a problem, which problem, and the fix. For the worst 10 offenders, we draft the full replacement text — title, description, metafield values — ready to paste into Shopify.',
   },
   {
     title: 'A 30-day fix sequence',
@@ -344,10 +346,57 @@ export const REVENUE_LEDE_EYEBROW = 'Annual demand at risk'
 export const REVENUE_LEDE_DISCLOSURE =
   'Modelled from public catalog signals — missing barcodes, GMC categories, and allergen statements. Install Flintmere to verify against your Google Merchant Center account.'
 
+/**
+ * Disclosure variant when the scan was truncated and figures are projected
+ * from a sample. Per BUSINESS.md:19 council ruling 2026-04-27 #4: when
+ * scaling applies, the disclosure must say so. Honest projection beats
+ * silent inflation.
+ */
+export function sampledRevenueDisclosure(args: {
+  sampledCount: number
+  actualProductCount: number | null
+}): string {
+  const sampled = args.sampledCount.toLocaleString()
+  const total =
+    args.actualProductCount !== null
+      ? args.actualProductCount.toLocaleString()
+      : `${sampled}+`
+  return `Projected from a ${sampled}-product sample of your ${total}-product catalog. Modelled from public signals — missing barcodes, GMC categories, and allergen statements. Install Flintmere to verify against your full catalog and Google Merchant Center account.`
+}
+
+/**
+ * Scope line shown above every results lede — gives the merchant
+ * calibration on what we scanned BEFORE they read the £-figure. Per
+ * BUSINESS.md:19 council ruling 2026-04-27 #3: trust-anchor sits ahead of
+ * the headline so the merchant absorbs the sampling story before the
+ * number lands.
+ */
+export function scanScopeLine(args: {
+  sampledCount: number
+  actualProductCount: number | null
+  truncated: boolean
+}): string {
+  const sampled = args.sampledCount.toLocaleString()
+  if (!args.truncated) {
+    return `Scanned ${sampled} products · 60 seconds`
+  }
+  const total =
+    args.actualProductCount !== null
+      ? args.actualProductCount.toLocaleString()
+      : `${sampled}+`
+  return `Scanned ${sampled} of ${total} products · 60 seconds`
+}
+
 export function revenueLede(args: { low: number; high: number }): string {
   const { low, high } = args
+  // £-formatter polish per operator + #21 Tech copywriter 2026-04-27.
+  // For ≥£100k, drop the decimal — "£210k" reads cleaner than "£210.1k".
+  // For ≥£10m, round to whole millions. For £1k–£99k and £1m–£9m, keep
+  // one-decimal where non-round, drop where round.
   const fmt = (n: number) => {
-    if (n >= 1_000_000) return `£${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}m`
+    if (n >= 10_000_000) return `£${Math.round(n / 1_000_000)}m`
+    if (n >= 1_000_000) return `£${(n / 1_000_000).toFixed(1)}m`
+    if (n >= 100_000) return `£${Math.round(n / 1_000).toLocaleString()}k`
     if (n >= 1_000) return `£${(n / 1_000).toFixed(n % 1_000 === 0 ? 0 : 1)}k`
     return `£${n.toLocaleString()}`
   }

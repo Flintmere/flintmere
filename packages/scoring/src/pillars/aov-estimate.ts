@@ -36,6 +36,91 @@ const MIN_VARIANT_SAMPLE = 3;
 const AOV_BAND_FLOOR_RATIO = 0.30;
 const FOOD_THRESHOLD = 0.40;
 
+// Anti-keyword exclusion list — vetoes a food-positive classification when
+// any product on the catalog hits a non-food vertical signal. Allbirds
+// (apparel/footwear) was the live false-positive that surfaced this need:
+// colour names like "milk" and "almond" hit FOOD_HINT_KEYWORDS while the
+// catalog is plainly shoes. Catalogs mixing food + apparel (a deli that
+// sells branded merch) trip the veto and fall back to SKU-count framing,
+// which is the right honest behaviour — we'd rather under-emit a food
+// classification than mis-emit one.
+const NON_FOOD_VERTICAL_KEYWORDS: ReadonlyArray<string> = Object.freeze([
+  // Apparel + footwear
+  'shoe',
+  'sneaker',
+  'trainer',
+  'boot',
+  'sandal',
+  'apparel',
+  'clothing',
+  't-shirt',
+  'tshirt',
+  'shirt',
+  'jacket',
+  'coat',
+  'hoodie',
+  'sweater',
+  'jumper',
+  'knit',
+  'wool',
+  'fabric',
+  'denim',
+  'jeans',
+  'pants',
+  'trouser',
+  'short ',
+  'shorts',
+  'dress',
+  'skirt',
+  'sock',
+  'underwear',
+  'lingerie',
+  'swimwear',
+  'bikini',
+  'footwear',
+  'leather',
+  'suede',
+  'cotton',
+  'linen',
+  'cashmere',
+  'merino',
+  // Beauty / skincare / cosmetics — they trip food keywords aggressively
+  // ("almond oil", "vanilla extract" in fragrance), so veto here too
+  'skincare',
+  'haircare',
+  'cosmetic',
+  'fragrance',
+  'perfume',
+  'serum',
+  'moisturiser',
+  'moisturizer',
+  'cleanser',
+  'lipstick',
+  'mascara',
+  'foundation makeup',
+  'shampoo',
+  'conditioner',
+  // Hardware / home / furniture
+  'furniture',
+  'sofa',
+  'chair',
+  'table',
+  'lamp',
+  'rug',
+  'pillow',
+  'bedding',
+  'mattress',
+  'tool',
+  'hardware',
+  // Tech / electronics
+  'electronic',
+  'gadget',
+  'cable',
+  'charger',
+  'headphone',
+  'speaker',
+]);
+
 // Months in a year, used to scale a per-month suppression count up to an
 // annual demand figure. NOT a turn rate — see Q-C in the requirement: no
 // defensible public per-SKU monthly purchase frequency exists, so the
@@ -46,22 +131,43 @@ const ANNUAL_SCALAR = 12;
 
 // ---- Vertical detection ----
 
-function looksFoodPositive(product: ProductInput): boolean {
-  // Re-implemented inline to avoid coupling to suppression-estimate's
-  // private `looksLikeFood` helper. Keyword set is shared.
-  const haystack = [
+function productHaystack(product: ProductInput): string {
+  return [
     product.productType ?? '',
     ...(product.tags ?? []),
     product.title ?? '',
   ]
     .join(' ')
     .toLowerCase();
+}
+
+function looksFoodPositive(product: ProductInput): boolean {
+  // Re-implemented inline to avoid coupling to suppression-estimate's
+  // private `looksLikeFood` helper. Keyword set is shared.
+  const haystack = productHaystack(product);
   return FOOD_HINT_KEYWORDS.some((kw) => haystack.includes(kw));
+}
+
+function looksNonFoodVertical(product: ProductInput): boolean {
+  const haystack = productHaystack(product);
+  return NON_FOOD_VERTICAL_KEYWORDS.some((kw) => haystack.includes(kw));
 }
 
 function detectVertical(catalog: CatalogInput): 'food' | null {
   const total = catalog.products.length;
   if (total === 0) return null;
+
+  // Veto pass: if ANY product on the catalog carries a strong non-food
+  // vertical signal (apparel / beauty / hardware / electronics keyword),
+  // refuse to emit a food classification. Reason: pure-food merchants
+  // don't sell shoes; a "shoe" hit is structural evidence the catalog
+  // isn't food-first. We'd rather under-classify than mis-classify and
+  // emit a wrong £-figure on /scan. (Per OQ-4 from the architect's
+  // blueprint, confirmed live by allbirds.com false-positive 2026-04-27.)
+  for (const product of catalog.products) {
+    if (looksNonFoodVertical(product)) return null;
+  }
+
   let foodPositive = 0;
   for (const product of catalog.products) {
     if (looksFoodPositive(product)) foodPositive++;

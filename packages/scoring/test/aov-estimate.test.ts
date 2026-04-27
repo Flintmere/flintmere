@@ -22,14 +22,18 @@ interface MakeProductOpts {
 function productOf(opts: MakeProductOpts): ProductInput {
   const prices =
     opts.prices && opts.prices.length > 0 ? opts.prices : [opts.price];
+  // Non-food default uses neutral categories that hit neither
+  // FOOD_HINT_KEYWORDS nor NON_FOOD_VERTICAL_KEYWORDS — stationery is a
+  // clean negative signal. "Leather Wallet" was the previous default but
+  // "leather" now (correctly) trips the apparel veto.
   return {
     id: opts.id,
     handle: opts.id.replace(/[^a-z0-9]/gi, '-').toLowerCase(),
-    title: opts.food ? 'Organic Snack Bar' : 'Leather Wallet',
+    title: opts.food ? 'Organic Snack Bar' : 'Notebook A5',
     bodyHtml: '<p>Sample body.</p>',
     vendor: 'Test Brand',
-    productType: opts.food ? 'Snack' : 'Accessory',
-    tags: opts.food ? ['food', 'snack'] : ['accessory'],
+    productType: opts.food ? 'Snack' : 'Stationery',
+    tags: opts.food ? ['food', 'snack'] : ['stationery', 'paper'],
     status: 'active',
     publishedAt: '2026-01-01T00:00:00Z',
     variants: prices.map((price, i) => ({
@@ -306,5 +310,107 @@ describe('estimateAov', () => {
     const result = estimateAov(makeCatalog(products), moderateSuppression);
     expect(result).not.toBeNull();
     expect(result!.aovEstimate.low).toBeGreaterThanOrEqual(1);
+  });
+
+  // ---- Apparel/beauty veto: false-positive prevention (OQ-4 fix) ----
+  //
+  // Live regression: allbirds.com (apparel/footwear) was classified as food
+  // because shoe colour names like "milk", "almond", "natural", "cream" hit
+  // FOOD_HINT_KEYWORDS. The veto pass in detectVertical now requires that
+  // ANY non-food vertical signal on the catalog disqualifies food
+  // classification. These tests lock that behaviour in.
+  it('veto: allbirds-shaped catalog (shoe + food-coloured names) returns null', () => {
+    // 10 shoe products with food-flavoured colour names like "Milk White"
+    // and "Almond" — the actual allbirds antipattern.
+    const apparel: ProductInput[] = Array.from({ length: 10 }, (_, i) => ({
+      id: `apparel-${i}`,
+      handle: `wool-runner-milk-${i}`,
+      title: i % 2 === 0 ? 'Wool Runner — Milk' : 'Tree Dasher — Almond',
+      bodyHtml: '<p>Sustainable shoes made from merino wool.</p>',
+      vendor: 'Allbirds',
+      productType: 'Shoe',
+      tags: ['shoe', 'footwear', 'sustainable'],
+      status: 'active' as const,
+      publishedAt: '2026-01-01T00:00:00Z',
+      variants: [
+        {
+          id: `apparel-${i}-v0`,
+          sku: `APP-${i}`,
+          barcode: null,
+          price: '95.00',
+          inventoryQuantity: 10,
+          inventoryPolicy: 'deny' as const,
+          available: true,
+        },
+      ],
+      images: [],
+      brandMetafield: 'Allbirds',
+    }));
+    expect(estimateAov(makeCatalog(apparel), moderateSuppression)).toBeNull();
+  });
+
+  it('veto: even ONE apparel-keyword product on a mostly-food catalog vetoes', () => {
+    // 9 food + 1 apparel. Without veto, this would clear the 40% threshold
+    // and emit food. With veto, the single apparel signal disqualifies.
+    const products: ProductInput[] = [
+      ...Array.from({ length: 9 }, (_, i) =>
+        productOf({ id: `f-${i}`, price: '10.00', food: true }),
+      ),
+      {
+        id: 'apparel-merch',
+        handle: 'branded-tshirt',
+        title: 'Branded t-shirt — bakery merch',
+        bodyHtml: '<p>Cotton t-shirt with bakery logo.</p>',
+        vendor: 'Bakery',
+        productType: 'Apparel',
+        tags: ['apparel', 'merch', 'cotton'],
+        status: 'active',
+        publishedAt: '2026-01-01T00:00:00Z',
+        variants: [
+          {
+            id: 'apparel-merch-v0',
+            sku: 'TS-001',
+            barcode: '5012345678900',
+            price: '20.00',
+            inventoryQuantity: 50,
+            inventoryPolicy: 'deny',
+            available: true,
+          },
+        ],
+        images: [],
+        brandMetafield: 'Bakery',
+      },
+    ];
+    expect(estimateAov(makeCatalog(products), moderateSuppression)).toBeNull();
+  });
+
+  it('veto: beauty-keyword catalog ("serum", "moisturiser") returns null', () => {
+    // Beauty/skincare products use food-adjacent ingredient names ("vanilla
+    // extract" in fragrance, "almond oil" in skincare). Veto must catch.
+    const beauty: ProductInput[] = Array.from({ length: 10 }, (_, i) => ({
+      id: `beauty-${i}`,
+      handle: `vanilla-serum-${i}`,
+      title: 'Vanilla Almond Serum',
+      bodyHtml: '<p>Skincare serum with almond and vanilla notes.</p>',
+      vendor: 'Beauty Brand',
+      productType: 'Skincare serum',
+      tags: ['skincare', 'serum', 'beauty'],
+      status: 'active',
+      publishedAt: '2026-01-01T00:00:00Z',
+      variants: [
+        {
+          id: `beauty-${i}-v0`,
+          sku: `BTY-${i}`,
+          barcode: null,
+          price: '45.00',
+          inventoryQuantity: 20,
+          inventoryPolicy: 'deny',
+          available: true,
+        },
+      ],
+      images: [],
+      brandMetafield: 'Beauty Brand',
+    }));
+    expect(estimateAov(makeCatalog(beauty), moderateSuppression)).toBeNull();
   });
 });

@@ -153,7 +153,7 @@ export default function FlintmereForPlus() {
             className="mt-8 max-w-[56ch]"
             style={{ color: 'var(--color-mute-inv)', fontSize: 16, lineHeight: 1.55 }}
           >
-            £97 gets you John reading your catalog product by product, a 1,500-word
+            £97 gets you the team reading your catalog product by product, a 1,500-word
             letter pointing at specific SKUs by name, a per-product fix CSV with the
             worst ten offenders already drafted, a 30-day fix sequence, and a 30-day
             re-scan. No video, no call — just the data a Plus ops team can action

@@ -53,7 +53,8 @@ export async function POST(req: NextRequest) {
   });
 
   try {
-    const catalog = await fetchCatalog(body.shopUrl, { maxPages: 4 });
+    const fetched = await fetchCatalog(body.shopUrl, { maxPages: 4 });
+    const { catalog, truncated, actualProductCount } = fetched;
     const crawlability = await fetchCrawlability(catalog.shopDomain).catch(
       () => null,
     );
@@ -69,12 +70,49 @@ export async function POST(req: NextRequest) {
     // non-food catalogs and below-sample-floor catalogs (food-first at
     // v1 per requirement Q1.1).
     //
-    // OQ-1: persistence gap. `aovEstimate` and `revenueEstimate` are
-    // surfaced on the scan response but NOT written to `scoreJson`. They
-    // therefore won't render on /score/[shop] for historical scans
-    // without a future migration that re-computes from the persisted
-    // catalog or back-fills these fields.
+    // OQ-1: persistence gap. `aovEstimate`, `revenueEstimate`, `truncated`,
+    // and `actualProductCount` are surfaced on the scan response but NOT
+    // written to `scoreJson`. They therefore won't render on /score/[shop]
+    // for historical scans without a future migration that re-computes from
+    // the persisted catalog or back-fills these fields.
     const aovResult = estimateAov(catalog, suppressionEstimate);
+
+    // Ratio-scaling for truncated catalogs — projects sample-derived counts
+    // up to the merchant's true catalog size so the displayed £-figure
+    // reflects their REAL exposure, not the sampled-1000 exposure. Per
+    // BUSINESS.md:19 council ruling 2026-04-27 #2: emit scaled estimates
+    // alongside raw so the UI can render the projection with disclosure.
+    const sampledCount = catalog.products.length;
+    const scaleRatio =
+      truncated && actualProductCount !== null && actualProductCount > sampledCount
+        ? actualProductCount / sampledCount
+        : null;
+
+    const scaledSuppressionEstimate =
+      scaleRatio !== null
+        ? {
+            low: Math.ceil(suppressionEstimate.low * scaleRatio),
+            high: Math.ceil(suppressionEstimate.high * scaleRatio),
+            signals: {
+              missingGtin: Math.ceil(suppressionEstimate.signals.missingGtin * scaleRatio),
+              ambiguousAllergen: Math.ceil(
+                suppressionEstimate.signals.ambiguousAllergen * scaleRatio,
+              ),
+              missingGmcCategory: Math.ceil(
+                suppressionEstimate.signals.missingGmcCategory * scaleRatio,
+              ),
+            },
+          }
+        : null;
+
+    const scaledRevenueEstimate =
+      scaleRatio !== null && aovResult?.revenueEstimate
+        ? {
+            low: Math.floor(aovResult.revenueEstimate.low * scaleRatio),
+            high: Math.ceil(aovResult.revenueEstimate.high * scaleRatio),
+            aovEstimate: aovResult.revenueEstimate.aovEstimate,
+          }
+        : null;
 
     await prisma.scan.update({
       where: { id: scan.id },
@@ -99,9 +137,20 @@ export async function POST(req: NextRequest) {
         gtinlessCeiling: score.gtinlessCeiling,
         productCount: score.productCount,
         variantCount: score.variantCount,
+        // Sampling-honesty fields per BUSINESS.md:19 council ruling 2026-04-27.
+        // `truncated` flags when the per-scan page cap was hit; `actualProductCount`
+        // is the merchant's true catalog total (null when /products/count.json blocked).
+        // UI uses these to render "Sampled N of M products" not "N products".
+        truncated,
+        actualProductCount,
         suppressionEstimate,
+        // When truncated, the scaled estimates project sample counts up to
+        // the merchant's full catalog. UI displays scaled when present and
+        // falls back to raw otherwise. Both surfaces ship with disclosure.
+        scaledSuppressionEstimate,
         aovEstimate: aovResult?.aovEstimate ?? null,
         revenueEstimate: aovResult?.revenueEstimate ?? null,
+        scaledRevenueEstimate,
         pillars: score.pillars.map((p) => ({
           pillar: p.pillar,
           score: p.score,

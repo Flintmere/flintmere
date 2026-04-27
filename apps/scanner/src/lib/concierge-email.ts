@@ -3,7 +3,9 @@
  * Fired from the Stripe webhook handler after payment_intent.succeeded.
  *
  * Copy rules (Copy Council #20 #21 #22 #37):
- *   - No operator / team language. John reviews personally.
+ *   - Body copy uses "we" / "the team" per BUSINESS.md:19 customer-facing
+ *     framing rule. The 1:1 email signature retains the named director
+ *     (procurement-disclosure exception in the same rule).
  *   - Delivery window matches the report email promise (three working days).
  *   - Plain-language: no jargon, no "deliverables", no "remediation plan".
  *   - Bracket signature preserved on [ in ] moment.

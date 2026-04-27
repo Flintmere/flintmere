@@ -139,9 +139,9 @@ export const TIERS: Tier[] = [
     ],
     cta: {
       kind: 'mailto',
-      label: 'Talk to John →',
+      label: 'Talk to the team →',
       href: mailtoLink('Flintmere Agency plan — enquiry'),
-      note: 'Agencies get a call. John replies within two working days.',
+      note: 'Agencies get a call. We reply within two working days.',
     },
   },
   {
@@ -151,7 +151,7 @@ export const TIERS: Tier[] = [
     unit: '/mo',
     scope: 'Shopify Plus, 10,000+ SKUs',
     blurb:
-      'Shopify Plus, 10,000+ SKUs. Custom attribute templates, dedicated support, monthly strategy call. Talk to John before buying a £2k/mo discovery platform — Plus is the diagnostic layer beneath it.',
+      'Shopify Plus, 10,000+ SKUs. Custom attribute templates, dedicated support, monthly strategy call. Talk to us before buying a £2k/mo discovery platform — Plus is the diagnostic layer beneath it.',
     features: [
       'Everything in Scale',
       'Custom attribute templates per vertical',
@@ -162,9 +162,9 @@ export const TIERS: Tier[] = [
     ],
     cta: {
       kind: 'mailto',
-      label: 'Talk to John →',
+      label: 'Talk to the team →',
       href: mailtoLink('Flintmere Plus — enquiry'),
-      note: 'From £1,500/mo. Direct-invoice via Stripe. John replies within two working days.',
+      note: 'From £1,500/mo. Direct-invoice via Stripe. We reply within two working days.',
     },
   },
 ]

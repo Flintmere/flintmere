@@ -147,7 +147,7 @@ export default function Pricing() {
           <div>
             <p className="eyebrow mb-3">One-off audit</p>
             <h2 className="max-w-[28ch]" style={{ fontSize: 28, letterSpacing: '-0.02em' }}>
-              Want John to read your store? <Bracket>£97</Bracket>, delivered in three working days.
+              Want us to read your store? <Bracket>£97</Bracket>, delivered in three working days.
             </h2>
             <p className="mt-4 text-[color:var(--color-mute)] max-w-[48ch]" style={{ fontSize: 14, lineHeight: 1.55 }}>
               Written audit letter, per-product fix CSV with the worst ten already drafted, 30-day fix sequence, GS1 UK barcode path, and a 30-day re-scan. No video, no call &mdash; just the data.

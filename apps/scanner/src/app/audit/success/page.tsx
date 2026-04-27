@@ -31,15 +31,15 @@ export default async function AuditSuccess({ searchParams }: Props) {
           className="mx-auto mt-8 max-w-[48ch] text-[color:var(--color-ink-2)]"
           style={{ fontSize: 17, lineHeight: 1.55 }}
         >
-          John starts reading your store today. Within three working days your
+          We start reading your store today. Within three working days your
           audit letter, per-product CSV, and 30-day fix sequence will land in
-          your inbox. No call needed — the URL is all he needs.
+          your inbox. No call needed — the URL is all we need.
         </p>
         <p
           className="mx-auto mt-4 max-w-[48ch] text-[color:var(--color-ink-2)]"
           style={{ fontSize: 15, lineHeight: 1.55 }}
         >
-          Watch for a confirmation email from John in the next minute.
+          Watch for a confirmation email from the team in the next minute.
         </p>
 
         {calendly ? (
@@ -55,8 +55,9 @@ export default async function AuditSuccess({ searchParams }: Props) {
               className="text-[color:var(--color-ink-2)]"
               style={{ fontSize: 14, lineHeight: 1.55 }}
             >
-              If it&rsquo;s easier, book a 15-minute call to walk John through
-              the store. Most people skip this — the URL is all he needs.
+              If it&rsquo;s easier, book a 15-minute call to walk the team
+              through the store. Most people skip this — the URL is all we
+              need.
             </p>
             <a
               href={calendly}

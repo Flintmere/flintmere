@@ -284,7 +284,7 @@ export default async function FlintmereForBeauty() {
             className="mt-8 max-w-[56ch]"
             style={{ color: 'var(--color-mute-inv)', fontSize: 16, lineHeight: 1.55 }}
           >
-            £97 gets you John reading your catalog product by product: a
+            £97 gets you the team reading your catalog product by product: a
             1,500-word letter pointing at specific SKUs by name (beauty teams
             get the INCI, shade-family and claims-taxonomy reads as standard),
             a per-product fix CSV with the worst ten already drafted &mdash;

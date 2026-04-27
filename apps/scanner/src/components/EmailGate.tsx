@@ -187,7 +187,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
               margin: '12px 0 0 0',
             }}
           >
-            Have John read your store for you.
+            Have us read your store for you.
           </h3>
           <p
             style={{
@@ -198,8 +198,8 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
               maxWidth: '52ch',
             }}
           >
-            John reads your store product by product, writes a detailed audit
-            letter pointing at exactly what to fix, and sends a per-product CSV
+            We read your store product by product, write a detailed audit
+            letter pointing at exactly what to fix, and send a per-product CSV
             with the worst 10 products already drafted. A 30-day re-scan is
             included. No video, no call — just the data.
           </p>

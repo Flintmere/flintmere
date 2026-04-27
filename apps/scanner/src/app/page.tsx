@@ -96,18 +96,18 @@ export default async function MarketingHome() {
             </p>
             <ViewportReveal>
               <h1 className="max-w-[22ch]">
-                ChatGPT lists you and every competitor. Yours ranks{' '}
+                Which of your products are{' '}
                 <Bracket>
                   <span aria-hidden="true" className="text-outlined text-outlined--reveal">
-                    last
+                    suppressed
                   </span>
-                  <span className="sr-only">last</span>
+                  <span className="sr-only">suppressed</span>
                 </Bracket>
-                .
+                {' '}in Google Shopping today?
               </h1>
             </ViewportReveal>
             <p className="hero-lede mt-10 max-w-[44ch] text-[color:var(--color-ink-2)]">
-              Shopify enrolled millions of catalogs in ChatGPT, Perplexity and Claude this March. You&rsquo;re already in. So is every competitor. The agents pass over stores with broken catalog data — paste your URL; we show what&rsquo;s costing you the sale.
+              Paste your URL. We estimate how much annual demand is going to competitors while these products stay demoted — and show you the catalog data costing you the sale.
             </p>
             <div className="mt-12 flex flex-wrap gap-3">
               <Link href="/scan" className="btn btn-accent">
@@ -122,7 +122,7 @@ export default async function MarketingHome() {
               <a href="mailto:hello@flintmere.com" className="underline">
                 hello@flintmere.com
               </a>{' '}
-              — John usually replies within two working days.
+              — the team usually replies within two working days.
             </p>
           </div>
           <figure className="hero-figure">
@@ -358,13 +358,13 @@ export default async function MarketingHome() {
       <section aria-labelledby="different-heading" className="mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">Who builds Flintmere</p>
         <h2 id="different-heading" className="max-w-[22ch]">
-          John reads every email. John writes every audit.
+          We read every email. We write every audit.
         </h2>
         <p className="founder-copy mt-8 max-w-[54ch] text-[color:var(--color-ink-2)]">
-          If you book the £97 audit, John writes the letter and the
-          per-product CSV himself. If you email hello@flintmere.com,
-          John replies — usually within two working days. No operator
-          team. No pitch. No sales call.
+          If you book the £97 audit, the team writes the letter and the
+          per-product CSV. If you email hello@flintmere.com, we reply —
+          usually within two working days. No outsourced support queue.
+          No pitch. No sales call.
         </p>
       </section>
 
@@ -390,7 +390,7 @@ export default async function MarketingHome() {
             <li>Honest barcode guidance: buy GS1 barcodes from GS1 UK, we help you import them</li>
             <li>Flat monthly price. Scan as often as you like. No credits.</li>
             <li>We re-scan your catalog nightly. Drift alerts on the cadence your tier specifies — weekly on Growth, daily on Scale and above</li>
-            <li>John reads every reply — usually within two working days</li>
+            <li>We read every reply — usually within two working days</li>
           </ul>
         </div>
       </section>

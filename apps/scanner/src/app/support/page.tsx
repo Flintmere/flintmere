@@ -12,7 +12,7 @@ export default function Support() {
     <LegalShell
       eyebrow="Support"
       title="How to get help."
-      summary="One inbox per topic, real humans reading. Support is support@flintmere.com. Security is security@flintmere.com. Billing is billing@flintmere.com. We reply within one working day on the free scanner, same day on paid plans. John reads every email for the first hundred customers."
+      summary="One inbox per topic, real humans reading. Support is support@flintmere.com. Security is security@flintmere.com. Billing is billing@flintmere.com. We reply within one working day on the free scanner, same day on paid plans. The team reads every email for the first hundred customers."
       lastUpdated="2026-04-23"
       anchorNumeral="06"
     >
@@ -160,7 +160,7 @@ export default function Support() {
         <p>
           If you aren&rsquo;t happy with the response you received, reply with
           the word <em>&ldquo;escalate&rdquo;</em> and the thread is routed
-          directly to John. Unresolved complaints about personal data can be
+          directly to the founder. Unresolved complaints about personal data can be
           raised with the ICO:{' '}
           <a href="https://ico.org.uk/make-a-complaint/" className="underline">
             ico.org.uk/make-a-complaint

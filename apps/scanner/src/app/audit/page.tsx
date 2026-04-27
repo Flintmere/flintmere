@@ -6,7 +6,7 @@ import { CONCIERGE_DELIVERABLE_LIST } from '@/lib/copy';
 export const metadata: Metadata = {
   title: 'Concierge audit — £97',
   description:
-    'John reads your Shopify store product by product and sends a written audit letter plus a per-product fix CSV within three working days. 30-day re-scan included.',
+    'We read your Shopify store product by product and send a written audit letter plus a per-product fix CSV within three working days. 30-day re-scan included.',
 };
 
 export default function Audit() {
@@ -17,16 +17,16 @@ export default function Audit() {
           Concierge audit · £97 one-off · three working days
         </p>
         <h1 className="mx-auto max-w-[16ch]">
-          Want John to read your store <Bracket>for you</Bracket>?
+          Want us to read your store <Bracket>for you</Bracket>?
         </h1>
         <p
           className="mx-auto mt-8 max-w-[50ch] text-[color:var(--color-ink-2)]"
           style={{ fontSize: 17, lineHeight: 1.55 }}
         >
-          John reads your store product by product, writes a detailed audit
-          letter pointing at exactly what to fix, and sends a per-product CSV
-          with the worst 10 products already drafted for you. No video, no
-          call, no upsell. Just the data.
+          We read your store product by product, write a detailed audit letter
+          pointing at exactly what to fix, and send a per-product CSV with the
+          worst 10 products already drafted for you. No video, no call, no
+          upsell. Just the data.
         </p>
       </section>
 
@@ -79,23 +79,23 @@ export default function Audit() {
               <strong className="text-[color:var(--color-ink)]" aria-hidden="true">
                 [ 01 ]
               </strong>
-              &nbsp;&nbsp;Pay £97. A confirmation email from John arrives
+              &nbsp;&nbsp;Pay £97. A confirmation email from the team arrives
               within a minute.
             </li>
             <li>
               <strong className="text-[color:var(--color-ink)]" aria-hidden="true">
                 [ 02 ]
               </strong>
-              &nbsp;&nbsp;John reads your catalog and writes the audit. No
-              call, no screen-share — the URL is all he needs.
+              &nbsp;&nbsp;We read your catalog and write the audit. No call,
+              no screen-share — the URL is all we need.
             </li>
             <li>
               <strong className="text-[color:var(--color-ink)]" aria-hidden="true">
                 [ 03 ]
               </strong>
               &nbsp;&nbsp;Within three working days, the letter plus CSV plus
-              30-day plan lands in your inbox. Reply with questions — John
-              reads every one.
+              30-day plan lands in your inbox. Reply with questions — we read
+              every one.
             </li>
             <li>
               <strong className="text-[color:var(--color-ink)]" aria-hidden="true">
