@@ -4,6 +4,11 @@ import { Suspense } from 'react';
 import { Bracket, SiteFooter, StatTriad, type Stat } from '@flintmere/ui';
 import { ViewportReveal } from '@/components/ViewportReveal';
 import { HomepageVerticalPicker } from '@/components/HomepageVerticalPicker';
+import { Pillar } from '@/components/sections/Pillar';
+import { FounderStrip } from '@/components/sections/FounderStrip';
+import { CompareSection } from '@/components/sections/CompareSection';
+import { ManifestoSection } from '@/components/sections/ManifestoSection';
+import { PricingStripPlaceholder } from '@/components/sections/PricingStripPlaceholder';
 import { prisma } from '@/lib/db';
 import {
   summariseBenchmark,
@@ -355,141 +360,25 @@ export default async function MarketingHome() {
       <hr className="rule" />
 
       {/* What makes us different */}
-      <section aria-labelledby="different-heading" className="mx-auto max-w-[1280px] px-8 py-24">
-        <p className="eyebrow mb-6">Who builds Flintmere</p>
-        <h2 id="different-heading" className="max-w-[22ch]">
-          We read every email. We write every audit.
-        </h2>
-        <p className="founder-copy mt-8 max-w-[54ch] text-[color:var(--color-ink-2)]">
-          If you book the £97 audit, the team writes the letter and the
-          per-product CSV. If you email hello@flintmere.com, we reply —
-          usually within two working days. No outsourced support queue.
-          No pitch. No sales call.
-        </p>
-      </section>
+      <FounderStrip />
 
       {/* How we&rsquo;re different */}
-      <section aria-labelledby="compare-heading" className="grid md:grid-cols-2 border-y border-[color:var(--color-line)]">
-        <div className="p-12 md:p-16 border-b md:border-b-0 md:border-r border-[color:var(--color-line)]">
-          <p className="eyebrow mb-6">What other tools do</p>
-          <span className="sr-only">
-            What other tools do — items struck through:
-          </span>
-          <ul className="compare-list compare-list--struck list-none p-0 m-0 space-y-4 text-[color:var(--color-mute)]">
-            <li>Repurpose a Google-ranking tool for AI agents</li>
-            <li>Resell barcodes from non-GS1 sources</li>
-            <li>Charge per-product, so a big catalog triples your bill</li>
-            <li>One-time audit, then silence</li>
-            <li>Hide the founder behind a support queue</li>
-          </ul>
-        </div>
-        <div className="p-12 md:p-16 bg-[color:var(--color-paper-2)]">
-          <p className="eyebrow mb-6" id="compare-heading">What Flintmere does</p>
-          <ul className="compare-list list-none p-0 m-0 space-y-4">
-            <li>Built from the first line for ChatGPT, Perplexity and Claude — not Google</li>
-            <li>Honest barcode guidance: buy GS1 barcodes from GS1 UK, we help you import them</li>
-            <li>Flat monthly price. Scan as often as you like. No credits.</li>
-            <li>We re-scan your catalog nightly. Drift alerts on the cadence your tier specifies — weekly on Growth, daily on Scale and above</li>
-            <li>We read every reply — usually within two working days</li>
-          </ul>
-        </div>
-      </section>
+      <CompareSection />
 
       {/* Pricing — slim placeholder while the per-vertical / per-channel
           pricing axis lands out-of-band per ADR 0016 + 2026-04-26 strategy
           ratification. The legacy 5-tier strip on this surface is RETIRED;
           /pricing keeps the legacy composition until the pricing-restructure
           phase. Page bracket cap stays at 2 (hero `[ last ]` + audit `[ £97 ]`). */}
-      <section id="pricing" className="mx-auto max-w-[1280px] px-8 py-24">
-        <p className="eyebrow mb-6">Pricing</p>
-        <p
-          className="max-w-[60ch] text-[color:var(--color-ink)] mb-6"
-          style={{ fontSize: 16, lineHeight: 1.55, fontWeight: 500 }}
-        >
-          Per-vertical, per-channel. Magnitudes are calibrating.
-        </p>
-        <p>
-          <Link
-            href="/pricing"
-            className="text-[color:var(--color-ink)] underline"
-            style={{ fontSize: 16, fontWeight: 500 }}
-          >
-            See pricing →
-          </Link>
-        </p>
-      </section>
+      <PricingStripPlaceholder />
 
       {/* Manifesto — inverted ink block */}
-      <section
-        aria-label="Flintmere manifesto"
-        style={{
-          background: 'var(--color-ink)',
-          color: 'var(--color-paper)',
-          padding: '96px 32px',
-        }}
-      >
-        <div className="mx-auto max-w-[1000px]">
-          <p
-            style={{
-              fontSize: 'clamp(28px, 4.5vw, 56px)',
-              letterSpacing: '-0.025em',
-              lineHeight: 1.12,
-              maxWidth: '22ch',
-            }}
-          >
-            Commerce is being re-plumbed. The search-era catalog is being replaced by structured data that agents can reason about. Most Shopify stores aren&rsquo;t ready. We make them ready.
-          </p>
-          <p
-            className="eyebrow"
-            style={{
-              marginTop: 40,
-              color: 'var(--color-accent)',
-              letterSpacing: '0.2em',
-            }}
-          >
-            Catalogs built for AI shopping agents
-          </p>
-        </div>
-      </section>
+      <ManifestoSection />
 
       {/* Footer */}
       <SiteFooter />
       </ViewportReveal>
     </main>
-  );
-}
-
-function Pillar({
-  name,
-  weight,
-  desc,
-  idx,
-}: {
-  name: string;
-  weight: string;
-  desc: string;
-  idx?: number;
-}) {
-  const weightLabel = `${weight.replace('%', ' percent')} of total score weight`;
-  const staggerStyle =
-    typeof idx === 'number'
-      ? ({ '--reveal-delay': `${idx * 80}ms` } as React.CSSProperties)
-      : undefined;
-  return (
-    <li
-      className="pillar-row grid grid-cols-[280px_1fr_100px] gap-6 py-7 items-baseline max-md:grid-cols-1 max-md:gap-2"
-      data-reveal
-      style={staggerStyle}
-    >
-      <span className="pillar-name">{name}</span>
-      <span className="pillar-desc text-[color:var(--color-mute)]">{desc}</span>
-      <span
-        className="eyebrow text-right max-md:text-left"
-        aria-label={weightLabel}
-      >
-        {weight}
-      </span>
-    </li>
   );
 }
 
