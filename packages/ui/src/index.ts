@@ -10,3 +10,5 @@ export type {
 } from './PickerDrivenContentBlock.js';
 export { StatTriad } from './StatTriad.js';
 export type { Stat, StatTriadProps } from './StatTriad.js';
+export { NumeralCountUp } from './NumeralCountUp.js';
+export type { NumeralCountUpProps } from './NumeralCountUp.js';

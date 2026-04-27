@@ -26,16 +26,34 @@
 'use client';
 
 import * as React from 'react';
+import { Bracket } from './Bracket.js';
 
 export interface PickerDrivenContent {
   /** Vertical-specific h2 text. */
   h2: string;
+  /**
+   * Optional bracket-keyword slotted into the h2 ahead of a closing question
+   * mark or full-stop. When set, the primitive renders the heading as
+   * `What changes for [ keyword ]?` — bracket co-occurrence per ADR 0021
+   * axis 4 + the homepage redesign (each photoreal moment carries a bracket
+   * in the same viewport — #9 Lawyer binding from Q-A2).
+   */
+  headingBracket?: string;
   /** 3 bullets per vertical (lint-enforced length 3 at the callsite). */
   bullets: ReadonlyArray<string>;
   /** CTA button text — Copy Council polish via web-implementation. */
   ctaLabel: string;
   /** Route target for the CTA. */
   ctaHref: string;
+  /**
+   * Optional photoreal hero source (AVIF). When omitted the primitive renders
+   * a paper-2 solid block placeholder of the same aspect ratio so the layout
+   * holds while operator licenses + drops final assets per
+   * `apps/scanner/public/marketing/verticals/${vertical}.avif`.
+   */
+  imageSrc?: string;
+  /** Required when imageSrc is set — descriptive alt per Noor's a11y floor. */
+  imageAlt?: string;
 }
 
 export interface PickerDrivenContentBlockProps {
@@ -138,6 +156,20 @@ export function PickerDrivenContentBlock({
     .filter(Boolean)
     .join(' ');
 
+  // Heading composition. When `headingBracket` is set, the heading takes
+  // shape "What changes for [ {keyword} ]?" — bracket co-occurrence
+  // satisfied on the heading itself (no overlay needed on the image).
+  // When unset, the h2 renders verbatim from `content.h2`.
+  const heading = content.headingBracket ? (
+    <h2 className="font-medium tracking-[-0.03em] leading-[1.05] text-[clamp(32px,5vw,44px)] max-w-[24ch]">
+      What changes for <Bracket>{content.headingBracket}</Bracket>?
+    </h2>
+  ) : (
+    <h2 className="font-medium tracking-[-0.03em] leading-[1.05] text-[clamp(32px,5vw,44px)] max-w-[24ch]">
+      {content.h2}
+    </h2>
+  );
+
   return (
     <section
       aria-live="polite"
@@ -145,11 +177,34 @@ export function PickerDrivenContentBlock({
       className={sectionClass}
       style={{ opacity }}
     >
+      {/* Photoreal hero slot per Q-A2 (Mode b) — full-bleed dramatic.
+          When imageSrc is unset we render a paper-2 placeholder block of
+          the same aspect ratio so the layout holds while operator licenses
+          + drops final assets at /marketing/verticals/{vertical}.avif. */}
+      {content.imageSrc ? (
+        <div className="relative mb-12 overflow-hidden border border-[color:var(--color-line)]">
+          <img
+            src={content.imageSrc}
+            alt={content.imageAlt ?? ''}
+            loading="lazy"
+            className="block w-full h-auto"
+            style={{ filter: 'var(--image-treatment-warm)' }}
+          />
+        </div>
+      ) : (
+        <div
+          aria-hidden="true"
+          className="mb-12 border border-[color:var(--color-line)]"
+          style={{
+            background: 'var(--color-paper-2)',
+            aspectRatio: '16 / 9',
+            width: '100%',
+          }}
+        />
+      )}
       <div className="grid lg:grid-cols-[3fr_2fr] gap-12 items-start">
         <div>
-          <h2 className="font-medium tracking-[-0.03em] leading-[1.05] text-[clamp(32px,5vw,44px)] max-w-[24ch]">
-            {content.h2}
-          </h2>
+          {heading}
           <ul
             className={`mt-8 list-none p-0 m-0 space-y-3 text-[15px] leading-[1.55] max-w-[56ch] ${bulletColourClass(surface)}`}
           >

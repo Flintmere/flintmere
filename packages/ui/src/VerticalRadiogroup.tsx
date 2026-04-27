@@ -211,6 +211,7 @@ export function VerticalRadiogroup({
             onClick={() => onChange(v.id)}
             onKeyDown={(event) => handleKeyDown(event, i)}
             className={cardClass}
+            data-hover-lift
           >
             <span className={cardEyebrowClassName({ surface, selected: isSelected })}>
               {v.eyebrow}

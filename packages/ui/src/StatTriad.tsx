@@ -58,6 +58,7 @@
  */
 
 import * as React from 'react';
+import { NumeralCountUp } from './NumeralCountUp.js';
 
 export interface Stat {
   /** Mono uppercase eyebrow (no brackets). e.g. "scan", "time", "paid". */
@@ -133,14 +134,25 @@ function eyebrowClass(surface: 'paper' | 'ink-slab'): string {
 function numeralClass(args: {
   surface: 'paper' | 'ink-slab';
   accent: 'amber' | 'ink';
+  isFocal: boolean;
 }): string {
-  const base = 'font-medium tracking-[-0.045em] leading-[0.92] text-[clamp(72px,12vw,144px)]';
+  // Per ADR 0021 axis 6 + the homepage redesign spec: focal numeral uses
+  // the canon-ceiling clamp(88px, 14vw, 220px) at weight 700 (display
+  // moments only — body weight rules unchanged). Non-focal numerals scale
+  // to 60% (clamp(56px, 9vw, 132px)) at weight 500 — supporting numerals
+  // read as supporting, not as competing focal moments. (Council ruling
+  // Q11: 60% beats 50% on mobile readability — #7 Maren + #37 Consumer
+  // psychologist + #34 Maya unanimous.)
+  const tracking = 'tracking-[-0.045em] leading-[0.92]';
+  const sized = args.isFocal
+    ? `font-bold ${tracking} text-[clamp(88px,14vw,220px)] tabular-nums`
+    : `font-medium ${tracking} text-[clamp(56px,9vw,132px)]`;
   if (args.accent === 'amber') {
-    return `${base} text-[color:var(--color-accent)]`;
+    return `${sized} text-[color:var(--color-accent)]`;
   }
   return args.surface === 'paper'
-    ? `${base} text-[color:var(--color-ink)]`
-    : `${base} text-[color:var(--color-paper)]`;
+    ? `${sized} text-[color:var(--color-ink)]`
+    : `${sized} text-[color:var(--color-paper)]`;
 }
 
 function microLineClass(surface: 'paper' | 'ink-slab'): string {
@@ -210,9 +222,11 @@ export function StatTriad({
           const composedAriaLabel = [s.numeralAriaLabel ?? s.numeral, '—', s.microLine].join(
             ' ',
           );
-          const numeralBaseClass = numeralClass({ surface, accent });
+          const numeralBaseClass = numeralClass({ surface, accent, isFocal });
           const shift = baselineShiftClass({ index: i, focalIndex: safeFocalIndex });
-          const numeralWrapperClass = ['inline-block', shift].filter(Boolean).join(' ');
+          const numeralWrapperClass = ['inline-block', 'relative', shift]
+            .filter(Boolean)
+            .join(' ');
 
           return (
             <div
@@ -225,16 +239,34 @@ export function StatTriad({
             >
               <span className={eyebrowClass(surface)}>{s.eyebrow}</span>
               <span className={numeralWrapperClass}>
-                <span
-                  className={numeralBaseClass}
-                  aria-hidden={s.numeralAriaLabel ? 'true' : undefined}
-                >
-                  {s.numeral}
-                </span>
                 {isFocal ? (
                   <span
                     aria-hidden="true"
-                    className="block h-[1px] w-[2px] mx-auto mt-2 bg-[color:var(--color-accent)]"
+                    className="pointer-events-none absolute"
+                    style={{
+                      inset: '-20% -20%',
+                      background: 'var(--gradient-amber-radial)',
+                      zIndex: 0,
+                    }}
+                  />
+                ) : null}
+                {isFocal ? (
+                  <NumeralCountUp
+                    value={s.numeral}
+                    className={`${numeralBaseClass} relative z-[1]`}
+                  />
+                ) : (
+                  <span
+                    className={numeralBaseClass}
+                    aria-hidden={s.numeralAriaLabel ? 'true' : undefined}
+                  >
+                    {s.numeral}
+                  </span>
+                )}
+                {isFocal ? (
+                  <span
+                    aria-hidden="true"
+                    className="block h-[1px] w-[2px] mx-auto mt-2 bg-[color:var(--color-accent)] relative z-[1]"
                   />
                 ) : null}
               </span>

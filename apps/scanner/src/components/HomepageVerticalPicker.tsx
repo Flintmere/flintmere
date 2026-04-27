@@ -39,24 +39,41 @@ import {
  *    "What changes for {vertical}?" — Copy Council polish lands in
  *    web-implementation; we ship the spec-direction-level placeholder.
  */
+// Per-vertical photoreal hero slots — Q-A2 Mode (b) lock.
+//
+// Initial commit ships placeholder imagery: food borrows the existing
+// hero `jar.avif` (warm-treated, on-canon, ≤100KB) so the food slot has
+// real-world weight; beauty + apparel land as paper-2 solid blocks until
+// operator licenses + drops Adobe Stock candidates per the operator-locks
+// doc §"Operator next-step on imagery." Final assets land at:
+//   apps/scanner/public/marketing/verticals/{food|beauty|apparel}.avif
 const PICKER_SLOTS: Readonly<Record<HomepageVerticalId, PickerDrivenContent>> = {
   food: {
     h2: 'What changes for food?',
+    headingBracket: 'food',
     bullets: HOMEPAGE_VERTICAL_CONTENT.food.bullets,
     ctaLabel: HOMEPAGE_VERTICAL_CONTENT.food.ctaLabel,
     ctaHref: HOMEPAGE_VERTICAL_CONTENT.food.ctaHref,
+    // Placeholder until operator drops /marketing/verticals/food.avif.
+    imageSrc: '/marketing/hero/jar.avif',
+    imageAlt:
+      'A UK speciality food shelf with structured data overlaid — placeholder; operator drops the licensed kitchen-context AVIF here.',
   },
   beauty: {
     h2: 'What changes for beauty?',
+    headingBracket: 'beauty',
     bullets: HOMEPAGE_VERTICAL_CONTENT.beauty.bullets,
     ctaLabel: HOMEPAGE_VERTICAL_CONTENT.beauty.ctaLabel,
     ctaHref: HOMEPAGE_VERTICAL_CONTENT.beauty.ctaHref,
+    // No imageSrc — primitive renders a paper-2 placeholder block.
   },
   apparel: {
     h2: 'What changes for apparel?',
+    headingBracket: 'apparel',
     bullets: HOMEPAGE_VERTICAL_CONTENT.apparel.bullets,
     ctaLabel: HOMEPAGE_VERTICAL_CONTENT.apparel.ctaLabel,
     ctaHref: HOMEPAGE_VERTICAL_CONTENT.apparel.ctaHref,
+    // No imageSrc — primitive renders a paper-2 placeholder block.
   },
 };
 

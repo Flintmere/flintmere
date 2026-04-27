@@ -133,7 +133,7 @@ describe('PickerDrivenContentBlock — render shape', () => {
     expect(html).toContain('text-[color:var(--color-paper)]');
   });
 
-  it('does NOT render any bracket characters (Phase-C amendment — primitive carries no brackets)', () => {
+  it('does NOT render brackets when headingBracket is unset (default contract)', () => {
     const html = renderToString(
       <PickerDrivenContentBlock
         selectedId="food"
@@ -141,9 +141,60 @@ describe('PickerDrivenContentBlock — render shape', () => {
         ariaLabelTemplate={(id) => id}
       />,
     );
-    // Spec line: this primitive does NOT render brackets. The h2 is plain prose.
+    // Default contract: plain h2 prose; no bracket signature on the heading.
     expect(html).not.toContain('class="bracket');
-    expect(html).not.toContain('Bracket');
+  });
+
+  it('renders the bracket signature on the heading when headingBracket is set (post-ADR-0021)', () => {
+    const slotsWithBracket: Readonly<Record<string, PickerDrivenContent>> = {
+      food: {
+        ...SLOTS.food!,
+        headingBracket: 'food',
+      },
+    };
+    const html = renderToString(
+      <PickerDrivenContentBlock
+        selectedId="food"
+        slots={slotsWithBracket}
+        ariaLabelTemplate={(id) => id}
+      />,
+    );
+    // Bracket co-occurrence per Q-A2 binding — heading carries the bracket.
+    expect(html).toContain('class="bracket');
+    expect(html).toContain('What changes for ');
+    expect(html).toContain('food');
+  });
+
+  it('renders a paper-2 placeholder when imageSrc is unset (operator drops final asset later)', () => {
+    const html = renderToString(
+      <PickerDrivenContentBlock
+        selectedId="food"
+        slots={SLOTS}
+        ariaLabelTemplate={(id) => id}
+      />,
+    );
+    // Placeholder div carries aria-hidden + paper-2 background.
+    expect(html).toContain('var(--color-paper-2)');
+    expect(html).toContain('aspect-ratio');
+  });
+
+  it('renders the photoreal image when imageSrc is set (Q-A2 Mode b)', () => {
+    const slotsWithImage: Readonly<Record<string, PickerDrivenContent>> = {
+      food: {
+        ...SLOTS.food!,
+        imageSrc: '/marketing/verticals/food.avif',
+        imageAlt: 'A UK speciality food shelf with structured data overlaid.',
+      },
+    };
+    const html = renderToString(
+      <PickerDrivenContentBlock
+        selectedId="food"
+        slots={slotsWithImage}
+        ariaLabelTemplate={(id) => id}
+      />,
+    );
+    expect(html).toContain('src="/marketing/verticals/food.avif"');
+    expect(html).toContain('A UK speciality food shelf');
   });
 
   it('initial mount uses opacity 1 (cross-fade only fires on selectedId change)', () => {

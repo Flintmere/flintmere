@@ -253,6 +253,33 @@
    making this redundant. Soft contract per memory/design/motion.md §The
    reduced-motion contract (two tiers). */
 
+/* --- Hover-lift utility (Pattern 2 — ADR 0021 axis 8 + axis 2) ---
+   Cards / rows opt-in via `data-hover-lift`. Single transition statement
+   on transform + box-shadow + border-color to avoid cascading paint cost.
+   Non-shadow signal (sage border) carries the affordance for forced-colors
+   + high-contrast users (Noor P1 binding from the homepage critique). */
+[data-hover-lift] {
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--duration-short) var(--ease-sharp),
+              box-shadow var(--duration-short) var(--ease-sharp),
+              border-color var(--duration-short) var(--ease-sharp);
+}
+
+[data-hover-lift]:hover,
+[data-hover-lift]:focus-visible {
+  transform: translate3d(0, -2px, 0);
+  box-shadow: var(--shadow-paper-1);
+  border-color: var(--color-accent-sage);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-hover-lift]:hover,
+  [data-hover-lift]:focus-visible {
+    transform: none;
+    border-color: var(--color-accent-sage);
+  }
+}
+
 /* --- Generic viewport reveal contract (paired with ViewportReveal.tsx) ---
    Sections opt-in via the [data-reveal] attribute. Stagger via --reveal-delay
    custom property set inline on the element (canon-acceptable inline style:

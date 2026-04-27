@@ -124,10 +124,17 @@ export function cardClassName(args: {
     'focus-visible:outline-offset-2',
   ];
 
+  // Selected card carries a 1px sage hairline at the bottom edge (decorative
+  // affordance per ADR 0021 axis 1). Sage is decorative-only (paired with
+  // aria-checked + the under-tick + the paper-2 background — never colour
+  // alone). Selected card also carries `--shadow-paper-1` permanently so it
+  // sits visually elevated above the unselected siblings.
   const surface =
     args.surface === 'paper'
       ? [
           'border-[color:var(--color-line)]',
+          args.selected ? 'border-b-[color:var(--color-accent-sage)]' : '',
+          args.selected ? 'shadow-[var(--shadow-paper-1)]' : '',
           // Paper surface: --paper unselected, --paper-2 selected (depth without shadow).
           args.selected
             ? 'bg-[color:var(--color-paper-2)]'
@@ -137,6 +144,8 @@ export function cardClassName(args: {
         ]
       : [
           'border-[color:var(--color-line-dark)]',
+          args.selected ? 'border-b-[color:var(--color-accent-sage)]' : '',
+          args.selected ? 'shadow-[var(--shadow-paper-1)]' : '',
           // Ink surface compound: --ink unselected, --ink-3 selected.
           args.selected
             ? 'bg-[color:var(--color-ink-3)]'

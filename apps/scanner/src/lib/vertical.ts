@@ -51,19 +51,22 @@ export const HOMEPAGE_VERTICALS: ReadonlyArray<Vertical> = [
     id: 'food',
     label: 'Food + drink.',
     eyebrow: 'FOOD + DRINK',
-    subline: 'FSA Big-14 + ISO + PDO + certifications. Spearhead vertical.',
+    subline:
+      'Allergens, origin, certifications — written so Google Shopping, Amazon Fresh, Ocado and Deliveroo accept them.',
   },
   {
     id: 'beauty',
     label: 'Beauty.',
     eyebrow: 'BEAUTY',
-    subline: 'Standard in development. Free scan available.',
+    subline:
+      'Ingredients, shelf life and skin type — readable by Google Shopping and the AI shopping agents.',
   },
   {
     id: 'apparel',
     label: 'Apparel.',
     eyebrow: 'APPAREL',
-    subline: 'Standard in development. Free scan available.',
+    subline:
+      'Materials, care, sizing and origin — readable by Google Shopping and the AI shopping agents.',
   },
 ];
 
@@ -114,33 +117,33 @@ export interface HomepageVerticalContent {
 export const HOMEPAGE_VERTICAL_CONTENT: Record<HomepageVerticalId, HomepageVerticalContent> = {
   food: {
     eyebrow: 'WHAT CHANGES FOR FOOD',
-    heading: 'Food + drink. The spearhead vertical.',
+    heading: 'Food + drink. Built for the channels you sell on.',
     bullets: [
-      'FSA Big-14 allergens encoded as structured Shopify metafields, not free-text in product descriptions',
-      'Country-of-origin to ISO 3166-1; certifications (PDO / PGI / organic / kosher / halal) as controlled vocabulary, not as ingredient-list noise',
-      'Standard published at standards.flintmere.com/food/v1 — half-yearly cadence + AI-assisted diff log between publications',
+      'Allergens get a structured field instead of a sentence in the description — so an agent filtering "dairy-free" can trust your structured data.',
+      'Country of origin and certifications (organic, kosher, halal, PDO) get fixed values instead of free text — so Google Shopping doesn’t reject the listing.',
+      'Every change to the [ standard ] will be published, dated and version-controlled — so you’ll be able to prove what your data meant the day a buyer saw it.',
     ],
     ctaLabel: 'See food catalog readiness →',
     ctaHref: '/for/food-and-drink',
   },
   beauty: {
     eyebrow: 'WHAT CHANGES FOR BEAUTY',
-    heading: 'Beauty. Standard in development.',
+    heading: 'Beauty. Standard arriving after food lands.',
     bullets: [
-      'INCI ingredient names + PAO + skin-type as structured fields',
-      'Standard in development — beauty cadence not yet committed',
-      "Run a free scan now; we'll publish your gaps against the food canonical example",
+      'Ingredient names go in a structured INCI field — so agents filtering "fragrance-free" or "no parabens" can trust your listing.',
+      'Shelf life (PAO), volume and skin type get fixed values instead of buried in product copy — so listings stay valid as they age.',
+      'Run a free scan now. You get the same [ scorecard ] as food merchants — the catalog standard arrives once food is shipped.',
     ],
     ctaLabel: 'See beauty catalog readiness →',
     ctaHref: '/for/beauty',
   },
   apparel: {
     eyebrow: 'WHAT CHANGES FOR APPAREL',
-    heading: 'Apparel. Standard in development.',
+    heading: 'Apparel. Standard arriving after food lands.',
     bullets: [
-      'Materials, care, country-of-origin, sizing as structured fields',
-      'Standard in development — apparel cadence not yet committed',
-      "Run a free scan now; we'll publish your gaps against the food canonical example",
+      'Materials, care, sizing and origin get structured fields — so Google Shopping accepts UK and EU listings at the same time.',
+      'Country of origin uses fixed codes instead of free text — so the same product works for GB and EU sales without re-keying.',
+      'Run a free scan now. You get the same [ scorecard ] as food merchants — the catalog standard arrives once food is shipped.',
     ],
     ctaLabel: 'See apparel catalog readiness →',
     ctaHref: '/for/apparel',

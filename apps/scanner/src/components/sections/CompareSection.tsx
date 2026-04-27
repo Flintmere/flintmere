@@ -2,13 +2,20 @@
  * CompareSection — "What other tools do / What Flintmere does" two-panel
  * block on the marketing homepage.
  *
- * Extracted from `apps/scanner/src/app/page.tsx` as part of the pre-emptive
- * homepage split (refactor only — no behaviour change). Pure-presentational;
- * no props, no state.
+ * Post-ADR-0021 redesign:
+ *   - Right panel ("What Flintmere does") gets `--shadow-paper-1` (axis 2)
+ *     + a 1px sage `border-l` at desktop (single-side per operator Q10 lock).
+ *   - Left panel keeps the default ink hairline. Mobile keeps the existing
+ *     horizontal stack with the existing ink `border-b` between panels —
+ *     the sage divider is desktop-only to avoid a stacked sage hairline
+ *     re-reading as "the section is wrapped in sage" (Q10 council ruling).
  */
 export function CompareSection() {
   return (
-    <section aria-labelledby="compare-heading" className="grid md:grid-cols-2 border-y border-[color:var(--color-line)]">
+    <section
+      aria-labelledby="compare-heading"
+      className="grid md:grid-cols-2 border-y border-[color:var(--color-line)]"
+    >
       <div className="p-12 md:p-16 border-b md:border-b-0 md:border-r border-[color:var(--color-line)]">
         <p className="eyebrow mb-6">What other tools do</p>
         <span className="sr-only">
@@ -22,7 +29,13 @@ export function CompareSection() {
           <li>Hide the founder behind a support queue</li>
         </ul>
       </div>
-      <div className="p-12 md:p-16 bg-[color:var(--color-paper-2)]">
+      <div
+        className="p-12 md:p-16 bg-[color:var(--color-paper-2)]"
+        style={{
+          boxShadow: 'var(--shadow-paper-1)',
+          borderLeft: '1px solid var(--color-accent-sage)',
+        }}
+      >
         <p className="eyebrow mb-6" id="compare-heading">What Flintmere does</p>
         <ul className="compare-list list-none p-0 m-0 space-y-4">
           <li>Built from the first line for ChatGPT, Perplexity and Claude — not Google</li>

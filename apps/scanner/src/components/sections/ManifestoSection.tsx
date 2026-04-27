@@ -2,9 +2,12 @@
  * ManifestoSection — inverted ink-slab manifesto block at the foot of the
  * marketing homepage.
  *
- * Extracted from `apps/scanner/src/app/page.tsx` as part of the pre-emptive
- * homepage split (refactor only — no behaviour change). Pure-presentational;
- * no props, no state. Inline `style={{...}}` blocks preserved verbatim.
+ * Post-ADR-0021 redesign:
+ *   - Inline `var(--color-paper)` text replaced with `var(--color-paper-on-ink)`
+ *     (axis 7 — semantic clarity; same hex, ink-slab text token now explicit).
+ *   - 1px sage hairline above the eyebrow — decorative-only per operator Q9
+ *     "ship now" (P3 lifted to P2). Sage on ink ≈ 3.5:1: safe as a hairline
+ *     with no text meaning per Noor's ADR 0021 binding.
  */
 export function ManifestoSection() {
   return (
@@ -12,7 +15,7 @@ export function ManifestoSection() {
       aria-label="Flintmere manifesto"
       style={{
         background: 'var(--color-ink)',
-        color: 'var(--color-paper)',
+        color: 'var(--color-paper-on-ink)',
         padding: '96px 32px',
       }}
     >
@@ -27,10 +30,20 @@ export function ManifestoSection() {
         >
           Commerce is being re-plumbed. The search-era catalog is being replaced by structured data that agents can reason about. Most Shopify stores aren&rsquo;t ready. We make them ready.
         </p>
+        <span
+          aria-hidden="true"
+          style={{
+            display: 'block',
+            height: 1,
+            width: 48,
+            background: 'var(--color-accent-sage)',
+            marginTop: 40,
+            marginBottom: 12,
+          }}
+        />
         <p
           className="eyebrow"
           style={{
-            marginTop: 40,
             color: 'var(--color-accent)',
             letterSpacing: '0.2em',
           }}

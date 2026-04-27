@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { Bracket, SiteFooter, StatTriad, type Stat } from '@flintmere/ui';
 import { ViewportReveal } from '@/components/ViewportReveal';
 import { HomepageVerticalPicker } from '@/components/HomepageVerticalPicker';
+import { HeroParallaxFigure } from '@/components/HeroParallaxFigure';
 import { Pillar } from '@/components/sections/Pillar';
 import { FounderStrip } from '@/components/sections/FounderStrip';
 import { CompareSection } from '@/components/sections/CompareSection';
@@ -92,9 +93,16 @@ export default async function MarketingHome() {
     <main id="main">
       <a href="#hero" className="skip-link">Skip to content</a>
       <ViewportReveal>
-      {/* Hero */}
-      <section id="hero" className="mx-auto max-w-[1280px] px-8 py-24 md:py-32">
-        <div className="grid md:grid-cols-[1.2fr_1fr] gap-16 items-center">
+      {/* Hero — section background fill: --gradient-paper-warmth (ADR 0021
+          axis 3, atmosphere only). Hero figure wrapped in HeroParallaxFigure
+          for Pattern 3 (subtle parallax, 0.5× scroll velocity, ±40px clamp,
+          JS prefers-reduced-motion bypass + change-listener). */}
+      <section
+        id="hero"
+        className="px-8 py-24 md:py-32"
+        style={{ background: 'var(--gradient-paper-warmth)' }}
+      >
+        <div className="mx-auto max-w-[1280px] grid md:grid-cols-[1.2fr_1fr] gap-16 items-center">
           <div>
             <p className="eyebrow text-[color:var(--color-ink-2)] mb-8">
               Free scan · 60 seconds · No install
@@ -130,7 +138,7 @@ export default async function MarketingHome() {
               — the team usually replies within two working days.
             </p>
           </div>
-          <figure className="hero-figure">
+          <HeroParallaxFigure caption="A jar of loose-leaf tea on a real shelf. The agent extracts grade, origin, steep time — only if the data is there.">
             <Image
               src="/marketing/hero/jar.avif"
               alt="A jar of loose-leaf tea on a real shelf, with brass lid and warm window light behind."
@@ -140,10 +148,7 @@ export default async function MarketingHome() {
               sizes="(min-width: 768px) 40vw, 100vw"
               className="hero-image"
             />
-            <figcaption className="hero-caption mt-4 max-w-[40ch]">
-              A jar of loose-leaf tea on a real shelf. The agent extracts grade, origin, steep time — only if the data is there.
-            </figcaption>
-          </figure>
+          </HeroParallaxFigure>
         </div>
       </section>
 
@@ -219,36 +224,43 @@ export default async function MarketingHome() {
             {
               name: 'Product IDs',
               weight: '20%',
+              weightPct: 0.2,
               desc: 'Whether each product carries the codes agents look it up by — barcode, brand, manufacturer part number.',
             },
             {
               name: 'Structured attributes',
               weight: '20%',
+              weightPct: 0.2,
               desc: 'Whether size, colour, material and other fields exist as structured data — not hidden inside the description.',
             },
             {
               name: 'Title & description quality',
               weight: '15%',
+              weightPct: 0.15,
               desc: 'Whether titles and descriptions read like spec sheets an agent can parse — not marketing copy.',
             },
             {
               name: 'Google category match',
               weight: '15%',
+              weightPct: 0.15,
               desc: 'Whether products carry a Google Merchant Center category, so agents know what you sell.',
             },
             {
               name: 'Data consistency',
               weight: '15%',
+              weightPct: 0.15,
               desc: 'Whether the catalog looks healthy — images load, active products have stock, alt text exists, prices match across pages.',
             },
             {
               name: 'AI agent access',
               weight: '5%',
+              weightPct: 0.05,
               desc: 'Whether AI shopping agents are allowed to read your site at all — robots rules, sitemap, llms.txt.',
             },
             {
               name: 'Agent checkout readiness',
               weight: '10%',
+              weightPct: 0.1,
               desc: 'Whether an AI agent can actually complete a purchase on your store without human intervention.',
             },
           ].map((p, idx) => (
