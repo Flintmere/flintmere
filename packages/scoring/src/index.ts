@@ -4,6 +4,7 @@ export { scoreTitles, titleWordCount } from './pillars/titles.js';
 export { scoreConsistency } from './pillars/consistency.js';
 export { scoreCrawlability } from './pillars/crawlability.js';
 export { estimateSuppression } from './pillars/suppression-estimate.js';
+export { estimateAov } from './pillars/aov-estimate.js';
 export { isValidGtin, gtinLength } from './utils/gtin.js';
 export { detectFluff } from './utils/fluff.js';
 export {
@@ -31,4 +32,6 @@ export type {
   Severity,
   ScoreOptions,
   SuppressionEstimate,
+  AovEstimate,
+  RevenueEstimate,
 } from './types.js';

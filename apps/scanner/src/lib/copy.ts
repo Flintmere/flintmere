@@ -332,6 +332,28 @@ export function suppressionSignalLine(args: {
   return parts.join(' · ')
 }
 
+// ----------------------------------------------------------------------
+// Revenue-band lede — dead-inventory wedge finish arc
+// ----------------------------------------------------------------------
+// Copy Council seam: all four lenses (#1, #20, #22, #37) review before hero ships.
+// Claim-review seam: #9 + #23 review before hero ships (ASA / CAP Code).
+// Framing: "annual demand at risk" per requirement Q-C Option 3 (no defensible
+// monthly turn source).
+export const REVENUE_LEDE_EYEBROW = 'Annual demand at risk'
+
+export const REVENUE_LEDE_DISCLOSURE =
+  'Modelled from public catalog signals — missing barcodes, GMC categories, and allergen statements. Install Flintmere to verify against your Google Merchant Center account.'
+
+export function revenueLede(args: { low: number; high: number }): string {
+  const { low, high } = args
+  const fmt = (n: number) => {
+    if (n >= 1_000_000) return `£${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}m`
+    if (n >= 1_000) return `£${(n / 1_000).toFixed(n % 1_000 === 0 ? 0 : 1)}k`
+    return `£${n.toLocaleString()}`
+  }
+  return `Roughly ${fmt(low)}–${fmt(high)} of annual demand may be going to competitors while these products stay suppressed.`
+}
+
 // Grade badge anchor. Live median from scanner_scans table when n≥50;
 // otherwise falls back to a copy that does not over-claim.
 export function gradeBadgeAnchor(args: {

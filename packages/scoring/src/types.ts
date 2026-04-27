@@ -140,3 +140,24 @@ export interface SuppressionEstimate {
     missingGmcCategory: number;
   };
 }
+
+// ---- AOV inference (wedge finish arc) ----
+export interface AovEstimate {
+  /** Lower bound: median minus band-half (floored at £1). */
+  low: number;
+  /** Upper bound: median plus band-half. */
+  high: number;
+  /** Median variant price — the anchor signal. */
+  medianPrice: number;
+  /** Confidence reflects sample size and price spread. */
+  confidence: 'high' | 'medium' | 'low';
+}
+
+export interface RevenueEstimate {
+  /** Lower bound of annual demand at risk (£, integer). */
+  low: number;
+  /** Upper bound of annual demand at risk (£, integer). */
+  high: number;
+  /** The AovEstimate that generated this band. */
+  aovEstimate: AovEstimate;
+}

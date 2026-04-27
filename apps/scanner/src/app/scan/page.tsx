@@ -12,13 +12,21 @@ import {
   issueCodeToFounderSpeak,
   pillarExplanationCustomerFacing,
   pillarLabelCustomerFacing,
+  REVENUE_LEDE_DISCLOSURE,
+  REVENUE_LEDE_EYEBROW,
+  revenueLede,
   SUPPRESSION_LEDE_EYEBROW,
   SUPPRESSION_LEDE_SUBHEAD,
   suppressionLede,
   suppressionSignalLine,
   verdictHeader,
 } from '@/lib/copy';
-import type { PillarId, SuppressionEstimate } from '@flintmere/scoring';
+import type {
+  AovEstimate,
+  PillarId,
+  RevenueEstimate,
+  SuppressionEstimate,
+} from '@flintmere/scoring';
 
 type ScanState =
   | { phase: 'idle' }
@@ -38,6 +46,16 @@ interface ScanResult {
    * the dead-inventory wedge shipped won't carry this field.
    */
   suppressionEstimate?: SuppressionEstimate;
+  /**
+   * AOV inference (wedge finish arc). Null for non-food catalogs and
+   * below-sample-floor catalogs. Older persisted scans won't carry it.
+   */
+  aovEstimate?: AovEstimate | null;
+  /**
+   * Annual-demand-at-risk band. Null when suppression.high === 0 OR when
+   * `aovEstimate` itself is null.
+   */
+  revenueEstimate?: RevenueEstimate | null;
   pillars: Array<{
     pillar: string;
     score: number;
@@ -206,29 +224,77 @@ function useLiveSample(): LiveSample {
   return sample;
 }
 
+interface SuppressionLedeProps {
+  estimate: SuppressionEstimate | undefined;
+  productCount: number;
+  revenueEstimate?: RevenueEstimate | null;
+}
+
 /**
- * The lead result block — surfaces the dead-inventory suppression
- * estimate ahead of the score + pillar breakdown. Renders nothing if
- * the scan response did not include a `suppressionEstimate` (older
- * persisted scans, or future opt-out scans).
+ * The lead result block — surfaces the dead-inventory wedge ahead of the
+ * score + pillar breakdown. Three states:
  *
- * Per v2 strategic report §7: range, not a point. Three signals named.
- * No revenue-impact framing in this MVP — that comes Phase 2 with AOV.
+ *   State 1 (revenue band available): "Roughly £X–£Y of annual demand at
+ *           risk" — the v2 §7 hero framing. Renders for food catalogs
+ *           with a priced-variant sample above the floor AND non-zero
+ *           suppression.
+ *   State 2 (suppression available, no revenue band): existing MVP
+ *           SKU-count lede. Falls back for non-food catalogs, low
+ *           sample, or older scans persisted before AOV shipped.
+ *   State 3 (no suppression signal): renders nothing — don't manufacture
+ *           a "you're losing nothing" line (per requirement Q-G).
  */
 function SuppressionLede({
   estimate,
   productCount,
-}: {
-  estimate: SuppressionEstimate | undefined;
-  productCount: number;
-}) {
-  if (!estimate) return null;
+  revenueEstimate,
+}: SuppressionLedeProps) {
+  // State 3: no suppression to surface.
+  if (!estimate || estimate.high === 0) return null;
+
+  const signalLine = suppressionSignalLine(estimate.signals);
+
+  // State 1: revenue band available — lead with the £-figure.
+  if (revenueEstimate) {
+    const headline = revenueLede({
+      low: revenueEstimate.low,
+      high: revenueEstimate.high,
+    });
+    return (
+      <div className="mb-12 pb-12 border-b border-[color:var(--color-line)]">
+        <p className="eyebrow mb-4">
+          <Bracket>{REVENUE_LEDE_EYEBROW}</Bracket>
+        </p>
+        <h2 className="max-w-[40ch]">{headline}</h2>
+        {signalLine ? (
+          <p
+            className="mt-6 max-w-[58ch] text-[color:var(--color-ink-2)]"
+            style={{ fontSize: 16, lineHeight: 1.55 }}
+          >
+            {signalLine}.
+          </p>
+        ) : null}
+        <p
+          className="mt-4 max-w-[58ch]"
+          style={{
+            fontSize: 14,
+            lineHeight: 1.55,
+            color: 'var(--color-mute)',
+            fontFamily: 'var(--font-mono)',
+          }}
+        >
+          {REVENUE_LEDE_DISCLOSURE}
+        </p>
+      </div>
+    );
+  }
+
+  // State 2: SKU-count fallback (existing MVP lede unchanged).
   const headline = suppressionLede({
     low: estimate.low,
     high: estimate.high,
     productCount,
   });
-  const signalLine = suppressionSignalLine(estimate.signals);
   return (
     <div className="mb-12 pb-12 border-b border-[color:var(--color-line)]">
       <p className="eyebrow mb-4">
@@ -289,6 +355,7 @@ function Results({ result }: { result: ScanResult }) {
       <SuppressionLede
         estimate={result.suppressionEstimate}
         productCount={result.productCount}
+        revenueEstimate={result.revenueEstimate}
       />
 
       <div className="grid md:grid-cols-[300px_1fr] gap-12 items-center">

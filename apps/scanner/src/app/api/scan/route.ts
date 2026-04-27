@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { estimateSuppression, scoreCatalog } from '@flintmere/scoring';
+import { estimateAov, estimateSuppression, scoreCatalog } from '@flintmere/scoring';
 import { prisma } from '@/lib/db';
 import { fetchCrawlability } from '@/lib/crawlability-fetcher';
 import { fetchCatalog, ShopifyFetchError } from '@/lib/shopify-fetcher';
@@ -64,6 +64,17 @@ export async function POST(req: NextRequest) {
     // Dead-inventory wedge — v2 strategic report §7. Computed from the
     // already-loaded catalog; no new fetches, no LLM, no OAuth.
     const suppressionEstimate = estimateSuppression(catalog);
+    // AOV inference (wedge finish arc) — composes with the suppression
+    // estimate to produce an annual-demand-at-risk band. Returns null for
+    // non-food catalogs and below-sample-floor catalogs (food-first at
+    // v1 per requirement Q1.1).
+    //
+    // OQ-1: persistence gap. `aovEstimate` and `revenueEstimate` are
+    // surfaced on the scan response but NOT written to `scoreJson`. They
+    // therefore won't render on /score/[shop] for historical scans
+    // without a future migration that re-computes from the persisted
+    // catalog or back-fills these fields.
+    const aovResult = estimateAov(catalog, suppressionEstimate);
 
     await prisma.scan.update({
       where: { id: scan.id },
@@ -89,6 +100,8 @@ export async function POST(req: NextRequest) {
         productCount: score.productCount,
         variantCount: score.variantCount,
         suppressionEstimate,
+        aovEstimate: aovResult?.aovEstimate ?? null,
+        revenueEstimate: aovResult?.revenueEstimate ?? null,
         pillars: score.pillars.map((p) => ({
           pillar: p.pillar,
           score: p.score,

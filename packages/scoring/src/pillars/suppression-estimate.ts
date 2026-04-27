@@ -44,7 +44,7 @@ const PROBABILITY_BANDS: Readonly<Record<0 | 1 | 2 | 3, { low: number; high: num
 // ---- Food-vertical heuristic ----
 // We only flag ambiguous allergen text on products that look like food.
 // A coffee grinder shouldn't trip the allergen check.
-const FOOD_HINT_KEYWORDS = [
+export const FOOD_HINT_KEYWORDS = [
   'food',
   'drink',
   'beverage',
