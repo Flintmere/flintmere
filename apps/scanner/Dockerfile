@@ -14,6 +14,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/scanner/package.json apps/scanner/package.json
 COPY packages/scoring/package.json packages/scoring/package.json
 COPY packages/llm/package.json packages/llm/package.json
+COPY packages/ui/package.json packages/ui/package.json
 RUN pnpm install --frozen-lockfile
 
 # ---- build ----
