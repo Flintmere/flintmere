@@ -41,11 +41,28 @@ Canonical source of truth is `apps/*/globals.css` + `tailwind.config.js` (once b
 | `--accent` (amber) | `#F8BF24` | **All three surfaces.** Score-ring fill, pillar progress bars, severity-high dot, terminal `warn` rows, icon fills, chip fills, bracket under-tick hairline, hero display type at ≥48px, any amber-fill CTA (amber background + ink text). |
 | `--accent-ink` | `#0A0A0B` | The only colour on top of amber. Never white on amber; always ink. Amber-on-ink contrast ≈ 11:1 (AAA). |
 
-Amber is Flintmere's brand colour and a cross-portfolio signature carried by the operator across products. The **sole** accent — no sulphur, no secondary colour.
+Amber is Flintmere's brand colour and a cross-portfolio signature carried by the operator across products. The **diagnostic-warning** accent.
 
 **Noor's floor (amber contrast rule).** Amber on `--paper` is ≈ 1.7:1 — insufficient for text. Amber never appears as body text, meta text, small labels, or inline links on paper. On ink, amber is a full text colour (≈ 11:1). See `accessibility.md` §Contrast floors and `decisions/0007` for the full rule.
 
 Ratified 2026-04-20 via ADR 0007. Sulphur `#D9E05A` is retired. See §Retired.
+
+### Accent — sage (decorative second brand colour, ADR 0021)
+
+| Token | Hex | Contrast on `--paper` | Where it is allowed |
+|---|---|---|---|
+| `--accent-sage` | `#5A6B4D` | ≈ 5.5:1 (AA) | **Decorative only.** Section dividers, eyebrow underlines, hairline rules below display numerals, decorative borders, secondary-CTA hover state, ink-slab section accent, header bottom-rule. |
+
+Sage is Flintmere's **second brand accent** — visual variety, NOT a semantic-state token. Industry-conventional "green = passing" mental model is intentionally NOT honoured here; sage is decorative-not-semantic per operator option-(ii) selection on ADR 0021.
+
+**Forbidden uses (Noor's veto + #37 caveat):**
+- Score rings, severity dots, status pills, suppression-engine output, pillar weight bars, anything carrying *meaning*. Sage on those would mis-cue merchants.
+- Body text (sage on paper passes AA but the colour is reserved for hairline + decorative roles; body text stays ink).
+- Inline links, eyebrow text, micro-labels — sage is structural-decorative, never typographic.
+
+Amber stays the diagnostic accent; sage stays the brand-decorative accent. Two accents because they do *different jobs*, not "more colour for colour's sake."
+
+Ratified 2026-04-27 via ADR 0021.
 
 ### Semantic
 
@@ -117,7 +134,7 @@ Email report      [ Flintmere Report · Jun 2026 ]
 
 - Brackets must be **structural markup**, not decoration. Every bracketed word must correspond to a meaningful extractable token: a noun, a number, an identifier, a URL, a score.
 - **Never** bracket verbs, articles, or filler words.
-- **One bracket moment per section. Two per page maximum.** More than two and the signature becomes decoration.
+- **One bracket moment per section. No page-wide cap.** (Updated 2026-04-27 via ADR 0021. Original ADR 0003 cap of "two per page maximum" was preventing structural brackets like `[ 01 ]–[ 07 ]` pillar IDs from co-existing with hero + audit-deep zone brackets. Per-section discipline now governs.) More than one bracket per section and the signature becomes decoration; no page-wide budget.
 - Screen readers announce `[` and `]` as "left bracket" / "right bracket". On headings that's acceptable (the bracket is part of the sentence). On interactive elements (buttons, links), hide brackets from AT with `aria-hidden="true"` wrappers and pass the clean text via `aria-label`.
 - The bracketed word must be readable **without** the brackets. If removing the brackets breaks comprehension, the sentence is wrong, not the bracket.
 
@@ -213,22 +230,26 @@ Pre-2026-04-26 surfaces shipped under the line-art-only mandate. They remain val
 ## Corners, surfaces, motion floors
 
 - **Corners sharp.** No `border-radius` except on circular gauges (score-ring), avatars (if introduced), toggle handles.
-- **No shadows.** Separation via 1px `--line` hairline. Apple-bold does not use drop shadows.
-- **No gradients** except the conic-gradient that renders score rings.
-- **No blur, no glass.** Opaque surfaces only.
-- **Motion:** opacity + transform only. Never animate `width/height/top/left`. Marketing + scanner surfaces use a single global `prefers-reduced-motion` block in `globals.css` to scale durations to zero (soft contract, 2026-04-26). Shopify-app island components retain the per-animation strict contract for Built-for-Shopify submission. See `motion.md` §The reduced-motion contract (two tiers).
+- **One disciplined elevation shadow** — `--shadow-paper-1`: `0 1px 0 rgba(20,18,16,0.04), 0 8px 24px -12px rgba(20,18,16,0.08)`. A tonal wash, not a crisp drop shadow. Used on cards, button hover, modals/popovers. **Forbidden** on body type, paragraphs, headings. **No second shadow level. No glassmorphism. No backdrop-filter blur.** Per ADR 0021. (The original ADR 0003 "no shadows" rule is relaxed — replacement, not retraction.)
+- **Two atmosphere-only gradients** —
+  - `--gradient-paper-warmth`: `linear-gradient(180deg, var(--color-paper) 0%, var(--color-paper-2) 100%)` — barely perceptible vertical gradient for hero/section backgrounds.
+  - `--gradient-amber-radial`: `radial-gradient(circle at center, rgba(248,191,36,0.12) 0%, transparent 70%)` — focal-numeral backdrop on display-scale moments.
+  - Atmosphere only — never on text, borders, CTAs, or status indicators. The conic-gradient on score rings remains a separate scanner-specific exception. Per ADR 0021. (The original ADR 0003 "no gradients" rule is relaxed — replacement, not retraction.)
+- **No blur, no glass.** Opaque surfaces only. Glassmorphism still banned.
+- **Motion:** opacity + transform only. Never animate `width/height/top/left`. Marketing + scanner surfaces use a single global `prefers-reduced-motion` block in `globals.css` to scale durations to zero (soft contract, 2026-04-26). Shopify-app island components retain the per-animation strict contract for Built-for-Shopify submission. See `motion.md` §The reduced-motion contract (two tiers). Three new motion patterns (numerals-count-up, hover-lift, subtle parallax) added under ADR 0021 — all behind the same reduced-motion contracts.
 
 ## Inversion
 
-Paper → ink token swap for dark sections (email gate, hero over-inverted moments, Shopify-app sidebar):
+Paper → ink token swap for dark sections (email gate, hero over-inverted moments, Shopify-app sidebar). The **ink-slab** is now a documented surface variant per ADR 0021 — used for numbers-strip moments, callouts, mid-page emphasis-flip beats. Forbidden on body content >800px tall (the surface is for moments, not pages).
 
 | Paper | → Ink |
 |---|---|
 | `--paper` (bg) | `--ink` |
-| `--ink` (body text) | `--paper` |
+| `--ink` (body text) | `--paper-on-ink` (≈ AAA on ink) |
 | `--mute` (meta, paper) | `--mute-inv` |
 | `--line` | `--line-dark` |
 | `--accent` amber | unchanged — amber is both-canvas, but still never body text on paper |
+| `--accent-sage` | unchanged — sage on ink ≈ 3.5:1, decorative-only on ink as on paper |
 
 ## Surface-specific notes
 
@@ -288,6 +309,7 @@ Everything from the inherited allowanceguard Ledger canon is **retired**. Do not
 
 ## Changelog
 
+- 2026-04-27: ADR 0021 ratified. Eight axes of canon relaxation within the neutral-bold posture. New tokens: `--accent-sage` (`#5A6B4D`, decorative-not-semantic per operator option-(ii)), `--shadow-paper-1` (single tonal-wash elevation), `--gradient-paper-warmth` (vertical paper→paper-2), `--gradient-amber-radial` (focal-numeral backdrop), `--paper-on-ink` (ink-slab text token, ≈AAA). Bracket budget changes from ≤2/page → ≤1/section, no page cap. Line-art reinstated as second imagery mode (paired with photoreal + screenshots — three modes). Display-weight 700 permitted at ≥80px. Ink-slab promoted to documented surface variant. Three new motion patterns (numerals-count-up, hover-lift, subtle parallax). Layers on ADR 0003 + 0007; existing surfaces stay valid (relaxation, not retraction).
 - 2026-04-26: Standing Council voted 10–0 (with conditions) to lift the line-art-only imagery mandate and soften the `prefers-reduced-motion` contract on marketing/scanner. New §Imagery section added with three image modes (photoreal, screenshot, line-art), a rotation rule (emotion → photoreal, proof → screenshot), three new tokens (`--image-treatment-warm`, `--image-overlay-bracket-color`, `--image-caption-mono`), weight budgets, and a bracket co-occurrence rule. `motion.md` updated to a two-tier contract: marketing/scanner soft (global `globals.css` block), Shopify app strict (per-animation, retained for BFS). DESIGN.md law #1 reframed from "Type is the image" to "Type leads, imagery proves."
 - 2026-04-20 (later): ADR 0007 accepted — Glowing Amber `#F8BF24` adopted as portfolio signature and sole accent across all three surfaces. Sulphur `#D9E05A` retired. Wordmark changed from bilateral dark-form `Flint[ mere ]` to asymmetric `Flintmere]` (both canvases, monochrome). Palette, §Signature under-tick, §Wordmark, §Inversion, §Surface-specific, §Rejected patterns, §Retired all reconciled to 0007. The bracket signature, neutral-bold structure, and Geist type stack from 0003 remain authoritative.
 - 2026-04-20: Added §Wordmark and §Rejected brand-asset patterns after Standing Council review of an external (Gemini-generated) brand-assets sheet. Wordmark converted from §Signature example into a formal rule: the mark is the type, no logomark, no tagline lockup. (Rules refined later the same day by 0007 — the wordmark form became asymmetric; amber was accepted as the brand colour.)

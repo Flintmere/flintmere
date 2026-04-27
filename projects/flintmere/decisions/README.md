@@ -25,6 +25,8 @@ One file per significant decision. Name them `NNNN-slug.md` (4-digit zero-padded
 | [0017](0017-plus-tier-private-beta-gate.md) | Plus tier private-beta gate + price-on-enquiry | Accepted | Public £1,500+ floor withdrawn; anchor "from £1,200/mo on enquiry"; re-list when embedded app's first installable food-vertical build ships |
 | [0018](0018-standards-subdomain-and-cadence.md) | `standards.flintmere.com` + half-yearly food cadence + AI-assisted diff log | Accepted | Q3c at ~£200/yr (recalibrated from infeasible £20–25k/yr contractor); #39 Regulatory Affairs review; upgrade to Q3d on first volunteer reviewer landing |
 | [0019](0019-strategic-gate-window-six-month.md) | Strategic gate: 6-month window, 2026-10-26 | Accepted | Latest-by date; earlier qualifying citation passes early; mid-window check 2026-07-26 |
+| 0020 | (reserved — per-channel pricing axis) | Reserved | Layers on ADR 0016; per-channel multiplier dimension. Triggered by v2 strategic ratification 2026-04-26. Drafting deferred to post-Phase-3 design pass. |
+| [0021](0021-canon-relaxation.md) | Canon relaxation — visual variation expands within neutral-bold | Accepted | Layers on ADR 0003 + 0007 (does not retract). Eight axes: sage decorative accent, paper-1 shadow, paper-warmth + amber-radial gradients, per-section bracket budget, line-art second imagery mode, display-700 weight at ≥80px, ink-slab promoted, motion vocabulary expanded. Noor's accessibility conditions binding. |
 
 ## Template
 

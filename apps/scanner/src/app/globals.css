@@ -33,9 +33,33 @@
   --color-accent: #f8bf24;
   --color-accent-ink: #0a0a0b;
 
+  /* --- Accent (Sage — second brand colour, decorative-only, ADR 0021) ---
+     AA on paper (~5.5:1). Forbidden on score rings, severity dots, status
+     pills, suppression-engine output, pillar weight bars — anything carrying
+     meaning. Used for: section dividers, eyebrow underlines, hairline rules,
+     decorative borders, secondary-CTA hover, ink-slab section accent. */
+  --color-accent-sage: #5a6b4d;
+
+  /* --- Ink-slab text token (paper text on ink background, ADR 0021) ---
+     The paper-on-ink colour for ink-slab section variants. ≈ AAA on ink. */
+  --color-paper-on-ink: #f7f7f4;
+
   /* --- Semantic --- */
   --color-alert: #e54a2a;
   --color-ok: #3f8f57;
+
+  /* --- Elevation (single shadow per ADR 0021) ---
+     Tonal wash — not a crisp drop shadow. Used on cards, button hover,
+     modals/popovers. NEVER on body type, paragraphs, headings. No second
+     elevation level. No glassmorphism. No backdrop-filter blur. */
+  --shadow-paper-1: 0 1px 0 rgba(20, 18, 16, 0.04), 0 8px 24px -12px rgba(20, 18, 16, 0.08);
+
+  /* --- Atmosphere gradients (ADR 0021) ---
+     Atmosphere only — never on text, borders, CTAs, status indicators.
+     The conic-gradient on score rings is a separate scanner-specific
+     exception that lives in the score-ring component, not here. */
+  --gradient-paper-warmth: linear-gradient(180deg, var(--color-paper) 0%, var(--color-paper-2) 100%);
+  --gradient-amber-radial: radial-gradient(circle at center, rgba(248, 191, 36, 0.12) 0%, transparent 70%);
 
   /* --- Typography --- */
   --font-sans: var(--geist-sans), system-ui, -apple-system, sans-serif;

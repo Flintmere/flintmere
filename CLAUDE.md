@@ -41,7 +41,7 @@ Target users: **UK food merchants first** per ADR 0015 (100–5,000 SKUs, £500K
 
 ## The canon in one line
 
-**Neutral-bold hybrid + the legibility bracket + Geist Sans + Geist Mono.** Warm near-white + near-black. Glowing Amber `#F8BF24` as portfolio signature (sole accent, all surfaces). Apple-bold structure. See `memory/design/tokens.md` for the authoritative statement, `decisions/0003` for the structural rationale, and `decisions/0007` for the amber + asymmetric-wordmark canon.
+**Neutral-bold hybrid + the legibility bracket + Geist Sans + Geist Mono.** Warm near-white + near-black. Glowing Amber `#F8BF24` as the diagnostic-warning accent + portfolio signature; **Sage `#5A6B4D` as a decorative-only second brand accent** (ADR 0021, operator option-(ii)). Apple-bold structure. **Eight-axis canon relaxation ratified 2026-04-27** — sage decorative accent, single `--shadow-paper-1` elevation, two atmosphere gradients (`--gradient-paper-warmth` + `--gradient-amber-radial`), bracket budget changes from ≤2/page → ≤1/section (no page cap), line-art reinstated as second imagery mode, display-weight 700 at ≥80px, ink-slab promoted to documented surface variant, expanded motion vocabulary (numerals-count-up, hover-lift, subtle parallax). See `memory/design/tokens.md` for the authoritative statement, `decisions/0003` for the structural rationale, `decisions/0007` for the amber + asymmetric-wordmark canon, and **`decisions/0021` for the relaxation axes**.
 
 ## The signature
 
