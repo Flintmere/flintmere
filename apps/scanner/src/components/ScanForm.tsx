@@ -25,7 +25,7 @@ export function ScanForm({
       return;
     }
     setError(null);
-    track('scan_started', { domain: trimmed });
+    track('scan_started', { domain: trimmed, hero_variant: 'ranks_last_v0' });
     onSubmit(trimmed);
   };
 
