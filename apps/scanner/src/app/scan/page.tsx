@@ -126,16 +126,16 @@ export default function ScanPage() {
         <p className="eyebrow mb-6">
           Free scan · No signup · 60 seconds
         </p>
-        <h1 className="max-w-[18ch]">
-          Is your Shopify catalog <Bracket>invisible</Bracket> to ChatGPT?
+        <h1 className="max-w-[22ch]">
+          Which of your products are <Bracket>suppressed</Bracket> in Google Shopping today?
         </h1>
         <p
           className="mt-8 max-w-[54ch] text-[color:var(--color-ink-2)]"
           style={{ fontSize: 17, lineHeight: 1.55 }}
         >
-          Paste your store URL. We run the same checks AI shopping agents
-          use — Shopify product data, GS1 UK barcodes, Google Merchant Center
-          specs — and show you exactly where you disappear.
+          Paste your URL. We estimate how much annual demand is going to
+          competitors while these products stay demoted — and show you the
+          catalog data costing you the sale.
         </p>
         <div className="mt-10">
           <ScanForm
