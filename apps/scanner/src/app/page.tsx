@@ -163,13 +163,42 @@ export default function MarketingHome() {
         </div>
       </section>
 
-      {/* Chapter 2 — Pillars (awaiting Chapter 2 Pentagram-scale
-          amplification per cull-to-four arc 2026-04-28) */}
+      {/* Chapter 2 — Pillars (Pentagram-scale rebuild — cull-to-four arc
+          2026-04-28). Zone A: Pentagram cover (eyebrow + oversized [ 07 ]
+          decorative numeral + headline). Zone B: preserved intro paragraph
+          + seven-pillar list. Operator-default Option α (centered
+          composition). References: Pentagram case-study covers (lead),
+          Bloomberg Businessweek covers (secondary), Anthony Burrill
+          (tertiary). */}
       <section id="pillars" className="mx-auto max-w-[1280px] px-8 py-24">
-        <p className="eyebrow mb-6">What we check</p>
-        <h2 className="max-w-[22ch] mb-4">
-          Seven things an AI shopping agent looks for before it will recommend your product.
-        </h2>
+        {/* Zone A — Pentagram cover */}
+        <div className="flex flex-col items-center justify-center text-center min-h-[60vh] max-md:min-h-[80vh] mb-16">
+          <p className="eyebrow mb-8 lg:mb-12">// the seven checks</p>
+          <span
+            aria-hidden="true"
+            data-reveal
+            className="block font-mono leading-[0.85] mb-8 lg:mb-12"
+            style={{
+              fontSize: 'clamp(220px, 32vw, 480px)',
+              color: 'var(--color-ink)',
+            }}
+          >
+            <Bracket>07</Bracket>
+          </span>
+          <h2
+            data-reveal
+            className="font-sans font-medium leading-[0.95] tracking-[-0.04em] max-w-[26ch] max-md:max-w-[22ch]"
+            style={{
+              fontSize: 'clamp(48px, 6vw, 96px)',
+              color: 'var(--color-ink)',
+              ['--reveal-delay' as string]: '120ms',
+            }}
+          >
+            An AI agent reads your catalog in seven passes. Fail one, lose the sale.
+          </h2>
+        </div>
+
+        {/* Zone B — pillar list (preserved) */}
         <p className="pillars-intro max-w-[60ch] text-[color:var(--color-mute)]">
           Each pillar carries the weight shown. Your final score is a weighted average across the seven.
         </p>
