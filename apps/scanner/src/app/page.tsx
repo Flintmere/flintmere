@@ -1,94 +1,34 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Suspense } from 'react';
-import { Bracket, SiteFooter, StatTriad, type Stat } from '@flintmere/ui';
+import { Bracket, SiteFooter } from '@flintmere/ui';
 import { ViewportReveal } from '@/components/ViewportReveal';
-import { HomepageVerticalPicker } from '@/components/HomepageVerticalPicker';
 import { HeroParallaxFigure } from '@/components/HeroParallaxFigure';
 import { Pillar } from '@/components/sections/Pillar';
 import { FounderStrip } from '@/components/sections/FounderStrip';
-import { CompareSection } from '@/components/sections/CompareSection';
-import { ManifestoSection } from '@/components/sections/ManifestoSection';
-import { PricingStripPlaceholder } from '@/components/sections/PricingStripPlaceholder';
-import { prisma } from '@/lib/db';
-import {
-  summariseBenchmark,
-  type BenchmarkRow,
-} from '@/lib/benchmark-summary';
-
-// Belt-and-braces: render per request so build never hits the DB. The
-// live-sample line stays fresh without depending on a build-time crawl.
-export const dynamic = 'force-dynamic';
 
 /**
- * Homepage trust strip — Phase-C StatTriad data.
+ * Marketing home — cull-to-four arc 2026-04-28.
  *
- * Per amendment block in context/design/components/2026-04-26-stat-triad.md:
- *  - Eyebrows render as plain Mono labels (no brackets).
- *  - `60s` is the focal stat — gets the amber under-tick.
- *  - `£97` renders in --paper (ink-slab variant), NOT amber. The strip's
- *    single amber moment is the focal-numeral under-tick.
- *  - `numeralAriaLabel` provided where SR pronunciation is uncertain.
+ * Four chapters: Hero · Pillars · FounderStrip · Footer. Council 11-1
+ * (#15 conditional) approved cull from 12 sections to 4. Path A
+ * (type-led, no imagery beyond the hero photo) — operator pick.
  *
- * MicroLines kept tight + sentence-case per amendment §upgrade b.
+ * Each chapter awaits its amplification dispatch:
+ *  - Chapter 1 (Hero): typographic scale-up to clamp(72px,11vw,144px)
+ *    weight 500, parallax + photoreal stay.
+ *  - Chapter 2 (Pillars): Pentagram-scale rebuild — oversized [ 06 ]
+ *    numeral fills 60% of frame; six pillars as Bloomberg-cover essay
+ *    with hairline rules between rows.
+ *  - Chapter 3 (FounderStrip): Margaret-Howell restraint amplified;
+ *    paper-bordered Book audit CTA at chapter-anchor scale.
+ *  - Chapter 4 (Footer): closing wordmark amplified to clamp(80px,
+ *    10vw,160px) so the page closes on the mark.
+ *
+ * Cuts (one commit, no replacement): StatTriad, live sample,
+ * HomepageVerticalPicker, Before/After, £97 audit-deep, CompareSection,
+ * PricingStripPlaceholder, ManifestoSection.
  */
-const HOMEPAGE_STATS: ReadonlyArray<Stat> = [
-  {
-    eyebrow: 'scan',
-    numeral: '7',
-    microLine: 'Checks we run on every scan.',
-  },
-  {
-    eyebrow: 'time',
-    numeral: '60s',
-    microLine: 'Time the free scan takes on a 5,000-product store.',
-    numeralAriaLabel: '60 seconds',
-  },
-  {
-    eyebrow: 'paid',
-    numeral: '£97',
-    microLine: 'One-off concierge audit. Fix CSV + 30-day re-scan.',
-    numeralAriaLabel: 'ninety-seven pounds',
-  },
-];
-
-async function loadLiveSample(): Promise<{
-  show: boolean;
-  median: number;
-  n: number;
-}> {
-  const rows = await prisma.scan.findMany({
-    where: {
-      OR: [{ source: 'bot' }, { publishedToBenchmark: true }],
-      status: 'complete',
-      score: { not: null },
-      grade: { not: null },
-    },
-    select: { score: true, grade: true, vertical: true },
-  });
-  const typed: BenchmarkRow[] = rows.map((r) => ({
-    score: r.score ?? 0,
-    grade: r.grade ?? '',
-    vertical: r.vertical,
-  }));
-  const summary = summariseBenchmark(typed);
-  // Only surface on home once we clear the publish floor — below that
-  // we quote the same numbers on /research as "early sample" but we
-  // don't front-door them. Claim review (#9 + #23) — no median framing
-  // at sub-publish-floor n.
-  const show =
-    summary.available &&
-    !summary.preview &&
-    summary.overall.medianScore !== null;
-  return {
-    show,
-    median: summary.overall.medianScore ?? 0,
-    n: summary.overall.n,
-  };
-}
-
-export default async function MarketingHome() {
-  const sample = await loadLiveSample();
+export default function MarketingHome() {
   return (
     <main id="main">
       <a href="#hero" className="skip-link">Skip to content</a>
@@ -223,65 +163,8 @@ export default async function MarketingHome() {
         </div>
       </section>
 
-      {/* Vertical picker + picker-driven content block (Phase B —
-          context/design/specs/2026-04-26-homepage-food-first.md §3 + §4).
-          Client component reads ?vertical= URL param and drives content swap
-          via aria-live. Vertical names are NOT bracketed (cap stays at 2:
-          hero h1 + audit £97). Suspense boundary required by Next.js 15 —
-          useSearchParams forces a CSR boundary. */}
-      <Suspense fallback={null}>
-        <HomepageVerticalPicker />
-      </Suspense>
-
-      <hr className="rule" />
-
-      {/* Numbers strip — Phase-C StatTriad primitive (ink-slab + focal=1).
-          Per amendment: NO amber on £97; the strip's single amber moment is
-          the focal-numeral under-tick on `60s`. Eyebrows are plain Mono
-          labels (no brackets) — page bracket cap stays at 2.
-          Per-stat numeralAriaLabel where SR pronunciation is uncertain. */}
-      <StatTriad
-        surface="ink-slab"
-        focalIndex={1}
-        ariaLabel="Key facts"
-        stats={HOMEPAGE_STATS}
-      />
-
-      {sample.show ? (
-        <section
-          aria-label="Live sample"
-          className="mx-auto max-w-[1280px] px-8 py-24 border-b border-[color:var(--color-line)]"
-        >
-          <p className="eyebrow mb-6 text-[color:var(--color-mute)]">
-            Live · from our rolling sample
-          </p>
-          <div className="grid md:grid-cols-[auto_1fr] gap-12 items-end">
-            <div>
-              <p className="live-sample-numeral">
-                {sample.median}
-                <span aria-hidden="true" className="live-sample-undertick" />
-              </p>
-              <p className="live-sample-meta eyebrow mt-4 text-[color:var(--color-mute)]">
-                / 100 · median
-              </p>
-            </div>
-            <div className="pb-4">
-              <p className="live-sample-lede max-w-[40ch]">
-                The median score across {sample.n.toLocaleString()} mid-market
-                Shopify catalogs in our rolling sample. Most fall short on the
-                structured fields AI shopping agents actually filter on.
-              </p>
-              <p className="mt-6">
-                <Link href="/research" className="underline eyebrow">
-                  Read the full report →
-                </Link>
-              </p>
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      {/* Seven checks */}
+      {/* Chapter 2 — Pillars (awaiting Chapter 2 Pentagram-scale
+          amplification per cull-to-four arc 2026-04-28) */}
       <section id="pillars" className="mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">What we check</p>
         <h2 className="max-w-[22ch] mb-4">
@@ -340,125 +223,11 @@ export default async function MarketingHome() {
         </ol>
       </section>
 
-      <hr className="rule" />
-
-      {/* Before / After */}
-      <section aria-labelledby="before-after-heading" className="grid md:grid-cols-2 border-b border-[color:var(--color-line)]">
-        <div className="p-12 md:p-16 border-b md:border-b-0 md:border-r border-[color:var(--color-line)]">
-          <p className="eyebrow mb-6">How product pages used to work</p>
-          <h3 id="before-after-heading" className="max-w-[18ch]">Titles written for Google. Humans did the rest.</h3>
-          <p className="mt-6 text-[color:var(--color-ink-2)] max-w-[38ch]" style={{ fontSize: 16, lineHeight: 1.55 }}>
-            Stuffed titles. Attributes buried in descriptions. Barcodes optional. Humans skimmed and filled in the gaps. The same catalog ranked fine in Google search for a decade.
-          </p>
-        </div>
-        <div className="p-12 md:p-16">
-          <p className="eyebrow mb-6">How they work now</p>
-          <h3 className="max-w-[18ch]">Machines read every word and check every field.</h3>
-          <p className="mt-6 text-[color:var(--color-ink-2)] max-w-[38ch]" style={{ fontSize: 16, lineHeight: 1.55 }}>
-            ChatGPT, Perplexity and Claude don&rsquo;t skim. They verify barcodes, compare prices across pages, and reject products with missing fields. No field, no recommendation.
-          </p>
-        </div>
-      </section>
-
-      {/* What you get with the £97 audit */}
-      <section
-        aria-labelledby="audit-deep-heading"
-        className="mx-auto max-w-[1280px] px-8 py-24"
-      >
-        <p className="eyebrow mb-6">What you get with the £97 audit</p>
-        <h2 id="audit-deep-heading" className="max-w-[24ch]">
-          A real scan. A real letter. A 30-day re-scan to prove it stuck.
-        </h2>
-
-        <div className="mt-12 grid md:grid-cols-[1.4fr_1fr] gap-12 items-start">
-          {/* Audit screenshot anchor — proof of the £97 audit deliverable */}
-          <figure
-            className="audit-figure"
-            data-reveal
-            style={{ '--reveal-delay': '0ms' } as React.CSSProperties}
-          >
-            <Image
-              src="/marketing/proof/audit-scan.avif"
-              alt="Flintmere scanner results: a 49-out-of-100 score for a Shopify catalog where 1,000 of 1,000 products fail at least one AI-agent readiness check, with three top issues including missing barcodes."
-              width={1200}
-              height={638}
-              sizes="(min-width: 768px) 60vw, 100vw"
-              className="audit-image"
-            />
-            <figcaption className="audit-caption mt-3">
-              A real Shopify catalog. The free scan in 60 seconds.
-            </figcaption>
-          </figure>
-
-          {/* Deliverables list */}
-          <div
-            data-reveal
-            style={{ '--reveal-delay': '200ms' } as React.CSSProperties}
-          >
-            <p className="eyebrow mb-6 text-[color:var(--color-mute)]">
-              For your <Bracket>£97</Bracket> — within three working days
-            </p>
-            <ul className="list-none p-0 m-0 space-y-8">
-              <li>
-                <p className="audit-item-name">A written audit letter</p>
-                <p className="audit-item-copy">
-                  One PDF. Plain English. The seven checks for your catalog,
-                  ranked by how many products each one affects, with the exact
-                  fix for each.
-                </p>
-              </li>
-              <li>
-                <p className="audit-item-name">A per-product fix CSV</p>
-                <p className="audit-item-copy">
-                  Every product that needs work, with the field that&rsquo;s
-                  wrong and the value that should replace it. Import into
-                  Shopify in one paste.
-                </p>
-              </li>
-              <li>
-                <p className="audit-item-name">A 30-day re-scan</p>
-                <p className="audit-item-copy">
-                  We rescan after you&rsquo;ve applied the fixes and tell you
-                  what landed and what didn&rsquo;t — so you know the work
-                  actually moved the score.
-                </p>
-              </li>
-            </ul>
-            <p className="mt-10">
-              <Link href="/audit" className="btn btn-accent">
-                Book the £97 audit →
-              </Link>
-            </p>
-            <p className="audit-fineprint mt-4 text-[color:var(--color-mute)]">
-              Or{' '}
-              <Link href="/pricing" className="underline">
-                see monthly Pro tiers
-              </Link>{' '}
-              for 100+ stores or recurring scans.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <hr className="rule" />
-
-      {/* What makes us different */}
+      {/* Chapter 3 — Founder strip (post-Batch-A canon-compliant; awaiting
+          Chapter 3 amplification per cull-to-four arc 2026-04-28) */}
       <FounderStrip />
 
-      {/* How we&rsquo;re different */}
-      <CompareSection />
-
-      {/* Pricing — slim placeholder while the per-vertical / per-channel
-          pricing axis lands out-of-band per ADR 0016 + 2026-04-26 strategy
-          ratification. The legacy 5-tier strip on this surface is RETIRED;
-          /pricing keeps the legacy composition until the pricing-restructure
-          phase. Page bracket cap stays at 2 (hero `[ last ]` + audit `[ £97 ]`). */}
-      <PricingStripPlaceholder />
-
-      {/* Manifesto — inverted ink block */}
-      <ManifestoSection />
-
-      {/* Footer */}
+      {/* Chapter 4 — Footer (post-Batch-A canon-compliant) */}
       <SiteFooter />
       </ViewportReveal>
     </main>
