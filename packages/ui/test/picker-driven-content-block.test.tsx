@@ -108,7 +108,7 @@ describe('PickerDrivenContentBlock — render shape', () => {
     }
   });
 
-  it('paper surface (default) renders --paper bg + --ink text', () => {
+  it('paper surface (default) renders --paper bg + paper-on-ink text (Option A overlay)', () => {
     const html = renderToString(
       <PickerDrivenContentBlock
         selectedId="food"
@@ -117,10 +117,12 @@ describe('PickerDrivenContentBlock — render shape', () => {
       />,
     );
     expect(html).toContain('bg-[color:var(--color-paper)]');
-    expect(html).toContain('text-[color:var(--color-ink)]');
+    // Post-Option-A: text colour flips to paper-on-ink because the overlay
+    // sits on a darkened scrim, not on the paper background.
+    expect(html).toContain('text-[color:var(--color-paper-on-ink)]');
   });
 
-  it('ink surface inverts to --ink bg + --paper text', () => {
+  it('ink surface renders --ink bg + paper-on-ink text', () => {
     const html = renderToString(
       <PickerDrivenContentBlock
         selectedId="food"
@@ -130,7 +132,7 @@ describe('PickerDrivenContentBlock — render shape', () => {
       />,
     );
     expect(html).toContain('bg-[color:var(--color-ink)]');
-    expect(html).toContain('text-[color:var(--color-paper)]');
+    expect(html).toContain('text-[color:var(--color-paper-on-ink)]');
   });
 
   it('does NOT render brackets when headingBracket is unset (default contract)', () => {
@@ -173,9 +175,11 @@ describe('PickerDrivenContentBlock — render shape', () => {
         ariaLabelTemplate={(id) => id}
       />,
     );
-    // Placeholder div carries aria-hidden + paper-2 background.
+    // Placeholder div carries paper-2 background + absolute fill.
+    // Post-Option-A: the placeholder is absolute-positioned full-bleed so
+    // the section's min-height drives the layout shape, not aspect-ratio.
     expect(html).toContain('var(--color-paper-2)');
-    expect(html).toContain('aspect-ratio');
+    expect(html).toContain('aria-hidden="true"');
   });
 
   it('renders the photoreal image when imageSrc is set (Q-A2 Mode b)', () => {
