@@ -55,7 +55,7 @@ export function SiteFooter() {
           <nav aria-label="Product" className="flex flex-col gap-3">
             <p
               className="font-mono text-[11px] tracking-[0.14em] uppercase mb-2"
-              style={{ color: 'var(--color-accent-sage)', fontWeight: 500 }}
+              style={{ color: 'var(--color-mute-inv)', fontWeight: 500 }}
             >
               // Product
             </p>
@@ -93,7 +93,7 @@ export function SiteFooter() {
           <nav aria-label="Verticals" className="flex flex-col gap-3">
             <p
               className="font-mono text-[11px] tracking-[0.14em] uppercase mb-2"
-              style={{ color: 'var(--color-accent-sage)', fontWeight: 500 }}
+              style={{ color: 'var(--color-mute-inv)', fontWeight: 500 }}
             >
               // Verticals
             </p>
@@ -131,7 +131,7 @@ export function SiteFooter() {
           <nav aria-label="Company" className="flex flex-col gap-3">
             <p
               className="font-mono text-[11px] tracking-[0.14em] uppercase mb-2"
-              style={{ color: 'var(--color-accent-sage)', fontWeight: 500 }}
+              style={{ color: 'var(--color-mute-inv)', fontWeight: 500 }}
             >
               // Company
             </p>
@@ -190,7 +190,7 @@ export function SiteFooter() {
           </p>
           <p
             className="font-mono text-[11px] tracking-[0.14em] uppercase"
-            style={{ color: 'var(--color-accent-sage)', fontWeight: 500 }}
+            style={{ color: 'var(--color-paper-on-ink)', fontWeight: 500 }}
           >
             Flintmere<span aria-hidden="true">]</span>
           </p>

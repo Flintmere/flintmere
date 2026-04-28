@@ -1,33 +1,81 @@
 import Link from 'next/link';
 
 /**
- * PricingStripPlaceholder — slim pricing placeholder while the per-vertical /
- * per-channel pricing axis lands out-of-band per ADR 0016 + 2026-04-26
- * strategy ratification. The legacy 5-tier strip on this surface is RETIRED;
- * `/pricing` keeps the legacy composition until the pricing-restructure
- * phase. Page bracket cap stays at 2 (hero `[ last ]` + audit `[ £97 ]`).
+ * PricingStripPlaceholder — Shape C / Variant A composition.
  *
- * Extracted from `apps/scanner/src/app/page.tsx` as part of the pre-emptive
- * homepage split (refactor only — no behaviour change). Pure-presentational;
- * no props, no state.
+ * Operator-confirmed proposition (context/conversion/2026-04-28-pricing-strip-homepage.md):
+ *  - Eyebrow: `// pricing` — Mono, --color-mute, with sage decorative
+ *    text-decoration under-line (sage as text-decoration-color, NEVER as
+ *    text fill — ADR 0021 §Accent §Forbidden).
+ *  - Headline: "Catalogs built for the agentic web." — display Geist Sans,
+ *    weight 500, clamp(40px,4.5vw,56px), 22ch wrap, period preserved.
+ *  - Sub-line: 19-word lede in --color-mute, ≤56ch wrap.
+ *  - CTA: "See pricing →" as plain underlined Mono link (NOT btn-accent —
+ *    the audit-deep amber CTA two sections up is the page's primary CTA;
+ *    this CTA must not compete; Stripe secondary-link cadence).
+ *
+ * Surface: paper bg (NOT ink-slab; Manifesto immediately below carries
+ * the ink-slab beat — paper → ink → footer cadence per Margaret Howell
+ * quiet-luxury reference). Single left-aligned column, vertical rhythm,
+ * generous py-32, zero decorative ornament beyond the eyebrow under-line.
+ *
+ * Bracket count: zero. Page total stays at 2 (hero + audit-deep).
+ *
+ * Council 9-0 GREEN — context/design/marketing/2026-04-28-batch-a-foot-of-homepage.md.
  */
 export function PricingStripPlaceholder() {
   return (
-    <section id="pricing" className="mx-auto max-w-[1280px] px-8 py-24">
-      <p className="eyebrow mb-6">Pricing</p>
+    <section
+      id="pricing"
+      aria-labelledby="pricing-heading"
+      className="mx-auto max-w-[1280px] px-8 py-32"
+    >
       <p
-        className="max-w-[60ch] text-[color:var(--color-ink)] mb-6"
-        style={{ fontSize: 16, lineHeight: 1.55, fontWeight: 500 }}
+        className="font-mono text-[11px] tracking-[0.14em] uppercase mb-8"
+        style={{
+          color: 'var(--color-mute)',
+          fontWeight: 500,
+          textDecorationLine: 'underline',
+          textDecorationColor: 'var(--color-accent-sage)',
+          textDecorationThickness: '1px',
+          textUnderlineOffset: '6px',
+          display: 'inline-block',
+        }}
       >
-        Per-vertical, per-channel. Magnitudes are calibrating.
+        // pricing
       </p>
-      <p>
+      <h2
+        id="pricing-heading"
+        className="max-w-[22ch]"
+        style={{
+          fontSize: 'clamp(40px, 4.5vw, 56px)',
+          fontWeight: 500,
+          letterSpacing: '-0.03em',
+          lineHeight: 1.05,
+          color: 'var(--color-ink)',
+        }}
+      >
+        Catalogs built for the agentic web.
+      </h2>
+      <p
+        className="mt-8 max-w-[56ch]"
+        style={{
+          fontSize: 18,
+          lineHeight: 1.55,
+          color: 'var(--color-mute)',
+        }}
+      >
+        Free scan today. £97 to do it properly. Monthly tiers when the
+        product is ready for them.
+      </p>
+      <p className="mt-10">
         <Link
           href="/pricing"
-          className="text-[color:var(--color-ink)] underline"
-          style={{ fontSize: 16, fontWeight: 500 }}
+          className="font-mono text-[12px] tracking-[0.14em] uppercase underline underline-offset-[6px] decoration-[color:var(--color-line)]"
+          style={{ color: 'var(--color-ink)' }}
         >
-          See pricing →
+          See pricing
+          <span aria-hidden="true"> →</span>
         </Link>
       </p>
     </section>
