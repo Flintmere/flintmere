@@ -9,6 +9,8 @@
  *   - The 240ms cross-fade timing (useState + setTimeout) is NOT exercised
  *     here — it requires real DOM + timer mocks. The state machine is small
  *     enough (3 lines) that it's verified by manual review.
+ *   - Parallax IntersectionObserver + scroll handlers require real DOM.
+ *     Logic mirrors HeroParallaxFigure (which has its own integration shape).
  *   - aria-live="polite" announce on selectedId change requires AT runtime.
  */
 
@@ -108,7 +110,7 @@ describe('PickerDrivenContentBlock — render shape', () => {
     }
   });
 
-  it('paper surface (default) renders --paper bg + paper-on-ink text (Option A overlay)', () => {
+  it('paper surface (default) puts paper-bg + line border on the section root', () => {
     const html = renderToString(
       <PickerDrivenContentBlock
         selectedId="food"
@@ -117,12 +119,10 @@ describe('PickerDrivenContentBlock — render shape', () => {
       />,
     );
     expect(html).toContain('bg-[color:var(--color-paper)]');
-    // Post-Option-A: text colour flips to paper-on-ink because the overlay
-    // sits on a darkened scrim, not on the paper background.
-    expect(html).toContain('text-[color:var(--color-paper-on-ink)]');
+    expect(html).toContain('border-[color:var(--color-line)]');
   });
 
-  it('ink surface renders --ink bg + paper-on-ink text', () => {
+  it('ink surface inverts to ink-bg + line-dark border on the section root', () => {
     const html = renderToString(
       <PickerDrivenContentBlock
         selectedId="food"
@@ -132,6 +132,19 @@ describe('PickerDrivenContentBlock — render shape', () => {
       />,
     );
     expect(html).toContain('bg-[color:var(--color-ink)]');
+    expect(html).toContain('border-[color:var(--color-line-dark)]');
+  });
+
+  it('overlay text uses paper-on-ink colour regardless of surface (scrim covers image)', () => {
+    const html = renderToString(
+      <PickerDrivenContentBlock
+        selectedId="food"
+        slots={SLOTS}
+        ariaLabelTemplate={(id) => id}
+      />,
+    );
+    // Heading + bullets render in paper-on-ink because they sit over the
+    // ink-toned scrim, not on the section's underlying paper bg.
     expect(html).toContain('text-[color:var(--color-paper-on-ink)]');
   });
 
@@ -143,11 +156,13 @@ describe('PickerDrivenContentBlock — render shape', () => {
         ariaLabelTemplate={(id) => id}
       />,
     );
-    // Default contract: plain h2 prose; no bracket signature on the heading.
+    // Default contract: plain h2 prose; no keyword bracket on the heading.
+    // (Numeric enumeration brackets `[ 01 ]–[ 03 ]` always render — see
+    // separate test below.)
     expect(html).not.toContain('class="bracket');
   });
 
-  it('renders the bracket signature on the heading when headingBracket is set (post-ADR-0021)', () => {
+  it('renders the keyword bracket on the heading when headingBracket is set', () => {
     const slotsWithBracket: Readonly<Record<string, PickerDrivenContent>> = {
       food: {
         ...SLOTS.food!,
@@ -161,13 +176,31 @@ describe('PickerDrivenContentBlock — render shape', () => {
         ariaLabelTemplate={(id) => id}
       />,
     );
-    // Bracket co-occurrence per Q-A2 binding — heading carries the bracket.
+    // Bracket co-occurrence per Q-A2 binding — heading carries the keyword bracket.
     expect(html).toContain('class="bracket');
     expect(html).toContain('What changes for ');
     expect(html).toContain('food');
   });
 
-  it('renders a paper-2 placeholder when imageSrc is unset (operator drops final asset later)', () => {
+  it('renders the sage mono eyebrow `// {keyword} catalog` when headingBracket is set', () => {
+    const slotsWithBracket: Readonly<Record<string, PickerDrivenContent>> = {
+      food: {
+        ...SLOTS.food!,
+        headingBracket: 'food',
+      },
+    };
+    const html = renderToString(
+      <PickerDrivenContentBlock
+        selectedId="food"
+        slots={slotsWithBracket}
+        ariaLabelTemplate={(id) => id}
+      />,
+    );
+    expect(html).toContain('// food catalog');
+    expect(html).toContain('var(--color-accent-sage)');
+  });
+
+  it('renders bracketed numeral markers [ 01 ] [ 02 ] [ 03 ] on the bullet list', () => {
     const html = renderToString(
       <PickerDrivenContentBlock
         selectedId="food"
@@ -175,9 +208,38 @@ describe('PickerDrivenContentBlock — render shape', () => {
         ariaLabelTemplate={(id) => id}
       />,
     );
-    // Placeholder div carries paper-2 background + absolute fill.
-    // Post-Option-A: the placeholder is absolute-positioned full-bleed so
-    // the section's min-height drives the layout shape, not aspect-ratio.
+    // ADR 0021 axis 4 enumeration precedent (matches the pillar [ 01 ]–[ 07 ]
+    // pattern in tokens.md §Signature §Examples). Numerals are aria-hidden;
+    // the <ol> + <li> semantics carry the enumeration for AT users.
+    expect(html).toContain('[ 01 ]');
+    expect(html).toContain('[ 02 ]');
+    expect(html).toContain('[ 03 ]');
+  });
+
+  it('renders a decorative sage hairline anchor in the section', () => {
+    const html = renderToString(
+      <PickerDrivenContentBlock
+        selectedId="food"
+        slots={SLOTS}
+        ariaLabelTemplate={(id) => id}
+      />,
+    );
+    // The bottom-left sage hairline + the bullet list border use the sage
+    // accent token — at least two occurrences expected.
+    const matches = html.match(/var\(--color-accent-sage\)/g);
+    expect((matches?.length ?? 0)).toBeGreaterThanOrEqual(2);
+  });
+
+  it('renders a paper-2 placeholder when imageSrc is unset', () => {
+    const html = renderToString(
+      <PickerDrivenContentBlock
+        selectedId="food"
+        slots={SLOTS}
+        ariaLabelTemplate={(id) => id}
+      />,
+    );
+    // Placeholder div carries paper-2 background + aria-hidden — the layout
+    // shape comes from the section's min-height, not aspect-ratio.
     expect(html).toContain('var(--color-paper-2)');
     expect(html).toContain('aria-hidden="true"');
   });
@@ -201,7 +263,7 @@ describe('PickerDrivenContentBlock — render shape', () => {
     expect(html).toContain('A UK speciality food shelf');
   });
 
-  it('initial mount uses opacity 1 (cross-fade only fires on selectedId change)', () => {
+  it('initial mount uses opacity 1 on the inner overlay (cross-fade target)', () => {
     const html = renderToString(
       <PickerDrivenContentBlock
         selectedId="food"
@@ -209,7 +271,24 @@ describe('PickerDrivenContentBlock — render shape', () => {
         ariaLabelTemplate={(id) => id}
       />,
     );
-    // SSR opacity = 1 (initial useState). Inline style serialised as `opacity:1`.
+    // SSR opacity = 1 (initial useState). Inline style serialised. The
+    // 2026-04-28 redesign moved the opacity target FROM the section root
+    // TO the inner content overlay div so swaps don't flicker the image
+    // and scrims.
     expect(html).toContain('opacity:1');
+  });
+
+  it('section sets a hero-class height (~80vh with min-height fallback)', () => {
+    const html = renderToString(
+      <PickerDrivenContentBlock
+        selectedId="food"
+        slots={SLOTS}
+        ariaLabelTemplate={(id) => id}
+      />,
+    );
+    // The section reserves dramatic vertical real-estate so the photoreal
+    // image dominates the viewport.
+    expect(html).toContain('min(85vh, 780px)');
+    expect(html).toContain('min-height:560px');
   });
 });

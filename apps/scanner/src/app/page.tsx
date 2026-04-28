@@ -138,12 +138,12 @@ export default async function MarketingHome() {
               — the team usually replies within two working days.
             </p>
           </div>
-          <HeroParallaxFigure caption="A jar of loose-leaf tea on a real shelf. The agent extracts grade, origin, steep time — only if the data is there.">
+          <HeroParallaxFigure caption="A real merchant tray of unbranded artisan products. The agent reads each one — only if the catalog data is structured.">
             <Image
-              src="/marketing/hero/jar.avif"
-              alt="A jar of loose-leaf tea on a real shelf, with brass lid and warm window light behind."
-              width={1200}
-              height={1500}
+              src="/marketing/hero/hero.avif"
+              alt="A wooden compartmented tray displaying unbranded artisan goods — small jars, brass mortar, dried herbs — in warm afternoon side-light."
+              width={1536}
+              height={1200}
               priority
               sizes="(min-width: 768px) 40vw, 100vw"
               className="hero-image"
