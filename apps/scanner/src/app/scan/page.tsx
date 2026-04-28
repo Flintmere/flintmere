@@ -318,7 +318,7 @@ function SuppressionLede({
             className="mt-6 max-w-[58ch] text-[color:var(--color-ink-2)]"
             style={{ fontSize: 16, lineHeight: 1.55 }}
           >
-            {signalLine}.
+            {signalLine}
           </p>
         ) : null}
         <p
@@ -361,7 +361,7 @@ function SuppressionLede({
           className="mt-6 max-w-[58ch] text-[color:var(--color-ink-2)]"
           style={{ fontSize: 16, lineHeight: 1.55 }}
         >
-          {signalLine}.
+          {signalLine}
         </p>
       ) : null}
       <p

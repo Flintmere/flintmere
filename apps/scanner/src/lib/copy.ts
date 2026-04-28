@@ -276,14 +276,25 @@ export function verdictHeader(args: {
 
 export const SUPPRESSION_LEDE_EYEBROW = 'Likely suppressed in Google Shopping'
 
+// Disclosure tone softened 2026-04-28 per #37 Consumer psychologist lens.
+// Old subhead read as accusatory + demand-led ("Install Flintmere to confirm
+// exact figures..."). New subhead frames as honest projection + path-forward
+// ("verify and prioritise the biggest wins"). Same substance, less anxiety.
 export const SUPPRESSION_LEDE_SUBHEAD =
-  'Estimate based on missing GTINs, ambiguous allergen text, and missing GMC categories. Install Flintmere to confirm exact figures against your Google Merchant Center account.'
+  'Modelled from your public catalog signals — the actual count depends on your Google Merchant Center account. Install Flintmere to verify, then prioritise the fixes that move the most products.'
 
 /**
  * The lede headline for the scan results page.
  *
  * Returns a single sentence stating the modelled range. Wrapping
  * component handles the Bracket signature on key nouns.
+ *
+ * Tone (softened 2026-04-28 per #37):
+ *   - "aren't appearing" instead of "are likely suppressed" — matter-of-fact,
+ *     less accusatory. "Suppressed" is the canonical GMC dashboard term and
+ *     stays in the eyebrow; the body uses everyday English.
+ *   - "Roughly" prefix signals modelled-not-measured and matches "we estimate".
+ *   - Drop "today" tail — present-tense urgency without it.
  */
 export function suppressionLede(args: {
   low: number
@@ -299,14 +310,22 @@ export function suppressionLede(args: {
     return 'We see no clear suppression signals on this catalog. Every product carries a barcode, a category, and (for food items) an allergen statement.'
   }
   if (low === high) {
-    return `We estimate ${low.toLocaleString()} of your ${productCount.toLocaleString()} products are likely suppressed in Google Shopping today.`
+    return `We estimate ${low.toLocaleString()} of your ${productCount.toLocaleString()} products may not be appearing in Google Shopping right now.`
   }
-  return `We estimate ${low.toLocaleString()}–${high.toLocaleString()} of your ${productCount.toLocaleString()} products are likely suppressed in Google Shopping today.`
+  return `We estimate roughly ${low.toLocaleString()}–${high.toLocaleString()} of your ${productCount.toLocaleString()} products may not be appearing in Google Shopping right now.`
 }
 
 /**
- * One-line per-signal breakdown shown beneath the lede headline. Plain
- * factual counts; no severity language.
+ * Per-signal breakdown shown beneath the lede headline.
+ *
+ * Tone (rewritten 2026-04-28 per #37):
+ *   - Old version dot-separated three blunt failures ("63 products with no
+ *     barcode · 31 food products with no allergen statement · 29 products
+ *     with no Google Shopping category"). Read as a checklist of broken.
+ *   - New version frames as "what we found" + comma-separated prose. Same
+ *     numbers, conversational diagnostic cadence instead of telegram-style
+ *     enumeration. Reduces cognitive load on phone-skim per #37 plain-
+ *     language test.
  */
 export function suppressionSignalLine(args: {
   missingGtin: number
@@ -317,21 +336,23 @@ export function suppressionSignalLine(args: {
   const parts: string[] = []
   if (missingGtin > 0) {
     parts.push(
-      `${missingGtin.toLocaleString()} ${missingGtin === 1 ? 'product' : 'products'} with no barcode`,
+      `${missingGtin.toLocaleString()} ${missingGtin === 1 ? 'product' : 'products'} without a barcode`,
     )
   }
   if (ambiguousAllergen > 0) {
     parts.push(
-      `${ambiguousAllergen.toLocaleString()} food ${ambiguousAllergen === 1 ? 'product' : 'products'} with no allergen statement`,
+      `${ambiguousAllergen.toLocaleString()} food ${ambiguousAllergen === 1 ? 'product' : 'products'} where the allergen statement isn’t in a structured field`,
     )
   }
   if (missingGmcCategory > 0) {
     parts.push(
-      `${missingGmcCategory.toLocaleString()} ${missingGmcCategory === 1 ? 'product' : 'products'} with no Google Shopping category`,
+      `${missingGmcCategory.toLocaleString()} ${missingGmcCategory === 1 ? 'product' : 'products'} without a Google Merchant Center category`,
     )
   }
   if (parts.length === 0) return ''
-  return parts.join(' · ')
+  if (parts.length === 1) return `What we found: ${parts[0]}.`
+  if (parts.length === 2) return `What we found: ${parts[0]}, and ${parts[1]}.`
+  return `What we found: ${parts[0]}, ${parts[1]}, and ${parts[2]}.`
 }
 
 // ----------------------------------------------------------------------

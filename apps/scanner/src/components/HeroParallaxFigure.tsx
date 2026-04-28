@@ -24,7 +24,12 @@ import { useEffect, useRef, type ReactNode } from 'react';
 
 export interface HeroParallaxFigureProps {
   children: ReactNode;
-  caption: string;
+  /**
+   * Caption rendered as `<figcaption>` beneath the figure. Optional — overlay
+   * layouts (where the figure is full-bleed and headlines sit on top of the
+   * image) omit it. When omitted, no `<figcaption>` element is emitted.
+   */
+  caption?: string;
   className?: string;
 }
 
@@ -130,9 +135,11 @@ export function HeroParallaxFigure({
       <div ref={innerRef} style={{ willChange: 'transform' }}>
         {children}
       </div>
-      <figcaption className="hero-caption mt-4 max-w-[40ch]">
-        {caption}
-      </figcaption>
+      {caption ? (
+        <figcaption className="hero-caption mt-4 max-w-[40ch]">
+          {caption}
+        </figcaption>
+      ) : null}
     </figure>
   );
 }

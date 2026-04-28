@@ -93,62 +93,129 @@ export default async function MarketingHome() {
     <main id="main">
       <a href="#hero" className="skip-link">Skip to content</a>
       <ViewportReveal>
-      {/* Hero — section background fill: --gradient-paper-warmth (ADR 0021
-          axis 3, atmosphere only). Hero figure wrapped in HeroParallaxFigure
-          for Pattern 3 (subtle parallax, 0.5× scroll velocity, ±40px clamp,
-          JS prefers-reduced-motion bypass + change-listener). */}
+      {/* Hero — full-bleed photoreal overlay (Louis-Vuitton-heritage register
+          per operator 2026-04-28 lock). Image fills the section edge-to-edge;
+          two-layer scrim provides AA contrast on the left half; eyebrow +
+          h1 + lede + CTAs + fineprint overlaid on the photo, left-aligned,
+          vertically centered. Sage hairline at bottom-left anchors the
+          section to the page's structural grid (set cohesion with the
+          PickerDrivenContentBlock). Parallax via HeroParallaxFigure (Pattern 3
+          — 0.5× scroll velocity, ±40px clamp, JS prefers-reduced-motion
+          bypass + change-listener). */}
       <section
         id="hero"
-        className="px-8 py-24 md:py-32"
-        style={{ background: 'var(--gradient-paper-warmth)' }}
+        className="relative isolate overflow-hidden border-b border-[color:var(--color-line)] bg-[color:var(--color-ink)]"
+        style={{ height: 'min(92vh, 920px)', minHeight: '640px' }}
       >
-        <div className="mx-auto max-w-[1280px] grid md:grid-cols-[1.2fr_1fr] gap-16 items-center">
-          <div>
-            <p className="eyebrow text-[color:var(--color-ink-2)] mb-8">
-              Free scan · 60 seconds · No install
-            </p>
-            <ViewportReveal>
-              <h1 className="max-w-[22ch]">
-                Which of your products are{' '}
-                <Bracket>
-                  <span aria-hidden="true" className="text-outlined text-outlined--reveal">
-                    suppressed
-                  </span>
-                  <span className="sr-only">suppressed</span>
-                </Bracket>
-                {' '}in Google Shopping today?
-              </h1>
-            </ViewportReveal>
-            <p className="hero-lede mt-10 max-w-[44ch] text-[color:var(--color-ink-2)]">
-              Paste your URL. We estimate how much annual demand is going to competitors while these products stay demoted — and show you the catalog data costing you the sale.
-            </p>
-            <div className="mt-12 flex flex-wrap gap-3">
-              <Link href="/scan" className="btn btn-accent">
-                Run the free scan →
-              </Link>
-              <Link href="/audit" className="btn">
-                Or book the £97 concierge audit →
-              </Link>
+        <HeroParallaxFigure className="absolute inset-0 w-full h-full">
+          <Image
+            src="/marketing/hero/hero.avif"
+            alt="A wooden compartmented tray displaying unbranded artisan goods — small jars, brass mortar, dried herbs — in warm afternoon side-light."
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+            style={{
+              objectPosition: 'center',
+              filter: 'var(--image-treatment-warm)',
+            }}
+          />
+        </HeroParallaxFigure>
+
+        {/* Scrim layer 1 — vertical paper-mist for atmospheric depth. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(10,10,11,0.20) 0%, rgba(10,10,11,0.0) 28%, rgba(10,10,11,0.0) 60%, rgba(10,10,11,0.42) 100%)',
+          }}
+        />
+
+        {/* Scrim layer 2 — horizontal strong ink fade left → transparent right.
+            Provides AA contrast on overlay text; photo readable on the right. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(95deg, rgba(10,10,11,0.82) 0%, rgba(10,10,11,0.66) 30%, rgba(10,10,11,0.34) 58%, rgba(10,10,11,0.08) 82%, rgba(10,10,11,0) 100%)',
+          }}
+        />
+
+        {/* Decorative sage hairline anchor. */}
+        <div
+          aria-hidden="true"
+          className="absolute left-8 bottom-8 h-[2px] w-[160px] lg:left-12 lg:bottom-12 lg:w-[240px]"
+          style={{
+            background: 'var(--color-accent-sage)',
+            opacity: 0.85,
+          }}
+        />
+
+        {/* Overlay content — left ~58% column, vertically centered. */}
+        <div className="relative h-full mx-auto max-w-[1280px] px-8 lg:px-12">
+          <div className="grid h-full items-center">
+            <div className="max-w-[680px]">
+              <p
+                className="font-mono text-[11px] tracking-[0.18em] uppercase mb-8"
+                style={{
+                  color: 'var(--color-accent-sage)',
+                  fontWeight: 500,
+                }}
+              >
+                // free scan · 60 seconds · no install
+              </p>
+              <ViewportReveal>
+                <h1
+                  className="font-bold tracking-[-0.045em] leading-[0.92] text-[clamp(56px,9vw,108px)] max-w-[18ch]"
+                  style={{ color: 'var(--color-paper-on-ink)' }}
+                >
+                  Which of your products are{' '}
+                  <Bracket>suppressed</Bracket>
+                  {' '}in Google Shopping today?
+                </h1>
+              </ViewportReveal>
+              <p
+                className="mt-10 max-w-[44ch] text-[clamp(17px,1.55vw,20px)] leading-[1.55] font-medium"
+                style={{ color: 'var(--color-paper-on-ink)' }}
+              >
+                Paste your URL. We estimate how much annual demand is going to
+                competitors while these products stay demoted — and show you the
+                catalog data costing you the sale.
+              </p>
+              <div className="mt-12 flex flex-wrap gap-3">
+                <Link
+                  href="/scan"
+                  className="inline-flex items-center gap-3 px-7 py-3.5 bg-[color:var(--color-accent)] text-[color:var(--color-accent-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper-on-ink)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)] ease-[cubic-bezier(0.4,0,0.2,1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
+                >
+                  Run the free scan
+                  <span aria-hidden="true">→</span>
+                </Link>
+                <Link
+                  href="/audit"
+                  className="inline-flex items-center gap-3 px-7 py-3.5 border border-[color:var(--color-paper-on-ink)] text-[color:var(--color-paper-on-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper-on-ink)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)] ease-[cubic-bezier(0.4,0,0.2,1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
+                >
+                  Or book the £97 concierge audit
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </div>
+              <p
+                className="mt-8 max-w-[52ch] text-[14px] leading-[1.55]"
+                style={{ color: 'var(--color-mute-inv)' }}
+              >
+                Prefer to talk first? Email{' '}
+                <a
+                  href="mailto:hello@flintmere.com"
+                  className="underline hover:text-[color:var(--color-paper-on-ink)] transition-colors"
+                  style={{ color: 'var(--color-paper-on-ink)' }}
+                >
+                  hello@flintmere.com
+                </a>{' '}
+                — the team usually replies within two working days.
+              </p>
             </div>
-            <p className="hero-fineprint mt-6 max-w-[52ch] text-[color:var(--color-mute)]">
-              Prefer to talk first? Email{' '}
-              <a href="mailto:hello@flintmere.com" className="underline">
-                hello@flintmere.com
-              </a>{' '}
-              — the team usually replies within two working days.
-            </p>
           </div>
-          <HeroParallaxFigure caption="A real merchant tray of unbranded artisan products. The agent reads each one — only if the catalog data is structured.">
-            <Image
-              src="/marketing/hero/hero.avif"
-              alt="A wooden compartmented tray displaying unbranded artisan goods — small jars, brass mortar, dried herbs — in warm afternoon side-light."
-              width={1536}
-              height={1200}
-              priority
-              sizes="(min-width: 768px) 40vw, 100vw"
-              className="hero-image"
-            />
-          </HeroParallaxFigure>
         </div>
       </section>
 
