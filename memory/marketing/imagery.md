@@ -1,17 +1,28 @@
-# imagery.md — Type-as-image canon + prompt library
+# imagery.md — Imagery canon + prompt library
 
-Flintmere's default imagery mode is **type-as-image**: large Geist display carries the visual weight. Photography and illustration are rare, deliberate exceptions. No stock photography, no AI-gradient heroes, no decorative illustration.
+> **2026-04-28 reconciliation note.** This file's earlier framing — "type is the image, no stock ever" — was retired by the 2026-04-26 Standing Council canon shift documented in `memory/design/tokens.md` §Imagery. Photoreal Adobe Stock + product/agent screenshots + line-art are now the three permitted image modes on marketing surfaces, governed by a rotation rule (emotion → photoreal, proof → screenshot, supporting line-art on diagrams). The canonical statement of imagery rules lives in `memory/design/tokens.md` §Imagery; this file holds the marketing-side prompt library + sourcing patterns.
+>
+> When this file and `tokens.md` §Imagery conflict, **`tokens.md` wins** per CLAUDE.md precedence. Operator-licensed photoreal AVIFs at `apps/scanner/public/marketing/{hero,verticals}/*.avif` are the live canonical examples (landed 2026-04-28; sourcing brief at `context/decisions/2026-04-27-homepage-redesign-operator-locks.md` §M).
 
-Council gates at `memory/PROCESS.md` — #25 AI image director, #26 Visual brand photographer, #27 photorealism, #28 brand systems, #29 Art Director (veto on set cohesion), #8 Accessibility (veto on alt text + contrast), Design Council (Maren / Noor / Thane).
+Three permitted imagery modes per `tokens.md` §Imagery:
 
-## Standing rules
+1. **Photoreal** (Adobe Stock, warm-treated, ≤100KB AVIF/WebP) — emotion-zone moments, hero photography, vertical content blocks. Ratified 2026-04-26 (lifts the prior line-art-only mandate).
+2. **Product / agent screenshots** — proof-zone moments, "how it works" sections, results/scan moments. Annotated callouts in Geist Mono.
+3. **Line-art / inline SVG** — diagrams, hairline illustration, technical schematics. Permitted as a second option, not the only mode, per ADR 0021 axis 5.
 
-1. **Type is the image.** Hero visuals are typography first. Photography only where a merchant-facing moment genuinely requires it (testimonial portraits, very occasionally).
-2. **No stock.** Flintmere does not use stock photography. Ever.
-3. **No AI-gradient heroes.** No "liquid" abstract gradient backgrounds; no "glass" / frosted product shots.
+Council gates at `memory/PROCESS.md` — #25 AI image director, #26 Visual brand photographer, #27 photorealism, #28 brand systems, #29 Art Director (veto on set cohesion), #8 Accessibility (veto on alt text + contrast), Design Council (Maren / Noor / Thane). Plus **#9 Lawyer (binding on Adobe Stock licence clause 4.7 — trademark clearance is operator legal exposure).**
+
+## Standing rules (post-2026-04-26 canon shift)
+
+1. **Type leads, imagery proves.** (Replaces "type is the image, photography rare.") Display typography still carries hero rhythm; photoreal anchors emotion, screenshots demonstrate proof.
+2. **Adobe Stock photoreal permitted** with operator licence. Source unbranded products only — Adobe Stock licence clause 4.7 excludes trademark clearance, so every visible third-party brand mark is operator legal exposure (#9 Lawyer binding).
+3. **No AI-generated imagery on marketing surfaces.** Photoreal, gradient, illustrative — all banned. Trust risk on a security-adjacent product.
 4. **Palette is closed.** See tokens in `memory/design/tokens.md`. No new hues without `design-token` proposal.
 5. **Every asset has alt text.** No meaning conveyed by colour alone. **#8 Accessibility veto.**
 6. **Set cohesion beats per-image cleverness.** #29 Art Director rejects any asset that breaks the set's temperature, materiality, lighting direction, or colour grade.
+7. **No identifiable humans without releases.** Banned per `tokens.md` §Imagery + reaffirmed in operator-locks §M (homepage hero brief).
+8. **Banned tropes** per `tokens.md` §Imagery — team-in-glass-office, abstract-handshake, hands-typing-laptop, three-monitor-desk, hex-grid-with-neon-data-flow, robot-hand-meets-human-hand, server-room-with-blue-LED, post-purchase-shopper-with-paper-bag, box-on-doorstep-with-cute-dog. Reject without further review.
+9. **Bracket co-occurrence binding.** Every photoreal moment carries the legibility-bracket signature within the same viewport — overlay typography or adjacent display heading. The image alone never carries the brand; the bracket does. (#1 Hina + #8 Noor binding.)
 
 ## Type-as-image canon (primary mode)
 

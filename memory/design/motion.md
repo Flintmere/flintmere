@@ -20,7 +20,7 @@ The 2026-04-25 "wrong to apply to Shopify-app surfaces" note is **superseded** �
 - **Choreographed entrances.** Elements arrive in an order that reads top-to-bottom, left-to-right, primary-then-secondary.
 - **Scroll as revelation.** Content earns the scroll; the scroll doesn't scrub the content.
 - **One signature motion per surface.** Not three.
-- **Restrained, not absent.** Flintmere's neutral-bold posture demands considered motion — Emil-Kowalski-spare physics, type-led hierarchy, micro-interactions with weight (the sonner/vaul "everything has weight" quality). Hero parallax is still out. Ambient "breathing" UI is still out. Motion fires on state change or scroll-reveal, not on decoration. The marketing budget is generous; the bar for shipping a motion is "does this earn its frame?", not "is it possible to animate?".
+- **Restrained, not absent.** Flintmere's neutral-bold posture demands considered motion — Emil-Kowalski-spare physics, type-led hierarchy, micro-interactions with weight (the sonner/vaul "everything has weight" quality). ~~Hero parallax is still out.~~ — superseded 2026-04-27 by ADR 0021 axis 8; marketing/scanner permits subtle parallax (Pattern 3 in the design-motion spec) with binding reduced-motion JS bypass. Ambient "breathing" UI is still out. Motion fires on state change or scroll-reveal, not on decoration. The marketing budget is generous; the bar for shipping a motion is "does this earn its frame?", not "is it possible to animate?".
 
 ## The reduced-motion contract (two tiers)
 
@@ -105,7 +105,7 @@ Reduced-motion variant: halves the duration at most; often sets to 0ms.
 ## Bans (non-negotiable)
 
 - No horizontal scroll-jacking (pinning a section while scroll scrubs content).
-- No parallax on any surface.
+- ~~No parallax on any surface.~~ — **superseded 2026-04-27 by ADR 0021 axis 8.** Parallax now permitted on marketing/scanner per the documented motion-spec Pattern 3 (0.5× scroll velocity, ±40px clamp, IntersectionObserver-gated, JS-side `prefers-reduced-motion` bypass + change-listener). Multiple-instance-per-page allowance via operator override 2026-04-28 (homepage hero + visible PickerDrivenContentBlock = 2 simultaneous parallax instances when picker is in viewport). Shopify-app strict contract retained — **parallax stays banned on Shopify-app surfaces** for Built-for-Shopify submission.
 - No infinite animations (ambient "breathing" UI, pulsing dots, spinning logos outside of genuine loading states).
 - No animating `width`, `height`, `top`, `left`. Use `transform` + `opacity`.
 - No autoplay video.

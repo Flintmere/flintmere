@@ -20,18 +20,20 @@ Every source a data-intelligence skill may reference. Skills are read-only again
 
 ---
 
-## PostHog (self-hosted on droplet)
+## Plausible Cloud (EU)
 
 - Owner (operational): operator
 - Owner (council): #35 + #24
-- Access pattern: PostHog CSV export → `context/data-intelligence/posthog/<YYYY-MM-DD>.csv`
+- Access pattern: Plausible Stats API export → `context/data-intelligence/plausible/<YYYY-MM-DD>.csv`
 - Export cadence: weekly (Mondays)
-- Retention (in source): default 12 months; reviewable
+- Retention (in source): per Plausible Cloud Pro tier (rolling visitor data)
 - Retention (in context/): 30 days
-- Lawful basis: legitimate interest + analytics consent on UI surfaces
-- PII present: no (client-side consent-gated; server-side events = operational)
-- Aggregation required: by route + week at report level
+- Lawful basis: legitimate interest (cookieless analytics; no consent banner required per ADR 0013 + Cookie Policy clauses 02.2 + 05)
+- PII present: no (cookieless by design; IP addresses hashed server-side at Plausible)
+- Aggregation required: per-event + per-day at report level; custom property dimensions (e.g. `hero_variant` per `metric-catalog.md` §Event-prop registry) read as cohort splits.
 - Privacy Policy reference: analytics + cookies section
+- Site: `audit.flintmere.com` (registered against the Eazy Access Ltd Plausible org).
+- Adopted 2026-04-25 per ADR 0013 (replaces self-hosted PostHog plan that was infeasible on the shared droplet at scan-time resource budget).
 
 ## Shopify Partner Dashboard
 
@@ -186,4 +188,5 @@ Every source a data-intelligence skill may reference. Skills are read-only again
 
 ## Changelog
 
+- 2026-04-28: PostHog source block replaced with Plausible Cloud (EU). PostHog was the original analytics plan but never landed; ADR 0013 (2026-04-25) reversed to Plausible Cloud after the droplet resource check found self-hosted infeasible. Source block was stale on this file until now.
 - 2026-04-19: Rewritten for Flintmere. Replaced allowanceguard sources (Vercel Analytics, production scan/indexer data, Coinbase webhooks) with Flintmere sources (PostHog, Shopify Partner Dashboard, Postgres on droplet, Vertex AI + Azure OpenAI billing, BullMQ, BetterStack).
