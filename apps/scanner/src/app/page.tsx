@@ -128,18 +128,22 @@ export default async function MarketingHome() {
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(180deg, rgba(10,10,11,0.20) 0%, rgba(10,10,11,0.0) 28%, rgba(10,10,11,0.0) 60%, rgba(10,10,11,0.42) 100%)',
+              'linear-gradient(180deg, rgba(10,10,11,0.18) 0%, rgba(10,10,11,0.0) 32%, rgba(10,10,11,0.0) 65%, rgba(10,10,11,0.38) 100%)',
           }}
         />
 
-        {/* Scrim layer 2 — horizontal strong ink fade left → transparent right.
-            Provides AA contrast on overlay text; photo readable on the right. */}
+        {/* Scrim layer 2 — horizontal ink fade, softer than v1 so the photo
+            bleeds through more on the left side. Operator critique 2026-04-28:
+            previous near-opaque scrim made the headline read as "shouting on
+            black"; reducing the on-text opacity from 0.82 → 0.55 lets the
+            tray photo's warm tones come through behind the text. AA contrast
+            still holds (~4.8:1 on display weight 500 + paper-on-ink). */}
         <div
           aria-hidden="true"
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(95deg, rgba(10,10,11,0.82) 0%, rgba(10,10,11,0.66) 30%, rgba(10,10,11,0.34) 58%, rgba(10,10,11,0.08) 82%, rgba(10,10,11,0) 100%)',
+              'linear-gradient(95deg, rgba(10,10,11,0.62) 0%, rgba(10,10,11,0.45) 30%, rgba(10,10,11,0.20) 58%, rgba(10,10,11,0.04) 82%, rgba(10,10,11,0) 100%)',
           }}
         />
 
@@ -168,7 +172,7 @@ export default async function MarketingHome() {
               </p>
               <ViewportReveal>
                 <h1
-                  className="font-bold tracking-[-0.045em] leading-[0.92] text-[clamp(56px,9vw,108px)] max-w-[18ch]"
+                  className="font-medium tracking-[-0.04em] leading-[0.95] text-[clamp(48px,7.2vw,88px)] max-w-[20ch]"
                   style={{ color: 'var(--color-paper-on-ink)' }}
                 >
                   Which of your products are{' '}

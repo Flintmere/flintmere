@@ -29,7 +29,25 @@ export function FounderStrip() {
           Who builds Flintmere
         </p>
         <h2 id="different-heading" className="max-w-[22ch]">
-          We read every email. We write every audit.
+          We read{' '}
+          <span
+            style={{
+              borderBottom: '3px solid var(--color-accent)',
+              paddingBottom: '4px',
+            }}
+          >
+            every email
+          </span>
+          . We write{' '}
+          <span
+            style={{
+              borderBottom: '3px solid var(--color-accent)',
+              paddingBottom: '4px',
+            }}
+          >
+            every audit
+          </span>
+          .
         </h2>
         <p
           className="founder-copy mt-8 max-w-[54ch]"

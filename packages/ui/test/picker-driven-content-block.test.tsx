@@ -278,7 +278,7 @@ describe('PickerDrivenContentBlock — render shape', () => {
     expect(html).toContain('opacity:1');
   });
 
-  it('section sets a hero-class height (~80vh with min-height fallback)', () => {
+  it('section reserves a hero-class minimum height (post-2026-04-28 content-driven)', () => {
     const html = renderToString(
       <PickerDrivenContentBlock
         selectedId="food"
@@ -286,9 +286,10 @@ describe('PickerDrivenContentBlock — render shape', () => {
         ariaLabelTemplate={(id) => id}
       />,
     );
-    // The section reserves dramatic vertical real-estate so the photoreal
-    // image dominates the viewport.
-    expect(html).toContain('min(85vh, 780px)');
-    expect(html).toContain('min-height:560px');
+    // Post-2026-04-28 redesign: section is content-driven (operator critique
+    // "empty dark spaces convey nothing") with a 480px floor so the photoreal
+    // moment still reads as hero-class on small-content verticals. Fixed
+    // height + max cap retired.
+    expect(html).toContain('min-height:480px');
   });
 });

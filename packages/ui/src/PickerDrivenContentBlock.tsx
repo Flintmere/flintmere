@@ -302,8 +302,10 @@ export function PickerDrivenContentBlock({
         .filter(Boolean)
         .join(' ')}
       style={{
-        height: 'min(85vh, 780px)',
-        minHeight: '560px',
+        // Content-driven height — operator critique 2026-04-28 "empty dark
+        // spaces convey nothing". Section grows with content; 480px floor
+        // keeps the photoreal moment hero-class on small-content verticals.
+        minHeight: '480px',
       }}
     >
       {/* Image layer — full-bleed, parallax, object-cover. */}
@@ -340,35 +342,38 @@ export function PickerDrivenContentBlock({
         }}
       />
 
-      {/* Scrim layer 2 — horizontal strong ink fade left → transparent right.
-          Provides AA contrast on overlay text. ~5:1 on body bullets and
-          ~10:1 on display heading against paper-on-ink. Photo stays visible
-          on the right side. Noor #8 P0 binding satisfied. */}
+      {/* Scrim layer 2 — horizontal ink fade RIGHT → transparent LEFT.
+          Operator critique 2026-04-28: text now overlays the right column
+          (focal photo subjects sit on the left of the licensed AVIFs);
+          scrim direction mirrored so the right side is darkened where the
+          text reads, photo stays visible on the left. AA contrast holds
+          (~5:1 body, ~10:1 display) — Noor #8 P0 binding satisfied. */}
       <div
         aria-hidden="true"
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(95deg, rgba(10,10,11,0.78) 0%, rgba(10,10,11,0.62) 28%, rgba(10,10,11,0.30) 55%, rgba(10,10,11,0.05) 82%, rgba(10,10,11,0) 100%)',
+            'linear-gradient(265deg, rgba(10,10,11,0.78) 0%, rgba(10,10,11,0.62) 28%, rgba(10,10,11,0.30) 55%, rgba(10,10,11,0.05) 82%, rgba(10,10,11,0) 100%)',
         }}
       />
 
-      {/* Decorative sage hairline — bottom-left edge anchor. 2px stroke,
-          200px wide, ~32px from corner on desktop, scaled in on mobile.
-          Decorative-only sage per ADR 0021 axis 1; carries no meaning. */}
+      {/* Decorative sage hairline — bottom-RIGHT edge anchor (mirrored from
+          previous bottom-left after the text-flip 2026-04-28). 2px stroke,
+          200px wide. Decorative-only sage per ADR 0021 axis 1. */}
       <div
         aria-hidden="true"
-        className="absolute left-8 bottom-8 h-[2px] w-[160px] lg:left-12 lg:bottom-12 lg:w-[220px]"
+        className="absolute right-8 bottom-8 h-[2px] w-[160px] lg:right-12 lg:bottom-12 lg:w-[220px]"
         style={{
           background: 'var(--color-accent-sage)',
           opacity: 0.85,
         }}
       />
 
-      {/* Content overlay — left ~58% of the section. Cross-fade target. */}
-      <div className="relative h-full mx-auto max-w-[1280px] px-8 lg:px-12">
+      {/* Content overlay — RIGHT-aligned (operator critique 2026-04-28).
+          Cross-fade target. */}
+      <div className="relative py-20 lg:py-24 mx-auto max-w-[1280px] px-8 lg:px-12">
         <div
-          className="grid h-full items-center transition-opacity duration-[var(--duration-short)] ease-[cubic-bezier(0.4,0,0.2,1)]"
+          className="flex justify-end transition-opacity duration-[var(--duration-short)] ease-[cubic-bezier(0.4,0,0.2,1)]"
           style={{ opacity: textOpacity }}
         >
           <div className="max-w-[640px]">
