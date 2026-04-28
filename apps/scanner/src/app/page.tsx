@@ -164,7 +164,7 @@ export default async function MarketingHome() {
               <p
                 className="font-mono text-[11px] tracking-[0.18em] uppercase mb-8"
                 style={{
-                  color: 'var(--color-accent-sage)',
+                  color: 'var(--color-accent)',
                   fontWeight: 500,
                 }}
               >

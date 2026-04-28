@@ -17,7 +17,7 @@ export function SiteFooter() {
     >
       <div className="mx-auto max-w-[1280px] px-8 lg:px-12 py-16 lg:py-20">
         {/* Brand statement row */}
-        <div className="grid lg:grid-cols-[1.4fr_1fr_1fr_1fr] gap-12 lg:gap-16 pb-14 border-b border-[color:var(--color-line-dark)]">
+        <div className="grid md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] gap-12 lg:gap-16 pb-14 border-b border-[color:var(--color-line-dark)]">
           <div>
             <p
               className="text-[clamp(28px,3.5vw,40px)] font-medium tracking-[-0.025em] leading-[1.1] max-w-[28ch]"

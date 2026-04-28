@@ -132,7 +132,11 @@ export function HeroParallaxFigure({
 
   return (
     <figure ref={figureRef} className={className}>
-      <div ref={innerRef} style={{ willChange: 'transform' }}>
+      <div
+        ref={innerRef}
+        className="absolute inset-0"
+        style={{ willChange: 'transform' }}
+      >
         {children}
       </div>
       {caption ? (
