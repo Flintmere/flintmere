@@ -29,6 +29,7 @@
 import type { CatalogInput, ProductInput, SuppressionEstimate } from '../types.js';
 import { isValidGtin } from '../utils/gtin.js';
 import { stripHtml } from '../utils/text.js';
+import { NON_FOOD_VERTICAL_KEYWORDS } from './aov-estimate.js';
 
 // ---- Per-product probability bands ----
 // Probability that a product carrying N signals is suppressed in GMC.
@@ -171,15 +172,41 @@ interface ProductSignals {
   missingGmcCategory: boolean;
 }
 
-function looksLikeFood(product: ProductInput): boolean {
-  const haystack = [
+function productHaystack(product: ProductInput): string {
+  return [
     product.productType ?? '',
     ...(product.tags ?? []),
     product.title ?? '',
   ]
     .join(' ')
     .toLowerCase();
-  return FOOD_HINT_KEYWORDS.some((kw) => haystack.includes(kw));
+}
+
+function looksLikeFood(product: ProductInput): boolean {
+  return FOOD_HINT_KEYWORDS.some((kw) => productHaystack(product).includes(kw));
+}
+
+/**
+ * Catalog-wide non-food veto — mirrors the AOV engine's apparel/beauty/hardware
+ * pre-pass (aov-estimate.ts §detectVertical). When ANY product on the catalog
+ * carries a non-food vertical signal (shoe, knit, skincare, hardware,
+ * electronics, etc.), the suppression engine refuses to apply the allergen
+ * check across the catalog. Reason: false-positive surface confirmed live
+ * 2026-04-28 — allbirds.com flagged 998 of 1,000 "food products with no
+ * allergen statement" because shoe colour names like "milk" and "almond"
+ * trip FOOD_HINT_KEYWORDS. Catalog-wide veto is the right honest behaviour
+ * — better to under-flag than mis-flag. Mixed catalogs (a deli that sells
+ * branded merch) trip the veto and the food products fall back to a
+ * 1-signal (missing-GTIN) suppression band rather than a 2-signal band.
+ */
+function catalogIsApparelOrBeauty(input: CatalogInput): boolean {
+  for (const product of input.products) {
+    const haystack = productHaystack(product);
+    if (NON_FOOD_VERTICAL_KEYWORDS.some((kw) => haystack.includes(kw))) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function descriptionMentionsAllergen(product: ProductInput): boolean {
@@ -188,7 +215,10 @@ function descriptionMentionsAllergen(product: ProductInput): boolean {
   return ALLERGEN_MARKERS.some((marker) => plain.includes(marker));
 }
 
-function extractSignals(product: ProductInput): ProductSignals {
+function extractSignals(
+  product: ProductInput,
+  catalogIsNonFood: boolean,
+): ProductSignals {
   // Signal 1 — missing GTIN: any variant lacks a non-empty barcode.
   // We use "missing" rather than "invalid checksum" here — the strict
   // checksum signal is what `identifiers` already grades. Suppression
@@ -199,9 +229,12 @@ function extractSignals(product: ProductInput): ProductSignals {
   );
 
   // Signal 2 — ambiguous allergen text: only meaningful on food-plausible
-  // products. A non-food product cannot have an ambiguous allergen claim
-  // because no allergen claim is expected.
-  const isFood = looksLikeFood(product);
+  // products in food catalogs. A non-food product cannot have an ambiguous
+  // allergen claim because no allergen claim is expected. Catalog-wide
+  // apparel/beauty/hardware veto short-circuits this even when individual
+  // product names happen to hit FOOD_HINT_KEYWORDS (shoe colour names like
+  // "milk", "almond" — see catalogIsApparelOrBeauty doc).
+  const isFood = !catalogIsNonFood && looksLikeFood(product);
   const ambiguousAllergen = isFood && !descriptionMentionsAllergen(product);
 
   // Signal 3 — missing GMC category: best public proxy is the absence of
@@ -250,6 +283,11 @@ export function estimateSuppression(input: CatalogInput): SuppressionEstimate {
     };
   }
 
+  // Catalog-wide non-food veto — gates the per-product allergen check so
+  // apparel/beauty/hardware catalogs don't get inflated by products whose
+  // colour or material names happen to hit FOOD_HINT_KEYWORDS.
+  const catalogIsNonFood = catalogIsApparelOrBeauty(input);
+
   let lowSum = 0;
   let highSum = 0;
   let missingGtinCount = 0;
@@ -257,7 +295,7 @@ export function estimateSuppression(input: CatalogInput): SuppressionEstimate {
   let missingGmcCategoryCount = 0;
 
   for (const product of input.products) {
-    const signals = extractSignals(product);
+    const signals = extractSignals(product, catalogIsNonFood);
     if (signals.missingGtin) missingGtinCount++;
     if (signals.ambiguousAllergen) ambiguousAllergenCount++;
     if (signals.missingGmcCategory) missingGmcCategoryCount++;

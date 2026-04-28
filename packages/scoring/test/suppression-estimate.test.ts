@@ -231,4 +231,137 @@ describe('estimateSuppression', () => {
     );
     expect(result.signals.ambiguousAllergen).toBe(3);
   });
+
+  // ---- Catalog-wide apparel/beauty veto on allergen check ----
+  //
+  // Live regression 2026-04-28: allbirds.com flagged 998 of 1,000 products
+  // as "food products with no allergen statement" because shoe colour names
+  // ("milk", "almond", "natural") trip FOOD_HINT_KEYWORDS. Catalog-wide
+  // veto mirrors the AOV engine's apparel-veto (aov-estimate.ts §detectVertical).
+  it('catalog-wide veto: any apparel keyword on the catalog suppresses the allergen check', () => {
+    // 5 "snack" products that look like food via title — plus ONE
+    // shoe product. The shoe product trips the catalog veto; allergen
+    // count drops to 0 across the entire catalog.
+    const foodish = (id: string, title: string): ProductInput => ({
+      id,
+      handle: id,
+      title,
+      bodyHtml: '<p>No allergen mentioned in this description.</p>',
+      vendor: 'Test',
+      productType: 'Snack',
+      tags: ['snack'],
+      status: 'active',
+      publishedAt: '2026-01-01T00:00:00Z',
+      variants: [
+        {
+          id: `${id}-v0`,
+          sku: `SKU-${id}`,
+          barcode: '5012345678900',
+          price: '5.00',
+          inventoryQuantity: 10,
+          inventoryPolicy: 'deny',
+          available: true,
+        },
+      ],
+      images: [],
+      brandMetafield: 'Test',
+    });
+    const shoe: ProductInput = {
+      id: 'shoe-1',
+      handle: 'wool-runner',
+      title: 'Wool Runner — Milk',
+      bodyHtml: '<p>Sustainable shoes.</p>',
+      vendor: 'Allbirds',
+      productType: 'Shoe',
+      tags: ['shoe', 'footwear'],
+      status: 'active',
+      publishedAt: '2026-01-01T00:00:00Z',
+      variants: [
+        {
+          id: 'shoe-1-v0',
+          sku: 'APP-1',
+          barcode: null,
+          price: '95.00',
+          inventoryQuantity: 10,
+          inventoryPolicy: 'deny',
+          available: true,
+        },
+      ],
+      images: [],
+      brandMetafield: 'Allbirds',
+    };
+    const products: ProductInput[] = [
+      foodish('f1', 'Honey Snack Bar'),
+      foodish('f2', 'Almond Snack Bar'),
+      foodish('f3', 'Cocoa Snack Bar'),
+      foodish('f4', 'Vanilla Snack Bar'),
+      foodish('f5', 'Cinnamon Snack Bar'),
+      shoe,
+    ];
+    const result = estimateSuppression(makeCatalog(products));
+    expect(result.signals.ambiguousAllergen).toBe(0);
+  });
+
+  it('allbirds-shaped apparel catalog: zero ambiguousAllergen across the catalog', () => {
+    // 10 shoe products with food-flavoured colour names ("Milk", "Almond",
+    // "Natural", "Cream") — the actual allbirds antipattern. None should
+    // be flagged as food, allergen count = 0.
+    const apparel: ProductInput[] = Array.from({ length: 10 }, (_, i) => ({
+      id: `shoe-${i}`,
+      handle: `wool-runner-${i}`,
+      title: i % 2 === 0 ? 'Wool Runner — Milk' : 'Tree Dasher — Almond',
+      bodyHtml: '<p>Sustainable shoes made from merino wool.</p>',
+      vendor: 'Allbirds',
+      productType: 'Shoe',
+      tags: ['shoe', 'footwear', 'sustainable'],
+      status: 'active',
+      publishedAt: '2026-01-01T00:00:00Z',
+      variants: [
+        {
+          id: `shoe-${i}-v0`,
+          sku: `APP-${i}`,
+          barcode: null,
+          price: '95.00',
+          inventoryQuantity: 10,
+          inventoryPolicy: 'deny',
+          available: true,
+        },
+      ],
+      images: [],
+      brandMetafield: 'Allbirds',
+    }));
+    const result = estimateSuppression(makeCatalog(apparel));
+    expect(result.signals.ambiguousAllergen).toBe(0);
+    // missing GTIN signal still fires (apparel veto only gates allergen check)
+    expect(result.signals.missingGtin).toBe(10);
+  });
+
+  it('beauty catalog: skincare/serum products do not trip allergen check', () => {
+    const beauty: ProductInput[] = Array.from({ length: 5 }, (_, i) => ({
+      id: `beauty-${i}`,
+      handle: `vanilla-serum-${i}`,
+      title: 'Vanilla Almond Serum',
+      bodyHtml: '<p>Skincare serum with botanical notes.</p>',
+      vendor: 'Beauty Brand',
+      productType: 'Skincare serum',
+      tags: ['skincare', 'serum', 'beauty'],
+      status: 'active',
+      publishedAt: '2026-01-01T00:00:00Z',
+      variants: [
+        {
+          id: `beauty-${i}-v0`,
+          sku: `BTY-${i}`,
+          barcode: null,
+          price: '45.00',
+          inventoryQuantity: 20,
+          inventoryPolicy: 'deny',
+          available: true,
+        },
+      ],
+      images: [],
+      brandMetafield: 'Beauty Brand',
+    }));
+    const result = estimateSuppression(makeCatalog(beauty));
+    expect(result.signals.ambiguousAllergen).toBe(0);
+  });
 });

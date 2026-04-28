@@ -44,7 +44,7 @@ const FOOD_THRESHOLD = 0.40;
 // sells branded merch) trip the veto and fall back to SKU-count framing,
 // which is the right honest behaviour — we'd rather under-emit a food
 // classification than mis-emit one.
-const NON_FOOD_VERTICAL_KEYWORDS: ReadonlyArray<string> = Object.freeze([
+export const NON_FOOD_VERTICAL_KEYWORDS: ReadonlyArray<string> = Object.freeze([
   // Apparel + footwear
   'shoe',
   'sneaker',
