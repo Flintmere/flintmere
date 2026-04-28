@@ -227,6 +227,19 @@ If an image is challenged at review and cannot answer "what specific product tru
 
 Pre-2026-04-26 surfaces shipped under the line-art-only mandate. They remain valid — line-art is now one option, not the only one. New surfaces designed after this date may use any of the three modes per the rotation rule. No retroactive purge required.
 
+## Decoration earns its keep when beautiful (ratified 2026-04-28)
+
+**Updated reading of the previous "every element earns its keep" rule.** The earlier framing produced austerity — Claude defaulted to no decorative-non-functional elements on the assumption that beauty alone wasn't a load-bearing function. **Beauty IS a load-bearing function.** Decorative dot-grids, hairline ornaments, oversized index numerals, letter-cut shapes, asymmetric ornaments, cropped silhouettes, deliberate misalignments — all PERMITTED when they produce beauty. The earning-its-keep test now reads: *does this element add to the page's beauty?* If yes, it earns its keep. If no, it doesn't.
+
+What this does NOT change:
+- Banned tropes per §Imagery (team-in-glass-office, hex-grid-with-neon-data-flow, etc.) — still banned.
+- AI-generated decorative elements — still banned.
+- Single-amber-portfolio-signature (ADR 0007) + sage decorative second accent (ADR 0021 axis 1) — still binding palette closure.
+- AA contrast — still binding (decorative hairlines that don't carry text get a relaxed floor; anything text-adjacent stays AA).
+- Per-section bracket budget (≤1 keyword bracket per section + numerated enumeration brackets per the pillar precedent) — still binding.
+
+Reference for what "decoration earns its keep" looks like in practice: see `memory/design/reference-register.md` §Section D and §Section E.
+
 ## Corners, surfaces, motion floors
 
 - **Corners sharp.** No `border-radius` except on circular gauges (score-ring), avatars (if introduced), toggle handles.
@@ -309,6 +322,7 @@ Everything from the inherited allowanceguard Ledger canon is **retired**. Do not
 
 ## Changelog
 
+- 2026-04-28: §Decoration earns its keep when beautiful added. Operator + council ratification: "decoration earns its keep BY being beautiful" replaces the implicit austerity that "every element earns its keep" was producing. Plus `memory/design/reference-register.md` added — every design-skill dispatch reads it first per the binding pre-flight in that file. Reference selection is council work, per dispatch.
 - 2026-04-27: ADR 0021 ratified. Eight axes of canon relaxation within the neutral-bold posture. New tokens: `--accent-sage` (`#5A6B4D`, decorative-not-semantic per operator option-(ii)), `--shadow-paper-1` (single tonal-wash elevation), `--gradient-paper-warmth` (vertical paper→paper-2), `--gradient-amber-radial` (focal-numeral backdrop), `--paper-on-ink` (ink-slab text token, ≈AAA). Bracket budget changes from ≤2/page → ≤1/section, no page cap. Line-art reinstated as second imagery mode (paired with photoreal + screenshots — three modes). Display-weight 700 permitted at ≥80px. Ink-slab promoted to documented surface variant. Three new motion patterns (numerals-count-up, hover-lift, subtle parallax). Layers on ADR 0003 + 0007; existing surfaces stay valid (relaxation, not retraction).
 - 2026-04-26: Standing Council voted 10–0 (with conditions) to lift the line-art-only imagery mandate and soften the `prefers-reduced-motion` contract on marketing/scanner. New §Imagery section added with three image modes (photoreal, screenshot, line-art), a rotation rule (emotion → photoreal, proof → screenshot), three new tokens (`--image-treatment-warm`, `--image-overlay-bracket-color`, `--image-caption-mono`), weight budgets, and a bracket co-occurrence rule. `motion.md` updated to a two-tier contract: marketing/scanner soft (global `globals.css` block), Shopify app strict (per-animation, retained for BFS). DESIGN.md law #1 reframed from "Type is the image" to "Type leads, imagery proves."
 - 2026-04-20 (later): ADR 0007 accepted — Glowing Amber `#F8BF24` adopted as portfolio signature and sole accent across all three surfaces. Sulphur `#D9E05A` retired. Wordmark changed from bilateral dark-form `Flint[ mere ]` to asymmetric `Flintmere]` (both canvases, monochrome). Palette, §Signature under-tick, §Wordmark, §Inversion, §Surface-specific, §Rejected patterns, §Retired all reconciled to 0007. The bracket signature, neutral-bold structure, and Geist type stack from 0003 remain authoritative.

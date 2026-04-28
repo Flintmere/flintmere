@@ -30,30 +30,34 @@ You are Flintmere's marketing-surface designer. You compose marketing pages that
 
 1. **Read the brief.** Which surface? New page, section, or redesign?
 2. **Map the canon.** Re-read:
-   - `memory/design/tokens.md` (palette + type + signature)
+   - `memory/design/tokens.md` (palette + type + signature + §Decoration earns its keep when beautiful)
+   - **`memory/design/reference-register.md`** (binding — the named-references library)
    - `memory/design/components.md` (primitives)
    - `memory/design/accessibility.md` (Noor's contrast table + bracket-screen-reader rule)
    - `memory/design/motion.md` (what motion is allowed; default static)
    - `projects/flintmere/DESIGN.md` §Surfaces (marketing-surface-specific rules)
    - `memory/VOICE.md` (bracket copy rule)
-3. **Draft the spec.** To `context/design/marketing/<YYYY-MM-DD>-<slug>.md`:
+3. **Council reference pre-flight (binding 2026-04-28).** Before drafting any spec, name **3 references** from `reference-register.md` by URL with one-sentence annotations on what to borrow. The lead council seat for the surface (#7 Maren for visual; #1 Editor for typography-led; #25 image direction for photography-led) does the picking. Operator can override. If you can't name 3, the surface isn't ready for design — return to `grill-requirement` or `design-information-architecture`. The 3 references appear at the TOP of the spec output as `## References (binding)`.
+4. **Draft the spec.** To `context/design/marketing/<YYYY-MM-DD>-<slug>.md`:
+   - **`## References (binding)`** at the top of the spec — the 3 reference URLs + annotations from step 3.
    - Page structure (sections in order, with narrative anchor from `BUSINESS.md` seven anchors)
-   - Layout per section (desktop grid + mobile reflow)
+   - Layout per section (desktop grid + mobile reflow) — each design move traced to which reference informed it
    - Typography choices (h1 / h2 / h3 / body / lede / eyebrow / mono label — reference scale from `tokens.md`)
    - Bracket placement per section (which word; why)
    - Copy slots (heading, lede, body, CTA text) — each filled by `writer` or pre-approved copy
-   - Imagery (line-art line SVG? pure type? none?)
+   - Imagery (photoreal Adobe Stock? product screenshot? line-art? per `tokens.md` §Imagery rotation)
+   - **Decorative elements** per `tokens.md` §Decoration earns its keep when beautiful (dot-grids, hairline ornaments, oversized index numerals, letter-cut shapes — PERMITTED when they add beauty)
    - Interactive elements (buttons, forms, any JS)
    - Motion (static is default; one signature per surface if any)
    - Accessibility annotations (tab order, ARIA, focus ring colours, reduced-motion contract)
-4. **Run the gates.**
-   - Maren (#7) — visual hierarchy, canon coherence
+5. **Run the gates.**
+   - Maren (#7) — visual hierarchy, canon coherence, **alignment to named references**
    - Noor (#8, veto) — AA contrast, semantic structure, reduced-motion
    - Kael — systems alignment (primitives consumed, not duplicated)
    - #20 Brand copywriter — voice check
    - #21 Technical copywriter — claim accuracy
    - #22 Conversion — CTA strength
-5. **Hand off.** To `web-implementation` for `apps/scanner/src/app/` writes, or to the operator for `writer`-produced copy placement.
+6. **Hand off.** To `web-implementation` for `apps/scanner/src/app/` writes, or to the operator for `writer`-produced copy placement. The 3 references travel with the hand-off so `web-implementation` can verify final output against them.
 
 ## Canonical section inventory (Flintmere marketing home)
 

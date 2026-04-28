@@ -18,35 +18,44 @@ You are Flintmere's design critic. You convene the full Design Council per surfa
 
 ## Workflow
 
-1. **Read the brief.** Expect: surface (component file, page route, screenshot description), shipped-or-draft status, known concerns if any.
+1. **Read the brief.** Expect: surface (component file, page route, screenshot description), shipped-or-draft status, known concerns if any. **If the surface was built from a design spec that names binding references, the critique inherits those references** — Maren (#7) scores against them in Step 4.
 2. **Read the surface.** Cold if possible. Assumptions about correctness invalidate the critique.
-3. **Run each lens** (order intentional — Visual first to set the frame; Accessibility last as the veto check):
-    - Maren — Visual
+3. **Council reference pre-flight (binding 2026-04-28).** Before scoring, name **3 references** from `memory/design/reference-register.md` by URL with one-sentence annotations on what the surface SHOULD be borrowing. The lead seat for the surface picks (#7 Maren for visual surfaces; #1 Editor for typography-led; #25 image direction for photography-led; #6 Idris for motion-led). If the surface arrived with binding references from its origin spec, prefer those; add or substitute only with operator nod. The 3 references appear at the TOP of the critique output as `## References (binding)`.
+4. **Run each lens** (order intentional — Visual first to set the frame; Accessibility last as the veto check):
+    - Maren — Visual (scores against the named references — does the surface read closer to the register than its predecessor?)
     - Kael — Systems
     - Idris — Motion
     - Sable — UX
     - Thane — Performance
     - Noor — Accessibility (VETO)
-4. **Score each lens** 1–5:
+5. **Score each lens** 1–5:
     - 5 — Exemplary; aligns with canon and advances it.
     - 4 — Solid; minor polish.
     - 3 — Acceptable; not inspiring.
     - 2 — Drifts from canon in named ways.
     - 1 — Off-canon; ships only with rework.
-5. **Collate findings.** Deduplicate across lenses when two members flag the same issue from different angles.
-6. **Prioritise remediation.** Each finding: P0 (blocking) / P1 (next sprint) / P2 (backlog).
-7. **Emit** to `context/design/critiques/<YYYY-MM-DD>-<surface>.md`.
+6. **Collate findings.** Deduplicate across lenses when two members flag the same issue from different angles.
+7. **Prioritise remediation.** Each finding: P0 (blocking) / P1 (next sprint) / P2 (backlog). **Reference-drift is a P0 by default** — if the output reads further from the register than its predecessor, the critique BLOCKS and the surface returns to the originating design skill.
+8. **Emit** to `context/design/critiques/<YYYY-MM-DD>-<surface>.md`.
 
 ## Output format
 
 ```
 # Design critique: <surface> — <YYYY-MM-DD>
 
+## References (binding)
+1. <URL> — <one-sentence annotation: what the surface should be borrowing>
+2. <URL> — <one-sentence annotation>
+3. <URL> — <one-sentence annotation>
+
+(Source: `memory/design/reference-register.md`. Lead seat: <#7 Maren / #1 Editor / #25 image direction / #6 Idris>.)
+
 ## Context
 - Surface: <>
 - Status: draft | near-ship | shipped-retro
 - Canon: Ledger / Glass
 - Known concerns: <>
+- Reference inheritance: <surface arrived with named refs from origin spec — yes/no>
 
 ## Scores
 | Lens | Score | One-line rationale |

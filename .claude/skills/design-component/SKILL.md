@@ -23,36 +23,44 @@ You are Flintmere's component designer. Kael (Systems) leads; the full Design Co
     - If <3 callsites and no clear gap → reject. Inline until a third caller exists.
     - If ≥3 callsites with variant drift → strong candidate.
     - If design-system gap + upcoming work → candidate with user sign-off.
-3. **Identify canon fit.**
+3. **Council reference pre-flight (binding 2026-04-28).** Before sketching the API, name **3 references** from `memory/design/reference-register.md` by URL with one-sentence annotations on what to borrow (component-shape moves, micro-detail, state choreography). The lead council seat picks: Kael for systems-shaped primitives (compound APIs, polymorphism, variance scheme); Maren (#7) for visual-shaped primitives (decoration, rhythm, signature). Operator can override. If you can't name 3, the primitive isn't ready — return to extract / brainstorming. The 3 references appear at the TOP of the spec output as `## References (binding)`.
+4. **Identify canon fit.**
     - Ledger-only (marketing primitive — rare) → `src/components/<name>.tsx` in marketing area.
     - Glass-only (app primitive — rare) → colocated with the app feature.
     - Canon-agnostic (most common) → `src/components/ui/<Name>.tsx`, variants for Ledger / Glass where needed.
-4. **Sketch the API.**
+5. **Sketch the API.**
     - Props table: name, type, default, required, purpose.
     - Variants via CVA (class-variance-authority) if visual variance.
     - Sub-components (Card.Header, Card.Content, etc.) if compound.
     - Polymorphic via `asChild` / Radix pattern if the primitive wraps semantics.
-5. **Specify states.**
+6. **Specify states.**
     - Default, hover, active, focus, disabled, loading (if applicable), error (if applicable).
     - Each state: tokens used, transitions (per `motion.md`), screen-reader announcement.
-6. **Specify accessibility.**
+7. **Specify accessibility.**
     - Semantic element (`<button>`, `<a>`, `<input>`, `<div>` with proper `role`).
     - Keyboard interactions (Enter, Space, Arrow, Escape — where applicable).
     - ARIA attributes (`aria-pressed`, `aria-expanded`, `aria-label` — where applicable).
     - Focus management (focus ring, focus trap if modal-shaped).
-7. **Specify test strategy.** Per `memory/product-engineering/test-strategy.md`:
+8. **Specify test strategy.** Per `memory/product-engineering/test-strategy.md`:
     - Render test (basic).
     - Interaction test (keyboard + mouse).
     - State test (every state renders correctly).
     - A11y test (axe or equivalent pass).
-8. **Specify tokens used.** Every token named. If a token is missing, stop — propose via `design-token` first.
-9. **Run Design Council gates.**
-10. **Emit** to `context/design/components/<YYYY-MM-DD>-<slug>.md`. Handoff target: `build-feature`.
+9. **Specify tokens used.** Every token named. If a token is missing, stop — propose via `design-token` first.
+10. **Run Design Council gates.** Maren (#7) checks alignment to the 3 named references; if the sketch reads further from the register than its predecessor, BLOCK and rebuild.
+11. **Emit** to `context/design/components/<YYYY-MM-DD>-<slug>.md`. Handoff target: `build-feature`. The 3 references travel with the hand-off.
 
 ## Output format
 
 ```
 # Component spec: <Name>
+
+## References (binding)
+1. <URL> — <one-sentence annotation: component shape / micro-detail / state choreography to borrow>
+2. <URL> — <one-sentence annotation>
+3. <URL> — <one-sentence annotation>
+
+(Source: `memory/design/reference-register.md`. Lead seat: <Kael for systems-shaped / #7 Maren for visual-shaped>.)
 
 ## Case
 - Repeated pattern: <>

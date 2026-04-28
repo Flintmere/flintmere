@@ -82,11 +82,14 @@ Index: `memory/README.md`.
 | When working on... | Read |
 |---|---|
 | Design tokens, canon, signature | `tokens.md` |
+| **References to inform aesthetic register** (binding: every design-skill dispatch reads first) | **`reference-register.md`** |
 | Components, primitives, Shopify-app island rules | `components.md` |
 | Accessibility floors, Noor's veto rules | `accessibility.md` |
 | Motion, reduced-motion contract | `motion.md` |
 | Canonical design flow + stage gates | `process.md` |
 | Performance budget for design choices | `performance-budget.md` |
+
+**Binding 2026-04-28.** Every design-skill dispatch (`frontend-design`, `design-marketing-surface`, `design-component`, `design-critique`, `design-motion`) opens with a council pre-flight: name 3 references from `reference-register.md` by URL with one-sentence annotations on what to borrow. The skill brief carries the named references; output is traced to them. If the council can't name 3, the surface isn't ready for design — return to `grill-requirement` or `design-information-architecture`. **Decoration earns its keep when beautiful** — the earlier "every element earns its keep, no decoration" framing was retired in favour of the explicit "beauty is a load-bearing function" reading per `tokens.md` §Decoration.
 
 Skills: `grill-requirement` (stage 1 — interrogate the requirement), `design-information-architecture` (stage 3 — multi-page IA), `design-marketing-surface`, `design-app-surface`, `design-component`, `design-token`, `design-motion`, `design-system-audit`, `design-critique`.
 
