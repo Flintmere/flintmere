@@ -41,12 +41,11 @@ import {
  */
 // Per-vertical photoreal hero slots — Q-A2 Mode (b) lock.
 //
-// Initial commit ships placeholder imagery: food borrows the existing
-// hero `jar.avif` (warm-treated, on-canon, ≤100KB) so the food slot has
-// real-world weight; beauty + apparel land as paper-2 solid blocks until
-// operator licenses + drops Adobe Stock candidates per the operator-locks
-// doc §"Operator next-step on imagery." Final assets land at:
-//   apps/scanner/public/marketing/verticals/{food|beauty|apparel}.avif
+// Final Mode (b) assets landed at apps/scanner/public/marketing/verticals/
+// per the canonical sourcing brief in operator-locks 2026-04-28 (§A–§L).
+// Each AVIF is operator-licensed, warm-treated, ≤100KB, no visible
+// third-party logos / words / faces (Adobe Stock licence clause 4.7
+// trademark exclusion + #9 Lawyer binding). Alt text descriptive per Noor.
 const PICKER_SLOTS: Readonly<Record<HomepageVerticalId, PickerDrivenContent>> = {
   food: {
     h2: 'What changes for food?',
@@ -54,10 +53,9 @@ const PICKER_SLOTS: Readonly<Record<HomepageVerticalId, PickerDrivenContent>> = 
     bullets: HOMEPAGE_VERTICAL_CONTENT.food.bullets,
     ctaLabel: HOMEPAGE_VERTICAL_CONTENT.food.ctaLabel,
     ctaHref: HOMEPAGE_VERTICAL_CONTENT.food.ctaHref,
-    // Placeholder until operator drops /marketing/verticals/food.avif.
-    imageSrc: '/marketing/hero/jar.avif',
+    imageSrc: '/marketing/verticals/food.avif',
     imageAlt:
-      'A UK speciality food shelf with structured data overlaid — placeholder; operator drops the licensed kitchen-context AVIF here.',
+      'Warm-lit food still life in late-afternoon side-light, bracketed under the heading "What changes for [ food ]?"',
   },
   beauty: {
     h2: 'What changes for beauty?',
@@ -65,7 +63,9 @@ const PICKER_SLOTS: Readonly<Record<HomepageVerticalId, PickerDrivenContent>> = 
     bullets: HOMEPAGE_VERTICAL_CONTENT.beauty.bullets,
     ctaLabel: HOMEPAGE_VERTICAL_CONTENT.beauty.ctaLabel,
     ctaHref: HOMEPAGE_VERTICAL_CONTENT.beauty.ctaHref,
-    // No imageSrc — primitive renders a paper-2 placeholder block.
+    imageSrc: '/marketing/verticals/beauty.avif',
+    imageAlt:
+      'Warm-lit beauty still life in late-afternoon side-light, bracketed under the heading "What changes for [ beauty ]?"',
   },
   apparel: {
     h2: 'What changes for apparel?',
@@ -73,7 +73,9 @@ const PICKER_SLOTS: Readonly<Record<HomepageVerticalId, PickerDrivenContent>> = 
     bullets: HOMEPAGE_VERTICAL_CONTENT.apparel.bullets,
     ctaLabel: HOMEPAGE_VERTICAL_CONTENT.apparel.ctaLabel,
     ctaHref: HOMEPAGE_VERTICAL_CONTENT.apparel.ctaHref,
-    // No imageSrc — primitive renders a paper-2 placeholder block.
+    imageSrc: '/marketing/verticals/apparel.avif',
+    imageAlt:
+      'Warm-lit apparel still life in late-afternoon side-light, bracketed under the heading "What changes for [ apparel ]?"',
   },
 };
 
