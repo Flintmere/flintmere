@@ -125,8 +125,8 @@ export default function MarketingHome() {
           <ViewportReveal>
             <h1
               id="hero-heading"
-              className="font-medium tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)] max-w-[14ch]"
-              style={{ fontSize: 'clamp(56px, 9vw, 144px)' }}
+              className="font-medium tracking-[-0.04em] leading-[0.88] text-[color:var(--color-ink)] max-w-[14ch]"
+              style={{ fontSize: 'clamp(48px, 7vw, 112px)' }}
             >
               Which of your products are{' '}
               <Bracket size="saks">suppressed</Bracket>

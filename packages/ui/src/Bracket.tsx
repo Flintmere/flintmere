@@ -34,7 +34,7 @@ const SIZE_CLASS: Record<Required<BracketProps>['size'], string> = {
   default: 'text-[inherit]',
   display: 'text-[0.8em]', // display heading already sets the scale
   micro: 'text-[11px] tracking-[0.14em]',
-  saks: 'text-[clamp(140px,16vw,280px)] tracking-[-0.02em] leading-[1]',
+  saks: 'text-[clamp(96px,12vw,200px)] tracking-[-0.02em] leading-[1]',
 };
 
 export function Bracket({
