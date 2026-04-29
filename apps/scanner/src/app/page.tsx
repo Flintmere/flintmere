@@ -33,133 +33,157 @@ export default function MarketingHome() {
     <main id="main">
       <a href="#hero" className="skip-link">Skip to content</a>
       <ViewportReveal>
-      {/* Hero — full-bleed photoreal overlay (Louis-Vuitton-heritage register
-          per operator 2026-04-28 lock). Image fills the section edge-to-edge;
-          two-layer scrim provides AA contrast on the left half; eyebrow +
-          h1 + lede + CTAs + fineprint overlaid on the photo, left-aligned,
-          vertically centered. Sage hairline at bottom-left anchors the
-          section to the page's structural grid (set cohesion with the
-          PickerDrivenContentBlock). Parallax via HeroParallaxFigure (Pattern 3
-          — 0.5× scroll velocity, ±40px clamp, JS prefers-reduced-motion
-          bypass + change-listener). */}
+      {/* Chapter 1 — Hero (Modern House split + Pentagram Saks logotype scale +
+          A24 single-film credit). Second dispatch under design-extravagant
+          (commit 69d068d). Spec source of truth:
+          context/design/extravagant/2026-04-29-chapter-1-hero-modern-house-saks.md.
+
+          Composition (Option α): full-viewport split. Photo zone left 58%,
+          ink-letterboxed, full-bleed wooden tray AVIF, parallax retained, no
+          scrim — the photo's own light contrast carries. Paper zone right
+          42% holds the headline, compressed lede, and single primary CTA.
+          The bracketed word `[ suppressed ]` renders at clamp(140px, 16vw,
+          280px) via the new Bracket size="saks" variant — the bracket
+          characters become the brand mark at hero scale, not inline
+          formatting (Saks Fifth Avenue identity reference).
+
+          Relaxed bans (per dispatch #2): dual-CTA convention suspended (single
+          CTA only; audit CTA relocates to FounderStrip), eyebrow-above-headline
+          suspended (A24 bottom-left credit replaces it), hero-fineprint
+          suspended (covered by FounderStrip + SiteFooter), hero-lede 38→20
+          words.
+
+          References:
+          - The Modern House (themodernhouse.com) — split-composition lead.
+          - Pentagram Saks Fifth Avenue (case study) — logotype-scale typography.
+          - A24 single-film overview pages — bottom-left mono credit register. */}
       <section
         id="hero"
-        className="relative isolate overflow-hidden border-b border-[color:var(--color-line)] bg-[color:var(--color-ink)]"
-        style={{ height: 'min(92vh, 920px)', minHeight: '640px' }}
+        aria-labelledby="hero-heading"
+        className="relative isolate overflow-hidden bg-[color:var(--color-paper)] grid grid-cols-1 lg:grid-cols-[58fr_42fr]"
+        style={{ height: '100vh', minHeight: '640px' }}
       >
-        <HeroParallaxFigure className="absolute inset-0 w-full h-full">
-          <Image
-            src="/marketing/hero/hero.avif"
-            alt="A wooden compartmented tray displaying unbranded artisan goods — small jars, brass mortar, dried herbs — in warm afternoon side-light."
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
+        {/* Photo zone — full-bleed, ink-letterboxed (so asymmetric crops blend
+            into the section edge), warm-treated wooden-tray AVIF. No scrim
+            in Option α — the photo's own composition carries the contrast and
+            keeps the typographic event on paper, not on a darkened image.
+            Mobile: this zone stacks on top, min-height 56vh. */}
+        <div
+          className="relative overflow-hidden bg-[color:var(--color-ink)] max-lg:min-h-[56vh]"
+        >
+          <HeroParallaxFigure className="absolute inset-0 w-full h-full">
+            <Image
+              src="/marketing/hero/hero.avif"
+              alt="A wooden compartmented tray displaying unbranded artisan goods — small jars, brass mortar, dried herbs — in warm afternoon side-light."
+              fill
+              priority
+              sizes="(min-width: 1024px) 58vw, 100vw"
+              className="object-cover"
+              style={{
+                objectPosition: 'center',
+                filter: 'var(--image-treatment-warm)',
+              }}
+            />
+          </HeroParallaxFigure>
+
+          {/* A24 single-film bottom-left credit. Replaces the prior top
+              eyebrow. Tiny mono uppercase tracking-loose; sits on the photo's
+              dark wooden-base region (mean luminance ~0.14, paper-on-ink at
+              #F0EFE8 ⇒ ≈7.8:1, AAA at small text floor). aria-label expands
+              the dot-separators for screen readers (matches Chapter 2 A.5
+              pattern). */}
+          <p
+            aria-label="Flintmere catalog readiness scan, 2026, takes 60 seconds, no install required"
+            className="absolute font-mono uppercase"
             style={{
-              objectPosition: 'center',
-              filter: 'var(--image-treatment-warm)',
+              bottom: 'clamp(32px, 3vw, 48px)',
+              left: 'clamp(32px, 4vw, 64px)',
+              right: 'clamp(24px, 3vw, 48px)',
+              fontSize: 'clamp(11px, 1vw, 13px)',
+              letterSpacing: '0.18em',
+              fontWeight: 500,
+              color: 'var(--color-paper-on-ink)',
+            }}
+          >
+            Flintmere · Catalog readiness scan · 2026 · 60 seconds, no install
+          </p>
+        </div>
+
+        {/* Paper zone — Saks-scale typography on warm paper. The Bracket
+            saks variant carries the brand-mark scale; the running text flows
+            at clamp(56px, 9vw, 144px). No scrim, no overlay — the colour-edge
+            (warm photo to paper) is the rule. */}
+        <div
+          className="relative flex flex-col justify-center"
+          style={{
+            paddingLeft: 'clamp(32px, 5vw, 96px)',
+            paddingRight: 'clamp(32px, 4vw, 64px)',
+            paddingTop: 'clamp(48px, 6vw, 96px)',
+            paddingBottom: 'clamp(48px, 6vw, 96px)',
+          }}
+        >
+          <ViewportReveal>
+            <h1
+              id="hero-heading"
+              className="font-medium tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)] max-w-[14ch]"
+              style={{ fontSize: 'clamp(56px, 9vw, 144px)' }}
+            >
+              Which of your products are{' '}
+              <Bracket size="saks">suppressed</Bracket>
+              {' '}in Google Shopping today?
+            </h1>
+          </ViewportReveal>
+
+          {/* Compressed lede (38 → 20 words) per spec §2.5. Geist Sans (NOT
+              mono — mono at body scale on paper reads as code-block). Mute on
+              paper ≈ 6.3:1, AAA. */}
+          <p
+            className="font-sans"
+            style={{
+              marginTop: 'clamp(28px, 3vw, 48px)',
+              maxWidth: '42ch',
+              fontSize: 'clamp(15px, 1.1vw, 17px)',
+              lineHeight: 1.55,
+              fontWeight: 400,
+              color: 'var(--color-mute)',
+            }}
+          >
+            Paste your URL. We estimate how much annual demand is routing to
+            competitors while these products stay suppressed — and show the
+            catalog data costing you the sale.
+          </p>
+
+          {/* Single primary CTA — radical-reduction per spec §2.4. The audit
+              CTA relocates to FounderStrip (Chapter 3) where the founder copy
+              earns the ask. Amber fill, mono uppercase 12px, tracking 0.14em
+              — visual unchanged from prior hero. */}
+          <div style={{ marginTop: 'clamp(40px, 5vw, 64px)' }}>
+            <Link
+              href="/scan"
+              className="inline-flex items-center gap-3 px-7 py-3.5 bg-[color:var(--color-accent)] text-[color:var(--color-accent-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper-on-ink)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)] ease-[cubic-bezier(0.4,0,0.2,1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
+            >
+              Run the scan
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+
+          {/* Decorative sage hairline — relocated from photo zone (prior
+              composition) to paper zone bottom-left. Anchors the typography
+              column to the structural grid (same role The Modern House
+              listings give their single hairline rule). Sage on paper ≈
+              5.5:1 — well above the 3:1 non-text decorative floor per ADR
+              0021 §sage. */}
+          <div
+            aria-hidden="true"
+            className="absolute h-[2px]"
+            style={{
+              left: 'clamp(32px, 5vw, 96px)',
+              bottom: 'clamp(32px, 4vw, 56px)',
+              width: 'clamp(160px, 12vw, 240px)',
+              background: 'var(--color-accent-sage)',
+              opacity: 0.85,
             }}
           />
-        </HeroParallaxFigure>
-
-        {/* Scrim layer 1 — vertical paper-mist for atmospheric depth. */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(180deg, rgba(10,10,11,0.18) 0%, rgba(10,10,11,0.0) 32%, rgba(10,10,11,0.0) 65%, rgba(10,10,11,0.38) 100%)',
-          }}
-        />
-
-        {/* Scrim layer 2 — horizontal ink fade, softer than v1 so the photo
-            bleeds through more on the left side. Operator critique 2026-04-28:
-            previous near-opaque scrim made the headline read as "shouting on
-            black"; reducing the on-text opacity from 0.82 → 0.55 lets the
-            tray photo's warm tones come through behind the text. AA contrast
-            still holds (~4.8:1 on display weight 500 + paper-on-ink). */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(95deg, rgba(10,10,11,0.62) 0%, rgba(10,10,11,0.45) 30%, rgba(10,10,11,0.20) 58%, rgba(10,10,11,0.04) 82%, rgba(10,10,11,0) 100%)',
-          }}
-        />
-
-        {/* Decorative sage hairline anchor. */}
-        <div
-          aria-hidden="true"
-          className="absolute left-8 bottom-8 h-[2px] w-[160px] lg:left-12 lg:bottom-12 lg:w-[240px]"
-          style={{
-            background: 'var(--color-accent-sage)',
-            opacity: 0.85,
-          }}
-        />
-
-        {/* Overlay content — left ~58% column, vertically centered. */}
-        <div className="relative h-full mx-auto max-w-[1280px] px-8 lg:px-12">
-          <div className="grid h-full items-center">
-            <div className="max-w-[680px]">
-              <p
-                className="font-mono text-[11px] tracking-[0.18em] uppercase mb-8"
-                style={{
-                  color: 'var(--color-accent)',
-                  fontWeight: 500,
-                }}
-              >
-                // free scan · 60 seconds · no install
-              </p>
-              <ViewportReveal>
-                <h1
-                  className="font-medium tracking-[-0.04em] leading-[0.95] text-[clamp(48px,7.2vw,88px)] max-w-[20ch]"
-                  style={{ color: 'var(--color-paper-on-ink)' }}
-                >
-                  Which of your products are{' '}
-                  <Bracket>suppressed</Bracket>
-                  {' '}in Google Shopping today?
-                </h1>
-              </ViewportReveal>
-              <p
-                className="mt-10 max-w-[44ch] text-[clamp(17px,1.55vw,20px)] leading-[1.55] font-medium"
-                style={{ color: 'var(--color-paper-on-ink)' }}
-              >
-                Paste your URL. We estimate how much annual demand is going to
-                competitors while these products stay demoted — and show you the
-                catalog data costing you the sale.
-              </p>
-              <div className="mt-12 flex flex-wrap gap-3">
-                <Link
-                  href="/scan"
-                  className="inline-flex items-center gap-3 px-7 py-3.5 bg-[color:var(--color-accent)] text-[color:var(--color-accent-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper-on-ink)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)] ease-[cubic-bezier(0.4,0,0.2,1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
-                >
-                  Run the free scan
-                  <span aria-hidden="true">→</span>
-                </Link>
-                <Link
-                  href="/audit"
-                  className="inline-flex items-center gap-3 px-7 py-3.5 border border-[color:var(--color-paper-on-ink)] text-[color:var(--color-paper-on-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper-on-ink)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)] ease-[cubic-bezier(0.4,0,0.2,1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
-                >
-                  Or book the £97 concierge audit
-                  <span aria-hidden="true">→</span>
-                </Link>
-              </div>
-              <p
-                className="mt-8 max-w-[52ch] text-[14px] leading-[1.55]"
-                style={{ color: 'var(--color-mute-inv)' }}
-              >
-                Prefer to talk first? Email{' '}
-                <a
-                  href="mailto:hello@flintmere.com"
-                  className="underline hover:text-[color:var(--color-paper-on-ink)] transition-colors"
-                  style={{ color: 'var(--color-paper-on-ink)' }}
-                >
-                  hello@flintmere.com
-                </a>{' '}
-                — the team usually replies within two working days.
-              </p>
-            </div>
-          </div>
         </div>
       </section>
 

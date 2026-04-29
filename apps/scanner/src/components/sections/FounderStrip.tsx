@@ -9,7 +9,17 @@
  *     as text per Noor's ADR 0021 binding conditions.
  *   - Eyebrow uses amber per the manifesto-pattern precedent (amber on ink
  *     reads ~11:1 AAA — safe at small scale).
+ *
+ * 2026-04-29 (design-extravagant dispatch #2): added the £97 concierge audit
+ * CTA. It relocated here from the hero — the founder copy earns the ask
+ * (the merchant clicks it after reading why a human is on the other end).
+ * Bordered button on ink, paper-on-ink text (≈17:1, AAA). Same visual
+ * treatment as the prior hero secondary CTA; only the position + leading-
+ * "Or" copy change.
  */
+
+import Link from 'next/link';
+
 export function FounderStrip() {
   return (
     <section
@@ -40,6 +50,15 @@ export function FounderStrip() {
           usually within two working days. No outsourced support queue.
           No pitch. No sales call.
         </p>
+        <div className="mt-12">
+          <Link
+            href="/audit"
+            className="inline-flex items-center gap-3 px-7 py-3.5 border border-[color:var(--color-paper-on-ink)] text-[color:var(--color-paper-on-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper-on-ink)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)] ease-[cubic-bezier(0.4,0,0.2,1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
+          >
+            Book the £97 concierge audit
+            <span aria-hidden="true">→</span>
+          </Link>
+        </div>
       </div>
     </section>
   );
