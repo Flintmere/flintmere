@@ -187,45 +187,39 @@ export default function MarketingHome() {
         </div>
       </section>
 
-      {/* Chapter 2 — Pillars (Bureau Mirko Borsche embodiment, 2026-04-28).
-          Replaces the centred Pentagram cover at e50d9c4. First dispatch under
-          design-extravagant. Zone A: full-bleed cover with oversized [ 07 ]
-          numeral hard-right-bleeding past viewport edge, two-line Bloomberg-
-          cadence headline (line 1 weight 500, line 2 weight 700), hand-drawn
-          sage SVG arrow pointing from headline to numeral, A24 mono film-credit
-          caption bottom-left. Zone B: preserved intro paragraph + seven-pillar
-          list with visual-weight-by-data-weight scaling.
-          References: mirkoborsche.com (lead — type-bleeds-off-page);
-          Bloomberg Businessweek Richard-Turley-era covers (secondary —
-          headline-as-cover, weight-shift cadence); A24 single-film overview
-          pages (tertiary — bottom-left mono film-credit register). */}
+      {/* Chapter 2 — Pillars (v3 — list-as-design, 2026-04-29).
+          Replaces the Bureau-MB cover at 63e0a41 — that composition's
+          two-column grid + numeral-bleed produced catastrophic overlap
+          at narrow desktop viewports (the `[ 0 7 ]` characters collided
+          with the headline column). The list IS the cover; v3 trusts
+          the seven amplified pillar rows to carry the section without
+          a borrowed cover above them.
+          References: Order Form magazine (lead — typography-led indie-mag
+          where the explicit grid IS the design language); Areena's index
+          numerals (secondary — display-scale ordinals as section anchors);
+          Anthony Burrill (tertiary — bold declarative typography as the
+          entire surface, no decoration competing with the rows). */}
       <section
         id="pillars"
         aria-labelledby="pillars-heading"
-        className="relative isolate overflow-x-hidden"
+        className="bg-[color:var(--color-paper)]"
       >
-        {/* Zone A — Bureau Mirko Borsche project-cover.
-            Full-bleed within the page. Section-level overflow-x-hidden clips
-            the bleeding `]` at the viewport edge without disturbing body
-            scroll. Two-column grid at desktop; stacks at <768px. */}
+        {/* Section opener — single column, contained typography, no
+            overflow risk. The eyebrow + two-line headline carry the
+            opening; a 2px sage hairline anchors the bottom-left as
+            structural-decorative ornament (ADR 0021 §Decoration earns
+            its keep — sage on paper ≈5.5:1, decorative-ornament use). */}
         <div
-          className="relative grid items-center min-h-[100vh] max-md:min-h-[80vh] max-md:flex max-md:flex-col max-md:justify-center"
+          className="relative mx-auto max-w-[1280px] px-8 lg:px-12"
           style={{
-            gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.05fr)',
-            paddingTop: 'clamp(48px, 6vw, 96px)',
-            paddingBottom: 'clamp(48px, 6vw, 96px)',
-            paddingLeft: 'clamp(32px, 4vw, 64px)',
-            paddingRight: '0',
+            paddingTop: 'clamp(96px, 14vh, 200px)',
+            paddingBottom: 'clamp(72px, 10vh, 144px)',
           }}
         >
-          {/* A.4 — Mono eyebrow, top-left of the cover (asymmetric placement,
-              negative-space discipline per Bureau-MB). */}
           <p
             data-reveal
-            className="absolute font-mono uppercase"
+            className="font-mono uppercase mb-12 lg:mb-16"
             style={{
-              top: 'clamp(32px, 4vw, 64px)',
-              left: 'clamp(32px, 4vw, 64px)',
               fontSize: 'clamp(11px, 1.2vw, 13px)',
               letterSpacing: '0.18em',
               color: 'var(--color-mute)',
@@ -235,138 +229,49 @@ export default function MarketingHome() {
           >
             // the seven checks
           </p>
-
-          {/* A.2 — Headline column (left, vertically centred).
-              Two `<span>` lines wrapped inside one `<h2>`. Line 1 weight 500
-              sets the informational frame; line 2 weight 700 lands the
-              consequence — Bloomberg-cadence weight shift permitted at ≥80px
-              per ADR 0021 axis 5. */}
-          <div className="flex flex-col justify-center max-md:items-start max-md:order-1">
-            <h2
-              id="pillars-heading"
-              data-reveal
-              className="font-sans tracking-[-0.04em] leading-[0.95] max-w-[22ch]"
-              style={{
-                fontSize: 'clamp(48px, 7vw, 104px)',
-                color: 'var(--color-ink)',
-                ['--reveal-delay' as string]: '120ms',
-              }}
-            >
-              <span className="block font-medium">
-                An AI agent reads your catalog in seven passes.
-              </span>
-              <span className="block font-bold">
-                Fail one, lose the sale.
-              </span>
-            </h2>
-          </div>
-
-          {/* A.1 + A.3 — Right column carries the numeral and the arrow.
-              `flex-end` justification + the translateX bleed produces the
-              hard-right cut. The arrow is absolute-positioned within this
-              relative wrapper so it sits in the gap between headline and
-              numeral. */}
-          <div className="relative flex items-center justify-end max-md:order-2 max-md:w-full max-md:mt-8">
-            {/* A.3 — Hand-drawn sage SVG arrow.
-                Inline path data with deliberate bezier wobble + asymmetric
-                arrowhead. Responsive width via clamp. Decorative ornament
-                per ADR 0021 §Decoration earns its keep when beautiful —
-                sage `#5A6B4D` on paper at ~5.5:1, well above 3:1 non-text
-                AA floor. Rotates 90° down at mobile via CSS transform.
-                Reference: Bureau Mirko Borsche project pages (hand-drawn
-                marks alongside display type). */}
-            <svg
-              aria-hidden="true"
-              data-reveal
-              viewBox="0 0 200 28"
-              preserveAspectRatio="none"
-              className="absolute pointer-events-none max-md:rotate-90 max-md:-translate-y-12"
-              style={{
-                width: 'clamp(96px, 11vw, 200px)',
-                height: 'auto',
-                left: 'calc(-1 * clamp(96px, 11vw, 200px) - 24px)',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: 'var(--color-accent-sage)',
-                ['--reveal-delay' as string]: '240ms',
-              }}
-            >
-              {/* Wobbly horizontal stroke — three quadratic beziers with
-                  off-axis control points produce the hand-drawn cadence.
-                  NOT a straight line; NOT auto-CAD. */}
-              <path
-                d="M 4 14 Q 40 11, 70 15 Q 110 18, 140 13 Q 165 11, 184 14"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              {/* Asymmetric arrowhead — top stroke ~8px, bottom stroke ~6px.
-                  Drawn-in-30-seconds cadence. */}
-              <path
-                d="M 176 7 L 188 14 L 178 19"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-
-            {/* A.1 — The oversized [ 07 ] numeral.
-                Geist Mono weight 700 at clamp(280px, 42vw, 720px). The
-                translateX(min(8vw, 80px)) push past the right edge produces
-                the closing `]` half-cut — Bureau-MB's signature
-                type-bleeds-off-page move. aria-hidden because the seven
-                <Pillar> rows below carry the canonical enumeration. */}
-            <span
-              aria-hidden="true"
-              data-reveal
-              className="font-mono leading-[0.85] block max-md:self-end"
-              style={{
-                fontSize: 'clamp(280px, 42vw, 720px)',
-                color: 'var(--color-ink)',
-                fontWeight: 700,
-                transform: 'translateX(min(8vw, 80px))',
-              }}
-            >
-              <Bracket>07</Bracket>
-            </span>
-          </div>
-
-          {/* A.5 — Bottom-left film-credit caption (A24 register).
-              Middle-dot separators (U+00B7), uppercase mono, --color-mute on
-              paper at 6.3:1. aria-label expands the dots-as-separators for
-              screen readers. */}
-          <p
-            className="absolute font-mono uppercase"
-            aria-label="Flintmere homepage section 02 — catalog readiness"
+          <h2
+            id="pillars-heading"
+            data-reveal
+            className="font-sans tracking-[-0.04em] leading-[0.92] max-w-[26ch] text-[color:var(--color-ink)]"
             style={{
-              bottom: 'clamp(24px, 3vw, 48px)',
-              left: 'clamp(32px, 4vw, 64px)',
-              fontSize: 'clamp(10px, 0.85vw, 12px)',
-              letterSpacing: '0.18em',
-              color: 'var(--color-mute)',
-              fontWeight: 500,
+              fontSize: 'clamp(48px, 7vw, 112px)',
+              ['--reveal-delay' as string]: '120ms',
             }}
           >
-            Flintmere · Catalog readiness · 2026 · Section 02
-          </p>
+            <span className="block font-medium">
+              An AI agent reads your catalog in seven passes.
+            </span>
+            <span className="block font-bold mt-2">
+              Fail one, lose the sale.
+            </span>
+          </h2>
+          {/* Decorative sage hairline anchor — structural-decorative use
+              per ADR 0021 §Accent §Decorative. Sets up the rhythm to
+              the list below. */}
+          <div
+            aria-hidden="true"
+            data-reveal
+            className="mt-16 lg:mt-20"
+            style={{
+              height: '2px',
+              width: 'clamp(160px, 14vw, 280px)',
+              background: 'var(--color-accent-sage)',
+              opacity: 0.85,
+              ['--reveal-delay' as string]: '240ms',
+            }}
+          />
         </div>
 
-        {/* Zone B — pillar list (intro paragraph + amplified rows). */}
+        {/* Section body — the seven amplified pillars carry the section.
+            Order-Form-magazine register: explicit grid as design language;
+            each row is a tiny editorial spread. Visual-weight-by-data-weight
+            scaling preserved from v2 (20%→1.0, 15%→0.9, 10%→0.82, 5%→0.72)
+            so the smallest pillar reads as quieter, not broken. */}
         <div
-          className="mx-auto max-w-[1280px] px-8"
-          style={{
-            paddingTop: 'clamp(96px, 12vh, 160px)',
-            paddingBottom: 'clamp(96px, 12vh, 160px)',
-          }}
+          className="mx-auto max-w-[1280px] px-8 lg:px-12"
+          style={{ paddingBottom: 'clamp(96px, 12vh, 160px)' }}
         >
-          <p className="pillars-intro max-w-[60ch] text-[color:var(--color-mute)]">
-            Each pillar carries the weight shown. Your final score is a weighted average across the seven.
-          </p>
-          <ol className="mt-12 list-none p-0 m-0 divide-y divide-[color:var(--color-line)] border-y border-[color:var(--color-line)]">
+          <ol className="list-none p-0 m-0 divide-y divide-[color:var(--color-line)] border-y border-[color:var(--color-line)]">
           {[
             {
               name: 'Product IDs',
@@ -414,6 +319,21 @@ export default function MarketingHome() {
             <Pillar key={p.name} {...p} idx={idx} />
           ))}
           </ol>
+          {/* Section close — small mute methodology note in mono.
+              Sits below the list as a quiet footer to the section,
+              matching the editorial-spread cadence (the row IS the
+              spread; this is the colophon). */}
+          <p
+            className="mt-16 lg:mt-20 max-w-[60ch] font-sans"
+            style={{
+              fontSize: 'clamp(13px, 1vw, 15px)',
+              color: 'var(--color-mute)',
+              lineHeight: 1.55,
+            }}
+          >
+            Each pillar carries the weight shown. Your final score is a
+            weighted average across the seven.
+          </p>
         </div>
       </section>
 
