@@ -180,17 +180,30 @@ export function SiteFooter() {
           </nav>
         </div>
 
-        {/* Closing row — copyright + fineprint */}
-        <div className="pt-10 flex flex-wrap items-baseline justify-between gap-6">
+        {/* Closing row — chapter 4 amplification 2026-04-29.
+            The page closes on the brand mark. Wordmark scales to chapter-
+            anchor clamp(80, 10vw, 160) Geist Mono weight 500; copyright
+            stays as small mono caption on the same row at items-end
+            (Apartamento asymmetric-editorial register — extreme scale
+            contrast IS the closing move).
+            References: A24 closing pages (the brand mark closes the
+            journey); Pentagram Saks Fifth Avenue identity (wordmark as
+            the design itself); Linear footer (restrained but final-
+            feeling closing chord). */}
+        <div className="pt-12 lg:pt-16 flex flex-wrap items-end justify-between gap-x-8 gap-y-6">
           <p
-            className="font-mono text-[11px] tracking-[0.14em] uppercase"
+            className="font-mono text-[11px] tracking-[0.14em] uppercase max-w-[64ch]"
             style={{ color: 'var(--color-mute-inv)' }}
           >
             © 2026 Flintmere · a trading name of Eazy Access Ltd · England &amp; Wales · UK
           </p>
           <p
-            className="font-mono text-[11px] tracking-[0.14em] uppercase"
-            style={{ color: 'var(--color-paper-on-ink)', fontWeight: 500 }}
+            className="font-mono leading-[0.85] tracking-[-0.02em]"
+            style={{
+              fontSize: 'clamp(80px, 10vw, 160px)',
+              color: 'var(--color-paper-on-ink)',
+              fontWeight: 500,
+            }}
           >
             Flintmere<span aria-hidden="true">]</span>
           </p>
