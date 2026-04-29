@@ -4,27 +4,33 @@ import { Bracket } from '@flintmere/ui';
 /**
  * Pillar — single row in the seven-checks list on the marketing homepage.
  *
- * Post-ADR-0021 redesign:
- *   - Leftmost column carries a `[ NN ]` bracket-ID per ADR 0021 axis 4
- *     (bracket budget per section, no page cap). Zero-padded two-digit
- *     IDs per operator Q8 lock.
- *   - Right column replaces the inline percentage with the percentage +
- *     a 1px amber weight-bar scaled to the pillar's weight (`--color-accent`).
- *     The bar is a structural visual cue per Sable P1 in the homepage critique.
- *   - Each row carries `data-hover-lift` (Pattern 2 — hover-lift via
- *     transform + shadow + sage border, with non-shadow signal so
- *     forced-colors and high-contrast users get the same affordance).
- *   - Reveal stagger and a11y `aria-label` semantics preserved verbatim.
+ * Chapter 2 v4 amplification (Order Form + Areena + Apartamento, 2026-04-29):
+ *   Each row is an editorial spread, not a table row. THREE columns:
+ *     [ NN ]  ←  ordinal on left, display-mono, weight 700, scales by weight
+ *     ───┐
+ *        │  pillar name (display-sans, weight 500, scales by weight)
+ *        │  body copy (mute, body register, fixed scale — legibility floor)
+ *     ───┘
+ *               weight on right, display-mono, weight 700, scales by weight
+ *               (was a small eyebrow + 1px amber chart-bar; bar removed —
+ *                read as subordinate decoration not editorial)
  *
- * Chapter 2 v2 amplification (Bureau Mirko Borsche, 2026-04-28):
- *   - Bracket-ID scales to clamp(48px, 6vw, 96px) — ordinal becomes a poster.
- *   - Pillar name scales to clamp(28px, 3.5vw, 48px), Geist Sans weight 500.
- *   - Visual-weight-by-data-weight: each `<li>` sets a `--pillar-visual-scale`
- *     CSS variable derived from `weightPct` (Tufte information-design move).
- *     20% → 1.0; 15% → 0.9; 10% → 0.82; 5% → 0.72. Bracket-ID + pillar name
- *     scale; description body copy + percentage indicator stay constant
- *     (legibility floor).
- *   - Row gap rebalanced from `py-7` (28px) → `py-12` desktop / `py-8` mobile.
+ *   - Ordinal AND percentage at clamp(60, 8vw, 120) × visual-scale.
+ *     Two display events flank the editorial column. Areena's double-
+ *     numeral pattern (`No. 14` + display caption); Order-Form magazine's
+ *     explicit grid as design.
+ *   - Visual-weight-by-data-weight scaling preserved + extended to vertical
+ *     padding: paddingY = clamp(48, 6vw, 96) × visual-scale. The 5% pillar
+ *     row now physically stands shorter than the 20% pillar rows. The
+ *     Tufte information-design move reads as height, not just type-scale.
+ *   - 1px amber weight-bar removed. The percentage-as-display-numeral is
+ *     the weight visualization.
+ *   - Hover-lift contract preserved (Pattern 2 — transform + shadow + sage
+ *     border via data-hover-lift).
+ *
+ * Mobile (≤768px): the three-column grid stacks to single-column. Ordinal
+ * sits top-left, name + body middle, weight bottom-right. Same elements,
+ * vertical layout.
  */
 export function Pillar({
   name,
@@ -40,7 +46,6 @@ export function Pillar({
   weightPct?: number;
 }) {
   const weightLabel = `${weight.replace('%', ' percent')} of total score weight`;
-  // Visual-scale step function — driven by pillar weight (Chapter 2 v2 spec).
   const visualScale =
     typeof weightPct !== 'number'
       ? 1
@@ -56,62 +61,65 @@ export function Pillar({
       ? { '--reveal-delay': `${idx * 80}ms` }
       : null),
     '--pillar-visual-scale': String(visualScale),
+    paddingTop: 'calc(clamp(48px, 6vw, 96px) * var(--pillar-visual-scale, 1))',
+    paddingBottom:
+      'calc(clamp(48px, 6vw, 96px) * var(--pillar-visual-scale, 1))',
   } as CSSProperties;
-  // Bracketed IDs are derived from `idx` (0-indexed) → 01, 02, 03 ... per
-  // operator Q8 lock. Zero-padded so brackets read evenly across rows.
   const idLabel =
     typeof idx === 'number' ? String(idx + 1).padStart(2, '0') : '00';
-  // Bar width as a percentage of the bar's container — bar fills the right
-  // column proportionally to the pillar weight. Linear scale: 20% weight → 100%
-  // bar (max), 5% weight → 25% bar (min visible).
-  const barPercent =
-    typeof weightPct === 'number' && weightPct > 0
-      ? Math.min(100, (weightPct / 0.2) * 100)
-      : 0;
+  // Strip the percentage sign — rendered as a small mono superscript on the
+  // display numeral so the number itself reads at full editorial scale.
+  const weightNumber = weight.replace('%', '');
   return (
     <li
-      className="pillar-row grid grid-cols-[minmax(96px,12vw)_1fr_180px] gap-6 py-12 items-baseline max-md:grid-cols-1 max-md:gap-3 max-md:py-8 px-2"
+      className="pillar-row grid grid-cols-[minmax(120px,14vw)_1fr_minmax(120px,14vw)] gap-x-8 lg:gap-x-12 items-center max-md:grid-cols-1 max-md:gap-y-6 px-2"
       data-reveal
       data-hover-lift
       style={rowStyle}
     >
       <span
-        className="font-mono font-bold tracking-[-0.01em] leading-[0.95] text-[color:var(--color-ink)]"
+        className="font-mono font-bold tracking-[-0.02em] leading-[0.85] text-[color:var(--color-ink)]"
         aria-hidden="true"
         style={{
           fontSize:
-            'calc(clamp(48px, 6vw, 96px) * var(--pillar-visual-scale, 1))',
+            'calc(clamp(60px, 8vw, 120px) * var(--pillar-visual-scale, 1))',
         }}
       >
         <Bracket>{idLabel}</Bracket>
       </span>
-      <span className="grid grid-cols-1 gap-3">
+      <span className="grid grid-cols-1 gap-4 max-md:gap-3 max-w-[44ch]">
         <span
-          className="pillar-name font-sans font-medium tracking-[-0.02em] leading-[1.05]"
+          className="pillar-name font-sans font-medium tracking-[-0.025em] leading-[1.05] text-[color:var(--color-ink)]"
           style={{
             fontSize:
-              'calc(clamp(28px, 3.5vw, 48px) * var(--pillar-visual-scale, 1))',
+              'calc(clamp(28px, 4vw, 56px) * var(--pillar-visual-scale, 1))',
           }}
         >
           {name}
         </span>
-        <span className="pillar-desc text-[color:var(--color-mute)]">{desc}</span>
-      </span>
-      <span className="grid grid-cols-1 gap-2 max-md:gap-1">
         <span
-          className="eyebrow text-right max-md:text-left"
-          aria-label={weightLabel}
+          className="pillar-desc text-[color:var(--color-mute)] leading-[1.55]"
+          style={{ fontSize: 'clamp(15px, 1.2vw, 17px)' }}
         >
-          {weight}
+          {desc}
         </span>
+      </span>
+      <span
+        className="font-mono font-bold tracking-[-0.02em] leading-[0.85] text-[color:var(--color-ink)] text-right max-md:text-left whitespace-nowrap"
+        aria-label={weightLabel}
+        style={{
+          fontSize:
+            'calc(clamp(60px, 8vw, 120px) * var(--pillar-visual-scale, 1))',
+        }}
+      >
+        {weightNumber}
         <span
+          className="font-mono font-medium inline-block align-top"
           aria-hidden="true"
-          className="block h-[1px] justify-self-end max-md:justify-self-start"
-          style={{
-            width: `${barPercent}%`,
-            background: 'var(--color-accent)',
-          }}
-        />
+          style={{ fontSize: '0.32em', marginLeft: '0.06em' }}
+        >
+          %
+        </span>
       </span>
     </li>
   );
