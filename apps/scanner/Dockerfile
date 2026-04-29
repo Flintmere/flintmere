@@ -22,6 +22,9 @@ FROM node:22-alpine AS build
 RUN apk add --no-cache openssl
 RUN corepack enable
 WORKDIR /repo
+# Tier-1 build optimisation 2026-04-29 — skip Next.js telemetry HTTP call
+# during build (~1-2s; opt-out per https://nextjs.org/telemetry).
+ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /repo/node_modules ./node_modules
 COPY --from=deps /repo/apps/scanner/node_modules ./apps/scanner/node_modules
 COPY --from=deps /repo/packages ./packages

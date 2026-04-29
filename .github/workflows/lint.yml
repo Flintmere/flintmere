@@ -1,0 +1,35 @@
+# Lint replaces the in-build ESLint pass that next.config.ts disabled
+# for build-time savings (Tier-1 build optimisation 2026-04-29).
+# Runs on every PR + push to main; blocks merge if lint fails.
+
+name: lint
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages
+        run: pnpm -r --filter "@flintmere/*" build
+
+      - name: Lint scanner
+        run: pnpm -F scanner lint

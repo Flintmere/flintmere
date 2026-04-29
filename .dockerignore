@@ -33,3 +33,17 @@ projects/
 master-build-kit/
 *.md
 !README.md
+
+# Tier-1 build optimisation 2026-04-29 — keep scanner build context lean.
+# Each line below is something `COPY . .` was bringing into the scanner
+# build that scanner doesn't need; busted layer caches on every commit
+# touching shopify-app or design assets.
+apps/shopify-app
+packages/*/test
+packages/*/__tests__
+*.psd
+*.sketch
+*.fig
+docker-compose*.yml
+playwright.config.*
+vitest.config.*

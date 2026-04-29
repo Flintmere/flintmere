@@ -11,6 +11,9 @@ const config: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   transpilePackages: ['@flintmere/scoring', '@flintmere/ui'],
+  // Tier-1 build optimisation 2026-04-29 — ESLint runs in CI on every PR
+  // (.github/workflows/lint.yml); production build skips it for ~10-15s/build.
+  eslint: { ignoreDuringBuilds: true },
   images: {
     // Marketing surfaces ship AVIF as primary, WebP as fallback.
     // See memory/design/tokens.md §Imagery weight budgets.
@@ -47,8 +50,11 @@ export default withSentryConfig(config, {
   // For all available options, see:
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-  // Upload a larger set of source maps for prettier stack traces (increases build time)
-  widenClientFileUpload: true,
+  // Tier-1 build optimisation 2026-04-29 — widening explicitly increases build
+  // time (per Sentry's own comment); standard source-map upload is sufficient
+  // for our current stack-trace fidelity needs. Re-enable if a debugging
+  // session shows we need the extra granularity.
+  widenClientFileUpload: false,
 
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   // This can increase your server load as well as your hosting bill.
