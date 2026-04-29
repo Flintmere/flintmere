@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { Bracket, SiteFooter } from '@flintmere/ui';
 import { ViewportReveal } from '@/components/ViewportReveal';
 import { HeroParallaxFigure } from '@/components/HeroParallaxFigure';
-import { PillarWheel, type PillarSpec } from '@/components/sections/PillarWheel';
+import { type PillarSpec } from '@/components/sections/PillarWheel';
+import { PillarWheelScrollPin } from '@/components/sections/PillarWheelScrollPin';
 import { FounderStrip } from '@/components/sections/FounderStrip';
 import { ManifestoChord } from '@/components/sections/ManifestoChord';
 
@@ -329,25 +330,70 @@ export default function MarketingHome() {
           >
             // the seven checks
           </p>
+          {/* Chapter 2 headline — Apple-pattern word-cascade with beat
+              (2026-04-29). Each word fades up independently with 120ms
+              stagger on line 1 (medium weight, the assertion) and 150ms
+              stagger on line 2 (bold weight, the punchline) with a 300ms
+              pause between lines. Mimics Apple iPhone 17 Pro display-
+              headline cadence — each word a footstep. The h2 itself is
+              read as one phrase by screen readers; word spans are
+              decorative-only via aria-hidden, so the audio narration
+              stays clean prose. */}
           <h2
             id="pillars-heading"
-            data-reveal
             className="font-sans tracking-[-0.04em] leading-[0.92] max-w-[26ch] text-[color:var(--color-ink)]"
-            style={{
-              fontSize: 'clamp(48px, 7vw, 112px)',
-              ['--reveal-delay' as string]: '120ms',
-            }}
+            style={{ fontSize: 'clamp(48px, 7vw, 112px)' }}
           >
-            <span className="block font-medium">
-              An AI agent reads your catalog in seven passes.
+            <span className="sr-only">
+              An AI agent reads your catalog in seven passes. Fail one, lose the sale.
             </span>
-            <span className="block font-bold mt-2">
-              Fail one, lose the sale.
-            </span>
+            {(() => {
+              const LINE_1 = 'An AI agent reads your catalog in seven passes.'.split(' ');
+              const LINE_2 = 'Fail one, lose the sale.'.split(' ');
+              const ENTRY_DELAY = 200;
+              const STAGGER_1 = 120;
+              const LINE_GAP = 300;
+              const STAGGER_2 = 150;
+              const line1Total = ENTRY_DELAY + LINE_1.length * STAGGER_1;
+              return (
+                <span aria-hidden="true">
+                  <span className="block font-medium">
+                    {LINE_1.map((word, i) => (
+                      <span
+                        key={`l1-${i}`}
+                        data-reveal
+                        style={{
+                          display: 'inline-block',
+                          marginRight: i < LINE_1.length - 1 ? '0.28em' : 0,
+                          ['--reveal-delay' as string]: `${ENTRY_DELAY + i * STAGGER_1}ms`,
+                        }}
+                      >
+                        {word}
+                      </span>
+                    ))}
+                  </span>
+                  <span className="block font-bold mt-2">
+                    {LINE_2.map((word, i) => (
+                      <span
+                        key={`l2-${i}`}
+                        data-reveal
+                        style={{
+                          display: 'inline-block',
+                          marginRight: i < LINE_2.length - 1 ? '0.28em' : 0,
+                          ['--reveal-delay' as string]: `${line1Total + LINE_GAP + i * STAGGER_2}ms`,
+                        }}
+                      >
+                        {word}
+                      </span>
+                    ))}
+                  </span>
+                </span>
+              );
+            })()}
           </h2>
           {/* Decorative sage hairline anchor — structural-decorative use
-              per ADR 0021 §Accent §Decorative. Sets up the rhythm to
-              the list below. */}
+              per ADR 0021 §Accent §Decorative. Sweeps in AFTER the
+              headline cadence completes (~3000ms after section entry). */}
           <div
             aria-hidden="true"
             data-reveal
@@ -357,21 +403,20 @@ export default function MarketingHome() {
               width: 'clamp(160px, 14vw, 280px)',
               background: 'var(--color-accent-sage)',
               opacity: 0.85,
-              ['--reveal-delay' as string]: '240ms',
+              ['--reveal-delay' as string]: '3000ms',
             }}
           />
         </div>
 
-        {/* Section body — the diagnostic wheel.
+        {/* Section body — the diagnostic wheel, scroll-pinned (2026-04-29).
+            Apple-pattern: wheel pins at viewport top inside a 450vh
+            runway; scroll progress 0→1 advances the active pillar 0→6.
             Seven wedges angled by weight (20%→72°, 5%→18°), centre carries
             active ordinal, side panel shows "what we check" + "common miss"
-            for the active pillar. Mirrors the scanner's ScoreRing. */}
-        <div
-          className="mx-auto max-w-[1280px] px-8 lg:px-12"
-          style={{ paddingBottom: 'clamp(96px, 12vh, 160px)' }}
-        >
-          <PillarWheel pillars={PILLARS} />
-        </div>
+            for the active pillar. Mirrors the scanner's ScoreRing.
+            Reduced-motion users get the unpinned wheel with native click/
+            keyboard interaction. */}
+        <PillarWheelScrollPin pillars={PILLARS} />
         <p className="sr-only">
           Each pillar carries the weight shown. Your final score is a
           weighted average across the seven, out of 100.

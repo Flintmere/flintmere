@@ -1,7 +1,13 @@
 'use client';
 
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useMotionValueEvent,
+  useReducedMotion,
+} from 'motion/react';
 
 /**
  * ManifestoChord — Chapter 4, "Catalog Page Demo" with three rotating
@@ -98,8 +104,12 @@ const EXAMPLES: Example[] = [
   },
 ];
 
-const ROTATION_MS = 12000;
-const FADE_DURATION = 1.0;
+// Scroll-driven advance per #4 + #8 canon pairing. Each example gets
+// SCROLL_PER_EXAMPLE_VH of scroll runway; the section pins for the
+// duration so user controls pace. Reduced-motion drops the pin and
+// renders a single static example.
+const SCROLL_PER_EXAMPLE_VH = 100;
+const FADE_DURATION = 0.6;
 
 const proseStyle: CSSProperties = {
   color: 'var(--color-mute)',
@@ -115,24 +125,39 @@ const tokenSettledStyle: CSSProperties = {
 };
 
 export function ManifestoChord() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const reducedMotion = useReducedMotion() ?? false;
 
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
+  // Scroll-driven advance — scroll progress 0→1 across the runway maps
+  // to active example index 0→N-1. Replaces the previous setInterval
+  // timer per #4 + #8 canon pairing. Reduced-motion users skip this
+  // hook (early return below renders the static fallback).
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end end'],
+  });
 
-  useEffect(() => {
+  useMotionValueEvent(scrollYProgress, 'change', (progress) => {
     if (reducedMotion) return;
-    const id = window.setInterval(() => {
-      setIndex((i) => (i + 1) % EXAMPLES.length);
-    }, ROTATION_MS);
-    return () => window.clearInterval(id);
-  }, [reducedMotion]);
+    const next = Math.min(
+      EXAMPLES.length - 1,
+      Math.max(0, Math.floor(progress * EXAMPLES.length)),
+    );
+    if (next !== index) setIndex(next);
+  });
+
+  // Manual override — clicking a dot scrolls the page to that example's
+  // mid-range so scroll position and active state stay in sync.
+  const jumpTo = (target: number) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const scrollTop = window.scrollY + rect.top;
+    const totalRunway = containerRef.current.clientHeight - window.innerHeight;
+    const targetY =
+      scrollTop + ((target + 0.5) / EXAMPLES.length) * totalRunway;
+    window.scrollTo({ top: targetY, behavior: 'smooth' });
+  };
 
   const example = EXAMPLES[index] ?? EXAMPLES[0]!;
 
@@ -140,13 +165,30 @@ export function ManifestoChord() {
   const tokenCount = example.segments.filter((s) => s.kind === 'token').length;
   let tokenIdx = -1;
 
+  // Runway height = 1 base viewport + N examples × per-example vh.
+  // useScroll's "start start → end end" maps progress 0→1 to the scroll
+  // distance (containerHeight - viewportHeight) — so a 100vh sticky
+  // child gets (containerHeight - 100vh) of scroll runway.
+  const runwayVh = 100 + EXAMPLES.length * SCROLL_PER_EXAMPLE_VH;
+
   return (
+    <div
+      ref={containerRef}
+      style={{
+        position: 'relative',
+        height: reducedMotion ? 'auto' : `${runwayVh}vh`,
+      }}
+    >
     <section
       id="manifesto"
       aria-labelledby="manifesto-heading"
       className="relative flex flex-col justify-center bg-[color:var(--color-paper)]"
       style={{
+        position: reducedMotion ? 'relative' : 'sticky',
+        top: 0,
+        height: '100vh',
         minHeight: '100vh',
+        overflow: 'hidden',
         zIndex: 1,
         paddingLeft: 'clamp(24px, 6vw, 96px)',
         paddingRight: 'clamp(24px, 6vw, 96px)',
@@ -275,7 +317,7 @@ export function ManifestoChord() {
               role="tab"
               aria-selected={active}
               aria-label={`Show example ${i + 1} of ${EXAMPLES.length}`}
-              onClick={() => setIndex(i)}
+              onClick={() => (reducedMotion ? setIndex(i) : jumpTo(i))}
               style={{
                 width: active ? '28px' : '8px',
                 height: '8px',
@@ -299,6 +341,7 @@ export function ManifestoChord() {
         The rest is invisible to AI shopping agents.
       </p>
     </section>
+    </div>
   );
 }
 

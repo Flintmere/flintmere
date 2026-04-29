@@ -540,18 +540,14 @@
   background: var(--color-paper);
 }
 
-/* Two sticky-reveal panels at z:-1 — chapter 3 (FounderStrip) and chapter 5
-   (SiteFooter). Both paint below sibling sections (which paint at the
-   "z-index: auto / 0" layer per CSS stacking-order rules), but above
-   main's own background — so each curtain is uncovered when the chapter
-   above it scrolls off, then re-covered by the next paper chapter (chapter
-   4 manifesto, z:1) on the way down to the footer reveal.
+/* Sticky-bottom curtain reveal — chapter 5 (SiteFooter) only.
+   Paints below sibling sections (z:-1), above main's background, so the
+   wordmark closing chord is uncovered when chapter 4 scrolls off-top.
 
-   SCOPED to .flintmere-main only (homepage). On other pages (/research,
+   SCOPED to .flintmere-main (homepage). On other pages (/research,
    /audit, /pricing, etc.) the footer renders as a normal block element
    at natural height — no sticky, no negative z-index leaks. */
-.flintmere-main .flintmere-footer-sticky,
-.flintmere-main .flintmere-founder-sticky {
+.flintmere-main .flintmere-footer-sticky {
   position: sticky;
   bottom: 0;
   z-index: -1;
@@ -561,18 +557,39 @@
   justify-content: center;
 }
 
-/* Curtain-pair containing block (Batch B fix 2026-04-29).
-   Wraps chapters 3 + 4 so chapter 3's sticky-bottom-0 unsticks at the end
-   of chapter 4 (wrapper's bottom edge), instead of staying anchored all
-   the way to <main>'s bottom edge. Without this, founder + footer both
-   stickied at z:-1 collided at end of scroll and source-order painted
-   the footer over the founder ("footer repeated in chapter 3 position").
+/* Chapter 3 (FounderStrip) uses mechanic #5 dual-column pin + scrollable
+   companion (per memory/design/scroll-choreographies.md, redesigned
+   2026-04-29 after #2 sticky-top scroll-over was downgraded for content
+   overflow). The LEFT column (founder voice) pins via the
+   .flintmere-founder-pinned class below; the RIGHT column (three proof
+   panels) scrolls naturally past it. */
+.flintmere-main .flintmere-founder-sticky {
+  /* Section is content-driven height — no positioning at section level.
+     Pin is on the LEFT column only via .flintmere-founder-pinned. */
+}
 
-   z-index: 0 + isolation: isolate creates a NEW stacking context here,
-   so founder's z:-1 lives inside the wrapper's context, separate from
-   the footer's z:-1 in main's context. Without the new stacking context,
-   founder z:-1 would still compete with footer z:-1 at the main-level
-   z:-1 layer, and source order would paint footer on top of founder. */
+/* Founder voice — pinned LEFT column (#5 dual-column pin).
+   Sticky kicks in at ≥lg breakpoint only; below lg the columns stack
+   and the pin would be meaningless. The top offset gives breathing room
+   below any future fixed nav and matches the visual rhythm of the
+   pinned wheel above. */
+.flintmere-founder-pinned {
+  position: relative;
+}
+@media (min-width: 1024px) {
+  .flintmere-main .flintmere-founder-pinned {
+    position: sticky;
+    top: clamp(48px, 8vh, 96px);
+    align-self: start;
+    height: fit-content;
+  }
+}
+
+/* Curtain-pair wrapper retained for editorial grouping (chapters 3 + 4
+   as a related pair) but no longer creates a sticky containing block
+   since chapter 3 is no longer pinned. Position relative + isolation
+   isolate kept for stacking-context cleanliness — manifesto's z:1 stays
+   localised within the wrapper. */
 .flintmere-curtain-pair {
   position: relative;
   z-index: 0;

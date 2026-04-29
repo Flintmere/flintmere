@@ -218,8 +218,31 @@ const bodyLineVariants: Variants = {
   exit: { opacity: 0, y: -8, transition: { duration: 0.16 } },
 };
 
-export function PillarWheel({ pillars }: { pillars: PillarSpec[] }) {
-  const [active, setActive] = useState(0);
+export interface PillarWheelProps {
+  pillars: PillarSpec[];
+  /** Controlled active index — when supplied, the wheel reflects this
+   *  value and calls onActiveChange for click/keyboard. When omitted,
+   *  the wheel manages its own internal active state. Used for the
+   *  scroll-driven advance behaviour in chapter 2's pinned wheel. */
+  active?: number;
+  onActiveChange?: (next: number) => void;
+}
+
+export function PillarWheel({
+  pillars,
+  active: controlledActive,
+  onActiveChange,
+}: PillarWheelProps) {
+  const [internalActive, setInternalActive] = useState(0);
+  const active = controlledActive ?? internalActive;
+  const setActive = useCallback(
+    (next: number | ((prev: number) => number)) => {
+      const resolved = typeof next === 'function' ? next(active) : next;
+      if (onActiveChange) onActiveChange(resolved);
+      if (controlledActive === undefined) setInternalActive(resolved);
+    },
+    [active, controlledActive, onActiveChange],
+  );
   const [modalOpen, setModalOpen] = useState(false);
   const titleId = useId();
   const descId = useId();
