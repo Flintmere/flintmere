@@ -3,34 +3,134 @@ import Link from 'next/link';
 import { Bracket, SiteFooter } from '@flintmere/ui';
 import { ViewportReveal } from '@/components/ViewportReveal';
 import { HeroParallaxFigure } from '@/components/HeroParallaxFigure';
-import { Pillar } from '@/components/sections/Pillar';
+import { PillarWheel, type PillarSpec } from '@/components/sections/PillarWheel';
 import { FounderStrip } from '@/components/sections/FounderStrip';
+import { ManifestoChord } from '@/components/sections/ManifestoChord';
 
 /**
- * Marketing home — cull-to-four arc 2026-04-28.
+ * Marketing home — Batch B expand-to-five arc 2026-04-29.
+ * Five chapters: Hero · Pillars · FounderStrip · Manifesto · Footer.
  *
- * Four chapters: Hero · Pillars · FounderStrip · Footer. Council 11-1
- * (#15 conditional) approved cull from 12 sections to 4. Path A
- * (type-led, no imagery beyond the hero photo) — operator pick.
+ * Chapter 4 (ManifestoChord) is the new chord between proof and close,
+ * sitting on opaque paper at z:1. Chapter 5 (Footer) is pinned beneath
+ * via .flintmere-footer-sticky, so as chapter 4 scrolls off, the wordmark
+ * curtain is uncovered. The reveal mechanic is CSS-only — see
+ * apps/scanner/src/app/globals.css §Sticky-footer reveal.
  *
- * Each chapter awaits its amplification dispatch:
- *  - Chapter 1 (Hero): typographic scale-up to clamp(72px,11vw,144px)
- *    weight 500, parallax + photoreal stay.
- *  - Chapter 2 (Pillars): Pentagram-scale rebuild — oversized [ 06 ]
- *    numeral fills 60% of frame; six pillars as Bloomberg-cover essay
- *    with hairline rules between rows.
- *  - Chapter 3 (FounderStrip): Margaret-Howell restraint amplified;
- *    paper-bordered Book audit CTA at chapter-anchor scale.
- *  - Chapter 4 (Footer): closing wordmark amplified to clamp(80px,
- *    10vw,160px) so the page closes on the mark.
- *
- * Cuts (one commit, no replacement): StatTriad, live sample,
- * HomepageVerticalPicker, Before/After, £97 audit-deep, CompareSection,
- * PricingStripPlaceholder, ManifestoSection.
+ * Spec: context/design/extravagant/2026-04-29-batch-b-five-chapter-spec.md.
  */
+
+const PILLARS: PillarSpec[] = [
+  {
+    name: 'Product IDs',
+    headline: "Without IDs, you don't exist.",
+    weight: '20%',
+    weightPct: 0.2,
+    looksFor:
+      'GTIN, MPN or brand on every product variant — set as structured Shopify metafields, not buried in description text.',
+    commonMiss:
+      '"Brand: Generic" or empty MPN. Agents skip the listing because they cannot disambiguate the product from look-alikes.',
+    whatToDo:
+      'Backfill GTIN where you have one, MPN where you do not, and brand on every variant. Five minutes per product, properly categorised, beats five hours of guesswork at the checkout.',
+    image: '/marketing/pillars/01-product-ids.webp',
+    imageAlt:
+      'A small printed paper barcode sticker on a plain unbranded brown kraft parcel, soft daylight from upper-left, warm cream backdrop.',
+  },
+  {
+    name: 'Structured attributes',
+    headline: 'Specs as data. Or specs nowhere.',
+    weight: '20%',
+    weightPct: 0.2,
+    looksFor:
+      'Size, colour, material, dimensions exist as named metafields the agent can read directly.',
+    commonMiss:
+      'Specs live inside the description HTML. Agents cannot filter or compare your product against a query.',
+    whatToDo:
+      'Move every filterable attribute (size, colour, material, dimensions) out of free-text and into named metafields. Then audit your description for fields you can extract back into structured data.',
+    image: '/marketing/pillars/02-structured-attributes.webp',
+    imageAlt:
+      'A stack of four small cream-coloured woven garment care labels, fanned slightly, soft daylight, warm cream backdrop.',
+  },
+  {
+    name: 'Title & description quality',
+    headline: "Spec sheets sell. Prose doesn't.",
+    weight: '15%',
+    weightPct: 0.15,
+    looksFor:
+      'Titles read like spec sheets — concrete materials, dimensions, model. Descriptions extend the spec, they do not pitch.',
+    commonMiss:
+      'Marketing prose dense with adjectives but no parsable spec. Agents have nothing to extract.',
+    whatToDo:
+      'Rewrite titles to lead with brand, product, key spec. Move marketing language to the end. Descriptions: facts first, story second.',
+    image: '/marketing/pillars/03-title-quality.webp',
+    imageAlt:
+      'An open vintage hardcover ledger book showing neatly ruled cream pages with no text, soft daylight, warm cream backdrop.',
+  },
+  {
+    name: 'Google category match',
+    headline: 'Categorised, or invisible.',
+    weight: '15%',
+    weightPct: 0.15,
+    looksFor:
+      'Every product mapped to a Google Merchant Center taxonomy node, so the agent knows what category your product belongs in.',
+    commonMiss:
+      'Default or missing category. Your product is not classified for Google Shopping and falls out of the comparison set.',
+    whatToDo:
+      'Map every product to a specific Google Merchant taxonomy node — not the parent category, the leaf. The more specific, the more agents include you in their comparison set.',
+    image: '/marketing/pillars/04-category-match.webp',
+    imageAlt:
+      'An old wooden library card-catalog drawer half pulled open, revealing densely packed cream index cards in alphabetical order.',
+  },
+  {
+    name: 'Data consistency',
+    headline: 'Sloppy reads as suspicious.',
+    weight: '15%',
+    weightPct: 0.15,
+    looksFor:
+      'Live images, in-stock active variants, alt text on every image, and prices that match between product pages and the feed.',
+    commonMiss:
+      '404 image URLs, ghost variants left active, or price drift between PDP and the feed. Agents read inconsistency as low quality.',
+    whatToDo:
+      'Run a weekly catalog audit: dead images, stale variants, price drift, missing alt text. Five minutes a week prevents being filtered out as low-quality data.',
+    image: '/marketing/pillars/05-data-consistency.webp',
+    imageAlt:
+      'Three identical small cream ceramic jars in a neat horizontal row, the middle one with a tiny chip at the rim, on a wooden surface.',
+  },
+  {
+    name: 'AI agent access',
+    headline: 'Locked out, ranked out.',
+    weight: '5%',
+    weightPct: 0.05,
+    looksFor:
+      'robots.txt and sitemap permit the indexing your store needs; llms.txt declares scope for AI agents.',
+    commonMiss:
+      'Default robots.txt blocking AI user-agents you did not mean to block. The agent never reaches your catalog.',
+    whatToDo:
+      'Audit your robots.txt for accidental AI user-agent blocks. Publish llms.txt at the root with the catalog scope and rate-limit guidance. Submit your sitemap to Google Merchant.',
+    image: '/marketing/pillars/06-agent-access.webp',
+    imageAlt:
+      'An antique tarnished brass key resting beside an open vintage iron padlock on a wooden surface.',
+  },
+  {
+    name: 'Agent checkout readiness',
+    headline: 'Reach the cart. Win the cart.',
+    weight: '10%',
+    weightPct: 0.1,
+    looksFor:
+      'Cart and checkout work without human-only steps. The end-to-end purchase path is reachable by an automated agent.',
+    commonMiss:
+      'SMS verification or human captcha at checkout. Agents reach the purchase step, then bounce off the wall.',
+    whatToDo:
+      'Audit your checkout for human-only steps. SMS verification, captchas, and required account creation all kill agent purchases. Use Shop Pay or guest checkout as the agent-accessible path.',
+    image: '/marketing/pillars/07-checkout-readiness.webp',
+    imageAlt:
+      'A small empty woven wicker shopping basket with a worn leather handle, sitting on a wooden floor in soft daylight.',
+  },
+];
+
 export default function MarketingHome() {
   return (
-    <main id="main">
+    <main id="main" className="flintmere-main">
       <a href="#hero" className="skip-link">Skip to content</a>
       <ViewportReveal>
       {/* Chapter 1 — Hero (Modern House split + Pentagram Saks logotype scale +
@@ -187,18 +287,18 @@ export default function MarketingHome() {
         </div>
       </section>
 
-      {/* Chapter 2 — Pillars (v3 — list-as-design, 2026-04-29).
-          Replaces the Bureau-MB cover at 63e0a41 — that composition's
-          two-column grid + numeral-bleed produced catastrophic overlap
-          at narrow desktop viewports (the `[ 0 7 ]` characters collided
-          with the headline column). The list IS the cover; v3 trusts
-          the seven amplified pillar rows to carry the section without
-          a borrowed cover above them.
-          References: Order Form magazine (lead — typography-led indie-mag
-          where the explicit grid IS the design language); Areena's index
-          numerals (secondary — display-scale ordinals as section anchors);
-          Anthony Burrill (tertiary — bold declarative typography as the
-          entire surface, no decoration competing with the rows). */}
+      {/* Chapter 2 — Pillars (v7 — the Diagnostic Wheel, 2026-04-29).
+          Spec: context/design/extravagant/2026-04-29-chapter-2-pillars-wheel.md.
+          The seven pillars rendered as a weighted radial donut: each wedge
+          angled by its weight (20% → 72°, 5% → 18°). The marketing page
+          reuses the scanner's signature ScoreRing composition — annulus
+          + hollow centre + ordinal numeral — so the merchant learns the
+          diagnostic visual before ever running a scan. Click or arrow-key
+          cycles the active wedge; the editorial panel updates to show
+          "what we check" + "common miss" for the active pillar. Replaces
+          v6 (linear Hodinkee list) — operator-rejected as default-reflex.
+          Operator instruction: "extravagant means experiment use colour
+          be bold be brave." */}
       <section
         id="pillars"
         aria-labelledby="pillars-heading"
@@ -262,86 +362,44 @@ export default function MarketingHome() {
           />
         </div>
 
-        {/* Section body — the seven amplified pillars carry the section.
-            Order-Form-magazine register: explicit grid as design language;
-            each row is a tiny editorial spread. Visual-weight-by-data-weight
-            scaling preserved from v2 (20%→1.0, 15%→0.9, 10%→0.82, 5%→0.72)
-            so the smallest pillar reads as quieter, not broken. */}
+        {/* Section body — the diagnostic wheel.
+            Seven wedges angled by weight (20%→72°, 5%→18°), centre carries
+            active ordinal, side panel shows "what we check" + "common miss"
+            for the active pillar. Mirrors the scanner's ScoreRing. */}
         <div
           className="mx-auto max-w-[1280px] px-8 lg:px-12"
           style={{ paddingBottom: 'clamp(96px, 12vh, 160px)' }}
         >
-          <ol className="list-none p-0 m-0 divide-y divide-[color:var(--color-line)] border-y border-[color:var(--color-line)]">
-          {[
-            {
-              name: 'Product IDs',
-              weight: '20%',
-              weightPct: 0.2,
-              desc: 'Whether each product carries the codes agents look it up by — barcode, brand, manufacturer part number.',
-            },
-            {
-              name: 'Structured attributes',
-              weight: '20%',
-              weightPct: 0.2,
-              desc: 'Whether size, colour, material and other fields exist as structured data — not hidden inside the description.',
-            },
-            {
-              name: 'Title & description quality',
-              weight: '15%',
-              weightPct: 0.15,
-              desc: 'Whether titles and descriptions read like spec sheets an agent can parse — not marketing copy.',
-            },
-            {
-              name: 'Google category match',
-              weight: '15%',
-              weightPct: 0.15,
-              desc: 'Whether products carry a Google Merchant Center category, so agents know what you sell.',
-            },
-            {
-              name: 'Data consistency',
-              weight: '15%',
-              weightPct: 0.15,
-              desc: 'Whether the catalog looks healthy — images load, active products have stock, alt text exists, prices match across pages.',
-            },
-            {
-              name: 'AI agent access',
-              weight: '5%',
-              weightPct: 0.05,
-              desc: 'Whether AI shopping agents are allowed to read your site at all — robots rules, sitemap, llms.txt.',
-            },
-            {
-              name: 'Agent checkout readiness',
-              weight: '10%',
-              weightPct: 0.1,
-              desc: 'Whether an AI agent can actually complete a purchase on your store without human intervention.',
-            },
-          ].map((p, idx) => (
-            <Pillar key={p.name} {...p} idx={idx} />
-          ))}
-          </ol>
-          {/* Section close — small mute methodology note in mono.
-              Sits below the list as a quiet footer to the section,
-              matching the editorial-spread cadence (the row IS the
-              spread; this is the colophon). */}
-          <p
-            className="mt-16 lg:mt-20 max-w-[60ch] font-sans"
-            style={{
-              fontSize: 'clamp(13px, 1vw, 15px)',
-              color: 'var(--color-mute)',
-              lineHeight: 1.55,
-            }}
-          >
-            Each pillar carries the weight shown. Your final score is a
-            weighted average across the seven.
-          </p>
+          <PillarWheel pillars={PILLARS} />
         </div>
+        <p className="sr-only">
+          Each pillar carries the weight shown. Your final score is a
+          weighted average across the seven, out of 100.
+        </p>
       </section>
 
-      {/* Chapter 3 — Founder strip (post-Batch-A canon-compliant; awaiting
-          Chapter 3 amplification per cull-to-four arc 2026-04-28) */}
-      <FounderStrip />
+      {/* Curtain pair — chapters 3 + 4 share a position:relative wrapper
+          so chapter 3's sticky-bottom-0 unsticks at the wrapper's bottom
+          (end of chapter 4) instead of all the way to <main>'s end.
+          Without this bounded containing block, founder + footer (both at
+          z:-1 sticky) collided at end of scroll and source-order painted
+          the footer over the founder strip. See globals.css §Curtain-pair. */}
+      <div className="flintmere-curtain-pair">
+        {/* Chapter 3 — Founder strip (sticky reveal bounded by curtain-pair) */}
+        <FounderStrip />
 
-      {/* Chapter 4 — Footer (post-Batch-A canon-compliant) */}
+        {/* Chapter 4 — Manifesto chord (Batch B, 2026-04-29).
+            Single bracketed thesis sentence on paper, one viewport, the chord
+            before the footer curtain. Copy picked by claim-review:
+            context/design/extravagant/2026-04-29-chapter-4-manifesto-claim-review.md */}
+        <ManifestoChord />
+      </div>
+
+      {/* Chapter 5 — Footer (sticky-reveal mechanic; Batch B 2026-04-29).
+          Pinned at viewport bottom (z:0) via .flintmere-footer-sticky;
+          chapters 1–4 scroll over it on opaque paper (z:1). The wordmark
+          weight bumped 500→700 (relaxation-axis legal per ADR 0021); the
+          locked clamp(80,10vw,160) sizing is preserved. */}
       <SiteFooter />
       </ViewportReveal>
     </main>

@@ -1,60 +1,89 @@
 import Link from 'next/link';
 
 /**
- * SiteHeader — the lifted header chrome.
+ * SiteHeader — Batch B navbar redo (2026-04-29).
  *
- * Phase A of the food-first homepage restructure (per
- * context/design/specs/2026-04-26-homepage-food-first.md §Implementation order)
- * lifts the per-page <header> into a single shared component rendered from
- * apps/scanner/src/app/layout.tsx — so the IA's "5 nav items everywhere" contract
- * (and any future nav update) lands once, not per page.
+ * ABCS-reference editorial register: sentence-case, comma-delimited
+ * inline list, top-right. No pills, no buttons, no chrome bar border.
+ * Logo top-left preserved (existing wordmark + bracket). Hover ink → amber.
  *
- * Phase A constraint: preserve the existing canonical pattern verbatim
- * (3-item nav: Pillars / Pricing / Research + amber "Run a free scan" CTA).
- * The 5-item nav update (Verticals · Pricing · Methodology · Research · About)
- * is Phase C web-implementation work, not Phase A.
+ * Spec: context/design/extravagant/2026-04-29-batch-b-five-chapter-spec.md §Navbar redo.
  *
- * Scanner-only at this stage. Lifting to packages/ui/ happens when
- * standards.flintmere.com starts (the second consumer trigger per
- * memory/design/components.md and the standards architecture spec §2.2).
+ * Items:
+ *   Audit       → /audit
+ *   App         → app.flintmere.com (canonical Shopify-app destination)
+ *   Standards   → /research (until standards.flintmere.com ships)
+ *   Pricing     → /pricing
+ *   Sign in     → app.flintmere.com (auth lives on the embedded app subdomain)
  */
 export function SiteHeader() {
   return (
-    <header className="border-b border-[color:var(--color-line)]">
-      <div className="mx-auto max-w-[1280px] px-8 h-[56px] flex items-center justify-between">
+    <header className="relative z-20 bg-[color:var(--color-paper)]">
+      <div
+        className="mx-auto max-w-[1280px] flex items-center justify-between"
+        style={{
+          paddingLeft: 'clamp(24px, 4vw, 48px)',
+          paddingRight: 'clamp(24px, 4vw, 48px)',
+          paddingTop: 'clamp(20px, 2.5vw, 32px)',
+          paddingBottom: 'clamp(16px, 2vw, 24px)',
+        }}
+      >
         <Link
           href="/"
           aria-label="Flintmere home"
-          className="text-[18px] font-medium tracking-tight"
+          className="font-medium tracking-tight text-[color:var(--color-ink)]"
+          style={{ fontSize: 'clamp(18px, 1.4vw, 20px)' }}
         >
           Flintmere
           <span className="font-mono font-bold" aria-hidden="true">
             ]
           </span>
         </Link>
-        <nav className="hidden md:flex gap-8" aria-label="Primary">
+
+        <nav
+          aria-label="Primary"
+          className="flex items-baseline gap-x-1.5 text-[color:var(--color-ink)]"
+          style={{
+            fontSize: 'clamp(14px, 1.1vw, 16px)',
+            fontWeight: 600,
+            letterSpacing: 0,
+          }}
+        >
           <Link
-            href="/#pillars"
-            className="eyebrow hover:text-[color:var(--color-ink)]"
+            href="/audit"
+            className="site-nav-item hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >
-            Pillars
+            Audit
           </Link>
+          <span aria-hidden="true">,</span>
+          <Link
+            href="https://app.flintmere.com"
+            className="site-nav-item hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
+          >
+            App
+          </Link>
+          <span aria-hidden="true">,</span>
+          <Link
+            href="/research"
+            className="site-nav-item hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
+          >
+            Standards
+          </Link>
+          <span aria-hidden="true">,</span>
           <Link
             href="/pricing"
-            className="eyebrow hover:text-[color:var(--color-ink)]"
+            className="site-nav-item hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >
             Pricing
           </Link>
+          <span aria-hidden="true">,</span>
           <Link
-            href="/research"
-            className="eyebrow hover:text-[color:var(--color-ink)]"
+            href="https://app.flintmere.com"
+            className="site-nav-item hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >
-            Research
+            Sign in
           </Link>
         </nav>
-        <Link href="/scan" className="btn btn-accent">
-          Run a free scan →
-        </Link>
       </div>
     </header>
   );

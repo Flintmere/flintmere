@@ -1,213 +1,188 @@
 import Link from 'next/link';
 
 /**
- * SiteFooter — substantive footer with brand statement, four-column nav,
- * and a closing rule. Replaces the 27-line minimal version 2026-04-28
- * after operator critique "where is your footer".
+ * SiteFooter — closing-chord footer (Batch B, 2026-04-29).
  *
- * Surface: ink-slab variant (paper-on-ink), pairs with the manifesto
- * section that precedes it — visual continuity. Sage hairline at top
- * for set cohesion with the homepage's hero + picker-block sage anchors.
+ * Composition:
+ *   - Sticky-reveal panel (.flintmere-footer-sticky) — sticky CSS scoped to
+ *     .flintmere-main parent in globals.css, so on the homepage the footer
+ *     is the curtain reveal and on other pages it renders as a normal block.
+ *   - Wordmark + captions centred horizontally + vertically; legal nav
+ *     centred at bottom.
+ *   - Wordmark at locked clamp(80,10vw,160) Geist Mono weight 700 — size
+ *     locked per feedback_footer_wordmark_locked.md, weight bumped per
+ *     ADR 0021 relaxation-axis allowance.
+ *   - Three-line caption block beneath wordmark — email · Built in [London] ·
+ *     legal-entity strip.
+ *   - Bottom legal nav — Privacy / Terms / Security / Cookies / DPA / Support
+ *     comma-delimited, mute-inv on ink ≈ AA at 12px.
  */
 export function SiteFooter() {
   return (
     <footer
-      className="border-t-[2px] border-[color:var(--color-accent-sage)] bg-[color:var(--color-ink)]"
+      className="flintmere-footer-sticky border-t-[2px] border-[color:var(--color-accent-sage)] bg-[color:var(--color-ink)]"
       aria-label="Site footer"
     >
-      <div className="mx-auto max-w-[1280px] px-8 lg:px-12 py-16 lg:py-20">
-        {/* Brand statement row */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] gap-12 lg:gap-16 pb-14 border-b border-[color:var(--color-line-dark)]">
-          <div>
-            <p
-              className="text-[clamp(28px,3.5vw,40px)] font-medium tracking-[-0.025em] leading-[1.1] max-w-[28ch]"
-              style={{ color: 'var(--color-paper-on-ink)' }}
-            >
-              Catalogs built for the agents that decide your next sale.
-            </p>
-            <p
-              className="mt-6 max-w-[44ch] text-[15px] leading-[1.6]"
-              style={{ color: 'var(--color-mute-inv)' }}
-            >
-              Free public scanner. £97 one-off concierge audit. Pro subscriptions
-              for catalogs of any size — the data is yours either way.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/scan"
-                className="inline-flex items-center gap-2.5 px-5 py-3 bg-[color:var(--color-accent)] text-[color:var(--color-accent-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper-on-ink)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)]"
-              >
-                Run the free scan
-                <span aria-hidden="true">→</span>
-              </Link>
-              <Link
-                href="/audit"
-                className="inline-flex items-center gap-2.5 px-5 py-3 border border-[color:var(--color-paper-on-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper-on-ink)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)]"
-                style={{ color: 'var(--color-paper-on-ink)' }}
-              >
-                Book the £97 audit
-                <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Product column */}
-          <nav aria-label="Product" className="flex flex-col gap-3">
-            <p
-              className="font-mono text-[11px] tracking-[0.14em] uppercase mb-2"
-              style={{ color: 'var(--color-mute-inv)', fontWeight: 500 }}
-            >
-              // Product
-            </p>
-            <Link
-              href="/scan"
-              className="text-[14px] hover:opacity-100 transition-opacity"
-              style={{ color: 'var(--color-paper-on-ink)' }}
-            >
-              Free scanner
-            </Link>
-            <Link
-              href="/audit"
-              className="text-[14px] hover:opacity-100 transition-opacity"
-              style={{ color: 'var(--color-paper-on-ink)' }}
-            >
-              £97 concierge audit
-            </Link>
-            <Link
-              href="/pricing"
-              className="text-[14px] hover:opacity-100 transition-opacity"
-              style={{ color: 'var(--color-paper-on-ink)' }}
-            >
-              Pricing
-            </Link>
-            <Link
-              href="/research"
-              className="text-[14px] hover:opacity-100 transition-opacity"
-              style={{ color: 'var(--color-paper-on-ink)' }}
-            >
-              Research
-            </Link>
-          </nav>
-
-          {/* Verticals column */}
-          <nav aria-label="Verticals" className="flex flex-col gap-3">
-            <p
-              className="font-mono text-[11px] tracking-[0.14em] uppercase mb-2"
-              style={{ color: 'var(--color-mute-inv)', fontWeight: 500 }}
-            >
-              // Verticals
-            </p>
-            <Link
-              href="/for/food-and-drink"
-              className="text-[14px]"
-              style={{ color: 'var(--color-paper-on-ink)' }}
-            >
-              Food &amp; drink
-            </Link>
-            <Link
-              href="/for/beauty"
-              className="text-[14px]"
-              style={{ color: 'var(--color-paper-on-ink)' }}
-            >
-              Beauty
-            </Link>
-            <Link
-              href="/for/apparel"
-              className="text-[14px]"
-              style={{ color: 'var(--color-paper-on-ink)' }}
-            >
-              Apparel
-            </Link>
-            <Link
-              href="/for/plus"
-              className="text-[14px]"
-              style={{ color: 'var(--color-paper-on-ink)' }}
-            >
-              Shopify Plus
-            </Link>
-          </nav>
-
-          {/* Company column */}
-          <nav aria-label="Company" className="flex flex-col gap-3">
-            <p
-              className="font-mono text-[11px] tracking-[0.14em] uppercase mb-2"
-              style={{ color: 'var(--color-mute-inv)', fontWeight: 500 }}
-            >
-              // Company
-            </p>
-            <Link
-              href="/support"
-              className="text-[14px]"
-              style={{ color: 'var(--color-paper-on-ink)' }}
-            >
-              Support
-            </Link>
-            <Link
-              href="/privacy"
-              className="text-[14px]"
-              style={{ color: 'var(--color-paper-on-ink)' }}
-            >
-              Privacy
-            </Link>
-            <Link
-              href="/terms"
-              className="text-[14px]"
-              style={{ color: 'var(--color-paper-on-ink)' }}
-            >
-              Terms
-            </Link>
-            <Link
-              href="/security"
-              className="text-[14px]"
-              style={{ color: 'var(--color-paper-on-ink)' }}
-            >
-              Security
-            </Link>
-            <Link
-              href="/cookies"
-              className="text-[14px]"
-              style={{ color: 'var(--color-paper-on-ink)' }}
-            >
-              Cookies
-            </Link>
-            <Link
-              href="/dpa"
-              className="text-[14px]"
-              style={{ color: 'var(--color-paper-on-ink)' }}
-            >
-              DPA
-            </Link>
-          </nav>
-        </div>
-
-        {/* Closing row — chapter 4 amplification 2026-04-29.
-            The page closes on the brand mark. Wordmark scales to chapter-
-            anchor clamp(80, 10vw, 160) Geist Mono weight 500; copyright
-            stays as small mono caption on the same row at items-end
-            (Apartamento asymmetric-editorial register — extreme scale
-            contrast IS the closing move).
-            References: A24 closing pages (the brand mark closes the
-            journey); Pentagram Saks Fifth Avenue identity (wordmark as
-            the design itself); Linear footer (restrained but final-
-            feeling closing chord). */}
-        <div className="pt-12 lg:pt-16 flex flex-wrap items-end justify-between gap-x-8 gap-y-6">
-          <p
-            className="font-mono text-[11px] tracking-[0.14em] uppercase max-w-[64ch]"
-            style={{ color: 'var(--color-mute-inv)' }}
+      <div
+        className="mx-auto w-full max-w-[1280px] flex flex-col"
+        style={{
+          flex: 1,
+          paddingLeft: 'clamp(24px, 4vw, 48px)',
+          paddingRight: 'clamp(24px, 4vw, 48px)',
+          paddingTop: 'clamp(32px, 4vw, 64px)',
+          paddingBottom: 'clamp(24px, 3vw, 48px)',
+        }}
+      >
+        {/* Top strip — primary nav, sentence-case comma-delimited, paper-on-
+            ink, Geist Sans 600. Sits above the wordmark chord. */}
+        <nav
+          aria-label="Footer primary"
+          className="flex items-baseline flex-wrap gap-x-1.5 gap-y-2"
+          style={{
+            fontSize: 'clamp(13px, 1vw, 15px)',
+            fontWeight: 600,
+            color: 'var(--color-paper-on-ink)',
+          }}
+        >
+          <Link
+            href="/scan"
+            className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >
-            © 2026 Flintmere · a trading name of Eazy Access Ltd · England &amp; Wales · UK
-          </p>
+            Free scan
+          </Link>
+          <span aria-hidden="true">,</span>
+          <Link
+            href="/audit"
+            className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
+          >
+            £97 audit
+          </Link>
+          <span aria-hidden="true">,</span>
+          <Link
+            href="/pricing"
+            className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
+          >
+            Pricing
+          </Link>
+          <span aria-hidden="true">,</span>
+          <Link
+            href="/research"
+            className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
+          >
+            Standards
+          </Link>
+          <span aria-hidden="true">,</span>
+          <Link
+            href="https://app.flintmere.com"
+            className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
+          >
+            App
+          </Link>
+        </nav>
+
+        {/* Closing chord — wordmark + captions left-aligned, vertically
+            centred via flex-grow within the sticky panel. */}
+        <div
+          className="flex flex-col items-start justify-center"
+          style={{ flex: 1, minHeight: 'clamp(280px, 40vh, 520px)' }}
+        >
           <p
-            className="font-mono leading-[0.85] tracking-[-0.02em]"
+            className="font-mono leading-[0.85] tracking-[-0.04em]"
             style={{
               fontSize: 'clamp(80px, 10vw, 160px)',
-              color: 'var(--color-paper-on-ink)',
-              fontWeight: 500,
+              color: 'var(--color-accent)',
+              fontWeight: 700,
             }}
           >
             Flintmere<span aria-hidden="true">]</span>
           </p>
+
+          <div
+            className="font-mono flex flex-col items-start"
+            style={{
+              marginTop: 'clamp(16px, 2vw, 28px)',
+              fontSize: '13px',
+              lineHeight: 1.7,
+              color: 'var(--color-mute-inv)',
+              letterSpacing: '0.04em',
+            }}
+          >
+            <a
+              href="mailto:hello@flintmere.com"
+              className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
+            >
+              hello@flintmere.com
+            </a>
+            <p>
+              Built in{' '}
+              <span className="font-mono" aria-hidden="true">
+                [
+              </span>
+              <span> London </span>
+              <span className="font-mono" aria-hidden="true">
+                ]
+              </span>
+              .
+            </p>
+            <p>
+              © 2026 Flintmere · a trading name of Eazy Access Ltd · England &amp;
+              Wales · UK
+            </p>
+          </div>
         </div>
+
+        <nav
+          aria-label="Footer legal"
+          className="flex items-baseline flex-wrap gap-x-1.5 gap-y-1"
+          style={{
+            fontSize: '12px',
+            fontWeight: 500,
+            color: 'var(--color-mute-inv)',
+            letterSpacing: '0.04em',
+          }}
+        >
+          <Link
+            href="/privacy"
+            className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
+          >
+            Privacy
+          </Link>
+          <span aria-hidden="true">,</span>
+          <Link
+            href="/terms"
+            className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
+          >
+            Terms
+          </Link>
+          <span aria-hidden="true">,</span>
+          <Link
+            href="/security"
+            className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
+          >
+            Security
+          </Link>
+          <span aria-hidden="true">,</span>
+          <Link
+            href="/cookies"
+            className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
+          >
+            Cookies
+          </Link>
+          <span aria-hidden="true">,</span>
+          <Link
+            href="/dpa"
+            className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
+          >
+            DPA
+          </Link>
+          <span aria-hidden="true">,</span>
+          <Link
+            href="/support"
+            className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
+          >
+            Support
+          </Link>
+        </nav>
       </div>
     </footer>
   );

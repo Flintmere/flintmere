@@ -375,14 +375,49 @@
   line-height: 1.55;
 }
 
-.pillar-name {
-  font-size: 22px;
-  letter-spacing: -0.01em;
+/* --- Pillars v7 — the Diagnostic Wheel ---
+   Spec: context/design/extravagant/2026-04-29-chapter-2-pillars-wheel.md.
+   Seven SVG wedges as a weighted donut. Active wedge fills amber; inactive
+   wedges are paper-2 with 1px ink hairlines. Hover/focus get sage inset.
+   Soft motion contract via the global block at line 115. */
+
+.pillar-wheel {
+  container-type: inline-size;
 }
 
-.pillar-desc {
-  font-size: 15px;
-  line-height: 1.45;
+.pillar-wedge:focus-visible {
+  outline: 2px solid var(--color-accent-sage);
+  outline-offset: 2px;
+}
+
+.pillar-wedge:hover:not([data-active='true']) > path {
+  stroke: var(--color-accent-sage);
+  stroke-width: 2;
+}
+
+/* "Read full spec" trigger — Apple-style circular plus glyph that
+   inverts on hover. */
+.pillar-spec-plus {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid var(--color-ink);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
+  transition: background-color var(--duration-instant) var(--ease-sharp),
+    color var(--duration-instant) var(--ease-sharp);
+}
+
+.pillar-spec-trigger:hover .pillar-spec-plus,
+.pillar-spec-trigger:focus-visible .pillar-spec-plus {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.pillar-spec-trigger:focus-visible {
+  outline: 2px solid var(--color-accent-sage);
+  outline-offset: 4px;
 }
 
 /* --- Audit-deep section ("What you get with the £97 audit") ---
@@ -483,6 +518,74 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* --- Sticky-footer reveal (Batch B, chapter 5 — 2026-04-29) ---
+   The footer is pinned at the bottom of the viewport behind the page (z:0).
+   The page main wrap sits in front (z:1) with an opaque paper background,
+   so chapters 1–4 scroll over the footer rather than alongside it. As the
+   user reaches the bottom, the manifesto chord (chapter 4, also opaque)
+   peels away and the wordmark curtain is uncovered.
+
+   CSS-only; no JS, no scroll listener, no IntersectionObserver. The
+   global prefers-reduced-motion block handles motion safety automatically
+   (sticky positioning is not animated).
+
+   Reference: context/design/extravagant/2026-04-29-batch-b-five-chapter-spec.md
+   §Chapter 5 — Footer sticky-reveal. */
+.flintmere-main {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  background: var(--color-paper);
+}
+
+/* Two sticky-reveal panels at z:-1 — chapter 3 (FounderStrip) and chapter 5
+   (SiteFooter). Both paint below sibling sections (which paint at the
+   "z-index: auto / 0" layer per CSS stacking-order rules), but above
+   main's own background — so each curtain is uncovered when the chapter
+   above it scrolls off, then re-covered by the next paper chapter (chapter
+   4 manifesto, z:1) on the way down to the footer reveal.
+
+   SCOPED to .flintmere-main only (homepage). On other pages (/research,
+   /audit, /pricing, etc.) the footer renders as a normal block element
+   at natural height — no sticky, no negative z-index leaks. */
+.flintmere-main .flintmere-footer-sticky,
+.flintmere-main .flintmere-founder-sticky {
+  position: sticky;
+  bottom: 0;
+  z-index: -1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Curtain-pair containing block (Batch B fix 2026-04-29).
+   Wraps chapters 3 + 4 so chapter 3's sticky-bottom-0 unsticks at the end
+   of chapter 4 (wrapper's bottom edge), instead of staying anchored all
+   the way to <main>'s bottom edge. Without this, founder + footer both
+   stickied at z:-1 collided at end of scroll and source-order painted
+   the footer over the founder ("footer repeated in chapter 3 position").
+
+   z-index: 0 + isolation: isolate creates a NEW stacking context here,
+   so founder's z:-1 lives inside the wrapper's context, separate from
+   the footer's z:-1 in main's context. Without the new stacking context,
+   founder z:-1 would still compete with footer z:-1 at the main-level
+   z:-1 layer, and source order would paint footer on top of founder. */
+.flintmere-curtain-pair {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+}
+
+/* --- Site-nav inline-list separator hairline (Batch B navbar redo) ---
+   Comma between nav items is mute-tinted to recede; nav items themselves
+   stay ink. Hover lifts the item to amber via the existing transition
+   declared inline. */
+.site-nav-item:focus-visible {
+  outline: 1px solid var(--color-accent);
+  outline-offset: 4px;
 }
 
 /* --- Section anchor (editorial numerals + bracket bleeds) ---
