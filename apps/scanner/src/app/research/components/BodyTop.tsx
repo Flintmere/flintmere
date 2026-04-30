@@ -120,6 +120,24 @@ export function BodyTop({ data }: { data: Published }) {
                 ? ` Early sample — ${data.n.toLocaleString()} stores scanned so far. We don't frame these as "the median Shopify store" until the dataset clears ${data.publishFloor.toLocaleString()} per vertical.`
                 : ' The first bot scans are in flight; numbers appear here as soon as the first store lands in the dataset.'}
           </p>
+
+          {data.available && !data.preview ? (
+            <p
+              data-reveal
+              className="font-sans mt-8 lg:mt-10"
+              style={{
+                maxWidth: '60ch',
+                fontSize: 'clamp(16px, 1.15vw, 19px)',
+                lineHeight: 1.55,
+                color: 'var(--color-mute)',
+                ['--reveal-delay' as string]: '1900ms',
+              }}
+            >
+              Scores cluster inside a <Bracket>narrow band (47–50)</Bracket>.
+              The difference between the median catalog and the top decile is
+              not sophistication; it is structured fields populated.
+            </p>
+          ) : null}
         </div>
       </section>
 
