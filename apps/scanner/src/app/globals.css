@@ -750,6 +750,51 @@
   z-index: 1;
 }
 
+/* --- Research-page dual-column pin (mechanic #5, 2026-04-30) ---
+   Reused on /research chapters 3 (Median) + 7 (Methodology) so the
+   research-report film paces with deliberate-pin → action → deliberate-
+   pin (mirrors the homepage #4 → #5 → #4 → #3 structural rhyme).
+   The LEFT column pins via `position: sticky; top` at ≥lg breakpoint
+   only; below lg the columns stack and pinning would be meaningless.
+   The outer section is content-driven height — the right column drives
+   the scroll runway and the sticky left column rides along.
+   Reduced-motion: sticky positioning is not animated, so reduced-motion
+   users get the same layout. */
+.research-chapter-pinned {
+  position: relative;
+}
+@media (min-width: 1024px) {
+  .flintmere-main .research-chapter-pinned {
+    position: sticky;
+    top: clamp(48px, 8vh, 96px);
+    align-self: start;
+    height: fit-content;
+  }
+}
+
+/* --- Research-page bar-grow utility (2026-04-30) ---
+   Grade-distribution bars draw from left on entry. Pairs with the
+   [data-reveal] viewport observer in ViewportReveal.tsx — the observer
+   adds .is-visible when the row crosses 50% threshold; the bar then
+   grows from scaleX(0) → scaleX(1) over 360ms with the canonical sharp
+   ease. Width itself is set inline per bar (e.g. `width: 73%`); scaleX
+   provides the entry animation while preserving the final layout width.
+   The default [data-reveal] opacity-fade is overridden — bars stay
+   opaque from frame 0 (otherwise they'd grow into a fading ghost).
+   Reduced-motion: the global block at line 115 scales transition-
+   duration to 0.01ms — bars snap to their final scaleX(1) state. */
+[data-reveal].research-bar-grow {
+  opacity: 1;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--duration-medium) var(--ease-sharp);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+[data-reveal].research-bar-grow.is-visible {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
 /* --- Manifesto chord — Reduction Cascade × 3 (#9, 2026-04-30) ---
    Prose segments fade their opacity as the section scrolls; structured
    tokens remain. The literal subtractive demonstration of the metaphor
