@@ -13,7 +13,7 @@ const USER_AGENT = 'FlintmereBot/1.0 (+https://audit.flintmere.com/bot)';
 
 export default function BotPage() {
   return (
-    <main id="main">
+    <main id="main" className="flintmere-main">
       <section className="mx-auto max-w-[720px] px-6 pt-20 pb-10">
         <p className="eyebrow mb-6">FlintmereBot</p>
         <h1 className="max-w-[20ch]">

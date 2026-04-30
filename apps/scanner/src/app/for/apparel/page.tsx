@@ -152,7 +152,7 @@ export default async function FlintmereForApparel() {
   const bench = await getApparelMedian();
 
   return (
-    <main id="main">
+    <main id="main" className="flintmere-main">
       <section className="mx-auto max-w-[1280px] px-8 py-20 md:py-28">
         <p className="eyebrow mb-6">
           For apparel brands · 50–5,000 SKUs · £1M–£50M revenue

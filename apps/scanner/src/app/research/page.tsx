@@ -198,7 +198,7 @@ export default async function Research() {
   const n = data.n;
 
   return (
-    <main id="main">
+    <main id="main" className="flintmere-main">
       <section className="mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">Research · v1 · {data.asOfLabel}</p>
         <h1 className="max-w-[20ch]">

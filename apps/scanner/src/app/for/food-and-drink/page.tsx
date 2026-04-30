@@ -153,7 +153,7 @@ export default async function FlintmereForFoodAndDrink() {
   const bench = await getFoodMedian();
 
   return (
-    <main id="main">
+    <main id="main" className="flintmere-main">
       <section className="mx-auto max-w-[1280px] px-8 py-20 md:py-28">
         <p className="eyebrow mb-6">
           For food &amp; drink brands · 50–5,000 SKUs · £250K–£25M revenue

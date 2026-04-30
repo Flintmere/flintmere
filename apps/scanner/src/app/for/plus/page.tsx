@@ -85,7 +85,7 @@ const MISTAKES: Mistake[] = [
 
 export default function FlintmereForPlus() {
   return (
-    <main id="main">
+    <main id="main" className="flintmere-main">
       <section className="mx-auto max-w-[1280px] px-8 py-20 md:py-28">
         <p className="eyebrow mb-6">
           For Shopify Plus · £5M–£200M revenue · 1,000–50,000 SKUs

@@ -64,15 +64,16 @@ export function Bracket({
     );
   }
 
-  // Saks-scale variant: override .bracket's default font-weight: 700 with 500
-  // (the Saks reference is confidence-not-aggression at heroic scale per the
-  // spec at context/design/extravagant/2026-04-29-chapter-1-hero-modern-house-saks.md
-  // §2.3). Inline-style the weight so the .bracket CSS class's 700 doesn't win.
+  // Saks-scale variant: cover-art moment at hero scale. Inherits .bracket's
+  // weight 700 (uniform across bracket sizes) and layers the
+  // .flintmere-outline-shimmer canon — ink stroke + amber shimmer-sweep
+  // through the letterforms (paper-context). Matches the closing-chord
+  // wordmark signature in the footer; together they bracket the page with
+  // two typographic anchor moments (operator-locked 2026-04-30).
   if (size === 'saks') {
     return (
       <span
-        className={`bracket ${sizeClass} ${className}`}
-        style={{ fontWeight: 500 }}
+        className={`bracket flintmere-outline-shimmer ${sizeClass} ${className}`}
       >
         {children}
       </span>

@@ -248,10 +248,108 @@
   -webkit-text-stroke-width: 0;
 }
 
-/* Per-component prefers-reduced-motion block removed 2026-04-26 — the global
-   block on lines 115–122 scales transition-duration to 0.01ms across the board,
-   making this redundant. Soft contract per memory/design/motion.md §The
-   reduced-motion contract (two tiers). */
+/* --- Outline-shimmer utility — signature canon carry-through (2026-04-30) ---
+   The closing chord's outline-shimmer pattern, generalised for any heroic-scale
+   typographic anchor moment. Operator-approved 2026-04-30 ("the detail in the
+   wordmark — extra shapes inside the letters — needs to be carried through to
+   all surfaces").
+
+   What it does:
+   - Renders text as a transparent fill + stroke outline. Geist Mono glyphs
+     reveal their architectural detail (terminals, counters, joints) at
+     heroic scale — the "extra shapes inside the letters."
+   - Sweeps a slow diagonal amber-tinted highlight through the letterforms
+     every 5s. Editorial pace, not attention-grabbing.
+
+   Surface-aware variants:
+   - default (paper context): ink stroke + amber-yellow shimmer through the
+     glyphs. Conforms to the canon "amber not for text on paper" rule —
+     amber appears only as a brief shimmer reflection, the base text colour
+     is ink-outline.
+   - .on-ink modifier: amber stroke + warm-white shimmer (footer wordmark
+     uses its own .flintmere-footer-wordmark class with this pattern; this
+     modifier is here for parity / future ink-surface anchors).
+
+   prefers-reduced-motion: inherits the global block at line 115 — animation
+   duration scales to 0.01ms so reduced-motion users get the still outline. */
+.flintmere-outline-shimmer {
+  color: transparent;
+  paint-order: stroke fill;
+
+  -webkit-text-stroke: clamp(2px, 0.18vw, 3px) var(--color-ink);
+
+  background-image: linear-gradient(
+    110deg,
+    transparent 0%,
+    transparent 38%,
+    rgba(248, 191, 36, 0.85) 50%,
+    transparent 62%,
+    transparent 100%
+  );
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  animation: flintmere-outline-shimmer-sweep 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.flintmere-outline-shimmer.on-ink {
+  -webkit-text-stroke-color: var(--color-accent);
+  background-image: linear-gradient(
+    110deg,
+    transparent 0%,
+    transparent 38%,
+    rgba(255, 230, 150, 0.95) 50%,
+    transparent 62%,
+    transparent 100%
+  );
+}
+
+@keyframes flintmere-outline-shimmer-sweep {
+  0% { background-position: 220% 0; }
+  100% { background-position: -120% 0; }
+}
+
+/* --- Footer wordmark — shimmering amber outline (closing-chord signature) ---
+   Connects to the .text-outlined canon (transparent fill + ink stroke) but
+   in amber, with a slow diagonal shimmer-sweep through the letterforms.
+   Reads as the closing chord — the brand mark glowing on ink instead of
+   sitting flat.
+
+   Outline: amber text-stroke at clamp(2-3px) for visibility at 80-160px text.
+   Fill: linear-gradient highlight (warm amber tinted whitish at peak) clipped
+   to the letterforms via background-clip: text. Animates background-position
+   so the highlight sweeps diagonally through the wordmark every 5s.
+
+   prefers-reduced-motion: the global block at line 115 scales animation-
+   duration to 0.01ms — the wordmark snaps to its still state (outline
+   visible, no sweep). */
+.flintmere-footer-wordmark {
+  color: transparent;
+  -webkit-text-stroke: clamp(2px, 0.18vw, 3px) var(--color-accent);
+  paint-order: stroke fill;
+
+  background-image: linear-gradient(
+    110deg,
+    transparent 0%,
+    transparent 38%,
+    rgba(255, 230, 150, 0.95) 50%,
+    transparent 62%,
+    transparent 100%
+  );
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  animation: flintmere-footer-wordmark-shimmer 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes flintmere-footer-wordmark-shimmer {
+  0% { background-position: 220% 0; }
+  100% { background-position: -120% 0; }
+}
 
 /* --- Hover-lift utility (Pattern 2 — ADR 0021 axis 8 + axis 2) ---
    Cards / rows opt-in via `data-hover-lift`. Single transition statement
@@ -520,12 +618,18 @@
   border: 0;
 }
 
-/* --- Sticky-footer reveal (Batch B, chapter 5 — 2026-04-29) ---
+/* --- Sticky-footer reveal (Batch B, chapter 5 — 2026-04-29; promoted to
+   universal canon 2026-04-30) ---
    The footer is pinned at the bottom of the viewport behind the page (z:0).
-   The page main wrap sits in front (z:1) with an opaque paper background,
-   so chapters 1–4 scroll over the footer rather than alongside it. As the
-   user reaches the bottom, the manifesto chord (chapter 4, also opaque)
-   peels away and the wordmark curtain is uncovered.
+   The main wrapper sits in front (z:1) with an opaque paper background,
+   so page content scrolls over the footer rather than alongside it. As
+   the user reaches the bottom, the page content peels away and the
+   wordmark curtain is uncovered — the closing chord on every page.
+
+   Universal: every <main> in apps/scanner/src/app/** carries the
+   `flintmere-main` class so the choreography fires site-wide. Sole
+   exception is the 404 surface (score/[shop]/not-found.tsx + the global
+   not-found fallback) — by spec, no curtain on a not-found page.
 
    CSS-only; no JS, no scroll listener, no IntersectionObserver. The
    global prefers-reduced-motion block handles motion safety automatically
@@ -540,13 +644,12 @@
   background: var(--color-paper);
 }
 
-/* Sticky-bottom curtain reveal — chapter 5 (SiteFooter) only.
+/* Sticky-bottom curtain reveal — chapter 5 / universal closing chord.
    Paints below sibling sections (z:-1), above main's background, so the
-   wordmark closing chord is uncovered when chapter 4 scrolls off-top.
+   wordmark close is uncovered when content scrolls off-top.
 
-   SCOPED to .flintmere-main (homepage). On other pages (/research,
-   /audit, /pricing, etc.) the footer renders as a normal block element
-   at natural height — no sticky, no negative z-index leaks. */
+   Scoped to .flintmere-main descendants so any surface that opts out
+   (404) renders without the curtain. */
 .flintmere-main .flintmere-footer-sticky {
   position: sticky;
   bottom: 0;
@@ -645,4 +748,30 @@
 .section-anchor-host > *:not(.section-anchor) {
   position: relative;
   z-index: 1;
+}
+
+/* --- Manifesto chord — Reduction Cascade × 3 (#9, 2026-04-30) ---
+   Prose segments fade their opacity as the section scrolls; structured
+   tokens remain. The literal subtractive demonstration of the metaphor
+   "marketing prose is invisible to bots; only structured data registers."
+   Three sequential cascades (one per example) play across the section's
+   300vh runway. --prose-fade is set on the section via inline style;
+   React updates it from the rAF-throttled scroll listener. Inherited by
+   descendants. See apps/scanner/src/components/sections/ManifestoChord.tsx
+   for the full council rationale + reduced-motion contract. */
+.manifesto-prose-segment {
+  opacity: calc(1 - var(--prose-fade, 0));
+  transition: opacity 0.05s linear;
+}
+
+/* Paragraph entrance — when exampleIndex changes, the paragraph re-mounts
+   via key, and this animation plays. Gives a soft fade-in at the boundary
+   between examples so the new paragraph doesn't snap into existence.
+   Reduced-motion users skip the cascade entirely (rendered statically). */
+.manifesto-paragraph {
+  animation: manifesto-paragraph-enter 360ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes manifesto-paragraph-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }

@@ -36,7 +36,7 @@ const FAQS = [
 
 export default function Pricing() {
   return (
-    <main id="main">
+    <main id="main" className="flintmere-main">
       <section className="mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">Pricing</p>
         {/* Phase B: bracket on `question` removed — verbs / fillers banned per

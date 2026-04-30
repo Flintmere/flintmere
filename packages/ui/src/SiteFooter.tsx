@@ -86,16 +86,17 @@ export function SiteFooter() {
           className="flex flex-col items-start justify-center"
           style={{ flex: 1, minHeight: 'clamp(280px, 40vh, 520px)' }}
         >
-          <p
-            className="font-mono leading-[0.85] tracking-[-0.04em]"
+          <Link
+            href="/"
+            aria-label="Flintmere home"
+            className="flintmere-footer-wordmark font-mono leading-[0.85] tracking-[-0.04em] inline-block"
             style={{
               fontSize: 'clamp(80px, 10vw, 160px)',
-              color: 'var(--color-accent)',
               fontWeight: 700,
             }}
           >
             Flintmere<span aria-hidden="true">]</span>
-          </p>
+          </Link>
 
           <div
             className="font-mono flex flex-col items-start"

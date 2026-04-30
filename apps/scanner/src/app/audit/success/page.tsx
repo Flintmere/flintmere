@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Bracket } from '@flintmere/ui';
+import { Bracket, SiteFooter } from '@flintmere/ui';
 
 export const metadata: Metadata = {
   title: 'Audit booked',
@@ -19,7 +19,7 @@ export default async function AuditSuccess({ searchParams }: Props) {
   const processing = redirect_status === 'processing';
 
   return (
-    <main id="main">
+    <main id="main" className="flintmere-main">
       <section className="mx-auto max-w-[640px] px-6 py-24 text-center">
         <p className="eyebrow mb-6">
           {processing ? 'Payment processing' : 'Payment confirmed'}
@@ -79,6 +79,7 @@ export default async function AuditSuccess({ searchParams }: Props) {
             : 'A Stripe receipt has been emailed for your records.'}
         </p>
       </section>
+      <SiteFooter />
     </main>
   );
 }

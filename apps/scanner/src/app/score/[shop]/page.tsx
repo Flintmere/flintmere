@@ -98,7 +98,7 @@ export default async function ScorePage({ params }: PageProps) {
   const scannedOn = formatScanned(scan.completedAt);
 
   return (
-    <main id="main">
+    <main id="main" className="flintmere-main">
       <section className="mx-auto max-w-[1280px] px-8 py-24 md:py-28">
         <p className="eyebrow text-[color:var(--color-ink-2)] mb-8">
           AI-readiness score · Public by merchant opt-in

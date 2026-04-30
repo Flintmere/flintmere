@@ -1,6 +1,9 @@
 import Link from 'next/link';
-import { Bracket, SiteFooter } from '@flintmere/ui';
+import { Bracket } from '@flintmere/ui';
 
+// 404 — explicit exception to the universal SiteFooter rule.
+// No flintmere-main wrapper, no SiteFooter; the curtain reveal does not
+// belong on a not-found surface.
 export default function ScoreNotFound() {
   return (
     <main id="main">
@@ -28,8 +31,6 @@ export default function ScoreNotFound() {
           </Link>
         </div>
       </section>
-
-      <SiteFooter />
     </main>
   );
 }

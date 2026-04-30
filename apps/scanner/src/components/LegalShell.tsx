@@ -30,7 +30,7 @@ export function LegalShell({
   anchorNumeral = '01',
 }: LegalShellProps) {
   return (
-    <main id="main">
+    <main id="main" className="flintmere-main">
       <section className="section-anchor-host mx-auto max-w-[980px] px-8 py-20 md:py-24">
         <SectionAnchor variant="numeral" numeral={anchorNumeral} side="top-right" />
         <p className="eyebrow mb-6">{eyebrow}</p>

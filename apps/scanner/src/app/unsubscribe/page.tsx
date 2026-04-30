@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Bracket } from '@flintmere/ui';
+import { Bracket, SiteFooter } from '@flintmere/ui';
 
 interface Props {
   searchParams: Promise<{ status?: string }>;
@@ -10,7 +10,7 @@ export default async function UnsubscribePage({ searchParams }: Props) {
   const isOk = status === 'ok';
 
   return (
-    <main id="main">
+    <main id="main" className="flintmere-main">
       <section className="mx-auto max-w-[720px] px-8 py-24">
         <p className="eyebrow mb-6">Email preferences</p>
         {isOk ? (
@@ -43,6 +43,7 @@ export default async function UnsubscribePage({ searchParams }: Props) {
           </>
         )}
       </section>
+      <SiteFooter />
     </main>
   );
 }

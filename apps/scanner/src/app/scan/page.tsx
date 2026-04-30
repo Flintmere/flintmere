@@ -13,7 +13,7 @@
  */
 
 import { useState } from 'react';
-import { Bracket } from '@flintmere/ui';
+import { Bracket, SiteFooter } from '@flintmere/ui';
 import { EmailGate } from '@/components/EmailGate';
 import { ScanForm } from '@/components/ScanForm';
 import { BenchmarkOptIn } from '@/components/scan/BenchmarkOptIn';
@@ -53,7 +53,7 @@ export default function ScanPage() {
   };
 
   return (
-    <main id="main">
+    <main id="main" className="flintmere-main">
       <section className="mx-auto max-w-[1280px] px-8 py-20 md:py-24">
         <p className="eyebrow mb-6">
           Free scan · No signup · 60 seconds
@@ -97,6 +97,7 @@ export default function ScanPage() {
           />
         </>
       ) : null}
+      <SiteFooter />
     </main>
   );
 }
