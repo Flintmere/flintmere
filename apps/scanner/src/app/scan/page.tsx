@@ -54,7 +54,7 @@ export default function ScanPage() {
 
   return (
     <main id="main" className="flintmere-main">
-      <section className="mx-auto max-w-[1280px] px-8 py-20 md:py-24">
+      <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-20 md:py-24">
         <p className="eyebrow mb-6">
           Free scan · No signup · 60 seconds
         </p>

@@ -154,7 +154,7 @@ export default async function FlintmereForFoodAndDrink() {
 
   return (
     <main id="main" className="flintmere-main">
-      <section className="mx-auto max-w-[1280px] px-8 py-20 md:py-28">
+      <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-20 md:py-28">
         <p className="eyebrow mb-6">
           For food &amp; drink brands · 50–5,000 SKUs · £250K–£25M revenue
         </p>
@@ -250,7 +250,7 @@ export default async function FlintmereForFoodAndDrink() {
 
       <section
         aria-label="Food-specific mistakes"
-        className="mx-auto max-w-[1280px] px-8 py-20"
+        className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-20"
       >
         <p className="eyebrow mb-6">Eight food-and-drink mistakes</p>
         <h2 className="max-w-[22ch] mb-12">

@@ -153,7 +153,7 @@ export default async function FlintmereForApparel() {
 
   return (
     <main id="main" className="flintmere-main">
-      <section className="mx-auto max-w-[1280px] px-8 py-20 md:py-28">
+      <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-20 md:py-28">
         <p className="eyebrow mb-6">
           For apparel brands · 50–5,000 SKUs · £1M–£50M revenue
         </p>
@@ -247,7 +247,7 @@ export default async function FlintmereForApparel() {
 
       <section
         aria-label="Apparel-specific mistakes"
-        className="mx-auto max-w-[1280px] px-8 py-20"
+        className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-20"
       >
         <p className="eyebrow mb-6">Eight apparel-specific mistakes</p>
         <h2 className="max-w-[22ch] mb-12">

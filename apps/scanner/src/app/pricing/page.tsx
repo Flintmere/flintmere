@@ -37,7 +37,7 @@ const FAQS = [
 export default function Pricing() {
   return (
     <main id="main" className="flintmere-main">
-      <section className="mx-auto max-w-[1280px] px-8 py-24">
+      <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">Pricing</p>
         {/* Phase B: bracket on `question` removed — verbs / fillers banned per
             tokens.md §Signature. The page's bracket-2 (concierge £97) is
@@ -112,7 +112,7 @@ export default function Pricing() {
         </div>
       </section>
 
-      <section aria-label="Tiers" className="grid grid-cols-1 md:grid-cols-5 border-y border-[color:var(--color-line)]">
+      <section aria-label="Tiers" className="bg-[color:var(--color-paper)] grid grid-cols-1 md:grid-cols-5 border-y border-[color:var(--color-line)]">
         {TIERS.map((tier) => (
           <div
             key={tier.slug}
@@ -142,7 +142,7 @@ export default function Pricing() {
       </section>
 
       {/* Concierge callout */}
-      <section className="mx-auto max-w-[1280px] px-8 py-16">
+      <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-16">
         <div className="p-12 border border-[color:var(--color-line)] bg-[color:var(--color-paper-2)] flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <p className="eyebrow mb-3">One-off audit</p>
@@ -158,7 +158,7 @@ export default function Pricing() {
       </section>
 
       {/* FAQ */}
-      <section className="mx-auto max-w-[1280px] px-8 py-20 border-t border-[color:var(--color-line)]">
+      <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-20 border-t border-[color:var(--color-line)]">
         <p className="eyebrow mb-8">Frequently asked</p>
         <ul className="list-none p-0 m-0 border-y border-[color:var(--color-line)]">
           {FAQS.map((item) => (
@@ -176,7 +176,7 @@ export default function Pricing() {
       </section>
 
       {/* Disclaimer */}
-      <section className="mx-auto max-w-[1280px] px-8 py-12 border-t border-[color:var(--color-line)]">
+      <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-12 border-t border-[color:var(--color-line)]">
         <p className="text-[color:var(--color-mute)]" style={{ fontSize: 12, lineHeight: 1.55, maxWidth: '80ch' }}>
           Flintmere is not affiliated with GS1. Identifier requirements vary by marketplace and jurisdiction. Prices shown exclude VAT where applicable. Shopify&rsquo;s revenue share and Stripe processing fees are absorbed by us, not passed on.
         </p>

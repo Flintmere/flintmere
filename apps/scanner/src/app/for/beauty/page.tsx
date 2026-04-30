@@ -153,7 +153,7 @@ export default async function FlintmereForBeauty() {
 
   return (
     <main id="main" className="flintmere-main">
-      <section className="mx-auto max-w-[1280px] px-8 py-20 md:py-28">
+      <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-20 md:py-28">
         <p className="eyebrow mb-6">
           For beauty brands · 20–2,000 SKUs · £500K–£30M revenue
         </p>
@@ -248,7 +248,7 @@ export default async function FlintmereForBeauty() {
 
       <section
         aria-label="Beauty-specific mistakes"
-        className="mx-auto max-w-[1280px] px-8 py-20"
+        className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-20"
       >
         <p className="eyebrow mb-6">Eight beauty-specific mistakes</p>
         <h2 className="max-w-[22ch] mb-12">

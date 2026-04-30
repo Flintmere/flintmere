@@ -1,162 +1,85 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { Bracket, SiteFooter } from '@flintmere/ui';
+import { SiteFooter } from '@flintmere/ui';
+import { ViewportReveal } from '@/components/ViewportReveal';
+import { Cover } from './components/Cover';
+import { Passport } from './components/Passport';
+import { LiveCascade } from './components/LiveCascade';
+import { InkConstraints } from './components/InkConstraints';
+import { Limits } from './components/Limits';
+import { BlockSnippet } from './components/BlockSnippet';
+import { Aggregates } from './components/Aggregates';
 
 export const metadata: Metadata = {
   title: 'FlintmereBot — the Flintmere catalog scanner',
   description:
-    'FlintmereBot scans public Shopify catalogs to build anonymous, aggregated benchmarks of AI-agent readiness. What it fetches, how to opt out, and who to contact.',
+    'FlintmereBot scans public Shopify catalogs to build anonymous, aggregate benchmarks of AI-agent readiness. The user-agent it carries, what it reads, what it ignores, the rate limits, and how to opt out.',
   robots: { index: true, follow: true },
 };
 
-const USER_AGENT = 'FlintmereBot/1.0 (+https://audit.flintmere.com/bot)';
-
+/**
+ * /bot — FlintmereBot transparency page (extravagant pass + live cascade,
+ * 2026-04-30).
+ *
+ * Thin orchestrator. Eight chapters on paper (one ink-slab inversion as
+ * the negative-space chord), then the SiteFooter curtain.
+ *
+ * Council pre-flight (3 named references):
+ *   - Pentagram Saks Fifth Avenue case-study cover — Saks `[ FlintmereBot ]`
+ *     bracket as the page's brand mark; third Saks-bracket page after
+ *     /audit `[ for you ]` and /research `[ X% ]`.
+ *   - Stripe documentation typography — JetBrains-Mono inline tokens in
+ *     prose; basis for the live cascade Chapter 3 where structured-data
+ *     tokens light up amber as a parser walks them.
+ *   - A24 single-film overview — bottom-left mono credit "Flintmere ·
+ *     FlintmereBot · v1.0", moment-of-arrival composition for the robots.txt
+ *     poster.
+ *
+ * Composition: eight chapters + SiteFooter.
+ *   1. Cover           — Saks `[ FlintmereBot ]` brand-mark + word-cascade.
+ *   2. Passport        — the user-agent string as editorial display.
+ *   3. Live cascade ⭐ — pinned 400vh; three example documents; tokens
+ *                        light up amber as the parser walks them. (#4 + #8)
+ *   4. Ink-slab        — what we never touch. Paper-on-ink, four declarative
+ *                        rows, sage hairline anchor.
+ *   5. Limits          — three Bloomberg-cover numerals (NumeralCountUp).
+ *   6. Block snippet   — robots.txt opt-out as the typographic image.
+ *   7. Aggregates      — the closing argument; default-size bracket on
+ *                        `[ store's name ]`.
+ *   8. SiteFooter      — universal sticky-bottom curtain reveal (#3).
+ *
+ * Each section explicitly carries `bg-paper` (or `bg-ink` on Chapter 4) so
+ * the universal sticky-footer curtain (engaged by `flintmere-main`) is
+ * occluded until the user reaches the close.
+ *
+ * Choreography (5 distinct featured mechanics):
+ *   #1 cover · #4+#8 live cascade · ink-slab #7 · numerals #7 · #3 footer.
+ *   Default #7 cascade fade-in connects the rest.
+ *
+ * Reduced-motion: the global prefers-reduced-motion block in globals.css
+ * scales transition-duration to 0.01ms — every cascade endpoint, hairline,
+ * and word-stagger lands instantly. The Chapter 3 LiveCascade island has
+ * its own component-level reduced-motion branch (all 3 examples stacked
+ * statically with tokens pre-fired, no pin, no rAF listener).
+ *
+ * Spec source of truth (binding):
+ *   context/design/extravagant/2026-04-30-bot-page-spec.md
+ */
 export default function BotPage() {
   return (
     <main id="main" className="flintmere-main">
-      <section className="mx-auto max-w-[720px] px-6 pt-20 pb-10">
-        <p className="eyebrow mb-6">FlintmereBot</p>
-        <h1 className="max-w-[20ch]">
-          The Flintmere <Bracket>scanner</Bracket>, explained.
-        </h1>
-        <p
-          className="mt-8 max-w-[56ch] text-[color:var(--color-ink-2)]"
-          style={{ fontSize: 17, lineHeight: 1.55 }}
-        >
-          FlintmereBot visits public Shopify storefronts to read the same
-          catalog surfaces a buyer or an AI shopping agent would see. We
-          publish anonymous, aggregate benchmarks so merchants can compare
-          themselves to their vertical — never an individual-store list.
-        </p>
-      </section>
-
-      <section className="mx-auto max-w-[720px] px-6 pb-10">
-        <p className="eyebrow mb-4">User agent string</p>
-        <pre
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: 13,
-            padding: '14px 16px',
-            border: '1px solid var(--color-line)',
-            background: 'var(--color-paper-2)',
-            overflowX: 'auto',
-            margin: 0,
-          }}
-        >
-          {USER_AGENT}
-        </pre>
-        <p
-          className="mt-3 text-[color:var(--color-mute)]"
-          style={{ fontSize: 13, lineHeight: 1.55 }}
-        >
-          RFC 7231–compliant. The <code>+URL</code> resolves to this page so
-          any admin seeing the traffic can verify who we are.
-        </p>
-      </section>
-
-      <section className="mx-auto max-w-[720px] px-6 pb-10">
-        <p className="eyebrow mb-4">What we fetch</p>
-        <ul
-          className="list-none p-0 m-0 space-y-3 text-[color:var(--color-ink-2)]"
-          style={{ fontSize: 15, lineHeight: 1.55 }}
-        >
-          <li>
-            <strong className="text-[color:var(--color-ink)]">
-              /robots.txt, /sitemap.xml, /llms.txt
-            </strong>{' '}
-            — to see what the store tells crawlers.
-          </li>
-          <li>
-            <strong className="text-[color:var(--color-ink)]">
-              /products.json
-            </strong>{' '}
-            — Shopify&rsquo;s public product feed, which Shopify itself
-            exposes on every storefront.
-          </li>
-          <li>
-            <strong className="text-[color:var(--color-ink)]">
-              A small sample of product pages
-            </strong>{' '}
-            — to read structured data, meta tags, and rendered markup.
-          </li>
-        </ul>
-        <p
-          className="mt-6 text-[color:var(--color-mute)]"
-          style={{ fontSize: 13, lineHeight: 1.55 }}
-        >
-          We do not attempt to sign in. We do not submit forms. We do not
-          read data behind authentication. We do not crawl customer or
-          order pages.
-        </p>
-      </section>
-
-      <section className="mx-auto max-w-[720px] px-6 pb-10">
-        <p className="eyebrow mb-4">Rate limits</p>
-        <p
-          className="text-[color:var(--color-ink-2)]"
-          style={{ fontSize: 15, lineHeight: 1.55 }}
-        >
-          One request every two seconds per host. A complete visit typically
-          fetches fewer than twenty URLs. Each domain is revisited at most
-          once per month.
-        </p>
-      </section>
-
-      <section className="mx-auto max-w-[720px] px-6 pb-10">
-        <p className="eyebrow mb-4">How to block us</p>
-        <p
-          className="text-[color:var(--color-ink-2)]"
-          style={{ fontSize: 15, lineHeight: 1.55 }}
-        >
-          Add this to your <code>/robots.txt</code>:
-        </p>
-        <pre
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: 13,
-            padding: '14px 16px',
-            border: '1px solid var(--color-line)',
-            background: 'var(--color-paper-2)',
-            overflowX: 'auto',
-            margin: '12px 0 0 0',
-          }}
-        >{`User-agent: FlintmereBot
-Disallow: /`}</pre>
-        <p
-          className="mt-3 text-[color:var(--color-mute)]"
-          style={{ fontSize: 13, lineHeight: 1.55 }}
-        >
-          We respect robots.txt. New directives are picked up within 24
-          hours. To remove data from the benchmark entirely, email
-          {' '}
-          <a
-            href="mailto:hello@flintmere.com?subject=FlintmereBot%20opt-out"
-            className="underline"
-          >
-            hello@flintmere.com
-          </a>
-          . We reply within two working days.
-        </p>
-      </section>
-
-      <section className="mx-auto max-w-[720px] px-6 pb-20">
-        <p className="eyebrow mb-4">Why we publish aggregates only</p>
-        <p
-          className="text-[color:var(--color-ink-2)]"
-          style={{ fontSize: 15, lineHeight: 1.55 }}
-        >
-          Naming individual stores in a league table would be unfair and
-          unhelpful. We publish vertical medians (e.g. &ldquo;beauty stores,
-          median grade C&rdquo;) and never a list of stores by grade. The
-          research you see on{' '}
-          <Link href="/research" className="underline">
-            /research
-          </Link>{' '}
-          is drawn from these aggregates.
-        </p>
-      </section>
-
-      <SiteFooter />
+      <a href="#cover" className="skip-link">
+        Skip to content
+      </a>
+      <ViewportReveal>
+        <Cover />
+        <Passport />
+        <LiveCascade />
+        <InkConstraints />
+        <Limits />
+        <BlockSnippet />
+        <Aggregates />
+        <SiteFooter />
+      </ViewportReveal>
     </main>
   );
 }

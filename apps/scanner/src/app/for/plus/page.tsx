@@ -86,7 +86,7 @@ const MISTAKES: Mistake[] = [
 export default function FlintmereForPlus() {
   return (
     <main id="main" className="flintmere-main">
-      <section className="mx-auto max-w-[1280px] px-8 py-20 md:py-28">
+      <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-20 md:py-28">
         <p className="eyebrow mb-6">
           For Shopify Plus · £5M–£200M revenue · 1,000–50,000 SKUs
         </p>
@@ -115,7 +115,7 @@ export default function FlintmereForPlus() {
 
       <hr className="rule" />
 
-      <section aria-label="Plus-scale mistakes" className="mx-auto max-w-[1280px] px-8 py-20">
+      <section aria-label="Plus-scale mistakes" className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-20">
         <p className="eyebrow mb-6">Eight Plus-scale mistakes</p>
         <h2 className="max-w-[20ch] mb-12">
           Each one is silent. Each one is measurable. Flintmere surfaces all eight.

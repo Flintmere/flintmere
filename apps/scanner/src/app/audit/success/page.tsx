@@ -20,7 +20,7 @@ export default async function AuditSuccess({ searchParams }: Props) {
 
   return (
     <main id="main" className="flintmere-main">
-      <section className="mx-auto max-w-[640px] px-6 py-24 text-center">
+      <section className="bg-[color:var(--color-paper)] mx-auto max-w-[640px] px-6 py-24 text-center">
         <p className="eyebrow mb-6">
           {processing ? 'Payment processing' : 'Payment confirmed'}
         </p>

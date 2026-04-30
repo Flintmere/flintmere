@@ -11,7 +11,7 @@ export default async function UnsubscribePage({ searchParams }: Props) {
 
   return (
     <main id="main" className="flintmere-main">
-      <section className="mx-auto max-w-[720px] px-8 py-24">
+      <section className="bg-[color:var(--color-paper)] mx-auto max-w-[720px] px-8 py-24">
         <p className="eyebrow mb-6">Email preferences</p>
         {isOk ? (
           <>

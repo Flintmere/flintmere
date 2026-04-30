@@ -99,7 +99,7 @@ export default async function ScorePage({ params }: PageProps) {
 
   return (
     <main id="main" className="flintmere-main">
-      <section className="mx-auto max-w-[1280px] px-8 py-24 md:py-28">
+      <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-24 md:py-28">
         <p className="eyebrow text-[color:var(--color-ink-2)] mb-8">
           AI-readiness score · Public by merchant opt-in
         </p>
@@ -174,7 +174,7 @@ export default async function ScorePage({ params }: PageProps) {
       </section>
 
       {runPillars.length > 0 ? (
-        <section className="mx-auto max-w-[1280px] px-8 py-24">
+        <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-24">
           <p className="eyebrow mb-6">Pillar breakdown</p>
           <h2 className="max-w-[24ch] mb-12">
             How the score breaks down across the seven checks.
@@ -210,7 +210,7 @@ export default async function ScorePage({ params }: PageProps) {
         </section>
       ) : null}
 
-      <section className="mx-auto max-w-[1280px] px-8 py-12 border-t border-[color:var(--color-line)]">
+      <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-12 border-t border-[color:var(--color-line)]">
         <p
           className="text-[color:var(--color-mute)]"
           style={{ fontSize: 13, lineHeight: 1.55, maxWidth: '72ch' }}

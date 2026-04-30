@@ -31,7 +31,7 @@ export function LegalShell({
 }: LegalShellProps) {
   return (
     <main id="main" className="flintmere-main">
-      <section className="section-anchor-host mx-auto max-w-[980px] px-8 py-20 md:py-24">
+      <section className="bg-[color:var(--color-paper)] section-anchor-host mx-auto max-w-[980px] px-8 py-20 md:py-24">
         <SectionAnchor variant="numeral" numeral={anchorNumeral} side="top-right" />
         <p className="eyebrow mb-6">{eyebrow}</p>
         <h1 className="max-w-[20ch]">{title}</h1>
@@ -49,7 +49,7 @@ export function LegalShell({
         </p>
       </section>
 
-      <section className="mx-auto max-w-[980px] px-8 pb-24">
+      <section className="bg-[color:var(--color-paper)] mx-auto max-w-[980px] px-8 pb-24">
         <div className="legal-body">{children}</div>
       </section>
 
