@@ -38,7 +38,6 @@ import {
 } from '@stripe/react-stripe-js';
 import { track } from '@/lib/plausible';
 import {
-  AUDIT_BANDS,
   AUDIT_BESPOKE_ENQUIRY_EMAIL,
   bandBySlug,
   type AuditBand,
@@ -60,7 +59,12 @@ type CardState =
     }
   | { kind: 'error'; message: string };
 
-const DEFAULT_BAND: AuditBandSlug = 'band-2';
+interface CheckoutCardProps {
+  /** Selected band slug — controlled by the BandTriptych above. */
+  bandSlug: AuditBandSlug;
+  /** Lift selection back up — bespoke-fork advisory uses this hint. */
+  onBandChange: (slug: AuditBandSlug) => void;
+}
 
 function telemetry(event: string, data: Record<string, unknown> = {}): void {
   if (typeof window === 'undefined') return;
@@ -122,8 +126,7 @@ const APPEARANCE: Appearance = {
   },
 };
 
-export function CheckoutCard() {
-  const [bandSlug, setBandSlug] = useState<AuditBandSlug>(DEFAULT_BAND);
+export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: CheckoutCardProps) {
   const [email, setEmail] = useState('');
   const [shopUrl, setShopUrl] = useState('');
   const [state, setState] = useState<CardState>({ kind: 'collect' });
@@ -229,9 +232,18 @@ export function CheckoutCard() {
     const mailto = `mailto:${AUDIT_BESPOKE_ENQUIRY_EMAIL}?subject=${subject}`;
     return (
       <CardShell>
-        <BandSelector value={bandSlug} onChange={setBandSlug} />
-        <hr style={hairline} />
         <div style={{ padding: '28px 32px 32px 32px' }}>
+          <p
+            className="font-mono uppercase"
+            style={{
+              fontSize: 13,
+              letterSpacing: '0.14em',
+              color: 'var(--color-mute)',
+              marginBottom: 16,
+            }}
+          >
+            Catalog smaller than 5,000 SKUs? — pick Band 1 or Band 2 above.
+          </p>
           <p className="eyebrow mb-3">Bespoke quote</p>
           <p
             className="text-[color:var(--color-ink)]"
@@ -273,10 +285,6 @@ export function CheckoutCard() {
 
   return (
     <CardShell>
-      <BandSelector value={bandSlug} onChange={setBandSlug} />
-
-      <hr style={hairline} />
-
       <form onSubmit={handleStart} style={{ padding: '28px 32px 32px 32px' }}>
         <div style={{ display: 'grid', gap: 18 }}>
           <div>
@@ -353,12 +361,6 @@ export function CheckoutCard() {
   );
 }
 
-const hairline: React.CSSProperties = {
-  border: 0,
-  borderTop: '1px solid var(--color-line-soft)',
-  margin: 0,
-};
-
 const inputStyle: React.CSSProperties = {
   background: '#ffffff',
   border: '1px solid var(--color-line)',
@@ -367,87 +369,6 @@ const inputStyle: React.CSSProperties = {
   fontSize: 15,
   width: '100%',
 };
-
-function BandSelector({
-  value,
-  onChange,
-}: {
-  value: AuditBandSlug;
-  onChange: (slug: AuditBandSlug) => void;
-}) {
-  return (
-    <fieldset style={{ border: 0, padding: '32px 32px 0 32px', margin: 0 }}>
-      <legend className="eyebrow mb-4" style={{ padding: 0 }}>
-        Pick your band
-      </legend>
-      <div style={{ display: 'grid', gap: 10 }}>
-        {AUDIT_BANDS.map((band) => {
-          const selected = value === band.slug;
-          return (
-            <label
-              key={band.slug}
-              htmlFor={`band-${band.slug}`}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr auto',
-                alignItems: 'center',
-                gap: 16,
-                padding: '16px 18px',
-                border: selected
-                  ? '1px solid var(--color-ink)'
-                  : '1px solid var(--color-line)',
-                background: selected ? '#fbfaf6' : '#ffffff',
-                cursor: 'pointer',
-                transition: 'border-color 0.15s ease, background 0.15s ease',
-              }}
-            >
-              <span style={{ minWidth: 0 }}>
-                <span
-                  style={{
-                    display: 'block',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: 11,
-                    letterSpacing: '0.14em',
-                    textTransform: 'uppercase',
-                    color: 'var(--color-mute)',
-                    marginBottom: 6,
-                  }}
-                >
-                  {band.label} · {band.skuRangeLabel}
-                </span>
-                <span
-                  style={{
-                    display: 'block',
-                    fontSize: 17,
-                    color: 'var(--color-ink)',
-                    fontWeight: 500,
-                    letterSpacing: '-0.01em',
-                  }}
-                >
-                  {band.priceDisplay}
-                </span>
-              </span>
-              <input
-                id={`band-${band.slug}`}
-                type="radio"
-                name="audit-band"
-                value={band.slug}
-                checked={selected}
-                onChange={() => onChange(band.slug)}
-                style={{
-                  width: 18,
-                  height: 18,
-                  accentColor: '#0a0a0b',
-                  cursor: 'pointer',
-                }}
-              />
-            </label>
-          );
-        })}
-      </div>
-    </fieldset>
-  );
-}
 
 function CardShell({ children }: { children: React.ReactNode }) {
   return (

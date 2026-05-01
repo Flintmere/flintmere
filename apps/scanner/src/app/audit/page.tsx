@@ -3,8 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Bracket, SiteFooter } from '@flintmere/ui';
 import { ViewportReveal } from '@/components/ViewportReveal';
-import { CheckoutCard } from './CheckoutCard';
-import { CTAButton, DeliverableLift, PriceBracket } from './audit-motion';
+import { BandTriptych } from './BandTriptych';
+import { CTAButton, DeliverableLift } from './audit-motion';
 import { CONCIERGE_DELIVERABLE_LIST } from '@/lib/copy';
 
 export const metadata: Metadata = {
@@ -176,8 +176,16 @@ export default function Audit() {
           </div>
         </section>
 
-        {/* Chapter 2 — The price chord. One read, brackets immediate.
-            CheckoutCard ready ~240ms after section entry, not 1.9s. */}
+        {/* Chapter 2 — The price chord, as a triptych. The configurator
+            IS the visual anchor: three saks chords visible at once
+            across a grid that encodes the SKU-range axis (smallest →
+            largest, left → right). Selection swaps which chord carries
+            full ink fill + sage under-tick + paper-2 column wash; the
+            others remain visible as outline-stroke recessive states.
+
+            Per design-extravagant 2026-05-01 — bracket budget relaxed
+            to permit comparison-set brackets in the recessive form.
+            ADR 0021 §1 amendment pending operator codification. */}
         <section
           id="checkout"
           aria-labelledby="price-heading"
@@ -217,55 +225,10 @@ export default function Audit() {
                 ['--reveal-delay' as string]: `${D_HEADLINE}ms`,
               }}
             >
-              The whole audit, from{' '}
-              <PriceBracket>£197</PriceBracket>.
+              Three bands. Pick yours.
             </h2>
 
-            <p
-              data-reveal
-              className="font-mono uppercase mt-10 lg:mt-12"
-              aria-label="One-time payment, no VAT, thirty-day refund, three working days"
-              style={{
-                fontSize: 'clamp(11px, 1vw, 13px)',
-                letterSpacing: '0.18em',
-                fontWeight: 500,
-                color: 'var(--color-ink)',
-                ['--reveal-delay' as string]: `${D_SUPPORT}ms`,
-              }}
-            >
-              One-time
-              <span className="mx-3" aria-hidden="true" style={{ color: 'var(--color-mute-2)' }}>·</span>
-              No VAT
-              <span className="mx-3" aria-hidden="true" style={{ color: 'var(--color-mute-2)' }}>·</span>
-              30-day refund
-              <span className="mx-3" aria-hidden="true" style={{ color: 'var(--color-mute-2)' }}>·</span>
-              Three working days
-            </p>
-
-            <div
-              data-reveal
-              aria-hidden="true"
-              className="mt-8 lg:mt-10"
-              style={{
-                height: '2px',
-                width: 'clamp(160px, 14vw, 280px)',
-                background: 'var(--color-accent-sage)',
-                opacity: 0.85,
-                ['--reveal-delay' as string]: `${D_SUPPORT}ms`,
-              }}
-            />
-
-            <div
-              data-reveal
-              className="mx-auto"
-              style={{
-                marginTop: 'clamp(40px, 5vw, 72px)',
-                maxWidth: '720px',
-                ['--reveal-delay' as string]: `${D_PRIMARY}ms`,
-              }}
-            >
-              <CheckoutCard />
-            </div>
+            <BandTriptych />
           </div>
         </section>
 

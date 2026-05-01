@@ -821,3 +821,88 @@
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* --- /audit Chapter 2 — band triptych ---
+   Spec: context/design/marketing/2026-05-01-audit-band-selector.md
+   Critique: context/design/critiques/2026-05-01-audit-band-triptych.md
+
+   The selected chord renders ink-filled at saks scale; the recessive
+   chords render outline-only via -webkit-text-stroke. The differentiation
+   is four-axis (fill vs outline, sage tick presence, paper-2 column
+   wash, mono weight). Operator dropped .flintmere-outline-shimmer
+   from this surface 2026-05-01 — that canon stays reserved for
+   homepage hero / manifesto / footer wordmark.
+
+   Reduced-motion: inherits the global block at line 139 — transition
+   duration scales to 0.01ms, AnimatePresence layout disables via
+   useReducedMotion() at the React layer. */
+
+/* Saks chord numeral — base + state modifiers. Class system replaces
+   inline-style WebkitTextStroke per Kael P1 (no parallel cascade). */
+.band-chord-numeral {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: clamp(64px, 9vw, 144px);
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  transition: color 320ms ease, -webkit-text-stroke-color 320ms ease;
+}
+
+.band-chord-numeral--selected {
+  color: var(--color-ink);
+  -webkit-text-stroke: none;
+}
+
+.band-chord-numeral--recessive {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--color-mute-2);
+}
+
+/* Hover on a recessive chord — outline strokes ink, soft paper-2 wash
+   on the column. Cheap CSS, no JS. */
+.band-chord--recessive:hover .band-chord-numeral {
+  -webkit-text-stroke: 1px var(--color-ink);
+}
+.band-chord--recessive:hover {
+  background: color-mix(in srgb, var(--color-paper-2) 60%, transparent);
+}
+
+/* Focus-visible — 2px ink outline framing the column, keyboard-nav
+   route. :has() is 95%+ supported (Safari 15.4+, Firefox 121+).
+   Fallback :focus-within below covers the long tail. */
+.band-chord:has(input[type='radio']:focus-visible) {
+  outline: 2px solid var(--color-ink);
+  outline-offset: -2px;
+}
+@supports not selector(:has(*)) {
+  .band-chord:focus-within {
+    outline: 2px solid var(--color-ink);
+    outline-offset: -2px;
+  }
+}
+
+/* Mobile reflow — triptych collapses to a single-column stack on
+   ≤768px. Saks chord scale drops so Band 3's "£597+" doesn't wrap
+   on iPhone SE. */
+@media (max-width: 768px) {
+  .band-triptych-grid {
+    grid-template-columns: 1fr !important;
+    border-top: none !important;
+    border-bottom: none !important;
+  }
+  .band-triptych-grid > .band-chord {
+    border-left: none !important;
+    border-top: 1px solid var(--color-line-soft) !important;
+    padding-block: clamp(28px, 5vw, 48px) !important;
+  }
+  .band-triptych-grid > .band-chord:first-child {
+    border-top: 1px solid var(--color-line) !important;
+  }
+  .band-triptych-grid > .band-chord:last-child {
+    border-bottom: 1px solid var(--color-line) !important;
+  }
+  .band-triptych-grid .band-chord-numeral {
+    font-size: clamp(40px, 14vw, 56px) !important;
+  }
+}
