@@ -13,47 +13,46 @@ export const metadata: Metadata = {
 };
 
 /**
- * /audit — Concierge audit conversion surface (extravagant pass + choreography,
- * 2026-04-30).
+ * /audit — Concierge audit conversion surface.
  *
- * Council pre-flight (3 named references):
- *   - Pentagram Saks Fifth Avenue — logotype-scale numerals: the floor
- *     price (£197) set at Bracket size="saks" carries the page's brand mark
- *     until the Phase 2 redesign retires the chord in favour of a band
- *     selector signature (per ADR 0022).
- *   - The Modern House (offering pages) — single typographic chord per
- *     chapter, generous whitespace, sage hairline anchors.
- *   - A24 single-film overview — top-left mono credit replaces eyebrow
- *     chrome; one anchor per chapter, one CTA per page.
+ * This page is a sales page first. Restrained motion: one section-level
+ * fade-up per chapter (not word-by-word). Brackets render immediately,
+ * not as theatrical reveals after a beat. The CheckoutCard is reachable
+ * with a single scroll and is interactive within ~400ms of its section
+ * entering the viewport — no multi-second cascade.
  *
- * Choreography: each chapter cascades on entry — eyebrow → headline word-
- * cascade with Apple-pattern beat → sage hairline → body rows with stagger.
- * Saks brackets `[for you]` and `[£197]` reveal as the punchline after a
- * 300ms beat; their continuous outline-shimmer (canonical, baked into the
- * Bracket primitive) runs through the letterforms underneath.
+ * List-stagger is reserved for the deliverables grid and the
+ * how-it-works steps, where short sequencing aids scanning.
  *
- * Mechanism: a single `<ViewportReveal>` wraps the page; it observes every
- * `[data-reveal]` descendant individually with threshold 0.5. Each element
- * carries its own `--reveal-delay` so packed-together openers cascade from a
- * shared zero, while body rows fire when they personally enter the viewport.
+ * Reduced-motion: the global `prefers-reduced-motion` block in
+ * globals.css scales transition-duration to 0.01ms — reduced-motion
+ * users land on every endpoint instantly.
  *
- * Reduced-motion: the global `prefers-reduced-motion` block in globals.css
- * scales transition-duration to 0.01ms — reduced-motion users land on every
- * data-reveal endpoint instantly. No motion library, no JS animation loop.
+ * Bracket budget: ≤1 anchor bracket per section. Hero `[for you]`
+ * (saks), price chord `[£197]` (saks, Band 1 floor), deliverables
+ * `[three days]` (default). Ordinal markers `[01]…[05]` are ledger
+ * numerals, not anchor brackets.
  *
- * Bracket budget: ≤1 anchor bracket per section. Hero `[for you]` (saks),
- * price chord `[£197]` (saks, Band 1 floor), deliverables `[three days]`
- * (default). Ordinal markers `[01]…[05]` are ledger numerals, not anchor
- * brackets.
+ * Each section explicitly carries `bg-paper` so the universal
+ * sticky-footer curtain (engaged by `flintmere-main`) is occluded
+ * until the user reaches the bottom of the page.
  *
- * Each section explicitly carries `bg-paper` so the universal sticky-footer
- * curtain (engaged by `flintmere-main`) is occluded until the user reaches
- * the bottom of the page.
+ * Motion delays follow a single grammar:
+ *   - 0ms       section eyebrow
+ *   - 80ms      headline
+ *   - 160ms     supporting paragraph / hairline
+ *   - 240ms     CTA / first list item
+ *   - +80ms     each subsequent list item
+ *
+ * No 300ms BEAT. No 2000ms paragraph delay. No 2700ms hairline
+ * sweep. Restraint is the spec.
  */
 
-const STAGGER_HERO = 110;
-const STAGGER_BODY = 120;
-const BEAT = 300;
+const STEP = 80;
+const D_EYEBROW = 0;
+const D_HEADLINE = STEP;
+const D_SUPPORT = STEP * 2;
+const D_PRIMARY = STEP * 3;
 
 export default function Audit() {
   return (
@@ -62,14 +61,13 @@ export default function Audit() {
         Skip to content
       </a>
       <ViewportReveal>
-        {/* Chapter 1 — Hero (single typographic canvas, A24 + Saks).
-            Word-cascade with beat on the headline; the saks bracket
-            `[for you]` lands as the punchline after the cascade settles. */}
+        {/* Chapter 1 — Hero. Single typographic canvas. The value
+            proposition lands as one read, not as a six-word cascade. */}
         <section
           id="hero"
           aria-labelledby="audit-heading"
           className="relative isolate overflow-hidden bg-[color:var(--color-paper)] flex flex-col"
-          style={{ minHeight: '100vh' }}
+          style={{ minHeight: 'min(100vh, 880px)' }}
         >
           <div
             className="relative flex flex-col justify-center mx-auto w-full max-w-[1280px]"
@@ -77,8 +75,8 @@ export default function Audit() {
               flex: 1,
               paddingLeft: 'clamp(32px, 5vw, 96px)',
               paddingRight: 'clamp(32px, 4vw, 64px)',
-              paddingTop: 'clamp(120px, 14vh, 200px)',
-              paddingBottom: 'clamp(96px, 12vh, 160px)',
+              paddingTop: 'clamp(96px, 12vh, 160px)',
+              paddingBottom: 'clamp(72px, 10vh, 120px)',
             }}
           >
             <p
@@ -90,8 +88,8 @@ export default function Audit() {
                 letterSpacing: '0.18em',
                 fontWeight: 500,
                 color: 'var(--color-mute)',
-                marginBottom: 'clamp(48px, 6vw, 96px)',
-                ['--reveal-delay' as string]: '120ms',
+                marginBottom: 'clamp(32px, 4vw, 56px)',
+                ['--reveal-delay' as string]: `${D_EYEBROW}ms`,
               }}
             >
               Flintmere · Concierge audit · from £197 · 3 working days
@@ -99,47 +97,16 @@ export default function Audit() {
 
             <h1
               id="audit-heading"
+              data-reveal
               className="font-sans font-medium tracking-[-0.04em] leading-[0.88] text-[color:var(--color-ink)]"
               style={{
                 fontSize: 'clamp(56px, 8vw, 128px)',
                 maxWidth: '14ch',
+                ['--reveal-delay' as string]: `${D_HEADLINE}ms`,
               }}
             >
-              <span className="sr-only">
-                Want us to read your store for you?
-              </span>
-              {(() => {
-                const WORDS = ['Want', 'us', 'to', 'read', 'your', 'store'];
-                const ENTRY = 400;
-                const cascadeEnd = ENTRY + WORDS.length * STAGGER_HERO;
-                const bracketDelay = cascadeEnd + BEAT;
-                return (
-                  <span aria-hidden="true">
-                    {WORDS.map((w, i) => (
-                      <span
-                        key={`hw-${i}`}
-                        data-reveal
-                        style={{
-                          display: 'inline-block',
-                          marginRight: '0.28em',
-                          ['--reveal-delay' as string]: `${ENTRY + i * STAGGER_HERO}ms`,
-                        }}
-                      >
-                        {w}
-                      </span>
-                    ))}
-                    <span
-                      data-reveal
-                      style={{
-                        display: 'inline-block',
-                        ['--reveal-delay' as string]: `${bracketDelay}ms`,
-                      }}
-                    >
-                      <Bracket size="saks">for you</Bracket>?
-                    </span>
-                  </span>
-                );
-              })()}
+              Want us to read your store{' '}
+              <Bracket size="saks">for you</Bracket>?
             </h1>
 
             <p
@@ -152,20 +119,21 @@ export default function Audit() {
                 lineHeight: 1.55,
                 fontWeight: 400,
                 color: 'var(--color-mute)',
-                ['--reveal-delay' as string]: '2000ms',
+                ['--reveal-delay' as string]: `${D_SUPPORT}ms`,
               }}
             >
-              We read your catalog product by product, write a detailed letter
-              pointing at exactly what to fix, and send a per-product CSV with
-              the worst offenders already drafted for you. No call. No
-              screen-share. Three working days.
+              We read your catalog product by product, write a detailed
+              letter pointing at exactly what to fix, and send a per-product
+              CSV with the worst offenders already drafted for you. No call.
+              No screen-share. Three working days.
             </p>
 
             <div
               data-reveal
+              className="flex flex-wrap items-center gap-x-6 gap-y-3"
               style={{
-                marginTop: 'clamp(40px, 5vw, 64px)',
-                ['--reveal-delay' as string]: '2200ms',
+                marginTop: 'clamp(32px, 4vw, 56px)',
+                ['--reveal-delay' as string]: `${D_PRIMARY}ms`,
               }}
             >
               <Link
@@ -175,6 +143,20 @@ export default function Audit() {
                 See the bands
                 <span aria-hidden="true">↓</span>
               </Link>
+              <Link
+                href="/scan"
+                className="font-mono uppercase"
+                style={{
+                  fontSize: 'clamp(11px, 1vw, 13px)',
+                  letterSpacing: '0.18em',
+                  fontWeight: 500,
+                  color: 'var(--color-mute)',
+                  textDecoration: 'underline',
+                  textUnderlineOffset: 4,
+                }}
+              >
+                Or run the free scan first
+              </Link>
             </div>
 
             <div
@@ -183,23 +165,18 @@ export default function Audit() {
               className="absolute h-[2px]"
               style={{
                 left: 'clamp(32px, 5vw, 96px)',
-                bottom: 'clamp(40px, 5vw, 72px)',
+                bottom: 'clamp(32px, 4vw, 56px)',
                 width: 'clamp(160px, 14vw, 280px)',
                 background: 'var(--color-accent-sage)',
                 opacity: 0.85,
-                ['--reveal-delay' as string]: '2700ms',
+                ['--reveal-delay' as string]: `${D_PRIMARY}ms`,
               }}
             />
           </div>
         </section>
 
-        {/* Chapter 2 — The price chord (Saks logotype-scale numeral).
-            Word-cascade lands "The whole audit, from", beats 300ms, then
-            the saks `[£197]` reveals as the brand-mark moment — the Band 1
-            floor anchor per ADR 0022. Phase 2 redesign retires the chord
-            in favour of a band-selector signature; this is the interim
-            truthful read. Spec captions, hairline, and checkout cascade
-            in after. */}
+        {/* Chapter 2 — The price chord. One read, brackets immediate.
+            CheckoutCard ready ~240ms after section entry, not 1.9s. */}
         <section
           id="checkout"
           aria-labelledby="price-heading"
@@ -210,8 +187,8 @@ export default function Audit() {
             style={{
               paddingLeft: 'clamp(24px, 5vw, 64px)',
               paddingRight: 'clamp(24px, 5vw, 64px)',
-              paddingTop: 'clamp(96px, 14vh, 200px)',
-              paddingBottom: 'clamp(72px, 10vh, 144px)',
+              paddingTop: 'clamp(72px, 10vh, 128px)',
+              paddingBottom: 'clamp(72px, 10vh, 128px)',
             }}
           >
             <p
@@ -222,8 +199,8 @@ export default function Audit() {
                 letterSpacing: '0.18em',
                 color: 'var(--color-mute)',
                 fontWeight: 500,
-                marginBottom: 'clamp(32px, 4vw, 64px)',
-                ['--reveal-delay' as string]: '60ms',
+                marginBottom: 'clamp(28px, 3vw, 48px)',
+                ['--reveal-delay' as string]: `${D_EYEBROW}ms`,
               }}
             >
               <span aria-hidden="true">// </span>the cost
@@ -231,55 +208,28 @@ export default function Audit() {
 
             <h2
               id="price-heading"
+              data-reveal
               className="font-sans font-medium tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)]"
-              style={{ fontSize: 'clamp(40px, 5vw, 80px)', maxWidth: '20ch' }}
+              style={{
+                fontSize: 'clamp(40px, 5vw, 80px)',
+                maxWidth: '20ch',
+                ['--reveal-delay' as string]: `${D_HEADLINE}ms`,
+              }}
             >
-              <span className="sr-only">The whole audit, from one hundred and ninety-seven pounds.</span>
-              {(() => {
-                const WORDS = ['The', 'whole', 'audit,', 'from'];
-                const ENTRY = 200;
-                const cascadeEnd = ENTRY + WORDS.length * STAGGER_BODY;
-                const bracketDelay = cascadeEnd + BEAT;
-                return (
-                  <span aria-hidden="true">
-                    {WORDS.map((w, i) => (
-                      <span
-                        key={`pw-${i}`}
-                        data-reveal
-                        style={{
-                          display: 'inline-block',
-                          marginRight: '0.22em',
-                          ['--reveal-delay' as string]: `${ENTRY + i * STAGGER_BODY}ms`,
-                        }}
-                      >
-                        {w}
-                      </span>
-                    ))}
-                    <span
-                      data-reveal
-                      style={{
-                        display: 'inline-block',
-                        verticalAlign: 'baseline',
-                        ['--reveal-delay' as string]: `${bracketDelay}ms`,
-                      }}
-                    >
-                      <Bracket size="saks">£197</Bracket>
-                    </span>
-                  </span>
-                );
-              })()}
+              The whole audit, from{' '}
+              <Bracket size="saks">£197</Bracket>.
             </h2>
 
             <p
               data-reveal
-              className="font-mono uppercase mt-12 lg:mt-16"
+              className="font-mono uppercase mt-10 lg:mt-12"
               aria-label="One-time payment, no VAT, thirty-day refund, three working days"
               style={{
                 fontSize: 'clamp(11px, 1vw, 13px)',
                 letterSpacing: '0.18em',
                 fontWeight: 500,
                 color: 'var(--color-ink)',
-                ['--reveal-delay' as string]: '1500ms',
+                ['--reveal-delay' as string]: `${D_SUPPORT}ms`,
               }}
             >
               One-time
@@ -294,13 +244,13 @@ export default function Audit() {
             <div
               data-reveal
               aria-hidden="true"
-              className="mt-10 lg:mt-12"
+              className="mt-8 lg:mt-10"
               style={{
                 height: '2px',
                 width: 'clamp(160px, 14vw, 280px)',
                 background: 'var(--color-accent-sage)',
                 opacity: 0.85,
-                ['--reveal-delay' as string]: '1700ms',
+                ['--reveal-delay' as string]: `${D_SUPPORT}ms`,
               }}
             />
 
@@ -308,9 +258,9 @@ export default function Audit() {
               data-reveal
               className="mx-auto"
               style={{
-                marginTop: 'clamp(64px, 8vw, 112px)',
+                marginTop: 'clamp(40px, 5vw, 72px)',
                 maxWidth: '720px',
-                ['--reveal-delay' as string]: '1900ms',
+                ['--reveal-delay' as string]: `${D_PRIMARY}ms`,
               }}
             >
               <CheckoutCard />
@@ -318,10 +268,9 @@ export default function Audit() {
           </div>
         </section>
 
-        {/* Chapter 3 — Deliverables. Headline word-cascade beats into the
-            `[three days]` bracket; each spec row reveals as it personally
-            enters the viewport (so slow-scrollers see each row land, fast-
-            scrollers see them already there). */}
+        {/* Chapter 3 — Deliverables. Headline lands as one read; the
+            list staggers (5 items × 60ms = 300ms total) so a scanner
+            still feels rhythm without theatre. */}
         <section
           aria-labelledby="deliverables-heading"
           className="relative bg-[color:var(--color-paper)]"
@@ -331,8 +280,8 @@ export default function Audit() {
             style={{
               paddingLeft: 'clamp(24px, 5vw, 64px)',
               paddingRight: 'clamp(24px, 5vw, 64px)',
-              paddingTop: 'clamp(96px, 14vh, 200px)',
-              paddingBottom: 'clamp(72px, 10vh, 144px)',
+              paddingTop: 'clamp(72px, 10vh, 128px)',
+              paddingBottom: 'clamp(72px, 10vh, 128px)',
             }}
           >
             <p
@@ -343,8 +292,8 @@ export default function Audit() {
                 letterSpacing: '0.18em',
                 color: 'var(--color-mute)',
                 fontWeight: 500,
-                marginBottom: 'clamp(32px, 4vw, 64px)',
-                ['--reveal-delay' as string]: '60ms',
+                marginBottom: 'clamp(28px, 3vw, 48px)',
+                ['--reveal-delay' as string]: `${D_EYEBROW}ms`,
               }}
             >
               <span aria-hidden="true">// </span>what lands in your inbox
@@ -352,72 +301,40 @@ export default function Audit() {
 
             <h2
               id="deliverables-heading"
+              data-reveal
               className="font-sans font-medium tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)]"
-              style={{ fontSize: 'clamp(40px, 6vw, 96px)', maxWidth: '18ch' }}
+              style={{
+                fontSize: 'clamp(40px, 6vw, 96px)',
+                maxWidth: '18ch',
+                ['--reveal-delay' as string]: `${D_HEADLINE}ms`,
+              }}
             >
-              <span className="sr-only">
-                Your store, read by humans, in three days.
-              </span>
-              {(() => {
-                const WORDS = ['Your', 'store,', 'read', 'by', 'humans,', 'in'];
-                const ENTRY = 200;
-                const cascadeEnd = ENTRY + WORDS.length * STAGGER_BODY;
-                const bracketDelay = cascadeEnd + BEAT;
-                return (
-                  <span aria-hidden="true">
-                    {WORDS.map((w, i) => (
-                      <span
-                        key={`dw-${i}`}
-                        data-reveal
-                        style={{
-                          display: 'inline-block',
-                          marginRight: '0.24em',
-                          ['--reveal-delay' as string]: `${ENTRY + i * STAGGER_BODY}ms`,
-                        }}
-                      >
-                        {w}
-                      </span>
-                    ))}
-                    <span
-                      data-reveal
-                      style={{
-                        display: 'inline-block',
-                        ['--reveal-delay' as string]: `${bracketDelay}ms`,
-                      }}
-                    >
-                      <Bracket>three days</Bracket>.
-                    </span>
-                  </span>
-                );
-              })()}
+              Your store, read by humans, in{' '}
+              <Bracket>three days</Bracket>.
             </h2>
 
             <div
               data-reveal
               aria-hidden="true"
-              className="mt-10 lg:mt-14"
+              className="mt-8 lg:mt-12"
               style={{
                 height: '2px',
                 width: 'clamp(160px, 14vw, 280px)',
                 background: 'var(--color-accent-sage)',
                 opacity: 0.85,
-                ['--reveal-delay' as string]: '1700ms',
+                ['--reveal-delay' as string]: `${D_SUPPORT}ms`,
               }}
             />
 
-            {/* Cover plate — bespoke editorial still-life as proof-of-deliverable.
-                "Type leads, imagery proves" canon. Bracket signature co-occurs
-                in the same viewport via the headline `[three days]` above.
-                Asset rendered 2026-04-30 via Runware Flux Dev under per-surface
-                operator override of the AI-imagery canon ban. Workflow: see
-                memory project_runware_image_workflow.md. Native 21:9 (1344×576),
-                60KB — well under the 100KB editorial-photo ceiling. */}
+            {/* Cover plate — bespoke editorial still-life as
+                proof-of-deliverable. "Type leads, imagery proves" canon.
+                21:9, ~60KB. */}
             <figure
               data-reveal
-              className="relative mt-12 lg:mt-16"
+              className="relative mt-10 lg:mt-14"
               style={{
                 margin: 0,
-                ['--reveal-delay' as string]: '1900ms',
+                ['--reveal-delay' as string]: `${D_PRIMARY}ms`,
               }}
             >
               <div
@@ -454,26 +371,26 @@ export default function Audit() {
               data-reveal
               className="font-mono"
               style={{
-                marginTop: 'clamp(48px, 6vw, 80px)',
+                marginTop: 'clamp(32px, 4vw, 56px)',
                 fontSize: 'clamp(12px, 1vw, 13px)',
                 lineHeight: 1.6,
                 letterSpacing: '0.02em',
                 color: 'var(--color-mute-2)',
                 maxWidth: '64ch',
-                ['--reveal-delay' as string]: '2100ms',
+                ['--reveal-delay' as string]: `${D_PRIMARY}ms`,
               }}
             >
-              <span aria-hidden="true">// </span>The list below shows the Band 1
-              deliverable. Band 2 audits draft the worst 25 products (not 10);
-              Band 3 audits read a representative sample plus the structural
-              data model, and draft the worst 25.
+              <span aria-hidden="true">// </span>The list below shows the
+              Band 1 deliverable. Band 2 audits draft the worst 25 products
+              (not 10); Band 3 audits read a representative sample plus the
+              structural data model, and draft the worst 25.
             </p>
 
             <ol
               className="list-none p-0 grid grid-cols-1 lg:grid-cols-2"
               style={{
-                marginTop: 'clamp(40px, 5vw, 64px)',
-                gap: 'clamp(40px, 4vw, 64px) clamp(48px, 5vw, 96px)',
+                marginTop: 'clamp(32px, 4vw, 56px)',
+                gap: 'clamp(32px, 3vw, 48px) clamp(40px, 4vw, 80px)',
               }}
             >
               {CONCIERGE_DELIVERABLE_LIST.map((item, idx) => (
@@ -482,7 +399,7 @@ export default function Audit() {
                   data-reveal
                   className="border-t border-[color:var(--color-line)] pt-8"
                   style={{
-                    ['--reveal-delay' as string]: `${idx * 100}ms`,
+                    ['--reveal-delay' as string]: `${idx * 60}ms`,
                   }}
                 >
                   <p
@@ -500,12 +417,12 @@ export default function Audit() {
                   </p>
                   <p
                     className="font-sans font-medium tracking-[-0.02em] leading-[1.05] text-[color:var(--color-ink)] mt-4"
-                    style={{ fontSize: 'clamp(24px, 2.4vw, 36px)' }}
+                    style={{ fontSize: 'clamp(22px, 2vw, 32px)' }}
                   >
                     {item.title}
                   </p>
                   <p
-                    className="font-sans mt-4"
+                    className="font-sans mt-3"
                     style={{
                       fontSize: 'clamp(15px, 1.05vw, 17px)',
                       lineHeight: 1.55,
@@ -521,8 +438,7 @@ export default function Audit() {
           </div>
         </section>
 
-        {/* Chapter 4 — How it works. Short headline cascade, then each step
-            reveals as the user scrolls past it. */}
+        {/* Chapter 4 — How it works. Headline + list-stagger. */}
         <section
           aria-labelledby="how-heading"
           className="relative bg-[color:var(--color-paper)]"
@@ -532,8 +448,8 @@ export default function Audit() {
             style={{
               paddingLeft: 'clamp(24px, 5vw, 64px)',
               paddingRight: 'clamp(24px, 5vw, 64px)',
-              paddingTop: 'clamp(96px, 14vh, 200px)',
-              paddingBottom: 'clamp(72px, 10vh, 144px)',
+              paddingTop: 'clamp(72px, 10vh, 128px)',
+              paddingBottom: 'clamp(72px, 10vh, 128px)',
             }}
           >
             <p
@@ -544,8 +460,8 @@ export default function Audit() {
                 letterSpacing: '0.18em',
                 color: 'var(--color-mute)',
                 fontWeight: 500,
-                marginBottom: 'clamp(32px, 4vw, 64px)',
-                ['--reveal-delay' as string]: '60ms',
+                marginBottom: 'clamp(28px, 3vw, 48px)',
+                ['--reveal-delay' as string]: `${D_EYEBROW}ms`,
               }}
             >
               <span aria-hidden="true">// </span>the four moves
@@ -553,50 +469,34 @@ export default function Audit() {
 
             <h2
               id="how-heading"
+              data-reveal
               className="font-sans font-medium tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)]"
-              style={{ fontSize: 'clamp(40px, 6vw, 96px)', maxWidth: '14ch' }}
+              style={{
+                fontSize: 'clamp(40px, 6vw, 96px)',
+                maxWidth: '14ch',
+                ['--reveal-delay' as string]: `${D_HEADLINE}ms`,
+              }}
             >
-              <span className="sr-only">How it works.</span>
-              {(() => {
-                const WORDS = ['How', 'it', 'works.'];
-                const ENTRY = 200;
-                return (
-                  <span aria-hidden="true">
-                    {WORDS.map((w, i) => (
-                      <span
-                        key={`hiw-${i}`}
-                        data-reveal
-                        style={{
-                          display: 'inline-block',
-                          marginRight: i < WORDS.length - 1 ? '0.24em' : 0,
-                          ['--reveal-delay' as string]: `${ENTRY + i * STAGGER_BODY}ms`,
-                        }}
-                      >
-                        {w}
-                      </span>
-                    ))}
-                  </span>
-                );
-              })()}
+              How it works.
             </h2>
 
             <div
               data-reveal
               aria-hidden="true"
-              className="mt-10 lg:mt-14"
+              className="mt-8 lg:mt-12"
               style={{
                 height: '2px',
                 width: 'clamp(160px, 14vw, 280px)',
                 background: 'var(--color-accent-sage)',
                 opacity: 0.85,
-                ['--reveal-delay' as string]: '900ms',
+                ['--reveal-delay' as string]: `${D_SUPPORT}ms`,
               }}
             />
 
             <ol
               className="list-none p-0"
               style={{
-                marginTop: 'clamp(64px, 8vw, 112px)',
+                marginTop: 'clamp(40px, 5vw, 72px)',
               }}
             >
               {[
@@ -611,9 +511,9 @@ export default function Audit() {
                   className="border-t border-[color:var(--color-line)] grid grid-cols-[auto_1fr] items-baseline"
                   style={{
                     gap: 'clamp(24px, 4vw, 64px)',
-                    paddingTop: 'clamp(32px, 4vw, 56px)',
-                    paddingBottom: 'clamp(32px, 4vw, 56px)',
-                    ['--reveal-delay' as string]: `${idx * 80}ms`,
+                    paddingTop: 'clamp(28px, 3vw, 48px)',
+                    paddingBottom: 'clamp(28px, 3vw, 48px)',
+                    ['--reveal-delay' as string]: `${idx * 60}ms`,
                   }}
                 >
                   <span
@@ -633,7 +533,7 @@ export default function Audit() {
                     style={{
                       fontSize: 'clamp(20px, 2vw, 32px)',
                       lineHeight: 1.25,
-                      maxWidth: '32ch',
+                      maxWidth: '36ch',
                     }}
                   >
                     {step}
@@ -644,7 +544,7 @@ export default function Audit() {
           </div>
         </section>
 
-        {/* Chapter 5 — Disclaimer band. Single quiet fade-up on paper. */}
+        {/* Chapter 5 — Disclaimer band. Single quiet fade-up. */}
         <section
           aria-labelledby="legal-heading"
           className="relative bg-[color:var(--color-paper)]"
@@ -654,8 +554,8 @@ export default function Audit() {
             style={{
               paddingLeft: 'clamp(24px, 5vw, 64px)',
               paddingRight: 'clamp(24px, 5vw, 64px)',
-              paddingTop: 'clamp(72px, 10vh, 144px)',
-              paddingBottom: 'clamp(96px, 12vh, 160px)',
+              paddingTop: 'clamp(56px, 8vh, 96px)',
+              paddingBottom: 'clamp(72px, 10vh, 128px)',
             }}
           >
             <h2 id="legal-heading" className="sr-only">
@@ -670,7 +570,7 @@ export default function Audit() {
                 letterSpacing: '0.02em',
                 color: 'var(--color-mute)',
                 maxWidth: '72ch',
-                ['--reveal-delay' as string]: '100ms',
+                ['--reveal-delay' as string]: '0ms',
               }}
             >
               Flintmere is a trading name of Eazy Access Ltd (England &amp; Wales).
