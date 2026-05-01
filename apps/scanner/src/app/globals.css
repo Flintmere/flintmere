@@ -378,6 +378,27 @@
   }
 }
 
+/* --- Scan-form slab — focus-within signal (2026-05-01 design-extravagant pass).
+   The form sits as the page's primary affordance; on focus-within the elevation
+   deepens and a sage border-edge confirms intent (matches the [data-hover-lift]
+   non-shadow signal pattern for forced-colors / high-contrast users). */
+.scan-form__slab:focus-within {
+  box-shadow:
+    0 1px 0 rgba(20, 18, 16, 0.06),
+    0 16px 40px -16px rgba(20, 18, 16, 0.18);
+  border-color: var(--color-ink) !important;
+}
+
+.scan-form__slab:focus-within::after {
+  content: '';
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-form__slab {
+    transition: none !important;
+  }
+}
+
 /* --- Generic viewport reveal contract (paired with ViewportReveal.tsx) ---
    Sections opt-in via the [data-reveal] attribute. Stagger via --reveal-delay
    custom property set inline on the element (canon-acceptable inline style:

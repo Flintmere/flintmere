@@ -8,8 +8,12 @@
  * SuppressionLede, ScanningOverlay, ErrorBlock, PublicPageOptIn,
  * BenchmarkOptIn, useLiveSample) live in apps/scanner/src/components/scan/.
  *
- * This file was 890 lines pre-refactor; pre-emptive extraction landed
- * 2026-04-28 to bring it under the 600-line ceiling per memory/PROCESS.md §2.
+ * Hero composition (2026-05-01 design-extravagant pass):
+ * `[ suppressed ]` lands at Saks scale via Bracket size="saks", carrying
+ * the marketing-homepage chord through to the conversion moment. Amber-
+ * radial atmosphere blooms behind the chord (per ADR 0021 §3 relaxation
+ * — atmospheric gradient permitted). The chord IS the page's brand-mark;
+ * the running text orbits it.
  */
 
 import { useState } from 'react';
@@ -54,26 +58,71 @@ export default function ScanPage() {
 
   return (
     <main id="main" className="flintmere-main">
-      <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-20 md:py-24">
-        <p className="eyebrow mb-6">
-          Free scan · No signup · 60 seconds
-        </p>
-        <h1 className="max-w-[22ch]">
-          Which of your products are <Bracket>suppressed</Bracket> in Google Shopping today?
-        </h1>
-        <p
-          className="mt-8 max-w-[54ch] text-[color:var(--color-ink-2)]"
-          style={{ fontSize: 17, lineHeight: 1.55 }}
+      <section
+        aria-labelledby="scan-heading"
+        className="relative isolate overflow-hidden bg-[color:var(--color-paper)]"
+      >
+        {/* Atmosphere — amber-radial gradient blooming behind the chord.
+            Per ADR 0021 §3 relaxation: --gradient-amber-radial is a documented
+            atmospheric gradient. Positioned to bloom from roughly the chord's
+            visual centre, falls off naturally via the radial. Decorative,
+            aria-hidden. */}
+        <div
+          aria-hidden="true"
+          className="absolute pointer-events-none"
+          style={{
+            inset: 0,
+            background: 'var(--gradient-amber-radial)',
+            transform: 'translate(0, -10%) scale(1.2)',
+            opacity: 0.95,
+          }}
+        />
+
+        <div
+          className="relative mx-auto max-w-[1280px]"
+          style={{
+            paddingLeft: 'clamp(24px, 4vw, 64px)',
+            paddingRight: 'clamp(24px, 4vw, 64px)',
+            paddingTop: 'clamp(72px, 9vw, 128px)',
+            paddingBottom: 'clamp(48px, 6vw, 96px)',
+          }}
         >
-          Paste your URL. We estimate how much annual demand is going to
-          competitors while these products stay demoted — and show you the
-          catalog data costing you the sale.
-        </p>
-        <div className="mt-10">
-          <ScanForm
-            onSubmit={runScan}
-            isSubmitting={state.phase === 'scanning'}
-          />
+          <p className="eyebrow mb-10">
+            Free scan · No signup · 60 seconds
+          </p>
+
+          <h1
+            id="scan-heading"
+            className="font-medium tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)] max-w-[16ch]"
+            style={{ fontSize: 'clamp(40px, 7vw, 112px)' }}
+          >
+            Which of your products are{' '}
+            <Bracket size="saks">suppressed</Bracket>
+            {' '}in Google Shopping today?
+          </h1>
+
+          <p
+            className="font-sans"
+            style={{
+              marginTop: 'clamp(32px, 4vw, 56px)',
+              maxWidth: '52ch',
+              fontSize: 'clamp(15px, 1.1vw, 17px)',
+              lineHeight: 1.55,
+              fontWeight: 400,
+              color: 'var(--color-mute)',
+            }}
+          >
+            Paste your URL. We measure how much annual demand is leaking to
+            competitors while these products stay demoted — and surface the
+            catalog data costing you the sale.
+          </p>
+
+          <div style={{ marginTop: 'clamp(40px, 5vw, 72px)' }}>
+            <ScanForm
+              onSubmit={runScan}
+              isSubmitting={state.phase === 'scanning'}
+            />
+          </div>
         </div>
       </section>
 
