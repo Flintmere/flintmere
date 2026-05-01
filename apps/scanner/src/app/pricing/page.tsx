@@ -112,33 +112,50 @@ export default function Pricing() {
         </div>
       </section>
 
+      {/*
+        Tier strip — Day-4 shim against the new pricing.ts shape (ADR
+        0020). Renders only tiers with a displayable magnitude:
+          - Free (basePlatform = 0)
+          - Grandfathered (legacyPrice populated; in-flight subscriptions only)
+        Forward tiers (food-single, food-agency, bundles, concierge-monthly)
+        carry null magnitudes during the WTP window and render as a
+        "Pricing finalising — May–June 2026" cohort in the Day-5 rebuild
+        with vertical selector + waitlist CTAs. Filtered out here.
+      */}
       <section aria-label="Tiers" className="bg-[color:var(--color-paper)] grid grid-cols-1 md:grid-cols-5 border-y border-[color:var(--color-line)]">
-        {TIERS.map((tier) => (
-          <div
-            key={tier.slug}
-            className="p-8 border-r border-[color:var(--color-line)] last:border-r-0 max-md:border-r-0 max-md:border-b max-md:last:border-b-0"
-            style={{ background: tier.featured ? 'var(--color-paper-2)' : undefined }}
-          >
-            <p className="eyebrow">{tier.name}</p>
-            <p className="mt-3" style={{ fontSize: 40, letterSpacing: '-0.04em', lineHeight: 1, fontWeight: 500 }}>
-              {tier.price}
-              {tier.unit ? (
-                <span className="text-[color:var(--color-mute)]" style={{ fontSize: 13, fontWeight: 400, marginLeft: 4 }}>
-                  {tier.unit}
-                </span>
-              ) : null}
-            </p>
-            <p className="eyebrow mt-4 text-[color:var(--color-mute)]">{tier.scope}</p>
-            <ul className="mt-6 list-none p-0 m-0 space-y-3" style={{ fontSize: 13, lineHeight: 1.5 }}>
-              {tier.features.map((f) => (
-                <li key={f} className="flex gap-3">
-                  <span aria-hidden="true" style={{ color: 'var(--color-mute-2)' }}>—</span>
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        {TIERS.filter((tier) => tier.basePlatform !== null || tier.legacyPrice !== undefined).map((tier) => {
+          const display = tier.basePlatform === 0
+            ? { amount: '£0', unit: undefined as string | undefined }
+            : tier.legacyPrice
+              ? { amount: `£${tier.legacyPrice.amount.toLocaleString()}`, unit: tier.legacyPrice.unit }
+              : { amount: '—', unit: undefined };
+          return (
+            <div
+              key={tier.slug}
+              className="p-8 border-r border-[color:var(--color-line)] last:border-r-0 max-md:border-r-0 max-md:border-b max-md:last:border-b-0"
+              style={{ background: tier.featured ? 'var(--color-paper-2)' : undefined }}
+            >
+              <p className="eyebrow">{tier.name}</p>
+              <p className="mt-3" style={{ fontSize: 40, letterSpacing: '-0.04em', lineHeight: 1, fontWeight: 500 }}>
+                {display.amount}
+                {display.unit ? (
+                  <span className="text-[color:var(--color-mute)]" style={{ fontSize: 13, fontWeight: 400, marginLeft: 4 }}>
+                    {display.unit}
+                  </span>
+                ) : null}
+              </p>
+              <p className="eyebrow mt-4 text-[color:var(--color-mute)]">{tier.scope}</p>
+              <ul className="mt-6 list-none p-0 m-0 space-y-3" style={{ fontSize: 13, lineHeight: 1.5 }}>
+                {tier.features.map((f) => (
+                  <li key={f} className="flex gap-3">
+                    <span aria-hidden="true" style={{ color: 'var(--color-mute-2)' }}>—</span>
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
       </section>
 
       {/* Concierge callout */}
