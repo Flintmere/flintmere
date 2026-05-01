@@ -73,6 +73,13 @@ export function SiteFooter() {
           </Link>
           <span aria-hidden="true">,</span>
           <Link
+            href="/about"
+            className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
+          >
+            About
+          </Link>
+          <span aria-hidden="true">,</span>
+          <Link
             href="https://app.flintmere.com"
             className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >
