@@ -55,7 +55,7 @@ export function SiteFooter() {
             href="/audit"
             className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >
-            £97 audit
+            £197 audit
           </Link>
           <span aria-hidden="true">,</span>
           <Link
