@@ -29,13 +29,14 @@
  * extravagant relaxation; ADR 0021 §1 amendment pending.
  */
 
-import { useId, useState } from 'react';
+import { useCallback, useId, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   AUDIT_BANDS,
   type AuditBand,
   type AuditBandSlug,
 } from '@/lib/audit-pricing';
+import { track } from '@/lib/plausible';
 import { CheckoutCard } from './CheckoutCard';
 
 const DEFAULT_BAND: AuditBandSlug = 'band-2'; // BUSINESS.md target cohort
@@ -47,6 +48,17 @@ export function BandTriptych() {
   const groupName = useId();
 
   const selected = AUDIT_BANDS.find((b) => b.slug === bandSlug)!;
+
+  const handleBandChange = useCallback(
+    (next: AuditBandSlug) => {
+      setBandSlug((prev) => {
+        if (prev === next) return prev;
+        track('band_switched', { from: prev, to: next });
+        return next;
+      });
+    },
+    [],
+  );
 
   return (
     <>
@@ -97,7 +109,7 @@ export function BandTriptych() {
               isFirst={idx === 0}
               isLast={idx === AUDIT_BANDS.length - 1}
               reducedMotion={!!reduce}
-              onSelect={() => setBandSlug(band.slug)}
+              onSelect={() => handleBandChange(band.slug)}
             />
           ))}
         </div>
@@ -146,7 +158,7 @@ export function BandTriptych() {
           ['--reveal-delay' as string]: '400ms',
         }}
       >
-        <CheckoutCard bandSlug={bandSlug} onBandChange={setBandSlug} />
+        <CheckoutCard bandSlug={bandSlug} onBandChange={handleBandChange} />
       </div>
     </>
   );

@@ -8,6 +8,7 @@
 // ADR 0013 trigger conditions T1–T7) is a string-rename, not a redesign:
 //   - scan_started        ScanForm submit
 //   - email_captured      EmailGate /api/lead success
+//   - band_switched       BandTriptych user-initiated band change ({ from, to })
 //   - concierge_clicked   CheckoutCard handleStart (start of /audit flow)
 //   - concierge_paid      Stripe webhook (server-side; not via this helper)
 //
