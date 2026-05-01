@@ -20,11 +20,13 @@ export default function DPA() {
         <p>
           This Data Processing Agreement (&ldquo;<strong>DPA</strong>&rdquo;)
           forms part of the Terms of Service between <strong>Eazy Access Ltd</strong>{' '}
-          (trading as Flintmere, the &ldquo;<strong>Processor</strong>&rdquo;)
-          and the customer (the &ldquo;<strong>Controller</strong>&rdquo;). It
-          applies whenever Flintmere processes personal data on behalf of the
-          Controller in the course of providing the scanner, Shopify app, or
-          concierge audit services.
+          (trading as Flintmere, registered in England and Wales under
+          Companies House number <strong>13205428</strong>, the
+          &ldquo;<strong>Processor</strong>&rdquo;) and the customer (the
+          &ldquo;<strong>Controller</strong>&rdquo;). It applies whenever
+          Flintmere processes personal data on behalf of the Controller in
+          the course of providing the scanner, Shopify app, or concierge
+          audit services.
         </p>
       </Clause>
 

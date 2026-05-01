@@ -20,7 +20,8 @@ export default function Terms() {
         <p>
           These terms form a binding agreement between you (the merchant,
           agency, or visitor) and <strong>Eazy Access Ltd</strong>, trading as
-          Flintmere, a company registered in England and Wales. References to
+          Flintmere, a company registered in England and Wales (Companies
+          House number <strong>13205428</strong>). References to
           &ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;Flintmere&rdquo; mean
           Eazy Access Ltd.
         </p>

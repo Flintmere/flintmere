@@ -379,7 +379,7 @@ export default function About() {
               />
               <ProcurementRow
                 label="Companies House number"
-                value="Available on request — email hello@flintmere.com"
+                value="13205428"
               />
               <ProcurementRow
                 label="Registered office"
@@ -391,7 +391,7 @@ export default function About() {
               />
               <ProcurementRow
                 label="ICO registration"
-                value="Available on request — email hello@flintmere.com"
+                value="Not currently registered — ICO registration follows commencement of paid trading"
               />
               <ProcurementRow
                 label="Accountable director"

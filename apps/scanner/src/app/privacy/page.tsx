@@ -19,7 +19,8 @@ export default function Privacy() {
       <Clause n="01" heading="Who we are">
         <p>
           Flintmere is a trading name of <strong>Eazy Access Ltd</strong>, a
-          company registered in England and Wales. Flintmere is the
+          company registered in England and Wales (Companies House
+          number <strong>13205428</strong>). Flintmere is the
           <em> data controller</em> for personal data you share with our
           website, the public scanner at <code>audit.flintmere.com</code>, and
           the Shopify app at <code>app.flintmere.com</code>.
@@ -28,7 +29,7 @@ export default function Privacy() {
           Questions, access requests, or complaints:{' '}
           <a href="mailto:privacy@flintmere.com" className="underline">
             privacy@flintmere.com
-          </a>. Founder: John Morris.
+          </a>. Accountable director: John Morris.
         </p>
       </Clause>
 
