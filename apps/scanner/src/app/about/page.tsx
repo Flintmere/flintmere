@@ -323,9 +323,10 @@ export default function About() {
         {/* ──────────────────────────────────────────────────────────────
             Section 6 — Procurement
             legal-page-draft co-authored. Definition list pattern.
-            Companies House number wired (13205428). Registered office held
-            for operator confirmation. ICO registration in progress — value
-            updates to the ICO number when confirmation lands.
+            Companies House number wired (13205428). Registered office
+            wired (71–75 Shelton Street, Covent Garden, London, WC2H 9JQ).
+            ICO registration in progress — value updates to the ICO number
+            when confirmation lands.
             ────────────────────────────────────────────────────────────── */}
         <section
           id="procurement"
@@ -384,7 +385,7 @@ export default function About() {
               />
               <ProcurementRow
                 label="Registered office"
-                value="Available on request — email hello@flintmere.com"
+                value="71–75 Shelton Street, Covent Garden, London, WC2H 9JQ"
               />
               <ProcurementRow
                 label="VAT registration"
