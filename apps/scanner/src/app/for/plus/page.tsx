@@ -108,7 +108,7 @@ export default function FlintmereForPlus() {
             Scan my Plus store →
           </Link>
           <Link href="/audit" className="btn">
-            Book a £97 concierge audit
+            Book a bespoke concierge audit
           </Link>
         </div>
       </section>
@@ -153,11 +153,14 @@ export default function FlintmereForPlus() {
             className="mt-8 max-w-[56ch]"
             style={{ color: 'var(--color-mute-inv)', fontSize: 16, lineHeight: 1.55 }}
           >
-            £97 gets you the team reading your catalog product by product, a 1,500-word
-            letter pointing at specific SKUs by name, a per-product fix CSV with the
-            worst ten offenders already drafted, a 30-day fix sequence, and a 30-day
-            re-scan. No video, no call — just the data a Plus ops team can action
-            the same morning it arrives.
+            For Plus-scale catalogs (5,001+ SKUs) the audit is contracted bespoke —
+            from £597 — and reads a representative sample across your catalog patterns
+            plus the structural data model. You get a 1,500-word letter pointing at
+            specific SKUs by name, a per-product fix CSV with the worst twenty-five
+            offenders already drafted, a 30-day fix sequence, and a 30-day re-scan.
+            No video, no call — just the data a Plus ops team can action the same
+            morning it arrives. Email hello@flintmere.com with your shop URL for a
+            fixed-fee quote within two working days.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
@@ -169,7 +172,7 @@ export default function FlintmereForPlus() {
                 borderColor: 'var(--color-accent)',
               }}
             >
-              Book the £97 audit →
+              Request a bespoke quote →
             </Link>
             <Link
               href="/scan"

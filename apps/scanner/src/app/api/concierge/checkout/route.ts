@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       {
         ok: false,
         code: 'bespoke-band',
-        message: 'Band 3 is a bespoke quote. Email john@flintmere.com to start.',
+        message: 'Band 3 is a bespoke quote. Email hello@flintmere.com to start.',
       },
       { status: 400 },
     );

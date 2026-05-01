@@ -309,7 +309,7 @@ export default function Audit() {
               className="mx-auto"
               style={{
                 marginTop: 'clamp(64px, 8vw, 112px)',
-                maxWidth: '520px',
+                maxWidth: '720px',
                 ['--reveal-delay' as string]: '1900ms',
               }}
             >

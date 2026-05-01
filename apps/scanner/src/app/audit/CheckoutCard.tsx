@@ -1,17 +1,20 @@
 'use client';
 
 /**
- * Apple-styled custom checkout for the Flintmere concierge audit.
+ * Apple-style checkout for the Flintmere concierge audit.
  *
- * Per ADR 0022 (audit-band pricing), the card carries a band selector
- * above the email + shop URL fields. Three bands:
+ * Three-step shape on one card:
  *
- *   - Band 1 (£197) and Band 2 (£397) — Stripe Payment Element flow.
- *   - Band 3 (from £597) — bespoke quote; the card swaps to an
- *     enquiry block with a mailto link to john@flintmere.com.
+ *   1. Band — pick Band 1 (£197), Band 2 (£397), or Band 3 (bespoke).
+ *      Default Band 2 (BUSINESS.md target cohort).
+ *   2. Collect — email + shop URL.
+ *   3. Pay — order summary at top, Express Checkout (Apple Pay /
+ *      Google Pay / Link) row, "or pay another way" divider, then
+ *      PaymentElement in accordion (single-column radio) layout. Card
+ *      first via `paymentMethodOrder`.
  *
- * Default selection is Band 2 (BUSINESS.md target cohort: £500K–£20M
- * revenue UK food merchants pushing 1,501–5,000 SKUs).
+ * Band 3 swaps the form for a mailto enquiry — bespoke quotes go via
+ * email, never Stripe.
  *
  * On Stripe success: redirect to /audit/success?payment_intent=…
  * The webhook at /api/webhooks/stripe is the source of truth for
@@ -28,6 +31,7 @@ import {
 } from '@stripe/stripe-js';
 import {
   Elements,
+  ExpressCheckoutElement,
   PaymentElement,
   useElements,
   useStripe,
@@ -47,7 +51,13 @@ const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
 type CardState =
   | { kind: 'collect' }
   | { kind: 'loading' }
-  | { kind: 'pay'; clientSecret: string; band: AuditBand }
+  | {
+      kind: 'pay';
+      clientSecret: string;
+      band: AuditBand;
+      email: string;
+      shopUrl: string;
+    }
   | { kind: 'error'; message: string };
 
 const DEFAULT_BAND: AuditBandSlug = 'band-2';
@@ -75,14 +85,14 @@ const APPEARANCE: Appearance = {
   },
   rules: {
     '.Input': {
-      border: '1px solid #0a0a0b',
-      backgroundColor: '#f7f7f4',
-      padding: '12px 14px',
+      border: '1px solid #d5d2c8',
+      backgroundColor: '#ffffff',
+      padding: '14px 16px',
       boxShadow: 'none',
     },
     '.Input:focus': {
       outline: '2px solid #0a0a0b',
-      outlineOffset: '2px',
+      outlineOffset: '0px',
       border: '1px solid #0a0a0b',
       boxShadow: 'none',
     },
@@ -93,22 +103,21 @@ const APPEARANCE: Appearance = {
       fontWeight: '500',
       letterSpacing: '0.14em',
       textTransform: 'uppercase',
-      color: '#8b8d95',
-      marginBottom: '6px',
+      color: '#5a5c64',
+      marginBottom: '8px',
     },
-    '.Tab': {
-      border: '1px solid #0a0a0b',
+    '.AccordionItem': {
+      border: '1px solid #d5d2c8',
       backgroundColor: '#ffffff',
-      padding: '12px 14px',
+      padding: '16px',
       boxShadow: 'none',
     },
-    '.Tab--selected': {
-      backgroundColor: '#0a0a0b',
-      color: '#f7f7f4',
+    '.AccordionItem--selected': {
       border: '1px solid #0a0a0b',
+      backgroundColor: '#fbfaf6',
     },
-    '.Tab:hover': {
-      backgroundColor: '#edece6',
+    '.AccordionItem:hover': {
+      backgroundColor: '#fbfaf6',
     },
   },
 };
@@ -159,6 +168,8 @@ export function CheckoutCard() {
         kind: 'pay',
         clientSecret: body.clientSecret,
         band: selectedBand,
+        email: email.trim(),
+        shopUrl: shopUrl.trim(),
       });
     } catch {
       telemetry('concierge-checkout-intent-network-error', { band: bandSlug });
@@ -174,7 +185,7 @@ export function CheckoutCard() {
       <CardShell>
         <p
           className="text-[color:var(--color-ink-2)]"
-          style={{ fontSize: 14, lineHeight: 1.55, padding: 28 }}
+          style={{ fontSize: 14, lineHeight: 1.55, padding: 32 }}
         >
           Payment is temporarily unavailable. Email{' '}
           <a href="mailto:hello@flintmere.com" className="underline">
@@ -197,10 +208,11 @@ export function CheckoutCard() {
     };
     return (
       <CardShell>
-        <CardHeader
-          email={email}
+        <OrderSummary
           band={state.band}
-          onBack={() => setState({ kind: 'collect' })}
+          email={state.email}
+          shopUrl={state.shopUrl}
+          onEdit={() => setState({ kind: 'collect' })}
         />
         <Elements stripe={stripePromise} options={options}>
           <PayStep returnUrl={returnUrl} band={state.band} />
@@ -218,14 +230,8 @@ export function CheckoutCard() {
     return (
       <CardShell>
         <BandSelector value={bandSlug} onChange={setBandSlug} />
-        <hr
-          style={{
-            border: 0,
-            borderTop: '1px solid var(--color-line-soft)',
-            margin: 0,
-          }}
-        />
-        <div style={{ padding: '24px 28px 28px 28px' }}>
+        <hr style={hairline} />
+        <div style={{ padding: '28px 32px 32px 32px' }}>
           <p className="eyebrow mb-3">Bespoke quote</p>
           <p
             className="text-[color:var(--color-ink)]"
@@ -237,7 +243,7 @@ export function CheckoutCard() {
           </p>
           <p
             className="text-[color:var(--color-mute)]"
-            style={{ fontSize: 14, lineHeight: 1.55, marginBottom: 20 }}
+            style={{ fontSize: 14, lineHeight: 1.55, marginBottom: 24 }}
           >
             Send the shop URL and a sentence on what you&rsquo;re selling. We
             reply within two working days with a fixed-fee quote.
@@ -263,66 +269,56 @@ export function CheckoutCard() {
   const ctaLabel =
     state.kind === 'loading'
       ? 'One moment…'
-      : `Pay ${selectedBand?.priceDisplay ?? '—'} →`;
+      : `Continue to pay ${selectedBand?.priceDisplay ?? '—'}`;
 
   return (
     <CardShell>
       <BandSelector value={bandSlug} onChange={setBandSlug} />
 
-      <hr
-        style={{
-          border: 0,
-          borderTop: '1px solid var(--color-line-soft)',
-          margin: 0,
-        }}
-      />
+      <hr style={hairline} />
 
-      <form onSubmit={handleStart} style={{ padding: '24px 28px 28px 28px' }}>
-        <label htmlFor="audit-email" className="eyebrow block mb-2">
-          Your email
-        </label>
-        <input
-          id="audit-email"
-          name="email"
-          type="email"
-          required
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full border border-[color:var(--color-ink)]"
-          style={{
-            background: 'var(--color-paper)',
-            padding: '12px 14px',
-            fontFamily: 'var(--font-mono)',
-            fontSize: 14,
-            marginBottom: 16,
-          }}
-          placeholder="you@store.com"
-        />
-        <label htmlFor="audit-shop" className="eyebrow block mb-2">
-          Shop URL
-        </label>
-        <input
-          id="audit-shop"
-          name="shopUrl"
-          type="text"
-          required
-          value={shopUrl}
-          onChange={(e) => setShopUrl(e.target.value)}
-          className="w-full border border-[color:var(--color-ink)]"
-          style={{
-            background: 'var(--color-paper)',
-            padding: '12px 14px',
-            fontFamily: 'var(--font-mono)',
-            fontSize: 14,
-            marginBottom: 20,
-          }}
-          placeholder="your-store.myshopify.com"
-        />
+      <form onSubmit={handleStart} style={{ padding: '28px 32px 32px 32px' }}>
+        <div style={{ display: 'grid', gap: 18 }}>
+          <div>
+            <label htmlFor="audit-email" className="eyebrow block mb-2">
+              Your email
+            </label>
+            <input
+              id="audit-email"
+              name="email"
+              type="email"
+              required
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full"
+              style={inputStyle}
+              placeholder="you@store.com"
+            />
+          </div>
+          <div>
+            <label htmlFor="audit-shop" className="eyebrow block mb-2">
+              Shop URL
+            </label>
+            <input
+              id="audit-shop"
+              name="shopUrl"
+              type="text"
+              required
+              value={shopUrl}
+              onChange={(e) => setShopUrl(e.target.value)}
+              className="w-full"
+              style={inputStyle}
+              placeholder="your-store.myshopify.com"
+            />
+          </div>
+        </div>
+
         <button
           type="submit"
           disabled={state.kind === 'loading'}
           className="btn btn-accent w-full justify-center"
+          style={{ marginTop: 24 }}
         >
           {ctaLabel}
         </button>
@@ -343,7 +339,7 @@ export function CheckoutCard() {
 
       <div
         style={{
-          padding: '20px 28px',
+          padding: '20px 32px',
           borderTop: '1px solid var(--color-line-soft)',
           fontSize: 12,
           color: 'var(--color-mute)',
@@ -357,6 +353,21 @@ export function CheckoutCard() {
   );
 }
 
+const hairline: React.CSSProperties = {
+  border: 0,
+  borderTop: '1px solid var(--color-line-soft)',
+  margin: 0,
+};
+
+const inputStyle: React.CSSProperties = {
+  background: '#ffffff',
+  border: '1px solid var(--color-line)',
+  padding: '14px 16px',
+  fontFamily: 'var(--font-mono)',
+  fontSize: 15,
+  width: '100%',
+};
+
 function BandSelector({
   value,
   onChange,
@@ -365,8 +376,8 @@ function BandSelector({
   onChange: (slug: AuditBandSlug) => void;
 }) {
   return (
-    <fieldset style={{ border: 0, padding: '28px 28px 0 28px', margin: 0 }}>
-      <legend className="eyebrow mb-3" style={{ padding: 0 }}>
+    <fieldset style={{ border: 0, padding: '32px 32px 0 32px', margin: 0 }}>
+      <legend className="eyebrow mb-4" style={{ padding: 0 }}>
         Pick your band
       </legend>
       <div style={{ display: 'grid', gap: 10 }}>
@@ -380,15 +391,14 @@ function BandSelector({
                 display: 'grid',
                 gridTemplateColumns: '1fr auto',
                 alignItems: 'center',
-                gap: 12,
-                padding: '14px 16px',
+                gap: 16,
+                padding: '16px 18px',
                 border: selected
                   ? '1px solid var(--color-ink)'
-                  : '1px solid var(--color-line-soft)',
-                background: selected
-                  ? 'var(--color-paper-2, #f7f7f4)'
-                  : '#ffffff',
+                  : '1px solid var(--color-line)',
+                background: selected ? '#fbfaf6' : '#ffffff',
                 cursor: 'pointer',
+                transition: 'border-color 0.15s ease, background 0.15s ease',
               }}
             >
               <span style={{ minWidth: 0 }}>
@@ -400,7 +410,7 @@ function BandSelector({
                     letterSpacing: '0.14em',
                     textTransform: 'uppercase',
                     color: 'var(--color-mute)',
-                    marginBottom: 4,
+                    marginBottom: 6,
                   }}
                 >
                   {band.label} · {band.skuRangeLabel}
@@ -408,9 +418,10 @@ function BandSelector({
                 <span
                   style={{
                     display: 'block',
-                    fontSize: 15,
+                    fontSize: 17,
                     color: 'var(--color-ink)',
                     fontWeight: 500,
+                    letterSpacing: '-0.01em',
                   }}
                 >
                   {band.priceDisplay}
@@ -424,8 +435,8 @@ function BandSelector({
                 checked={selected}
                 onChange={() => onChange(band.slug)}
                 style={{
-                  width: 16,
-                  height: 16,
+                  width: 18,
+                  height: 18,
                   accentColor: '#0a0a0b',
                   cursor: 'pointer',
                 }}
@@ -444,7 +455,7 @@ function CardShell({ children }: { children: React.ReactNode }) {
       style={{
         background: '#ffffff',
         border: '1px solid var(--color-ink)',
-        maxWidth: 480,
+        maxWidth: 640,
         margin: '0 auto',
         width: '100%',
       }}
@@ -454,35 +465,87 @@ function CardShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function CardHeader({
-  email,
+function OrderSummary({
   band,
-  onBack,
+  email,
+  shopUrl,
+  onEdit,
 }: {
-  email: string;
   band: AuditBand;
-  onBack: () => void;
+  email: string;
+  shopUrl: string;
+  onEdit: () => void;
 }) {
   return (
     <div
       style={{
-        padding: '20px 28px',
-        borderBottom: '1px solid var(--color-line-soft)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 12,
+        padding: '28px 32px',
+        borderBottom: '1px solid var(--color-line)',
       }}
     >
-      <div style={{ minWidth: 0 }}>
-        <p className="eyebrow" style={{ marginBottom: 4 }}>
-          {band.priceDisplay} · {band.label} · Concierge audit
-        </p>
-        <p
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          gap: 16,
+        }}
+      >
+        <div style={{ minWidth: 0 }}>
+          <p className="eyebrow" style={{ marginBottom: 6 }}>
+            {band.label} · Concierge audit
+          </p>
+          <p
+            style={{
+              fontSize: 28,
+              letterSpacing: '-0.02em',
+              fontWeight: 500,
+              lineHeight: 1.1,
+              color: 'var(--color-ink)',
+              margin: 0,
+            }}
+          >
+            {band.priceDisplay}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onEdit}
+          className="eyebrow"
           style={{
+            background: 'transparent',
+            border: 0,
+            cursor: 'pointer',
+            color: 'var(--color-mute)',
+            padding: 4,
+            flexShrink: 0,
+          }}
+        >
+          Edit
+        </button>
+      </div>
+      <dl
+        style={{
+          marginTop: 18,
+          display: 'grid',
+          gridTemplateColumns: 'auto 1fr',
+          rowGap: 6,
+          columnGap: 16,
+          fontSize: 13,
+          lineHeight: 1.5,
+        }}
+      >
+        <dt
+          className="eyebrow"
+          style={{ color: 'var(--color-mute)', marginBottom: 0 }}
+        >
+          Email
+        </dt>
+        <dd
+          style={{
+            margin: 0,
             fontFamily: 'var(--font-mono)',
-            fontSize: 13,
-            color: 'var(--color-ink-2)',
+            color: 'var(--color-ink)',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -490,22 +553,27 @@ function CardHeader({
           title={email}
         >
           {email}
-        </p>
-      </div>
-      <button
-        type="button"
-        onClick={onBack}
-        className="eyebrow"
-        style={{
-          background: 'transparent',
-          border: 0,
-          cursor: 'pointer',
-          color: 'var(--color-mute)',
-          padding: 4,
-        }}
-      >
-        Edit
-      </button>
+        </dd>
+        <dt
+          className="eyebrow"
+          style={{ color: 'var(--color-mute)', marginBottom: 0 }}
+        >
+          Shop
+        </dt>
+        <dd
+          style={{
+            margin: 0,
+            fontFamily: 'var(--font-mono)',
+            color: 'var(--color-ink)',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+          title={shopUrl}
+        >
+          {shopUrl}
+        </dd>
+      </dl>
     </div>
   );
 }
@@ -515,19 +583,15 @@ function PayStep({ returnUrl, band }: { returnUrl: string; band: AuditBand }) {
   const elements = useElements();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [hasExpressOption, setHasExpressOption] = useState(false);
 
-  async function onSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function confirm() {
     if (!stripe || !elements) return;
-    setBusy(true);
     setErr(null);
-    telemetry('concierge-checkout-confirm', { band: band.slug });
-
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: { return_url: returnUrl },
     });
-
     if (error) {
       telemetry('concierge-checkout-error', {
         type: error.type,
@@ -540,18 +604,104 @@ function PayStep({ returnUrl, band }: { returnUrl: string; band: AuditBand }) {
           'Payment could not be confirmed. Try another method or contact your bank.',
       );
       setBusy(false);
-      return;
     }
-    // On success Stripe redirects to returnUrl; no further action here.
+    // On success Stripe redirects to returnUrl; nothing more to do here.
+  }
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+    setBusy(true);
+    telemetry('concierge-checkout-confirm', { band: band.slug });
+    await confirm();
   }
 
   return (
-    <form onSubmit={onSubmit} style={{ padding: '24px 28px 28px 28px' }}>
-      <PaymentElement
+    <form onSubmit={onSubmit} style={{ padding: '28px 32px 32px 32px' }}>
+      <ExpressCheckoutElement
         options={{
-          layout: { type: 'tabs', defaultCollapsed: false },
+          paymentMethods: {
+            applePay: 'auto',
+            googlePay: 'auto',
+            link: 'auto',
+            amazonPay: 'never',
+            paypal: 'never',
+          },
+          buttonHeight: 48,
+        }}
+        onReady={(e) => {
+          const types = e.availablePaymentMethods;
+          setHasExpressOption(
+            !!(
+              types?.applePay ||
+              types?.googlePay ||
+              types?.link
+            ),
+          );
+        }}
+        onConfirm={async () => {
+          telemetry('concierge-checkout-express-confirm', {
+            band: band.slug,
+          });
+          setBusy(true);
+          await confirm();
         }}
       />
+
+      {hasExpressOption ? (
+        <div
+          aria-hidden="true"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            margin: '20px 0',
+            color: 'var(--color-mute-2)',
+            fontFamily: 'var(--font-mono)',
+            fontSize: 11,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+          }}
+        >
+          <span
+            style={{
+              flex: 1,
+              height: 1,
+              background: 'var(--color-line)',
+            }}
+          />
+          or pay another way
+          <span
+            style={{
+              flex: 1,
+              height: 1,
+              background: 'var(--color-line)',
+            }}
+          />
+        </div>
+      ) : (
+        <div style={{ height: 12 }} />
+      )}
+
+      <PaymentElement
+        options={{
+          layout: {
+            type: 'accordion',
+            defaultCollapsed: false,
+            radios: true,
+            spacedAccordionItems: false,
+          },
+          paymentMethodOrder: [
+            'card',
+            'apple_pay',
+            'google_pay',
+            'link',
+            'bacs_debit',
+            'pay_by_bank',
+          ],
+        }}
+      />
+
       {err ? (
         <p
           role="alert"
@@ -565,17 +715,19 @@ function PayStep({ returnUrl, band }: { returnUrl: string; band: AuditBand }) {
           {err}
         </p>
       ) : null}
+
       <button
         type="submit"
         disabled={!stripe || busy}
         className="btn btn-accent w-full justify-center"
-        style={{ marginTop: 20 }}
+        style={{ marginTop: 24, fontSize: 14 }}
       >
         {busy ? 'Processing…' : `Pay ${band.priceDisplay}`}
       </button>
+
       <p
         style={{
-          marginTop: 16,
+          marginTop: 18,
           fontSize: 11,
           fontFamily: 'var(--font-mono)',
           letterSpacing: '0.08em',
@@ -584,7 +736,7 @@ function PayStep({ returnUrl, band }: { returnUrl: string; band: AuditBand }) {
           textAlign: 'center',
         }}
       >
-        Secured by Stripe
+        Secured by Stripe · 30-day refund if we miss the three-day deadline
       </p>
     </form>
   );
