@@ -323,8 +323,9 @@ export default function About() {
         {/* ──────────────────────────────────────────────────────────────
             Section 6 — Procurement
             legal-page-draft co-authored. Definition list pattern.
-            Companies House number / registered office / ICO number held
-            for operator confirmation; "available on request" for now.
+            Companies House number wired (13205428). Registered office held
+            for operator confirmation. ICO registration in progress — value
+            updates to the ICO number when confirmation lands.
             ────────────────────────────────────────────────────────────── */}
         <section
           id="procurement"
@@ -391,7 +392,7 @@ export default function About() {
               />
               <ProcurementRow
                 label="ICO registration"
-                value="Not currently registered — ICO registration follows commencement of paid trading"
+                value="Registration in progress — confirmation pending"
               />
               <ProcurementRow
                 label="Accountable director"
