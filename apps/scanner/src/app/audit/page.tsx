@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Bracket, SiteFooter } from '@flintmere/ui';
 import { ViewportReveal } from '@/components/ViewportReveal';
 import { CheckoutCard } from './CheckoutCard';
+import { CTAButton, DeliverableLift, PriceBracket } from './audit-motion';
 import { CONCIERGE_DELIVERABLE_LIST } from '@/lib/copy';
 
 export const metadata: Metadata = {
@@ -136,13 +137,13 @@ export default function Audit() {
                 ['--reveal-delay' as string]: `${D_PRIMARY}ms`,
               }}
             >
-              <Link
+              <CTAButton
                 href="#checkout"
                 className="inline-flex items-center gap-3 px-7 py-3.5 bg-[color:var(--color-accent)] text-[color:var(--color-accent-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-ink)] hover:text-[color:var(--color-paper)] transition-colors duration-[var(--duration-instant)]"
               >
                 See the bands
                 <span aria-hidden="true">↓</span>
-              </Link>
+              </CTAButton>
               <Link
                 href="/scan"
                 className="font-mono uppercase"
@@ -217,7 +218,7 @@ export default function Audit() {
               }}
             >
               The whole audit, from{' '}
-              <Bracket size="saks">£197</Bracket>.
+              <PriceBracket>£197</PriceBracket>.
             </h2>
 
             <p
@@ -394,14 +395,7 @@ export default function Audit() {
               }}
             >
               {CONCIERGE_DELIVERABLE_LIST.map((item, idx) => (
-                <li
-                  key={item.title}
-                  data-reveal
-                  className="border-t border-[color:var(--color-line)] pt-8"
-                  style={{
-                    ['--reveal-delay' as string]: `${idx * 60}ms`,
-                  }}
-                >
+                <DeliverableLift key={item.title} delayMs={idx * 60}>
                   <p
                     className="font-mono uppercase"
                     style={{
@@ -432,7 +426,7 @@ export default function Audit() {
                   >
                     {item.body}
                   </p>
-                </li>
+                </DeliverableLift>
               ))}
             </ol>
           </div>
