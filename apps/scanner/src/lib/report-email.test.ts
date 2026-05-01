@@ -82,7 +82,8 @@ describe('buildReportEmail', () => {
   it('links Door 1 to the concierge audit page', () => {
     const email = buildReportEmail({ score: makeScore(), ...baseInput });
     expect(email.html).toContain('https://audit.flintmere.com/audit');
-    expect(email.html).toContain('Book the £97 audit');
+    expect(email.html).toContain('Book the audit');
+    expect(email.html).toContain('from £197');
   });
 
   it('signs off from John Morris', () => {

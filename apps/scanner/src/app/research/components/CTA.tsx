@@ -3,7 +3,7 @@ import Link from 'next/link';
 /**
  * Chapter 8 — Closing CTA on ink. Visual antecedent to the footer
  * curtain — same ink, sage hairline, amber CTA. Dual CTA: free
- * scan (next-edition contribution) + concierge audit (£97).
+ * scan (next-edition contribution) + concierge audit (from £197 per ADR 0022).
  */
 export function CTA() {
   return (
@@ -100,7 +100,7 @@ export function CTA() {
             href="/audit"
             className="inline-flex items-center gap-3 px-7 py-3.5 border border-[color:var(--color-paper)] text-[color:var(--color-paper)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)]"
           >
-            Or book the £97 concierge audit
+            Or book the concierge audit (from £197)
           </Link>
         </div>
       </div>

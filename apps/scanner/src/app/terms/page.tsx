@@ -41,8 +41,12 @@ export default function Terms() {
             (£499/mo), and Plus (from £1,500/mo).
           </li>
           <li>
-            <strong>Concierge audits</strong>: a £97 one-off written audit
+            <strong>Concierge audits</strong>: a one-off written audit
             delivered within three working days, purchased directly via Stripe.
+            Three SKU bands &mdash; £197 (up to 1,500 SKUs), £397
+            (1,501&ndash;5,000), or bespoke from £597 (5,001+, contracted by
+            email). Eazy Access Ltd is not VAT-registered, so the band price
+            you select is the full price &mdash; no VAT is added.
           </li>
         </ul>
       </Clause>

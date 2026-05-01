@@ -40,8 +40,9 @@ export default function Pricing() {
       <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-24">
         <p className="eyebrow mb-6">Pricing</p>
         {/* Phase B: bracket on `question` removed — verbs / fillers banned per
-            tokens.md §Signature. The page's bracket-2 (concierge £97) is
-            preserved below. Final hero copy lands in web-implementation. */}
+            tokens.md §Signature. The page's bracket-2 (concierge from £197,
+            per ADR 0022 band ladder) is preserved below. Final hero copy lands
+            in web-implementation. */}
         <h1 className="max-w-[20ch]">
           Five tiers. One question: how many stores?
         </h1>
@@ -164,10 +165,10 @@ export default function Pricing() {
           <div>
             <p className="eyebrow mb-3">One-off audit</p>
             <h2 className="max-w-[28ch]" style={{ fontSize: 28, letterSpacing: '-0.02em' }}>
-              Want us to read your store? <Bracket>£97</Bracket>, delivered in three working days.
+              Want us to read your store? <Bracket>from £197</Bracket>, delivered in three working days.
             </h2>
             <p className="mt-4 text-[color:var(--color-mute)] max-w-[48ch]" style={{ fontSize: 14, lineHeight: 1.55 }}>
-              Written audit letter, per-product fix CSV with the worst ten already drafted, 30-day fix sequence, GS1 UK barcode path, and a 30-day re-scan. No video, no call &mdash; just the data.
+              Three SKU bands &mdash; £197 (up to 1,500), £397 (1,501&ndash;5,000), from £597 bespoke (5,001+). Written audit letter, per-product fix CSV with the worst ten or twenty-five already drafted, 30-day fix sequence, GS1 UK barcode path, and a 30-day re-scan. No video, no call &mdash; just the data.
             </p>
           </div>
           <Link href="/audit" className="btn btn-accent whitespace-nowrap">Book the audit →</Link>

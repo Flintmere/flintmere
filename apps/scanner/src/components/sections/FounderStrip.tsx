@@ -129,9 +129,9 @@ export function FounderStrip() {
               color: 'var(--color-paper-on-ink)',
             }}
           >
-            If you book the £97 audit, the team writes the letter and the
-            per-product CSV. If you email hello@flintmere.com, we reply —
-            usually within two working days.
+            If you book the audit (from £197), the team writes the letter
+            and the per-product CSV. If you email hello@flintmere.com, we
+            reply — usually within two working days.
           </p>
 
           <p
@@ -174,7 +174,7 @@ export function FounderStrip() {
               href="/audit"
               className="inline-flex items-center gap-3 px-7 py-3.5 border border-[color:var(--color-paper-on-ink)] text-[color:var(--color-paper-on-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper-on-ink)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)] ease-[cubic-bezier(0.4,0,0.2,1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
             >
-              Book the £97 concierge audit
+              Book the concierge audit (from £197)
               <span aria-hidden="true">→</span>
             </Link>
           </div>

@@ -176,7 +176,7 @@ export default async function FlintmereForApparel() {
             Scan my apparel store →
           </Link>
           <Link href="/audit" className="btn">
-            Book a £97 concierge audit
+            Book a concierge audit (from £197)
           </Link>
         </div>
       </section>
@@ -283,13 +283,16 @@ export default async function FlintmereForApparel() {
             className="mt-8 max-w-[56ch]"
             style={{ color: 'var(--color-mute-inv)', fontSize: 16, lineHeight: 1.55 }}
           >
-            £97 gets you the team reading your catalog product by product: a
+            From £197, the team reads your catalog product by product: a
             1,500-word letter pointing at specific SKUs by name (apparel
             teams get the size-chart and colour-token reads as standard),
-            a per-product fix CSV with the worst ten already drafted &mdash;
-            title, structured size, structured colour, composition &mdash;
-            a 30-day fix sequence, the right GS1 UK route for your supplier
-            mix, and a 30-day re-scan. No video, no call, no slide deck.
+            a per-product fix CSV with the worst ten or twenty-five already
+            drafted &mdash; title, structured size, structured colour,
+            composition &mdash; a 30-day fix sequence, the right GS1 UK
+            route for your supplier mix, and a 30-day re-scan. No video,
+            no call, no slide deck. Three SKU bands &mdash; £197 (up to
+            1,500 SKUs), £397 (1,501&ndash;5,000), from £597 bespoke
+            (5,001+).
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
@@ -301,7 +304,7 @@ export default async function FlintmereForApparel() {
                 borderColor: 'var(--color-accent)',
               }}
             >
-              Book the £97 audit →
+              Book the audit →
             </Link>
             <Link
               href="/scan"

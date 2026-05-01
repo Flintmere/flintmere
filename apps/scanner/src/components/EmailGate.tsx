@@ -19,7 +19,7 @@ type GateState =
 
 /**
  * Post-scan commit surface. Three doors:
- *   1. Book the £97 concierge audit — primary, amber CTA.
+ *   1. Book the concierge audit (from £197) — primary, amber CTA.
  *   2. Email me the free report — secondary.
  *   3. Reply to John direct — tertiary, soft.
  * Canon: dark ink surface, paper text, amber accent, one bracket moment.
@@ -120,7 +120,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
               href="/audit"
               style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}
             >
-              Book the £97 concierge audit →
+              Book the concierge audit (from £197) →
             </Link>
           </p>
         </div>
@@ -159,7 +159,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
           {shopDomain}.
         </h2>
 
-        {/* Door 1 — primary: £97 concierge */}
+        {/* Door 1 — primary: concierge audit (from £197 per ADR 0022) */}
         <div
           style={{
             marginTop: 32,
@@ -176,7 +176,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
               margin: 0,
             }}
           >
-            Recommended · £97 one-off · three working days
+            Recommended · from £197 one-off · three working days
           </p>
           <h3
             style={{
@@ -200,8 +200,10 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
           >
             We read your store product by product, write a detailed audit
             letter pointing at exactly what to fix, and send a per-product CSV
-            with the worst 10 products already drafted. A 30-day re-scan is
-            included. No video, no call — just the data.
+            with the worst 10 (£197, up to 1,500 SKUs) or worst 25 (£397,
+            1,501–5,000 SKUs) products already drafted. A 30-day re-scan is
+            included. No video, no call — just the data. Larger catalogs
+            scope bespoke from £597.
           </p>
           <Link
             href="/audit"
@@ -219,7 +221,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
               textDecoration: 'none',
             }}
           >
-            Book the £97 audit →
+            Book the audit →
           </Link>
         </div>
 
