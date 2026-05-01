@@ -518,8 +518,9 @@
   outline-offset: 4px;
 }
 
-/* --- Audit-deep section ("What you get with the £97 audit") ---
-   Anchored by the recaptured Audit screenshot. Image lands in commit 7. */
+/* --- Audit-deep section ("What you get with the audit") ---
+   Anchored by the recaptured Audit screenshot. Image lands in commit 7.
+   Pricing per ADR 0022 band ladder: £197 / £397 / from £597. */
 .audit-figure {
   margin: 0;
 }

@@ -25,10 +25,12 @@
 // Free survives unchanged per ADR 0016 — basePlatform = 0 (known
 // magnitude), tireKicker funnel.
 //
-// The Concierge one-off audit (£97, Stripe PaymentIntent at
-// `api/concierge/checkout/route.ts:50`) is NOT a tier — it's a separate
-// one-off product. The `concierge-monthly` retainer tier is the
-// recurring counterpart per ADR 0016 §Launch ladder.
+// The Concierge one-off audit (band ladder per ADR 0022:
+// £197 / £397 / from £597, Stripe PaymentIntent created in
+// `api/concierge/checkout/route.ts`, band data canonicalised in
+// `lib/audit-pricing.ts`) is NOT a tier — it's a separate one-off
+// product. The `concierge-monthly` retainer tier is the recurring
+// counterpart per ADR 0016 §Launch ladder.
 //
 // The /pricing page rebuild (Day 5 of the 30-day plan, ADR 0020 §UI
 // behaviour) hides forward tiers with magnitudes-pending posture and a
@@ -339,7 +341,7 @@ export const TIERS: Tier[] = [
     betaGated: false,
     scope: 'Hands-on monthly service for one food store',
     blurb:
-      'A continuous version of the £97 audit — monthly read of new SKUs, drift watch, ad-hoc letter responses to channel rejections.',
+      'A continuous version of the one-off audit (ADR 0022 band ladder) — monthly read of new SKUs, drift watch, ad-hoc letter responses to channel rejections.',
     features: [
       'Monthly read of new + changed SKUs',
       'Per-product fix CSV refreshed monthly',

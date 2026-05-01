@@ -42,8 +42,8 @@ The deliverable depth scales with price. A customer who pays £397 receives the 
 ## Consequences
 
 - **`apps/scanner/src/lib/audit-pricing.ts` (NEW) is the canonical price source.** All surfaces import band data + price strings from it; no hardcoded `£97` / `£197` / `£397` / `£597` figures elsewhere. Eliminates the 20-surface-drift risk that ADR 0022 inherits from the existing flat-£97 codebase.
-- **DB schema gains `band` column** on `scanner_concierge_audits` (Prisma enum: `band_1 | band_2 | band_3 | bespoke`). Migration `add_band_to_scanner_concierge_audits` lands in Phase 1 via `write-migration` skill (operator-confirms generation per Autonomy Level 1).
-- **API + webhook + email pipeline becomes band-aware in one atomic commit** (Phase 1). No mid-flight inconsistency window.
+- **No DB schema change.** Band attribution lives on Stripe PaymentIntent metadata under `audit_band` (canonical key in `lib/audit-pricing.ts:STRIPE_BAND_METADATA_KEY`); Stripe is the audit trail. Architectural call ratified during Phase 1b (2026-05-01) — at validation-week volume (target 5–10 audits/week), Stripe-API queries cover any band-by-band reporting and sidestep the Autonomy-Level-1 migration gate. The earlier draft of this ADR specified a Prisma `band` column; that approach was withdrawn before any migration was written. Re-opens if (a) volume makes Stripe-API queries operationally costly, or (b) a hot-path query needs to join band data against internal tables.
+- **API + webhook + email pipeline becomes band-aware in one atomic commit** (Phase 1b, shipped as `fd02b42` on 2026-05-01). No mid-flight inconsistency window.
 - **`/audit` page redesign in Phase 2 + 3.** The Saks-scale `[£97]` chord that anchored the page's brand-mark moment retires; new band-selector signature replaces it. Design before code.
 - **Cascade across 12+ secondary surfaces in Phase 4** as one coordinated commit. `claim-review` agent pass before commit.
 - **Plausible event `concierge_clicked` carries `band` prop** from Phase 1 onwards. Pre-band events have no band attribution; documented in this ADR as the analytics-backfill seam.
@@ -56,12 +56,14 @@ The deliverable depth scales with price. A customer who pays £397 receives the 
 
 | Phase | Date | Deliverable | Atomic-commit boundary |
 |---|---|---|---|
-| **0** | 2026-05-01 (this commit) | ADR 0022 landed; index updated. | One commit. |
-| **1 — Stripe ground truth** | 2026-05-02 | `lib/audit-pricing.ts` constants; Prisma migration `add_band_to_scanner_concierge_audits`; band-aware checkout API + Stripe webhook + email templates + tests. | One commit (deploy applies migration before app code starts). |
-| **2 — `/audit` design** | 2026-05-03 to 05-04 | `design-marketing-surface` dispatch with council pre-flight. Spec at `context/design/specs/2026-05-01-audit-bands.md`. | No code commit. Spec only. |
-| **3 — `/audit` web-implementation** | 2026-05-05 | New `/audit` page + CheckoutCard + success page; Plausible band prop wired. | One commit. |
-| **4 — Cascade** | 2026-05-06 to 05-07 (alongside Day 5 `/pricing` rebuild on different file set) | 12+ secondary surfaces updated; `BUSINESS.md` + `STATUS.md` + `CLAUDE.md` updated; `claim-review` pass. | One coordinated commit. |
-| **5 — Council gates** | parallel with 2–4 | Legal Council (#9 + #23 + #24) on per-band refund + VAT framing + bespoke-band T&Cs. Copy Council on `/audit` copy. #38 Data intake engineer on Stripe-band → DB-band → email-band metadata flow. | Run as drafts land; gate vetos pre-ship. |
+| **0** | 2026-05-01 | ADR 0022 landed; index updated. ✅ Shipped (`1b6e34d`). | One commit. |
+| **1a — Canonical band data** | 2026-05-01 | `lib/audit-pricing.ts` data module + 21 boundary tests. ✅ Shipped (`5c9267c`). | One commit, no behaviour change. |
+| **1b — Stripe ground truth** | 2026-05-01 | Band-aware checkout API + Stripe webhook + email templates + audit page copy + 10 new tests. No Prisma migration (architectural call — Stripe metadata is ground truth). ✅ Shipped (`fd02b42`). | One atomic commit. |
+| **2 — `/audit` design** | 2026-05-03 to 05-04 (deferred) | `design-marketing-surface` dispatch with council pre-flight. Spec at `context/design/specs/2026-05-01-audit-bands.md`. | No code commit. Spec only. |
+| **3 — `/audit` web-implementation** | 2026-05-05 (deferred) | Final `/audit` page redesign retiring the Saks `[£97]` chord in favour of the band-selector signature; Phase 1b shipped an interim truthful read. | One commit. |
+| **4a — Customer-facing cascade** | 2026-05-01 | `/for/*` + `/pricing` callout + EmailGate + FounderStrip + research/CTA + `/terms` + `report-email.ts` + checkout redesign (Apple-style + ExpressCheckoutElement) + bespoke email switch (john → hello). ✅ Shipped (`1a1b999`, `362a168`). | Two commits. |
+| **4b — Internal docs cascade** | 2026-05-01 | `pricing.ts` comments, `globals.css` section comment, `BUSINESS.md`, `STATUS.md`, `CLAUDE.md`, ADR 0022 §Consequences amendment. | One commit. |
+| **5 — Council gates** | parallel with 2–4 | Legal Council (#9 + #23 + #24) on per-band refund + VAT framing + bespoke-band T&Cs. Copy Council on `/audit` copy. #38 Data intake engineer on Stripe-band → email-band metadata flow (no DB intermediate). | Run as drafts land; gate vetos pre-ship. |
 | **6 — Validation-week launch** | operator-gated on Coolify deploy + accounts | First cold outreach at £197 floor. Plausible tracks band-by-band conversion. Predeclared 5% trigger live. | Marketing only. |
 
 ## Re-open conditions

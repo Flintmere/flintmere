@@ -115,7 +115,7 @@ Provider abstraction per ADRs 0005 + 0006. Shipped:
 - `/research` — State of Shopify Catalogs 2026, fully wired: overall median, grade distribution, by-vertical deep cards (apparel/beauty/food-and-drink) + full-breadth grid across all scanned verticals, methodology, CTA. ISR `revalidate=3600`
 - `/for/apparel`, `/for/beauty`, `/for/food-and-drink` — per-vertical landing pages with live benchmark numbers and vertical-specific copy
 - `/bot` — FlintmereBot disclosure page (user-agent, rate limits, crawl scope, opt-out)
-- `/audit` + `/audit/success` — £97 concierge landing with written-audit methodology, Stripe Payment Element checkout, Calendly fallback
+- `/audit` + `/audit/success` — Concierge audit landing on the band ladder (ADR 0022, shipped 2026-05-01: £197 / £397 / from £597 bespoke). Apple-style Stripe checkout — ExpressCheckoutElement (Apple Pay / Google Pay / Link) + accordion PaymentElement, Card-first paymentMethodOrder. Band 3 routes to `hello@flintmere.com` mailto, not Stripe.
 - `/scan` — public scanner UI with three-door close, merchant opt-in to benchmark on Results
 - `/unsubscribe` — PECR/GDPR one-click unsubscribe page
 - API routes: `POST /api/scan`, `GET /api/scan/:id`, `POST /api/lead` (Resend full-report delivery), `POST /api/unsubscribe`, `POST /api/concierge/checkout` (Stripe Checkout Session, 303-redirect), `POST /api/webhooks/stripe` (signature-verified, idempotent on payment intent), `GET /api/benchmark/summary` (aggregate-only, cache-controlled), `POST /api/scan/:id/publish` (anonymised-benchmark opt-in), `POST|DELETE /api/scan/:id/publish-public-page` (per-shop public page opt-in / opt-out), `GET /api/healthz`
@@ -153,7 +153,7 @@ Provider abstraction per ADRs 0005 + 0006. Shipped:
 ## Next (in order of leverage)
 
 1. **Operator launch prep** — Stage 2 account creation (Shopify Partner, Google Vertex, Azure OpenAI, Stripe, Resend, Sentry, BetterStack) + Stage 3 Coolify deploy. See `OPERATOR-TASKS.md`.
-2. **Validation week (SPEC §2)** — scanner live at `audit.flintmere.com`, cold outreach (LinkedIn + r/shopify + Partner Slack), £97 concierge audits.
+2. **Validation week (SPEC §2)** — scanner live at `audit.flintmere.com`, cold outreach (LinkedIn + r/shopify + Partner Slack), Concierge audits on the ADR 0022 band ladder (£197 / £397 / from £597 bespoke). Predeclared 5% conversion trigger across 30+ qualified prospects in the first 14 days for ADR re-open.
 3. **Fix History UI + revert endpoint** (SPEC §5.2.1) — schema + job exist; UI + `POST /api/fix/:id/revert` route to wire.
 4. **Share-for-trial loop** (SPEC §2.1.3) — public score page ✅ shipped 2026-04-24; still to build: share-verification endpoint, trial-unlock token flow, Shopify subscription-API interplay, PDF certificate download, embeddable badge SVG widget.
 5. **Legal pages** — drafts landed 2026-04-20 in `context/compliance/legal-drafts/`. Next: #24 + #9 review, resolve per-doc "Open items" blockers (registered office, ICO number, consent-banner implementation, backup retention verification), then user-confirmed writes to `apps/scanner/src/app/{privacy,terms,cookies,dpa}/page.tsx`.

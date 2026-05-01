@@ -80,7 +80,7 @@ The cost side is controlled. The bet is on acquisition.
 
 - **Shopify Managed Pricing** for Growth + Scale (automatic subscription, no Stripe integration needed).
   - Shopify keeps: 0% on first $1M lifetime (2025 policy), 15% after.
-- **Stripe direct** for Agency + Plus + the £97 concierge audit (SPEC §2.4).
+- **Stripe direct** for Agency + Plus + the Concierge audit band ladder (ADR 0022 — £197 / £397 / from £597 bespoke; supersedes the £97 floor in SPEC §2.4).
 - No crypto payments. No alternative gateways.
 
 ## Promotions
