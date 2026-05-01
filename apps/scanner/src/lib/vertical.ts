@@ -80,7 +80,7 @@ export const PRICING_VERTICALS: ReadonlyArray<Vertical> = [
     id: 'food',
     label: 'Food + drink.',
     eyebrow: 'FOOD + DRINK',
-    subline: 'Single store £99/mo · agency £349/mo. Spearhead vertical.',
+    subline: 'Spearhead vertical. Pricing finalising — May–June 2026.',
   },
   {
     id: 'beauty',
@@ -98,7 +98,7 @@ export const PRICING_VERTICALS: ReadonlyArray<Vertical> = [
     id: 'bundle',
     label: 'Food + Beauty.',
     eyebrow: 'BUNDLE',
-    subline: 'Single £159/mo · agency £499/mo. Per ADR 0016.',
+    subline: 'Bundle pricing arrives once the beauty cadence is committed.',
   },
 ];
 
