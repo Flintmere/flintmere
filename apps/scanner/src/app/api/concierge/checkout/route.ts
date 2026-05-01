@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getStripe } from '@/lib/stripe';
+import {
+  bandBySlug,
+  STRIPE_BAND_METADATA_KEY,
+  type AuditBandSlug,
+} from '@/lib/audit-pricing';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -8,16 +13,18 @@ export const dynamic = 'force-dynamic';
 const BodySchema = z.object({
   email: z.string().email(),
   shopUrl: z.string().min(4).max(512),
+  bandSlug: z.enum(['band-1', 'band-2', 'band-3']),
 });
 
 /**
- * Creates a PaymentIntent for the £97 concierge audit and returns its client
- * secret so the Payment Element on /audit can confirm the payment in-place.
+ * Creates a PaymentIntent for the chosen Concierge-audit band per ADR 0022
+ * (three-band SKU ladder: £197 / £397 / £597+). Band 3 is bespoke and
+ * routes to a mailto enquiry on the client; the API rejects it.
  *
- * Metadata mirrors what the Stripe webhook expects: `kind: concierge-audit`
- * plus `shop_url`. The webhook reads `customer_email` off the expanded Charge;
- * we set `receipt_email` so Stripe sends its receipt and so the webhook has an
- * email even when the Payment Element's AddressElement is not used.
+ * Metadata mirrors what the Stripe webhook expects: `kind: concierge-audit`,
+ * `shop_url`, plus `audit_band` (canonical key from `lib/audit-pricing.ts`)
+ * and `band_label`. Stripe is the audit trail for band-by-band reporting —
+ * no Prisma column per Phase 1b architectural call.
  */
 export async function POST(req: NextRequest) {
   const stripe = getStripe();
@@ -34,29 +41,55 @@ export async function POST(req: NextRequest) {
 
   let email: string;
   let shopUrl: string;
+  let bandSlug: AuditBandSlug;
 
   try {
     const json = BodySchema.parse(await req.json());
     email = json.email.toLowerCase();
     shopUrl = json.shopUrl.trim();
+    bandSlug = json.bandSlug;
   } catch {
     return NextResponse.json(
-      { ok: false, code: 'bad-request', message: 'Check your email and shop URL.' },
+      { ok: false, code: 'bad-request', message: 'Check your email, shop URL, and band selection.' },
+      { status: 400 },
+    );
+  }
+
+  const band = bandBySlug(bandSlug);
+  if (!band) {
+    return NextResponse.json(
+      { ok: false, code: 'bad-band', message: 'Pick a band to continue.' },
+      { status: 400 },
+    );
+  }
+
+  // Band 3 is bespoke-quote; it never hits Stripe. The client routes to
+  // a mailto enquiry instead, but defend the API in case a stale form
+  // submits the slug.
+  if (band.isBespoke || band.pricePence === null) {
+    return NextResponse.json(
+      {
+        ok: false,
+        code: 'bespoke-band',
+        message: 'Band 3 is a bespoke quote. Email john@flintmere.com to start.',
+      },
       { status: 400 },
     );
   }
 
   const intent = await stripe.paymentIntents.create({
-    amount: 9700,
+    amount: band.pricePence,
     currency: 'gbp',
     receipt_email: email,
-    description: 'Flintmere concierge audit — written deliverable in three working days',
-    statement_descriptor_suffix: 'AUDIT',
+    description: `Flintmere concierge audit (${band.label}) — written deliverable in three working days`,
+    statement_descriptor_suffix: `AUDIT-B${bandSlug === 'band-1' ? '1' : '2'}`,
     automatic_payment_methods: { enabled: true },
     metadata: {
       kind: 'concierge-audit',
       email,
       shop_url: shopUrl.slice(0, 250),
+      [STRIPE_BAND_METADATA_KEY]: bandSlug,
+      band_label: band.label,
     },
   });
 
@@ -71,5 +104,7 @@ export async function POST(req: NextRequest) {
     ok: true,
     clientSecret: intent.client_secret,
     paymentIntentId: intent.id,
+    amountPence: band.pricePence,
+    bandSlug,
   });
 }

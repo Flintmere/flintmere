@@ -7,9 +7,9 @@ import { CheckoutCard } from './CheckoutCard';
 import { CONCIERGE_DELIVERABLE_LIST } from '@/lib/copy';
 
 export const metadata: Metadata = {
-  title: 'Concierge audit — £97',
+  title: 'Concierge audit — from £197',
   description:
-    'We read your Shopify store product by product and send a written audit letter plus a per-product fix CSV within three working days. 30-day re-scan included.',
+    'We read your Shopify store product by product and send a written audit letter plus a per-product fix CSV within three working days. Three SKU bands — £197 / £397 / from £597. 30-day re-scan included.',
 };
 
 /**
@@ -17,8 +17,10 @@ export const metadata: Metadata = {
  * 2026-04-30).
  *
  * Council pre-flight (3 named references):
- *   - Pentagram Saks Fifth Avenue — logotype-scale numerals: `£97` set at
- *     Bracket size="saks" becomes the page's brand mark.
+ *   - Pentagram Saks Fifth Avenue — logotype-scale numerals: the floor
+ *     price (£197) set at Bracket size="saks" carries the page's brand mark
+ *     until the Phase 2 redesign retires the chord in favour of a band
+ *     selector signature (per ADR 0022).
  *   - The Modern House (offering pages) — single typographic chord per
  *     chapter, generous whitespace, sage hairline anchors.
  *   - A24 single-film overview — top-left mono credit replaces eyebrow
@@ -26,9 +28,9 @@ export const metadata: Metadata = {
  *
  * Choreography: each chapter cascades on entry — eyebrow → headline word-
  * cascade with Apple-pattern beat → sage hairline → body rows with stagger.
- * Saks brackets `[for you]` and `[£97]` reveal as the punchline after a 300ms
- * beat; their continuous outline-shimmer (canonical, baked into the Bracket
- * primitive) runs through the letterforms underneath.
+ * Saks brackets `[for you]` and `[£197]` reveal as the punchline after a
+ * 300ms beat; their continuous outline-shimmer (canonical, baked into the
+ * Bracket primitive) runs through the letterforms underneath.
  *
  * Mechanism: a single `<ViewportReveal>` wraps the page; it observes every
  * `[data-reveal]` descendant individually with threshold 0.5. Each element
@@ -40,8 +42,9 @@ export const metadata: Metadata = {
  * data-reveal endpoint instantly. No motion library, no JS animation loop.
  *
  * Bracket budget: ≤1 anchor bracket per section. Hero `[for you]` (saks),
- * price chord `[£97]` (saks), deliverables `[three days]` (default). Ordinal
- * markers `[01]…[05]` are ledger numerals, not anchor brackets.
+ * price chord `[£197]` (saks, Band 1 floor), deliverables `[three days]`
+ * (default). Ordinal markers `[01]…[05]` are ledger numerals, not anchor
+ * brackets.
  *
  * Each section explicitly carries `bg-paper` so the universal sticky-footer
  * curtain (engaged by `flintmere-main`) is occluded until the user reaches
@@ -80,7 +83,7 @@ export default function Audit() {
           >
             <p
               data-reveal
-              aria-label="Flintmere concierge audit, ninety-seven pounds, three working days"
+              aria-label="Flintmere concierge audit, from one hundred and ninety-seven pounds, three working days"
               className="font-mono uppercase"
               style={{
                 fontSize: 'clamp(11px, 1vw, 13px)',
@@ -91,7 +94,7 @@ export default function Audit() {
                 ['--reveal-delay' as string]: '120ms',
               }}
             >
-              Flintmere · Concierge audit · £97 · 3 working days
+              Flintmere · Concierge audit · from £197 · 3 working days
             </p>
 
             <h1
@@ -169,7 +172,7 @@ export default function Audit() {
                 href="#checkout"
                 className="inline-flex items-center gap-3 px-7 py-3.5 bg-[color:var(--color-accent)] text-[color:var(--color-accent-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-ink)] hover:text-[color:var(--color-paper)] transition-colors duration-[var(--duration-instant)]"
               >
-                Pay £97
+                See the bands
                 <span aria-hidden="true">↓</span>
               </Link>
             </div>
@@ -190,10 +193,13 @@ export default function Audit() {
           </div>
         </section>
 
-        {/* Chapter 2 — The £97 chord (Saks logotype-scale numeral).
-            Word-cascade lands "The whole audit, for", beats 300ms, then
-            the saks `[£97]` reveals as the brand-mark moment. Spec captions,
-            hairline, and checkout cascade in after. */}
+        {/* Chapter 2 — The price chord (Saks logotype-scale numeral).
+            Word-cascade lands "The whole audit, from", beats 300ms, then
+            the saks `[£197]` reveals as the brand-mark moment — the Band 1
+            floor anchor per ADR 0022. Phase 2 redesign retires the chord
+            in favour of a band-selector signature; this is the interim
+            truthful read. Spec captions, hairline, and checkout cascade
+            in after. */}
         <section
           id="checkout"
           aria-labelledby="price-heading"
@@ -228,9 +234,9 @@ export default function Audit() {
               className="font-sans font-medium tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)]"
               style={{ fontSize: 'clamp(40px, 5vw, 80px)', maxWidth: '20ch' }}
             >
-              <span className="sr-only">The whole audit, for ninety-seven pounds.</span>
+              <span className="sr-only">The whole audit, from one hundred and ninety-seven pounds.</span>
               {(() => {
-                const WORDS = ['The', 'whole', 'audit,', 'for'];
+                const WORDS = ['The', 'whole', 'audit,', 'from'];
                 const ENTRY = 200;
                 const cascadeEnd = ENTRY + WORDS.length * STAGGER_BODY;
                 const bracketDelay = cascadeEnd + BEAT;
@@ -257,7 +263,7 @@ export default function Audit() {
                         ['--reveal-delay' as string]: `${bracketDelay}ms`,
                       }}
                     >
-                      <Bracket size="saks">£97</Bracket>
+                      <Bracket size="saks">£197</Bracket>
                     </span>
                   </span>
                 );
@@ -444,10 +450,29 @@ export default function Audit() {
               </figcaption>
             </figure>
 
+            <p
+              data-reveal
+              className="font-mono"
+              style={{
+                marginTop: 'clamp(48px, 6vw, 80px)',
+                fontSize: 'clamp(12px, 1vw, 13px)',
+                lineHeight: 1.6,
+                letterSpacing: '0.02em',
+                color: 'var(--color-mute-2)',
+                maxWidth: '64ch',
+                ['--reveal-delay' as string]: '2100ms',
+              }}
+            >
+              <span aria-hidden="true">// </span>The list below shows the Band 1
+              deliverable. Band 2 audits draft the worst 25 products (not 10);
+              Band 3 audits read a representative sample plus the structural
+              data model, and draft the worst 25.
+            </p>
+
             <ol
               className="list-none p-0 grid grid-cols-1 lg:grid-cols-2"
               style={{
-                marginTop: 'clamp(64px, 8vw, 112px)',
+                marginTop: 'clamp(40px, 5vw, 64px)',
                 gap: 'clamp(40px, 4vw, 64px) clamp(48px, 5vw, 96px)',
               }}
             >
@@ -575,7 +600,7 @@ export default function Audit() {
               }}
             >
               {[
-                'Pay £97. A confirmation email lands within a minute.',
+                'Pick your band and pay. A confirmation email lands within a minute.',
                 'We read your catalog and write the audit. The URL is all we need — no call, no screen-share.',
                 'Within three working days, the letter, CSV, and 30-day plan land in your inbox.',
                 'Day 30: the scanner re-runs and emails you a progress report.',
@@ -649,11 +674,12 @@ export default function Audit() {
               }}
             >
               Flintmere is a trading name of Eazy Access Ltd (England &amp; Wales).
-              Eazy Access Ltd is not VAT-registered, so £97 is the full price — no
-              VAT is added. Flintmere is not affiliated with GS1. Identifier
-              requirements vary by marketplace and jurisdiction. The audit is
-              informational; the checks map to Shopify product data requirements,
-              GS1 UK identifier rules, and Google Merchant Center specifications.
+              Eazy Access Ltd is not VAT-registered, so the band price you select
+              (£197 / £397 / from £597) is the full price — no VAT is added.
+              Flintmere is not affiliated with GS1. Identifier requirements vary
+              by marketplace and jurisdiction. The audit is informational; the
+              checks map to Shopify product data requirements, GS1 UK identifier
+              rules, and Google Merchant Center specifications.
             </p>
           </div>
         </section>

@@ -1,14 +1,22 @@
 'use client';
 
 /**
- * Apple-styled custom checkout for the £97 Flintmere concierge audit.
- * Two states on one card:
- *   1. Collect — email + shop URL, "Continue to payment" button.
- *   2. Pay    — Stripe Payment Element (Apple Pay / Google Pay / card), "Pay £97".
+ * Apple-styled custom checkout for the Flintmere concierge audit.
  *
- * On submit, Stripe redirects to /audit/success?payment_intent=… which is where
- * the thank-you UI lives. The webhook at /api/webhooks/stripe fires the
- * confirmation email and is the source of truth for fulfilment.
+ * Per ADR 0022 (audit-band pricing), the card carries a band selector
+ * above the email + shop URL fields. Three bands:
+ *
+ *   - Band 1 (£197) and Band 2 (£397) — Stripe Payment Element flow.
+ *   - Band 3 (from £597) — bespoke quote; the card swaps to an
+ *     enquiry block with a mailto link to john@flintmere.com.
+ *
+ * Default selection is Band 2 (BUSINESS.md target cohort: £500K–£20M
+ * revenue UK food merchants pushing 1,501–5,000 SKUs).
+ *
+ * On Stripe success: redirect to /audit/success?payment_intent=…
+ * The webhook at /api/webhooks/stripe is the source of truth for
+ * fulfilment and reads the `audit_band` metadata key set by the
+ * checkout API.
  */
 
 import { useMemo, useState } from 'react';
@@ -25,6 +33,13 @@ import {
   useStripe,
 } from '@stripe/react-stripe-js';
 import { track } from '@/lib/plausible';
+import {
+  AUDIT_BANDS,
+  AUDIT_BESPOKE_ENQUIRY_EMAIL,
+  bandBySlug,
+  type AuditBand,
+  type AuditBandSlug,
+} from '@/lib/audit-pricing';
 
 const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
@@ -32,8 +47,10 @@ const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
 type CardState =
   | { kind: 'collect' }
   | { kind: 'loading' }
-  | { kind: 'pay'; clientSecret: string }
+  | { kind: 'pay'; clientSecret: string; band: AuditBand }
   | { kind: 'error'; message: string };
+
+const DEFAULT_BAND: AuditBandSlug = 'band-2';
 
 function telemetry(event: string, data: Record<string, unknown> = {}): void {
   if (typeof window === 'undefined') return;
@@ -97,27 +114,37 @@ const APPEARANCE: Appearance = {
 };
 
 export function CheckoutCard() {
+  const [bandSlug, setBandSlug] = useState<AuditBandSlug>(DEFAULT_BAND);
   const [email, setEmail] = useState('');
   const [shopUrl, setShopUrl] = useState('');
   const [state, setState] = useState<CardState>({ kind: 'collect' });
 
+  const selectedBand = useMemo(() => bandBySlug(bandSlug), [bandSlug]);
+
   async function handleStart(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!selectedBand || selectedBand.isBespoke) return;
+
     setState({ kind: 'loading' });
-    telemetry('concierge-checkout-start');
-    track('concierge_clicked', { shop: shopUrl.trim() });
+    telemetry('concierge-checkout-start', { band: bandSlug });
+    track('concierge_clicked', { shop: shopUrl.trim(), band: bandSlug });
 
     try {
       const res = await fetch('/api/concierge/checkout', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), shopUrl: shopUrl.trim() }),
+        body: JSON.stringify({
+          email: email.trim(),
+          shopUrl: shopUrl.trim(),
+          bandSlug,
+        }),
       });
       const body = await res.json();
       if (!res.ok || !body?.clientSecret) {
         telemetry('concierge-checkout-intent-failed', {
           status: res.status,
           code: body?.code,
+          band: bandSlug,
         });
         setState({
           kind: 'error',
@@ -127,10 +154,14 @@ export function CheckoutCard() {
         });
         return;
       }
-      telemetry('concierge-checkout-intent-ready');
-      setState({ kind: 'pay', clientSecret: body.clientSecret });
+      telemetry('concierge-checkout-intent-ready', { band: bandSlug });
+      setState({
+        kind: 'pay',
+        clientSecret: body.clientSecret,
+        band: selectedBand,
+      });
     } catch {
-      telemetry('concierge-checkout-intent-network-error');
+      telemetry('concierge-checkout-intent-network-error', { band: bandSlug });
       setState({
         kind: 'error',
         message: 'Network error. Check your connection and try again.',
@@ -143,7 +174,7 @@ export function CheckoutCard() {
       <CardShell>
         <p
           className="text-[color:var(--color-ink-2)]"
-          style={{ fontSize: 14, lineHeight: 1.55 }}
+          style={{ fontSize: 14, lineHeight: 1.55, padding: 28 }}
         >
           Payment is temporarily unavailable. Email{' '}
           <a href="mailto:hello@flintmere.com" className="underline">
@@ -168,42 +199,81 @@ export function CheckoutCard() {
       <CardShell>
         <CardHeader
           email={email}
+          band={state.band}
           onBack={() => setState({ kind: 'collect' })}
         />
         <Elements stripe={stripePromise} options={options}>
-          <PayStep returnUrl={returnUrl} />
+          <PayStep returnUrl={returnUrl} band={state.band} />
         </Elements>
       </CardShell>
     );
   }
 
+  // Bespoke band — swap the form for an enquiry block.
+  if (selectedBand?.isBespoke) {
+    const subject = encodeURIComponent(
+      'Concierge audit — Band 3 enquiry (5,001+ SKUs)',
+    );
+    const mailto = `mailto:${AUDIT_BESPOKE_ENQUIRY_EMAIL}?subject=${subject}`;
+    return (
+      <CardShell>
+        <BandSelector value={bandSlug} onChange={setBandSlug} />
+        <hr
+          style={{
+            border: 0,
+            borderTop: '1px solid var(--color-line-soft)',
+            margin: 0,
+          }}
+        />
+        <div style={{ padding: '24px 28px 28px 28px' }}>
+          <p className="eyebrow mb-3">Bespoke quote</p>
+          <p
+            className="text-[color:var(--color-ink)]"
+            style={{ fontSize: 16, lineHeight: 1.55, marginBottom: 12 }}
+          >
+            For catalogs above 5,000 SKUs, the audit reads a representative
+            sample plus the structural data model. We scope and quote per
+            store — typically £597+, contracted before any work starts.
+          </p>
+          <p
+            className="text-[color:var(--color-mute)]"
+            style={{ fontSize: 14, lineHeight: 1.55, marginBottom: 20 }}
+          >
+            Send the shop URL and a sentence on what you&rsquo;re selling. We
+            reply within two working days with a fixed-fee quote.
+          </p>
+          <a
+            href={mailto}
+            className="btn btn-accent w-full justify-center"
+            onClick={() =>
+              track('concierge_clicked', {
+                shop: shopUrl.trim(),
+                band: bandSlug,
+                kind: 'bespoke-enquiry',
+              })
+            }
+          >
+            Email {AUDIT_BESPOKE_ENQUIRY_EMAIL} →
+          </a>
+        </div>
+      </CardShell>
+    );
+  }
+
+  const ctaLabel =
+    state.kind === 'loading'
+      ? 'One moment…'
+      : `Pay ${selectedBand?.priceDisplay ?? '—'} →`;
+
   return (
     <CardShell>
-      <div style={{ padding: '28px 28px 0 28px' }}>
-        <p className="eyebrow mb-3">Concierge audit</p>
-        <p
-          style={{
-            fontSize: 52,
-            letterSpacing: '-0.04em',
-            lineHeight: 1,
-            fontWeight: 500,
-          }}
-        >
-          £97
-        </p>
-        <p
-          className="mt-2 text-[color:var(--color-mute)]"
-          style={{ fontSize: 13, lineHeight: 1.55 }}
-        >
-          One-time. No VAT added. Delivered in three working days or full refund.
-        </p>
-      </div>
+      <BandSelector value={bandSlug} onChange={setBandSlug} />
 
       <hr
         style={{
           border: 0,
           borderTop: '1px solid var(--color-line-soft)',
-          margin: '24px 0 0 0',
+          margin: 0,
         }}
       />
 
@@ -254,7 +324,7 @@ export function CheckoutCard() {
           disabled={state.kind === 'loading'}
           className="btn btn-accent w-full justify-center"
         >
-          {state.kind === 'loading' ? 'One moment…' : 'Pay £97 →'}
+          {ctaLabel}
         </button>
         {state.kind === 'error' ? (
           <p
@@ -287,6 +357,87 @@ export function CheckoutCard() {
   );
 }
 
+function BandSelector({
+  value,
+  onChange,
+}: {
+  value: AuditBandSlug;
+  onChange: (slug: AuditBandSlug) => void;
+}) {
+  return (
+    <fieldset style={{ border: 0, padding: '28px 28px 0 28px', margin: 0 }}>
+      <legend className="eyebrow mb-3" style={{ padding: 0 }}>
+        Pick your band
+      </legend>
+      <div style={{ display: 'grid', gap: 10 }}>
+        {AUDIT_BANDS.map((band) => {
+          const selected = value === band.slug;
+          return (
+            <label
+              key={band.slug}
+              htmlFor={`band-${band.slug}`}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr auto',
+                alignItems: 'center',
+                gap: 12,
+                padding: '14px 16px',
+                border: selected
+                  ? '1px solid var(--color-ink)'
+                  : '1px solid var(--color-line-soft)',
+                background: selected
+                  ? 'var(--color-paper-2, #f7f7f4)'
+                  : '#ffffff',
+                cursor: 'pointer',
+              }}
+            >
+              <span style={{ minWidth: 0 }}>
+                <span
+                  style={{
+                    display: 'block',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 11,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    color: 'var(--color-mute)',
+                    marginBottom: 4,
+                  }}
+                >
+                  {band.label} · {band.skuRangeLabel}
+                </span>
+                <span
+                  style={{
+                    display: 'block',
+                    fontSize: 15,
+                    color: 'var(--color-ink)',
+                    fontWeight: 500,
+                  }}
+                >
+                  {band.priceDisplay}
+                </span>
+              </span>
+              <input
+                id={`band-${band.slug}`}
+                type="radio"
+                name="audit-band"
+                value={band.slug}
+                checked={selected}
+                onChange={() => onChange(band.slug)}
+                style={{
+                  width: 16,
+                  height: 16,
+                  accentColor: '#0a0a0b',
+                  cursor: 'pointer',
+                }}
+              />
+            </label>
+          );
+        })}
+      </div>
+    </fieldset>
+  );
+}
+
 function CardShell({ children }: { children: React.ReactNode }) {
   return (
     <div
@@ -305,9 +456,11 @@ function CardShell({ children }: { children: React.ReactNode }) {
 
 function CardHeader({
   email,
+  band,
   onBack,
 }: {
   email: string;
+  band: AuditBand;
   onBack: () => void;
 }) {
   return (
@@ -323,7 +476,7 @@ function CardHeader({
     >
       <div style={{ minWidth: 0 }}>
         <p className="eyebrow" style={{ marginBottom: 4 }}>
-          £97 · Concierge audit
+          {band.priceDisplay} · {band.label} · Concierge audit
         </p>
         <p
           style={{
@@ -357,7 +510,7 @@ function CardHeader({
   );
 }
 
-function PayStep({ returnUrl }: { returnUrl: string }) {
+function PayStep({ returnUrl, band }: { returnUrl: string; band: AuditBand }) {
   const stripe = useStripe();
   const elements = useElements();
   const [busy, setBusy] = useState(false);
@@ -368,7 +521,7 @@ function PayStep({ returnUrl }: { returnUrl: string }) {
     if (!stripe || !elements) return;
     setBusy(true);
     setErr(null);
-    telemetry('concierge-checkout-confirm');
+    telemetry('concierge-checkout-confirm', { band: band.slug });
 
     const { error } = await stripe.confirmPayment({
       elements,
@@ -380,6 +533,7 @@ function PayStep({ returnUrl }: { returnUrl: string }) {
         type: error.type,
         code: error.code,
         declineCode: error.decline_code,
+        band: band.slug,
       });
       setErr(
         error.message ??
@@ -417,7 +571,7 @@ function PayStep({ returnUrl }: { returnUrl: string }) {
         className="btn btn-accent w-full justify-center"
         style={{ marginTop: 20 }}
       >
-        {busy ? 'Processing…' : 'Pay £97'}
+        {busy ? 'Processing…' : `Pay ${band.priceDisplay}`}
       </button>
       <p
         style={{

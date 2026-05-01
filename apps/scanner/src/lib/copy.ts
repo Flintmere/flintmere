@@ -1,4 +1,6 @@
 import type { PillarId } from '@flintmere/scoring'
+import type { AuditBandSlug } from './audit-pricing'
+import { bandBySlug, bandPriceLine } from './audit-pricing'
 
 // Two-tier floor. BENCHMARK_FLOOR gates whether we render a number at all;
 // BENCHMARK_PUBLISH_FLOOR gates the "State of Shopify Catalogs" publishing
@@ -34,47 +36,105 @@ export const JOHN_SIGNATURE_REPLY_INVITE = 'Reply direct. We read every one.'
 
 // The concierge deliverable. Written audit — no video, no call —
 // delivered by the Flintmere team. Every customer-facing surface that
-// describes what £97 buys must use this wording (or the list below).
-// If you change the deliverable shape, update all five surfaces in
-// the same commit.
-export const CONCIERGE_DELIVERABLE_SUMMARY =
-  'We read every product, write a detailed audit letter pointing at exactly what to fix, and send a per-product CSV with the worst 10 products already drafted for you. A 30-day re-scan is included. Delivered within three working days.'
+// describes what the audit buys must use this wording (or the per-band
+// list below). Per ADR 0022 the deliverable depth scales with band:
+// Band 1 = full audit + worst 10 drafted; Band 2 = full audit + worst
+// 25 drafted; Band 3 = representative-sample audit + worst 25 drafted.
+//
+// Phase 1b: single source of truth for deliverable copy is the
+// per-band function; legacy `CONCIERGE_DELIVERABLE_LIST` is the
+// band-1 default snapshot kept for the page consumer until Phase 2's
+// design redesign wires per-band rendering.
 
-// Five-item list used on the /audit page and in the report email
-// Door 1 expansion. Keep in this order — #37 sequenced it for
-// objection handling (letter first = personal; CSV second = scale;
-// plan third = immediacy; GS1 fourth = authority; re-scan fifth =
-// accountability).
-export const CONCIERGE_DELIVERABLE_LIST: Array<{
+interface ConciergeDeliverableItem {
   title: string
   body: string
-}> = [
-  {
-    title: 'A written audit letter',
-    body:
-      'We read your store product by product, then write a 1,500-word letter pointing at specific products by name with annotated screenshots. Not a generic template — a read of your store.',
-  },
-  {
-    title: 'A per-product fix CSV',
-    body:
-      'Every product that has a problem, which problem, and the fix. For the worst 10 offenders, we draft the full replacement text — title, description, metafield values — ready to paste into Shopify.',
-  },
-  {
-    title: 'A 30-day fix sequence',
-    body:
-      'A one-page plan: what to do Day 1, Week 1, Week 2, Week 3-4 — ranked by how many products each fix unblocks first.',
-  },
-  {
-    title: 'A GS1 UK barcode path',
-    body:
-      'The right GS1 office for where your business is registered, what to buy, and how to import the codes into Shopify without breaking your theme.',
-  },
-  {
-    title: 'A 30-day re-scan',
-    body:
-      'Included. The scanner re-runs on day 30 and emails you a progress report, so you know whether the fixes moved the score.',
-  },
-]
+}
+
+/**
+ * The five-item deliverable list keyed to a band. Order is preserved
+ * across all bands — #37 sequenced it for objection handling (letter,
+ * CSV, plan, GS1, re-scan).
+ *
+ * The CSV row carries the band-specific worst-N count. Audit-letter
+ * scope branches Band 3 → representative-sample wording.
+ */
+export function conciergeDeliverableListForBand(
+  slug: AuditBandSlug,
+): ConciergeDeliverableItem[] {
+  const band = bandBySlug(slug)
+  const worstN = band?.deliverable.fullyDraftedFixCount ?? 10
+  const isSample = band?.deliverable.auditScope === 'representative-sample'
+
+  const letterBody = isSample
+    ? 'We read a representative sample across your catalog variant patterns and the structural data model, then write a 1,500-word letter pointing at specific products by name with annotated screenshots. Not a generic template — a read of your store.'
+    : 'We read your store product by product, then write a 1,500-word letter pointing at specific products by name with annotated screenshots. Not a generic template — a read of your store.'
+
+  const csvBody = isSample
+    ? `Every sampled product that has a problem, which problem, and the fix. For the worst ${worstN} offenders, we draft the full replacement text — title, description, metafield values — ready to paste into Shopify.`
+    : `Every product that has a problem, which problem, and the fix. For the worst ${worstN} offenders, we draft the full replacement text — title, description, metafield values — ready to paste into Shopify.`
+
+  return [
+    {
+      title: 'A written audit letter',
+      body: letterBody,
+    },
+    {
+      title: 'A per-product fix CSV',
+      body: csvBody,
+    },
+    {
+      title: 'A 30-day fix sequence',
+      body:
+        'A one-page plan: what to do Day 1, Week 1, Week 2, Week 3-4 — ranked by how many products each fix unblocks first.',
+    },
+    {
+      title: 'A GS1 UK barcode path',
+      body:
+        'The right GS1 office for where your business is registered, what to buy, and how to import the codes into Shopify without breaking your theme.',
+    },
+    {
+      title: 'A 30-day re-scan',
+      body:
+        'Included. The scanner re-runs on day 30 and emails you a progress report, so you know whether the fixes moved the score.',
+    },
+  ]
+}
+
+/**
+ * Per-band one-line summary used in the customer email. Mirrors
+ * `CONCIERGE_DELIVERABLE_SUMMARY` but parameterised on band.
+ */
+export function conciergeDeliverableSummaryForBand(
+  slug: AuditBandSlug,
+): string {
+  const band = bandBySlug(slug)
+  const worstN = band?.deliverable.fullyDraftedFixCount ?? 10
+  const isSample = band?.deliverable.auditScope === 'representative-sample'
+  const scopeLine = isSample
+    ? 'We read a representative sample across your catalog'
+    : 'We read every product'
+  return `${scopeLine}, write a detailed audit letter pointing at exactly what to fix, and send a per-product CSV with the worst ${worstN} products already drafted for you. A 30-day re-scan is included. Delivered within three working days.`
+}
+
+/**
+ * Default deliverable list — Band 1 wording — kept as a const export
+ * for the marketing page surface. Phase 2's `/audit` redesign wires
+ * per-band rendering; until then this surface shows the Band 1 list
+ * with an inline note that Bands 2 + 3 deliver the worst 25.
+ */
+export const CONCIERGE_DELIVERABLE_LIST: ConciergeDeliverableItem[] =
+  conciergeDeliverableListForBand('band-1')
+
+/**
+ * Default summary — Band 1 wording — kept for any non-band-aware
+ * surface. Phase 4 cascade migrates the remaining consumers.
+ */
+export const CONCIERGE_DELIVERABLE_SUMMARY =
+  conciergeDeliverableSummaryForBand('band-1')
+
+// Re-export for convenience so consumers don't need a second import.
+export { bandPriceLine }
 
 // Words that fail the #37 veto on Copy Council: Flintmere-internal or
 // Shopify-developer jargon that a non-technical founder will not parse

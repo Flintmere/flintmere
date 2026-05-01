@@ -6,6 +6,10 @@ import {
   sendConciergeCustomerEmail,
   sendConciergeOpsEmail,
 } from '@/lib/concierge-email';
+import {
+  STRIPE_BAND_METADATA_KEY,
+  type AuditBandSlug,
+} from '@/lib/audit-pricing';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -90,6 +94,7 @@ async function handleConciergePaymentIntent(
     ''
   ).toLowerCase();
   const shopUrl = typeof intent.metadata?.shop_url === 'string' ? intent.metadata.shop_url : '';
+  const bandSlug = readBandSlug(intent.metadata);
 
   if (!email || !shopUrl) return;
 
@@ -97,6 +102,7 @@ async function handleConciergePaymentIntent(
     email,
     shopUrl,
     paymentIntentId: intent.id,
+    bandSlug,
   });
 }
 
@@ -108,18 +114,34 @@ async function handleConciergeCheckout(
   const email = (session.customer_email ?? session.customer_details?.email ?? '').toLowerCase();
   const shopUrl = typeof session.metadata?.shop_url === 'string' ? session.metadata.shop_url : '';
   const paymentIntentId = typeof session.payment_intent === 'string' ? session.payment_intent : null;
+  const bandSlug = readBandSlug(session.metadata);
 
   if (!email || !shopUrl || !paymentIntentId) return;
 
-  await finaliseConciergeBooking({ email, shopUrl, paymentIntentId });
+  await finaliseConciergeBooking({ email, shopUrl, paymentIntentId, bandSlug });
+}
+
+/**
+ * Reads the band slug off Stripe metadata, defaulting to band-1 when
+ * absent. Defensive: zero in-flight pre-cutover audits exist (per ADR
+ * 0022 §Existing customers), so this branch only protects against
+ * malformed metadata, not legitimate legacy bookings.
+ */
+function readBandSlug(
+  metadata: Stripe.Metadata | null | undefined,
+): AuditBandSlug {
+  const raw = metadata?.[STRIPE_BAND_METADATA_KEY];
+  if (raw === 'band-1' || raw === 'band-2' || raw === 'band-3') return raw;
+  return 'band-1';
 }
 
 async function finaliseConciergeBooking(args: {
   email: string;
   shopUrl: string;
   paymentIntentId: string;
+  bandSlug: AuditBandSlug;
 }): Promise<void> {
-  const { email, shopUrl, paymentIntentId } = args;
+  const { email, shopUrl, paymentIntentId, bandSlug } = args;
 
   const row = await prisma.conciergeAudit.upsert({
     where: { stripePaymentIntentId: paymentIntentId },
@@ -138,8 +160,14 @@ async function finaliseConciergeBooking(args: {
   const opsEmail = process.env.CONCIERGE_OPS_EMAIL || process.env.RESEND_REPLY_TO || 'hello@flintmere.com';
 
   const [customerResult, opsResult] = await Promise.all([
-    sendConciergeCustomerEmail({ to: email, shopUrl, calendlyUrl }),
-    sendConciergeOpsEmail({ to: opsEmail, customerEmail: email, shopUrl, paymentIntentId }),
+    sendConciergeCustomerEmail({ to: email, shopUrl, calendlyUrl, bandSlug }),
+    sendConciergeOpsEmail({
+      to: opsEmail,
+      customerEmail: email,
+      shopUrl,
+      paymentIntentId,
+      bandSlug,
+    }),
   ]);
 
   if (customerResult.sent && opsResult.sent) {
