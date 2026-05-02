@@ -1,4 +1,5 @@
 import type { CrawlabilityInput } from '@flintmere/scoring';
+import { assertPublicHost, isPrivateHostLiteral } from './ssrf';
 
 const USER_AGENT =
   'Flintmere-Scanner/0.1 (+https://flintmere.com/bot)';
@@ -15,6 +16,18 @@ export async function fetchCrawlability(
   options: FetchCrawlabilityOptions = {},
 ): Promise<CrawlabilityInput> {
   const timeoutMs = options.timeoutMs ?? 5_000;
+
+  // Same domain that fetchCatalog already gated, but the scan route also
+  // calls this independently — re-gate here so the helper is safe to call
+  // from anywhere.
+  if (isPrivateHostLiteral(domain)) {
+    return { robotsTxt: null, llmsTxt: null, sitemapXml: null };
+  }
+  try {
+    await assertPublicHost(domain);
+  } catch {
+    return { robotsTxt: null, llmsTxt: null, sitemapXml: null };
+  }
 
   const [robotsTxt, llmsTxt, sitemapXml] = await Promise.all([
     fetchTextOrNull(`https://${domain}/robots.txt`, timeoutMs),

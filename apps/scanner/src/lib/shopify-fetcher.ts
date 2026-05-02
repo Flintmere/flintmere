@@ -1,4 +1,5 @@
 import type { CatalogInput, ProductInput } from '@flintmere/scoring';
+import { assertPublicHost, isPrivateHostLiteral, SsrfBlockedError } from './ssrf';
 
 /**
  * Fetches and normalises a public Shopify store's catalog from /products.json.
@@ -80,11 +81,13 @@ export function normaliseDomain(raw: string): string {
   }
 
   const host = url.hostname.toLowerCase();
-  if (!host || host === 'localhost' || host.endsWith('.local')) {
+  if (!host) {
     throw new ShopifyFetchError('invalid-url', `bad host: ${host}`);
   }
 
-  if (isPrivateHost(host)) {
+  // Literal-only check at parse time — full DNS-resolved check runs in
+  // fetchCatalog so we don't pay a lookup on hosts that fail trivially.
+  if (isPrivateHostLiteral(host)) {
     throw new ShopifyFetchError('invalid-url', `private host: ${host}`);
   }
 
@@ -97,6 +100,19 @@ export async function fetchCatalog(
 ): Promise<FetchedCatalog> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
   const domain = normaliseDomain(rawUrl);
+
+  // DNS-resolved SSRF gate. Catches names that resolve to private space
+  // (`internal.example` → 10.x). Surfaced as `invalid-url` so the user sees
+  // the same "check the URL" hint as other parse failures — we don't want to
+  // tell a probing actor that we resolve their host before fetching.
+  try {
+    await assertPublicHost(domain);
+  } catch (err) {
+    if (err instanceof SsrfBlockedError) {
+      throw new ShopifyFetchError('invalid-url', err.message);
+    }
+    throw err;
+  }
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), opts.timeoutMs);
@@ -261,17 +277,9 @@ function toProductInput(raw: ShopifyRawProduct): ProductInput {
   };
 }
 
-function isPrivateHost(host: string): boolean {
-  if (host === '127.0.0.1' || host === '::1') return true;
-  if (host.startsWith('10.')) return true;
-  if (host.startsWith('192.168.')) return true;
-  const match = /^172\.(\d+)\./.exec(host);
-  if (match) {
-    const octet = Number(match[1]);
-    if (octet >= 16 && octet <= 31) return true;
-  }
-  return false;
-}
+// Private-host detection now lives in `./ssrf.ts` and covers IPv6 ULA /
+// link-local, CGNAT 100.64/10, IPv4-mapped IPv6, multicast, and DNS
+// pre-resolution. The previous local helper missed all of those.
 
 // ---- Shopify /products.json raw shape (subset) ----
 interface ShopifyRawProduct {

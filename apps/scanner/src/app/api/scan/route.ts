@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db';
 import { fetchCrawlability } from '@/lib/crawlability-fetcher';
 import { fetchCatalog, ShopifyFetchError } from '@/lib/shopify-fetcher';
 import { hashIp } from '@/lib/hash';
+import { checkScanRateLimit } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -39,10 +40,32 @@ export async function POST(req: NextRequest) {
   // for operator-curated aggregate data, not user-supplied free text.
   const vertical = source === 'bot' ? (body.vertical ?? null) : null;
 
+  const normalisedDomain = body.shopUrl.toLowerCase().trim();
+
+  // Bot scans bypass the rate limit — they're already scheduled by the
+  // operator with their own concurrency floor. Human submissions go through
+  // both the per-IP bucket and the per-domain dedupe TTL.
+  if (source === 'user') {
+    const limit = checkScanRateLimit({ ip, normalisedDomain });
+    if (!limit.ok) {
+      const message =
+        limit.reason === 'domain'
+          ? 'This shop was scanned moments ago. Try again shortly.'
+          : 'Too many scans from this connection. Try again shortly.';
+      return NextResponse.json(
+        { ok: false, code: 'rate-limited', message },
+        {
+          status: 429,
+          headers: { 'retry-after': String(limit.retryAfterSec) },
+        },
+      );
+    }
+  }
+
   const scan = await prisma.scan.create({
     data: {
       shopUrl: body.shopUrl,
-      normalisedDomain: body.shopUrl.toLowerCase().trim(),
+      normalisedDomain,
       status: 'running',
       source,
       vertical,
@@ -69,12 +92,6 @@ export async function POST(req: NextRequest) {
     // estimate to produce an annual-demand-at-risk band. Returns null for
     // non-food catalogs and below-sample-floor catalogs (food-first at
     // v1 per requirement Q1.1).
-    //
-    // OQ-1: persistence gap. `aovEstimate`, `revenueEstimate`, `truncated`,
-    // and `actualProductCount` are surfaced on the scan response but NOT
-    // written to `scoreJson`. They therefore won't render on /score/[shop]
-    // for historical scans without a future migration that re-computes from
-    // the persisted catalog or back-fills these fields.
     const aovResult = estimateAov(catalog, suppressionEstimate);
 
     // Ratio-scaling for truncated catalogs — projects sample-derived counts
@@ -114,6 +131,23 @@ export async function POST(req: NextRequest) {
           }
         : null;
 
+    // Persist the projection envelope alongside the score so /score/[shop]
+    // can render historical scans without recomputing from the catalog.
+    // The wedge fields (truncated, actualProductCount, suppressionEstimate,
+    // aovEstimate, revenueEstimate, scaled*) live on the persisted JSON,
+    // not on dedicated columns — they're consumer-side projections, not
+    // queryable signals.
+    const persistedScoreJson = {
+      ...(score as unknown as Record<string, unknown>),
+      truncated,
+      actualProductCount,
+      suppressionEstimate,
+      scaledSuppressionEstimate,
+      aovEstimate: aovResult?.aovEstimate ?? null,
+      revenueEstimate: aovResult?.revenueEstimate ?? null,
+      scaledRevenueEstimate,
+    };
+
     await prisma.scan.update({
       where: { id: scan.id },
       data: {
@@ -123,7 +157,7 @@ export async function POST(req: NextRequest) {
         grade: score.grade,
         productCount: score.productCount,
         variantCount: score.variantCount,
-        scoreJson: score as unknown as object,
+        scoreJson: persistedScoreJson as unknown as object,
         completedAt: new Date(),
       },
     });

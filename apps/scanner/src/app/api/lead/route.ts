@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { CompositeScore } from '@flintmere/scoring';
 import { z } from 'zod';
+import { Prisma } from '@/generated/prisma';
 import { prisma } from '@/lib/db';
 import { buildReportEmail } from '@/lib/report-email';
 import { sendEmail } from '@/lib/resend';
@@ -48,13 +49,50 @@ export async function POST(req: NextRequest) {
 
   const email = body.email.trim().toLowerCase();
 
-  const lead = await prisma.lead.create({
-    data: {
-      email,
-      scanId: body.scanId,
-      consentedAt: body.consentedAt ? new Date(body.consentedAt) : new Date(),
-    },
-  });
+  // Idempotent insert. The unique (email, scan_id) index makes a repeat POST
+  // return the original row — same lead id, no duplicate row, no second
+  // report send. We don't expose this to the caller as a "duplicate" error
+  // because the user's intent (receive their report) is already satisfied
+  // and surfacing 409 would invite scripted retries.
+  let lead;
+  let alreadyRegistered = false;
+  try {
+    lead = await prisma.lead.create({
+      data: {
+        email,
+        scanId: body.scanId,
+        consentedAt: body.consentedAt ? new Date(body.consentedAt) : new Date(),
+      },
+    });
+  } catch (err) {
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === 'P2002'
+    ) {
+      const existing = await prisma.lead.findUnique({
+        where: { email_scanId: { email, scanId: body.scanId } },
+      });
+      if (!existing) throw err;
+      lead = existing;
+      alreadyRegistered = true;
+    } else {
+      throw err;
+    }
+  }
+
+  // The original POST already triggered a send (or recorded the failure
+  // reason). Don't re-send on a repeat; report status from the existing row.
+  if (alreadyRegistered) {
+    return NextResponse.json(
+      {
+        ok: true,
+        leadId: lead.id,
+        reportSent: lead.reportSentAt !== null,
+        alreadyRegistered: true,
+      },
+      { status: 200 },
+    );
+  }
 
   const scannerUrl =
     process.env.NEXT_PUBLIC_APP_URL ?? 'https://audit.flintmere.com';

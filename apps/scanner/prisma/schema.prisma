@@ -77,6 +77,10 @@ model Lead {
   reportSentAt   DateTime? @map("report_sent_at")
   reportOpenedAt DateTime? @map("report_opened_at")
 
+  // Idempotency key for /api/lead — repeated POSTs with the same
+  // email + scan return the existing row instead of sending a duplicate
+  // report. Email is normalised to lowercase at the API boundary.
+  @@unique([email, scanId])
   @@index([email])
   @@index([scanId])
   @@map("scanner_leads")
