@@ -91,9 +91,13 @@ export function PillarTreemap({ pillars }: PillarTreemapProps) {
     >
       <div
         aria-hidden="true"
-        className="border border-[color:var(--color-line)] overflow-hidden flex flex-col"
+        className="methodology-treemap-frame border border-[color:var(--color-line)] overflow-hidden flex flex-col"
         style={{
-          aspectRatio: '16 / 9',
+          // Wide ribbon, not a chapter-takeover. When pinned at the top of
+          // the viewport, the treemap must coexist with the spread content
+          // below it — not eclipse the whole screen.
+          aspectRatio: '16 / 4',
+          maxHeight: 'min(320px, 38vh)',
           background: 'var(--color-paper)',
         }}
       >
@@ -178,7 +182,7 @@ function TreemapTile({ pillar, isFirstInRow, isActive }: TreemapTileProps) {
         flex: `${pillar.weight} 1 0`,
         minWidth: 0,
         borderLeft: isFirstInRow ? 'none' : '1px solid var(--color-line)',
-        padding: 'clamp(16px, 2vw, 28px)',
+        padding: 'clamp(12px, 1.6vw, 22px)',
         textDecoration: 'none',
         color: 'inherit',
         background: isActive ? 'rgba(248, 191, 36, 0.16)' : 'transparent',
@@ -223,9 +227,14 @@ function TreemapTile({ pillar, isFirstInRow, isActive }: TreemapTileProps) {
 
       <div className="relative flex flex-col gap-1">
         <p
-          className="font-medium text-[color:var(--color-ink)] leading-[1.04]"
+          className="font-medium text-[color:var(--color-ink)] leading-[1.05]"
           style={{
-            fontSize: `clamp(14px, ${0.7 + pillar.weight * 0.06}vw, ${18 + pillar.weight}px)`,
+            // Tighter ceiling than the original. The ribbon is shorter
+            // now — pillar names that previously rendered at 38px+ would
+            // overflow the 96px-tall bottom row. Scaling tops out at ~26px
+            // for the heaviest pillars and degrades gracefully on small
+            // tiles.
+            fontSize: `clamp(13px, ${0.8 + pillar.weight * 0.04}vw, ${15 + pillar.weight * 0.55}px)`,
             letterSpacing: '-0.02em',
           }}
         >
