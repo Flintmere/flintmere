@@ -43,18 +43,32 @@ export function PillarSpread({ pillar }: PillarSpreadProps) {
         paddingBottom: 'clamp(64px, 9vw, 144px)',
       }}
     >
-      <div className="grid md:grid-cols-[minmax(180px,_0.9fr)_2fr] gap-x-8 lg:gap-x-16 gap-y-10 items-start">
-        {/* Left column — the oversized numeral as the chapter anchor. The
-            numeral is the design; nothing else fills this column. */}
-        <div className="methodology-spread__index relative md:sticky md:top-[280px] md:self-start">
+      <div className="grid md:grid-cols-[minmax(200px,_0.85fr)_2fr] gap-x-8 lg:gap-x-20 gap-y-10 items-start">
+        {/* Left column — the oversized numeral as the chapter anchor.
+            Static positioning (no sticky) — the pinned treemap above does
+            the persistent-navigation job; this numeral is just the chapter
+            anchor and should render fully + crisply at the top of its
+            column without overlap. Padding-top added so the cascade-rise
+            animation has room to land without being clipped by the pinned
+            treemap as the section enters viewport. */}
+        <div
+          className="methodology-spread__index relative"
+          style={{ paddingTop: 'clamp(8px, 1vw, 16px)' }}
+        >
           <p
             aria-hidden="true"
-            className="font-mono text-[color:var(--color-ink)] leading-[0.85]"
+            className="font-mono text-[color:var(--color-ink)] leading-[0.82]"
             style={{
-              fontSize: 'clamp(96px, 16vw, 240px)',
+              // Slightly tighter cap so the numeral fits in 2-row pin
+              // configurations without visually clipping. Still heroic.
+              fontSize: 'clamp(96px, 14vw, 220px)',
               fontWeight: 700,
               letterSpacing: '-0.06em',
               fontVariantNumeric: 'tabular-nums',
+              // Force the glyph's full ascent + descent into the box so
+              // the cascade animation never clips the top of '0' or '7'.
+              display: 'block',
+              paddingTop: '0.05em',
             }}
           >
             {pillar.n}
@@ -64,7 +78,7 @@ export function PillarSpread({ pillar }: PillarSpreadProps) {
             style={{
               fontSize: 11,
               letterSpacing: '0.16em',
-              marginTop: 16,
+              marginTop: 20,
             }}
           >
             {pillar.weight}% of score
@@ -76,11 +90,16 @@ export function PillarSpread({ pillar }: PillarSpreadProps) {
         <div className="methodology-spread__body">
           <h3
             id={headingId}
-            className="font-medium text-[color:var(--color-ink)]"
+            className="font-sans text-[color:var(--color-ink)]"
             style={{
-              fontSize: 'clamp(32px, 4.4vw, 64px)',
+              // Larger and bolder. The previous 32–64px ramp at font-medium
+              // (500) was undersized against the hero + the new
+              // unified-700 canon; bumped to 36–80px @ 700 to read as a
+              // proper chapter heading.
+              fontSize: 'clamp(36px, 5.2vw, 80px)',
               letterSpacing: '-0.03em',
-              lineHeight: 1.0,
+              lineHeight: 0.96,
+              fontWeight: 700,
             }}
           >
             {pillar.name}.

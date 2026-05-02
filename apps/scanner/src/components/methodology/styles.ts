@@ -62,15 +62,18 @@ export const methodologyStyles = `
 
   @media (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: view()) {
+      /* Numeral lands fully crisp by the time the spread's top edge has
+         travelled 25% of the entry range. Earlier "entry 60%" left it
+         half-faded while the user was already reading the body. */
       .methodology-spread__index {
         animation: methodology-rise 1 linear both;
         animation-timeline: view();
-        animation-range: entry 0% entry 60%;
+        animation-range: entry 0% entry 25%;
       }
       .methodology-spread__body h3 {
         animation: methodology-rise 1 linear both;
         animation-timeline: view();
-        animation-range: entry 10% entry 65%;
+        animation-range: entry 5% entry 30%;
       }
       .methodology-spread__body-prose > *:nth-child(1) {
         animation: methodology-rise 1 linear both;
