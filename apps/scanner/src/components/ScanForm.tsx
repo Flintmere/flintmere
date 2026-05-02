@@ -35,7 +35,7 @@ export function ScanForm({
         Store URL
       </label>
       <div
-        className="scan-form__slab flex items-stretch bg-[color:var(--color-paper)]"
+        className="scan-form__slab flex flex-col sm:flex-row items-stretch bg-[color:var(--color-paper)]"
         style={{
           border: '2px solid var(--color-ink)',
           boxShadow: 'var(--shadow-paper-1)',
@@ -52,7 +52,7 @@ export function ScanForm({
           disabled={isSubmitting}
           aria-describedby={error ? 'scan-url-error' : undefined}
           aria-invalid={error ? 'true' : undefined}
-          className="flex-1 bg-transparent outline-none placeholder:text-[color:var(--color-mute-2)]"
+          className="flex-1 min-w-0 bg-transparent outline-none placeholder:text-[color:var(--color-mute-2)]"
           style={{
             fontFamily: 'var(--font-mono)',
             fontSize: 15,
@@ -63,10 +63,8 @@ export function ScanForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="btn btn-accent"
+          className="scan-form__submit btn btn-accent justify-center"
           style={{
-            minWidth: 184,
-            borderLeft: '2px solid var(--color-ink)',
             fontSize: 13,
             letterSpacing: '0.08em',
           }}

@@ -39,10 +39,16 @@ export function SiteFooter() {
         }}
       >
         {/* Top strip — primary nav, sentence-case comma-delimited, paper-on-
-            ink, Geist Sans 600. Sits above the wordmark chord. */}
+            ink, Geist Sans 600. Sits above the wordmark chord.
+            Mobile (<sm): the 7 destinations don't fit on one line and the
+            comma-flex wrapped awkwardly across two lines (operator caught
+            2026-05-02 on iPhone 14 Pro Max). On <sm we flow the items as a
+            2-column grid (calmer column rhythm, no orphaned comma at line
+            end) and hide the comma separators since they only read inline.
+            ≥sm restores the canonical comma-flex pattern. */}
         <nav
           aria-label="Footer primary"
-          className="flex items-baseline flex-wrap gap-x-1.5 gap-y-2"
+          className="grid grid-cols-2 gap-x-6 gap-y-3 sm:flex sm:items-baseline sm:flex-wrap sm:gap-x-1.5 sm:gap-y-2"
           style={{
             fontSize: 'clamp(13px, 1vw, 15px)',
             fontWeight: 600,
@@ -55,42 +61,42 @@ export function SiteFooter() {
           >
             Free scan
           </Link>
-          <span aria-hidden="true">,</span>
+          <span aria-hidden="true" className="hidden sm:inline">,</span>
           <Link
             href="/audit"
             className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >
             £197 audit
           </Link>
-          <span aria-hidden="true">,</span>
+          <span aria-hidden="true" className="hidden sm:inline">,</span>
           <Link
             href="/pricing"
             className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >
             Pricing
           </Link>
-          <span aria-hidden="true">,</span>
+          <span aria-hidden="true" className="hidden sm:inline">,</span>
           <Link
             href="https://standards.flintmere.com"
             className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >
             Standards
           </Link>
-          <span aria-hidden="true">,</span>
+          <span aria-hidden="true" className="hidden sm:inline">,</span>
           <Link
             href="/methodology"
             className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >
             Methodology
           </Link>
-          <span aria-hidden="true">,</span>
+          <span aria-hidden="true" className="hidden sm:inline">,</span>
           <Link
             href="/about"
             className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >
             About
           </Link>
-          <span aria-hidden="true">,</span>
+          <span aria-hidden="true" className="hidden sm:inline">,</span>
           <Link
             href="https://app.flintmere.com"
             className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"

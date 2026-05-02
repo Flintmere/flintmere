@@ -253,6 +253,22 @@
   color: var(--color-paper);
 }
 
+/* --- Scan form submit — separator hairline between input and button.
+   Below sm, the form stacks (input on top, button below): hairline on
+   the button's TOP edge. ≥sm, the form is horizontal: hairline on the
+   button's LEFT edge. The 2px stroke matches the slab border weight. */
+.scan-form__submit {
+  border-top: 2px solid var(--color-ink);
+  min-width: 0;
+}
+@media (min-width: 640px) {
+  .scan-form__submit {
+    border-top-width: 0;
+    border-left: 2px solid var(--color-ink);
+    min-width: 184px;
+  }
+}
+
 /* --- Hairline divider (the one separator Flintmere uses) --- */
 .rule {
   border: 0;

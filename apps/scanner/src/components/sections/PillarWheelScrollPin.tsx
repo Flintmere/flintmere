@@ -80,9 +80,22 @@ export function PillarWheelScrollPin({ pillars }: PillarWheelScrollPinProps) {
 
   // Drop the pin entirely on reduced-motion OR narrow viewports. Click/
   // keyboard nav still works because the controlled prop is `undefined`
-  // (passes through to internal state in PillarWheel).
+  // (passes through to internal state in PillarWheel). Mirror the desktop
+  // wrapper's padding so the spotlight panel doesn't bleed to the viewport
+  // edge on phones (operator caught 2026-05-02 — pillar prose hugged the
+  // left edge with no breathing room).
   if (reducedMotion || narrowViewport) {
-    return <PillarWheel pillars={pillars} />;
+    return (
+      <div
+        className="mx-auto w-full max-w-[1280px]"
+        style={{
+          paddingLeft: 'clamp(24px, 5vw, 64px)',
+          paddingRight: 'clamp(24px, 5vw, 64px)',
+        }}
+      >
+        <PillarWheel pillars={pillars} />
+      </div>
+    );
   }
 
   return (

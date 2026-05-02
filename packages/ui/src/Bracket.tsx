@@ -14,11 +14,16 @@
  * - default: inherits from the parent (used inline in body / headings).
  * - display: 0.8em — used inside display headings that already set the scale.
  * - micro: 11px / 0.14em tracking — used in mono captions.
- * - saks: clamp(140px, 16vw, 280px), weight 500 — Saks-Fifth-Avenue logotype-
+ * - saks: clamp(48px, 12vw, 200px), weight 700 — Saks-Fifth-Avenue logotype-
  *   scale event for hero anchors. The bracket characters become the brand
  *   mark at hero scale, not inline formatting. Use sparingly — typically once
  *   per top-level surface as the page's cover-art moment.
- *   (Added 2026-04-29 under design-extravagant skill, dispatch #2.)
+ *   (Added 2026-04-29 under design-extravagant skill, dispatch #2.
+ *    Mobile floor lowered 96→48 on 2026-05-02 — operator caught
+ *    `[ from £197 ]` on /pricing being clipped by overflow-hidden at the
+ *    96px floor on iPhone 14 Pro Max. The 12vw scale rate keeps desktop
+ *    impact — at 1280px viewport renders at 153.6px, at 1440px at 172.8px,
+ *    near the 200px ceiling on ultrawide.)
  */
 
 import * as React from 'react';
@@ -34,7 +39,7 @@ const SIZE_CLASS: Record<Required<BracketProps>['size'], string> = {
   default: 'text-[inherit]',
   display: 'text-[0.8em]', // display heading already sets the scale
   micro: 'text-[11px] tracking-[0.14em]',
-  saks: 'text-[clamp(96px,12vw,200px)] tracking-[-0.02em] leading-[1]',
+  saks: 'text-[clamp(48px,12vw,200px)] tracking-[-0.02em] leading-[1]',
 };
 
 export function Bracket({

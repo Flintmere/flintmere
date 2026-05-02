@@ -177,10 +177,7 @@ export default function Pricing() {
             Skip the wait — book the audit.
           </h2>
 
-          <div
-            className="overflow-hidden"
-            style={{ marginTop: 'clamp(40px, 5vw, 72px)' }}
-          >
+          <div style={{ marginTop: 'clamp(40px, 5vw, 72px)' }}>
             <Bracket size="saks">from £197</Bracket>
           </div>
 
