@@ -95,8 +95,8 @@ export default function Pricing() {
           <p className="eyebrow mb-10">Pricing</p>
           <h1
             id="pricing-heading"
-            className="font-medium tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)] max-w-[18ch]"
-            style={{ fontSize: 'clamp(40px, 7vw, 112px)' }}
+            className="font-sans tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)] max-w-[18ch]"
+            style={{ fontSize: 'clamp(40px, 7vw, 112px)', fontWeight: 700 }}
           >
             Pick the{' '}
             <Bracket size="saks">standard</Bracket>

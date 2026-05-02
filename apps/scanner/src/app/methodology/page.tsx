@@ -23,6 +23,7 @@ import {
   ConflictsChapter,
   LimitationsChapter,
 } from '@/components/methodology/BottomChapters';
+import { EvidenceFigure } from '@/components/methodology/EvidenceFigure';
 import { methodologyStyles } from '@/components/methodology/styles';
 
 /**
@@ -107,7 +108,7 @@ export default function Methodology() {
           <p className="eyebrow mb-10">Methodology</p>
           <h1
             id="hero-heading"
-            className="font-medium tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)] max-w-[18ch]"
+            className="font-sans tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)] max-w-[18ch]"
             style={{ fontSize: 'clamp(40px, 7.6vw, 128px)', fontWeight: 700 }}
           >
             How we compute the score and maintain the{' '}
@@ -204,6 +205,12 @@ export default function Methodology() {
           </div>
         </div>
 
+        {/* Evidence figure — "type leads, imagery proves." Two synthetic
+            catalog rows for the same product, one passing the checks and
+            one failing on Identifiers + Attributes + Titles. Anchors the
+            chapter in concrete data before the per-pillar deep dives. */}
+        <EvidenceFigure />
+
         {/* Each pillar gets its own spread. The spread component owns the
             Bloomberg-cover layout (oversized numeral + body column) plus
             the cascade-fade-in choreography on entrance. */}
@@ -232,7 +239,7 @@ export default function Methodology() {
           <p className="eyebrow mb-4">The food catalog standard</p>
           <h2
             id="standard-heading"
-            className="font-medium text-[color:var(--color-ink)] max-w-[20ch]"
+            className="font-sans font-medium text-[color:var(--color-ink)] max-w-[20ch]"
             style={{
               fontSize: 'clamp(40px, 6vw, 88px)',
               letterSpacing: '-0.03em',
@@ -240,8 +247,56 @@ export default function Methodology() {
               fontWeight: 700,
             }}
           >
-            What the standard actually is.
+            What the{' '}
+            <Bracket size="saks">standard</Bracket>
+            {' '}actually is.
           </h2>
+
+          {/* Atmospheric still-life — UK speciality food editorial register
+              (Apartamento / Aesop journal). Generated via Runware Flux Dev
+              per the per-surface operator override on imagery rule #3
+              (`memory/marketing/imagery.md`). The bracket on "standard"
+              above satisfies the bracket co-occurrence rule for photoreal
+              moments. Single image; load behind LCP on a separate render
+              pass via priority={false}. */}
+          <figure
+            style={{
+              marginTop: 'clamp(40px, 5vw, 64px)',
+              marginBottom: 0,
+            }}
+          >
+            <picture>
+              <source
+                srcSet="/marketing/methodology/standard.avif"
+                type="image/avif"
+              />
+              <img
+                src="/marketing/methodology/standard.webp"
+                alt="Editorial still life of British speciality foods on warm cream paper — a glass jar of golden honey, a wedge of aged cheddar partially wrapped in waxed paper, a sprig of fresh thyme, and a wooden spoon, lit by soft north window light."
+                width={1024}
+                height={768}
+                loading="lazy"
+                decoding="async"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  display: 'block',
+                  border: '1px solid var(--color-line)',
+                }}
+              />
+            </picture>
+            <figcaption
+              className="font-mono uppercase text-[color:var(--color-mute-2)]"
+              style={{
+                fontSize: 11,
+                letterSpacing: '0.16em',
+                marginTop: 12,
+                textAlign: 'right',
+              }}
+            >
+              Catalog data, made of physical things
+            </figcaption>
+          </figure>
 
           {/* Status row — version + target + status reads as a ledger row
               under the headline. */}

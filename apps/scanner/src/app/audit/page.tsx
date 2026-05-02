@@ -99,10 +99,11 @@ export default function Audit() {
             <h1
               id="audit-heading"
               data-reveal
-              className="font-sans font-medium tracking-[-0.04em] leading-[0.88] text-[color:var(--color-ink)]"
+              className="font-sans tracking-[-0.04em] leading-[0.88] text-[color:var(--color-ink)]"
               style={{
                 fontSize: 'clamp(56px, 8vw, 128px)',
                 maxWidth: '14ch',
+                fontWeight: 700,
                 ['--reveal-delay' as string]: `${D_HEADLINE}ms`,
               }}
             >
