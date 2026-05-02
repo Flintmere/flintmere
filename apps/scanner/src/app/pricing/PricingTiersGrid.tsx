@@ -58,8 +58,40 @@ function FoodTierGrid() {
       aria-label="Food recurring tiers"
       className="bg-[color:var(--color-paper)]"
     >
-      <div className="mx-auto max-w-[1280px] px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div
+        className="mx-auto max-w-[1280px]"
+        style={{
+          paddingLeft: 'clamp(24px, 4vw, 64px)',
+          paddingRight: 'clamp(24px, 4vw, 64px)',
+          paddingTop: 'clamp(48px, 6vw, 96px)',
+          paddingBottom: 'clamp(64px, 8vw, 112px)',
+        }}
+      >
+        {/* Calibrating-frame header — anchors the empty price slots in
+            calendar time. The "Calibrating" word in MagnitudesPendingCard
+            reads against this frame, not as null. */}
+        <p className="eyebrow mb-4">Recurring · Calibrating May–June 2026</p>
+        <h2
+          className="font-medium tracking-[-0.03em] leading-[1.1] text-[color:var(--color-ink)] max-w-[28ch]"
+          style={{ fontSize: 'clamp(26px, 3.2vw, 38px)' }}
+        >
+          Or subscribe — pick the distribution mode.
+        </h2>
+        <p
+          className="text-[color:var(--color-ink-2)] max-w-[64ch]"
+          style={{
+            marginTop: 'clamp(16px, 2vw, 24px)',
+            fontSize: 16,
+            lineHeight: 1.7,
+          }}
+        >
+          We&rsquo;re calibrating sign-up prices with food merchants this May and June. Tiers below show the shape; magnitudes land once the WTP study closes. Existing subscribers stay grandfathered.
+        </p>
+
+        <div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          style={{ marginTop: 'clamp(40px, 5vw, 64px)' }}
+        >
           <FreeCard tier={free} />
           <MagnitudesPendingCard tier={foodSingle} mailtoSubject="Flintmere food single — waitlist" />
           <MagnitudesPendingCard tier={foodAgency} mailtoSubject="Flintmere food agency — waitlist" />
@@ -77,33 +109,40 @@ function NonFoodMessage({ vertical }: { vertical: PricingVerticalId }) {
   return (
     <section
       aria-label={`${content.label} pricing`}
+      aria-labelledby={`vertical-${vertical}-headline`}
       className="bg-[color:var(--color-paper)]"
     >
-      <div className="mx-auto max-w-[1280px] px-8 py-16">
-      <article
-        className="border border-[color:var(--color-line)] bg-[color:var(--color-paper)] p-12 md:p-16"
-        aria-labelledby={`vertical-${vertical}-headline`}
+      <div
+        className="mx-auto max-w-[1280px]"
+        style={{
+          paddingLeft: 'clamp(24px, 4vw, 64px)',
+          paddingRight: 'clamp(24px, 4vw, 64px)',
+          paddingTop: 'clamp(64px, 8vw, 128px)',
+          paddingBottom: 'clamp(64px, 8vw, 128px)',
+        }}
       >
-        <p className="eyebrow mb-4">{content.eyebrow}</p>
+        <p className="eyebrow mb-6">{content.eyebrow}</p>
         <h2
           id={`vertical-${vertical}-headline`}
-          className="max-w-[28ch]"
-          style={{
-            fontSize: 'clamp(28px, 4vw, 40px)',
-            letterSpacing: '-0.025em',
-            lineHeight: 1.1,
-            fontWeight: 500,
-          }}
+          className="font-medium tracking-[-0.035em] leading-[1.0] text-[color:var(--color-ink)] max-w-[20ch]"
+          style={{ fontSize: 'clamp(40px, 6vw, 88px)' }}
         >
           {content.headline}
         </h2>
         <p
-          className="mt-6 max-w-[60ch] text-[color:var(--color-ink-2)]"
-          style={{ fontSize: 16, lineHeight: 1.55 }}
+          className="text-[color:var(--color-ink-2)] max-w-[62ch]"
+          style={{
+            marginTop: 'clamp(32px, 4vw, 56px)',
+            fontSize: 'clamp(15px, 1.1vw, 17px)',
+            lineHeight: 1.7,
+          }}
         >
           {content.body}
         </p>
-        <div className="mt-8 flex flex-col sm:flex-row gap-4">
+        <div
+          className="flex flex-col sm:flex-row gap-4"
+          style={{ marginTop: 'clamp(32px, 4vw, 56px)' }}
+        >
           <Link href={content.primaryCta.href} className="btn btn-accent whitespace-nowrap">
             {content.primaryCta.label}
           </Link>
@@ -111,7 +150,6 @@ function NonFoodMessage({ vertical }: { vertical: PricingVerticalId }) {
             {content.secondaryCta.label}
           </Link>
         </div>
-      </article>
       </div>
     </section>
   );
