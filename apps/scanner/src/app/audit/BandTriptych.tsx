@@ -232,11 +232,11 @@ function BandColumn({
         aria-hidden="true"
         className={
           isSelected
-            ? 'band-chord-numeral band-chord-numeral--selected'
-            : 'band-chord-numeral band-chord-numeral--recessive'
+            ? 'band-chord-numeral band-chord-numeral--selected bracket-inline'
+            : 'band-chord-numeral band-chord-numeral--recessive bracket-inline'
         }
       >
-        [&nbsp;{chordText}&nbsp;]
+        {chordText}
       </span>
 
       {/* Sage under-tick — selected only. AnimatePresence + layout

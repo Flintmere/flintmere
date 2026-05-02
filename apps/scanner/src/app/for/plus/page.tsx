@@ -198,6 +198,7 @@ function MistakeRow({ mistake }: { mistake: Mistake }) {
     <li className="grid grid-cols-[80px_1fr_200px] gap-8 py-9 items-start max-md:grid-cols-1 max-md:gap-4">
       <span
         aria-hidden="true"
+        className="bracket-inline"
         style={{
           fontSize: 40,
           fontWeight: 500,
@@ -205,7 +206,7 @@ function MistakeRow({ mistake }: { mistake: Mistake }) {
           lineHeight: 1,
         }}
       >
-        [&nbsp;{mistake.n}&nbsp;]
+        {mistake.n}
       </span>
       <div>
         <h3

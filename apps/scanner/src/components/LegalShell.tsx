@@ -69,6 +69,7 @@ export function Clause({ n, heading, children }: ClauseProps) {
     <section className="grid md:grid-cols-[96px_1fr] gap-6 py-10 border-t border-[color:var(--color-line-soft)] first:border-t-0">
       <p
         aria-hidden="true"
+        className="bracket-inline"
         style={{
           fontFamily: 'var(--font-mono)',
           fontSize: 14,
@@ -77,7 +78,7 @@ export function Clause({ n, heading, children }: ClauseProps) {
           color: 'var(--color-mute)',
         }}
       >
-        [&nbsp;{n}&nbsp;]
+        {n}
       </p>
       <div>
         <h2

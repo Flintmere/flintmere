@@ -48,8 +48,12 @@ export function Bracket({
   if (interactive) {
     return (
       <>
-        <span aria-hidden="true" className={`bracket-char ${sizeClass} ${className}`}>
-          [&nbsp;
+        <span
+          aria-hidden="true"
+          className={`bracket-char ${sizeClass} ${className}`}
+          style={{ marginRight: '0.16em' }}
+        >
+          [
         </span>
         <span
           className={`${sizeClass} ${className}`}
@@ -57,8 +61,12 @@ export function Bracket({
         >
           {children}
         </span>
-        <span aria-hidden="true" className={`bracket-char ${sizeClass} ${className}`}>
-          &nbsp;]
+        <span
+          aria-hidden="true"
+          className={`bracket-char ${sizeClass} ${className}`}
+          style={{ marginLeft: '0.16em' }}
+        >
+          ]
         </span>
       </>
     );

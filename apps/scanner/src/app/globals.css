@@ -146,7 +146,15 @@
   }
 }
 
-/* --- Signature primitive: the legibility bracket --- */
+/* --- Signature primitive: the legibility bracket ---
+   Bracket-spacing rule (operator binding, 2026-05-02): brackets sit *close*
+   to the bracketed word. The earlier inline-space rendering ('[ ' + ' ]')
+   produced a font-rendered space that scaled with font-size — at Saks scale
+   (clamp 96–200px) the brackets read as orphaned punctuation 100–200px from
+   the word. Replaced with a deterministic em-margin (0.16em) so the gap is
+   visually consistent across all sizes (default body, micro 11px, display
+   0.8em, saks clamp 96–200px). Brackets read as part of the word, not as
+   surrounding punctuation. */
 .bracket {
   font-family: var(--font-mono);
   font-weight: 700;
@@ -162,11 +170,36 @@
 }
 
 .bracket::before {
-  content: '[ ';
+  content: '[';
+  margin-right: 0.16em;
 }
 
 .bracket::after {
-  content: ' ]';
+  content: ']';
+  margin-left: 0.16em;
+}
+
+/* --- Bracket-inline utility ---
+   Bespoke bracket renders (numerals, identifiers) that need the canon
+   bracket-spacing rule (0.16em em-margin between bracket character and
+   bracketed content) but DON'T want the .bracket primitive's mono-700
+   font override. Apply to a span wrapping the bracketed content; the
+   pseudo-elements add the brackets at the parent's font/weight. */
+.bracket-inline::before,
+.bracket-inline::after {
+  display: inline-block;
+  font-weight: inherit;
+  color: inherit;
+}
+
+.bracket-inline::before {
+  content: '[';
+  margin-right: 0.16em;
+}
+
+.bracket-inline::after {
+  content: ']';
+  margin-left: 0.16em;
 }
 
 /* --- Eyebrow (micro uppercase mono) --- */
