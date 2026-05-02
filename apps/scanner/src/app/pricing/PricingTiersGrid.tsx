@@ -56,13 +56,15 @@ function FoodTierGrid() {
   return (
     <section
       aria-label="Food recurring tiers"
-      className="mx-auto max-w-[1280px] px-8 py-16"
+      className="bg-[color:var(--color-paper)]"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <FreeCard tier={free} />
-        <MagnitudesPendingCard tier={foodSingle} mailtoSubject="Flintmere food single — waitlist" />
-        <MagnitudesPendingCard tier={foodAgency} mailtoSubject="Flintmere food agency — waitlist" />
-        <PlusAnchorCard tier={plus} />
+      <div className="mx-auto max-w-[1280px] px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <FreeCard tier={free} />
+          <MagnitudesPendingCard tier={foodSingle} mailtoSubject="Flintmere food single — waitlist" />
+          <MagnitudesPendingCard tier={foodAgency} mailtoSubject="Flintmere food agency — waitlist" />
+          <PlusAnchorCard tier={plus} />
+        </div>
       </div>
     </section>
   );
@@ -75,8 +77,9 @@ function NonFoodMessage({ vertical }: { vertical: PricingVerticalId }) {
   return (
     <section
       aria-label={`${content.label} pricing`}
-      className="mx-auto max-w-[1280px] px-8 py-16"
+      className="bg-[color:var(--color-paper)]"
     >
+      <div className="mx-auto max-w-[1280px] px-8 py-16">
       <article
         className="border border-[color:var(--color-line)] bg-[color:var(--color-paper)] p-12 md:p-16"
         aria-labelledby={`vertical-${vertical}-headline`}
@@ -109,6 +112,7 @@ function NonFoodMessage({ vertical }: { vertical: PricingVerticalId }) {
           </Link>
         </div>
       </article>
+      </div>
     </section>
   );
 }

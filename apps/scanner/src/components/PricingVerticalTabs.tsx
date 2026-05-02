@@ -31,8 +31,8 @@ export function PricingVerticalTabs() {
   return (
     <section
       aria-label="Pick a vertical"
-      className="mx-auto max-w-[1280px] px-8 py-12 border-y border-[color:var(--color-line)]"
-    >
+      className="bg-[color:var(--color-paper)] border-y border-[color:var(--color-line)]"
+    ><div className="mx-auto max-w-[1280px] px-8 py-12">
       <p className="eyebrow mb-6">Vertical</p>
       <VerticalRadiogroup
         verticals={PRICING_VERTICALS}
@@ -48,6 +48,7 @@ export function PricingVerticalTabs() {
       >
         {VERTICAL_LIVE_LABEL[selected]}
       </p>
+      </div>
     </section>
   );
 }
