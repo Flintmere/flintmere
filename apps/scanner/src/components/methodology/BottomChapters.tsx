@@ -165,10 +165,14 @@ export function ChallengeManifesto() {
           }}
         >
           If we got your score{' '}
-          <span className="font-mono inline-block bracket-inline">
-            <span aria-hidden="true" style={{ color: 'var(--color-accent)', fontWeight: 600 }}>[</span>
-            <span style={{ color: 'var(--color-accent)', fontWeight: 600 }}>wrong</span>
-            <span aria-hidden="true" style={{ color: 'var(--color-accent)', fontWeight: 600 }}>]</span>
+          {/* `.bracket-inline` provides the [ ] glyphs as ::before/::after
+              per the canonical bracket-spacing utility (0.16em em-margin).
+              Don't render literal brackets here — that produced the
+              double-bracket bug operator caught 2026-05-02. */}
+          <span
+            className="font-mono inline-block bracket-inline methodology-curtain__anchor"
+          >
+            wrong
           </span>
           .
         </h2>

@@ -128,6 +128,19 @@ export const methodologyStyles = `
     }
   }
 
+  /* Manifesto anchor — the [ wrong ] inline bracket on the ink-slab
+     curtain. Both the bracket glyphs (rendered by .bracket-inline's
+     ::before/::after) and the inner word use amber on the dark ground;
+     the ink-slab inversion makes amber-on-ink a high-contrast hit per
+     the outline-shimmer canon (saved memory feedback_outline_shimmer_canon
+     + tokens.md §Signature). */
+  .methodology-curtain__anchor,
+  .methodology-curtain__anchor::before,
+  .methodology-curtain__anchor::after {
+    color: var(--color-accent) !important;
+    font-weight: 600;
+  }
+
   /* Sources link — arrow nudges right on hover, underline thickens to
      amber. The row gets a soft amber wash on hover so the eye can track
      down the citation table without scanning. */
