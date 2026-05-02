@@ -335,42 +335,49 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* FAQ — full-bleed paper section; max-width lives on the inner div so
+          the background seals the gutter. Same pattern as "Existing subscribers"
+          above; without this the page-level ink shows through on the sides. */}
       <section
         aria-label="Frequently asked questions"
-        className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-20 border-t border-[color:var(--color-line)]"
+        className="bg-[color:var(--color-paper)] border-t border-[color:var(--color-line)]"
       >
-        <p className="eyebrow mb-8">Frequently asked</p>
-        <ul className="list-none p-0 m-0 border-y border-[color:var(--color-line)]">
-          {FAQS.map((item) => (
-            <li
-              key={item.q}
-              className="grid md:grid-cols-[280px_1fr] gap-6 py-8 border-t border-[color:var(--color-line-soft)] first:border-t-0"
-            >
-              <p style={{ fontSize: 18, letterSpacing: '-0.01em' }}>{item.q}</p>
-              <p
-                className="text-[color:var(--color-ink-2)]"
-                style={{ fontSize: 15, lineHeight: 1.55 }}
+        <div className="mx-auto max-w-[1280px] px-8 py-20">
+          <p className="eyebrow mb-8">Frequently asked</p>
+          <ul className="list-none p-0 m-0 border-y border-[color:var(--color-line)]">
+            {FAQS.map((item) => (
+              <li
+                key={item.q}
+                className="grid md:grid-cols-[280px_1fr] gap-6 py-8 border-t border-[color:var(--color-line-soft)] first:border-t-0"
               >
-                {item.a}
-              </p>
-            </li>
-          ))}
-        </ul>
+                <p style={{ fontSize: 18, letterSpacing: '-0.01em' }}>{item.q}</p>
+                <p
+                  className="text-[color:var(--color-ink-2)]"
+                  style={{ fontSize: 15, lineHeight: 1.55 }}
+                >
+                  {item.a}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       {/* GTIN / VAT / Shopify-revenue-share disclaimer — canonical wording per
-          claims-register.md §GTIN non-affiliation + BUSINESS.md §VAT framing. */}
+          claims-register.md §GTIN non-affiliation + BUSINESS.md §VAT framing.
+          Same full-bleed seal pattern as the FAQ above. */}
       <section
         aria-label="Disclaimers"
-        className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-12 border-t border-[color:var(--color-line)]"
+        className="bg-[color:var(--color-paper)] border-t border-[color:var(--color-line)]"
       >
-        <p
-          className="text-[color:var(--color-mute)]"
-          style={{ fontSize: 12, lineHeight: 1.55, maxWidth: '80ch' }}
-        >
-          Flintmere is not affiliated with GS1. Identifier requirements vary by marketplace and jurisdiction. GS1 fees are separate. Eazy Access Ltd is not VAT-registered, so prices shown are the full price &mdash; no VAT is added. Shopify&rsquo;s revenue share and Stripe processing fees are absorbed by us, not passed on.
-        </p>
+        <div className="mx-auto max-w-[1280px] px-8 py-12">
+          <p
+            className="text-[color:var(--color-mute)]"
+            style={{ fontSize: 12, lineHeight: 1.55, maxWidth: '80ch' }}
+          >
+            Flintmere is not affiliated with GS1. Identifier requirements vary by marketplace and jurisdiction. GS1 fees are separate. Eazy Access Ltd is not VAT-registered, so prices shown are the full price &mdash; no VAT is added. Shopify&rsquo;s revenue share and Stripe processing fees are absorbed by us, not passed on.
+          </p>
+        </div>
       </section>
 
       <SiteFooter />
