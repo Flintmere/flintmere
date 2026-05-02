@@ -15,7 +15,9 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "benchmark:compile": "tsx scripts/compile-store-list.ts",
-    "benchmark:scan": "tsx scripts/batch-scan.ts"
+    "benchmark:scan": "tsx scripts/batch-scan.ts",
+    "cohort:design-partners": "tsx scripts/export-design-partner-cohort.ts",
+    "cohort:diagnose": "tsx scripts/cohort-funnel-diagnose.ts"
   },
   "dependencies": {
     "@flintmere/scoring": "workspace:*",

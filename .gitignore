@@ -91,3 +91,7 @@ tmp/
 data/benchmark/*
 !data/benchmark/README.md
 !data/benchmark/candidates.example.csv
+
+# Recruitment cohort exports — contain merchant emails (PII)
+data/recruitment/*
+!data/recruitment/README.md
