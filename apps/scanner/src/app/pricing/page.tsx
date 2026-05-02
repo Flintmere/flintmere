@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { SiteFooter } from '@flintmere/ui';
+import { Bracket, SiteFooter } from '@flintmere/ui';
 import { PricingVerticalTabs } from '@/components/PricingVerticalTabs';
 import { PricingTiersGrid } from './PricingTiersGrid';
+import { AUDIT_BANDS } from '@/lib/audit-pricing';
 
 export const metadata: Metadata = {
   title: 'Pricing',
@@ -46,31 +47,75 @@ const FAQS = [
   },
 ];
 
+function conciergeBandsProse(): string {
+  const lines = AUDIT_BANDS.map((b) => {
+    if (b.isBespoke) {
+      const price = b.priceDisplay.match(/£[\d,]+/)?.[0] ?? '£597';
+      return `from ${price} bespoke (${b.skuLowerBound.toLocaleString()}+)`;
+    }
+    const upper = b.skuUpperBound?.toLocaleString();
+    const lower = b.skuLowerBound > 0 ? b.skuLowerBound.toLocaleString() : null;
+    const range = lower ? `${lower}–${upper}` : `≤${upper}`;
+    return `${b.priceDisplay} (${range})`;
+  });
+  return `Three SKU bands — ${lines.join(', ')}.`;
+}
+
 export default function Pricing() {
   return (
     <main id="main" className="flintmere-main">
-      {/* Hero — bracket-1 on `[ standard ]` (structural noun, ADR 0018). */}
-      <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-24">
-        <p className="eyebrow mb-6">Pricing</p>
-        <h1 className="max-w-[24ch]">
-          Pick the{' '}
-          <span
-            className="font-mono"
+      {/* Hero — Saks chord on `[ standard ]` (extravagant-mode rebuild
+          2026-05-02). The bracket is the page's brand-mark, not inline
+          punctuation. Amber-radial atmosphere blooms behind it per ADR
+          0021 §3. */}
+      <section
+        aria-labelledby="pricing-heading"
+        className="relative isolate overflow-hidden bg-[color:var(--color-paper)]"
+      >
+        <div
+          aria-hidden="true"
+          className="absolute pointer-events-none"
+          style={{
+            inset: 0,
+            background: 'var(--gradient-amber-radial)',
+            transform: 'translate(0, -10%) scale(1.15)',
+            opacity: 0.85,
+          }}
+        />
+
+        <div
+          className="relative mx-auto max-w-[1280px]"
+          style={{
+            paddingLeft: 'clamp(24px, 4vw, 64px)',
+            paddingRight: 'clamp(24px, 4vw, 64px)',
+            paddingTop: 'clamp(72px, 9vw, 128px)',
+            paddingBottom: 'clamp(48px, 6vw, 96px)',
+          }}
+        >
+          <p className="eyebrow mb-10">Pricing</p>
+          <h1
+            id="pricing-heading"
+            className="font-medium tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)] max-w-[18ch]"
+            style={{ fontSize: 'clamp(40px, 7vw, 112px)' }}
+          >
+            Pick the{' '}
+            <Bracket size="saks">standard</Bracket>
+            {' '}your catalog needs. We maintain it.
+          </h1>
+          <p
+            className="font-sans"
             style={{
-              fontWeight: 700,
-              letterSpacing: '-0.005em',
+              marginTop: 'clamp(32px, 4vw, 56px)',
+              maxWidth: '58ch',
+              fontSize: 'clamp(15px, 1.1vw, 17px)',
+              lineHeight: 1.55,
+              fontWeight: 400,
+              color: 'var(--color-mute)',
             }}
           >
-            [&nbsp;standard&nbsp;]
-          </span>{' '}
-          your catalog needs. We maintain it.
-        </h1>
-        <p
-          className="mt-8 max-w-[58ch] text-[color:var(--color-ink-2)]"
-          style={{ fontSize: 17, lineHeight: 1.55 }}
-        >
-          The vertical standard licensed sets the axis. Distribution mode sets the multiplier. Forward pricing finalising May–June 2026 — existing customers grandfathered at original prices.
-        </p>
+            The vertical standard licensed sets the axis. Distribution mode sets the multiplier. Forward pricing finalising May–June 2026 — existing customers grandfathered at original prices.
+          </p>
+        </div>
       </section>
 
       {/* Vertical selector — URL state (?vertical=food|beauty|apparel|bundle).
@@ -80,62 +125,184 @@ export default function Pricing() {
         <PricingVerticalTabs />
       </Suspense>
 
-      {/* Tier cards grid — vertical-aware. Food = 5-card grid (Free / Food
-          single / Food agency / Concierge audit (bracket-2) / Plus).
-          Beauty / Apparel / Bundle = single-message card. */}
+      {/* Tier cards grid — vertical-aware. Food = 4-card recurring grid
+          (Free / Food single / Food agency / Plus). Concierge audit pulled
+          out into its own anchor section below. Beauty / Apparel / Bundle
+          render single-message cards. */}
       <Suspense fallback={null}>
         <PricingTiersGrid />
       </Suspense>
 
-      {/* "We maintain it" claim block — load-bearing per ADR 0018 + ADR 0019.
-          Link target is a notify-me mailto until standards.flintmere.com
-          publishes (Phase 4). Re-targets on lift via separate claim-review. */}
+      {/* Concierge audit anchor — extravagant-mode rebuild 2026-05-02.
+          Was 1-of-5 cards in the tier grid; now its own full-width anchor
+          with `[ from £197 ]` Saks chord on paper-2 wash. Bracket budget:
+          this section's 1 active anchor (per ADR 0021 §4 amendment 2026-05-02). */}
+      <section
+        aria-label="Concierge audit"
+        className="relative isolate overflow-hidden bg-[color:var(--color-paper-2)] border-y border-[color:var(--color-line)]"
+      >
+        <div
+          aria-hidden="true"
+          className="absolute pointer-events-none"
+          style={{
+            inset: 0,
+            background: 'var(--gradient-amber-radial)',
+            transform: 'translate(0, 10%) scale(1.1)',
+            opacity: 0.6,
+          }}
+        />
+
+        <div
+          className="relative mx-auto max-w-[1280px]"
+          style={{
+            paddingLeft: 'clamp(24px, 4vw, 64px)',
+            paddingRight: 'clamp(24px, 4vw, 64px)',
+            paddingTop: 'clamp(72px, 9vw, 128px)',
+            paddingBottom: 'clamp(72px, 9vw, 128px)',
+          }}
+        >
+          <p className="eyebrow mb-6">Concierge audit · One-off</p>
+          <h2
+            className="font-medium tracking-[-0.03em] leading-[1.05] text-[color:var(--color-ink)] max-w-[22ch]"
+            style={{ fontSize: 'clamp(32px, 4.5vw, 56px)' }}
+          >
+            The audit lands first — letter, fix plan, re-scan.
+          </h2>
+
+          <div
+            className="overflow-hidden"
+            style={{ marginTop: 'clamp(40px, 5vw, 72px)' }}
+          >
+            <Bracket size="saks">from £197</Bracket>
+          </div>
+
+          <p
+            className="text-[color:var(--color-ink-2)]"
+            style={{
+              marginTop: 'clamp(32px, 4vw, 48px)',
+              maxWidth: '60ch',
+              fontSize: 17,
+              lineHeight: 1.55,
+            }}
+          >
+            {conciergeBandsProse()} Written audit letter, per-product fix CSV, 30-day plan, 30-day re-scan. Delivered in three working days.
+          </p>
+
+          <div
+            className="flex flex-col sm:flex-row gap-4"
+            style={{ marginTop: 'clamp(32px, 4vw, 48px)' }}
+          >
+            <Link href="/audit" className="btn btn-accent whitespace-nowrap">
+              Book the audit →
+            </Link>
+            <Link href="/audit#bands" className="btn whitespace-nowrap">
+              See the bands →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* "We maintain it" — ink-slab variant per ADR 0021 §7 (extravagant-mode
+          rebuild 2026-05-02). Display-700 h2 at clamp(48–96px) per axis 6
+          ("weight 700 permitted at display scale ≥80px"). Sage hairline
+          accent below the eyebrow per axis 1. Load-bearing per ADR 0018
+          + ADR 0019. */}
       <section
         aria-label="What we maintain"
-        className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-20 border-t border-[color:var(--color-line)]"
+        className="bg-[color:var(--color-ink)] text-[color:var(--color-paper-on-ink)]"
       >
-        <div className="grid lg:grid-cols-[1.4fr_1fr] gap-12 items-start">
+        <div
+          className="mx-auto max-w-[1280px] grid lg:grid-cols-[1.4fr_1fr] gap-12 items-start"
+          style={{
+            paddingLeft: 'clamp(24px, 4vw, 64px)',
+            paddingRight: 'clamp(24px, 4vw, 64px)',
+            paddingTop: 'clamp(80px, 10vw, 144px)',
+            paddingBottom: 'clamp(80px, 10vw, 144px)',
+          }}
+        >
           <div>
-            <p className="eyebrow mb-4">What &lsquo;we maintain&rsquo; means</p>
-            <h2
-              className="max-w-[26ch]"
+            <p
+              className="eyebrow"
               style={{
-                fontSize: 'clamp(28px, 3.4vw, 36px)',
-                fontWeight: 500,
-                letterSpacing: '-0.02em',
-                lineHeight: 1.15,
+                color: 'var(--color-paper-on-ink)',
+                opacity: 0.65,
+                marginBottom: 16,
+              }}
+            >
+              What &lsquo;we maintain&rsquo; means
+            </p>
+
+            <div
+              aria-hidden="true"
+              style={{
+                width: 'clamp(48px, 5vw, 80px)',
+                height: 2,
+                background: 'var(--color-accent-sage)',
+                marginBottom: 24,
+                opacity: 0.9,
+              }}
+            />
+
+            <h2
+              className="max-w-[18ch]"
+              style={{
+                fontSize: 'clamp(48px, 7vw, 96px)',
+                fontWeight: 700,
+                letterSpacing: '-0.03em',
+                lineHeight: 1.02,
               }}
             >
               Half-yearly publication. Public diff log between.
             </h2>
             <p
-              className="mt-6 max-w-[58ch] text-[color:var(--color-ink-2)]"
-              style={{ fontSize: 16, lineHeight: 1.55 }}
+              className="mt-8"
+              style={{
+                fontSize: 'clamp(15px, 1.1vw, 17px)',
+                lineHeight: 1.55,
+                maxWidth: '58ch',
+                opacity: 0.85,
+              }}
             >
               Half-yearly publication of the food catalog standard, with a public diff log of every regulatory change between publications. Every regulatory citation links to the primary regulator URL. Maintained by Flintmere Regulatory Affairs.
             </p>
             <p
-              className="mt-3 max-w-[58ch] text-[color:var(--color-ink-2)]"
-              style={{ fontSize: 16, lineHeight: 1.55 }}
+              className="mt-3"
+              style={{
+                fontSize: 'clamp(15px, 1.1vw, 17px)',
+                lineHeight: 1.55,
+                maxWidth: '58ch',
+                opacity: 0.7,
+              }}
             >
               The standard publishes at standards.flintmere.com/food/v1 — subdomain provisioned, v1 publication follows.
             </p>
           </div>
-          <div className="lg:pt-12">
+          <div className="lg:pt-16">
             <p>
               <Link
                 href="mailto:hello@flintmere.com?subject=Flintmere%20food%20standard%20%E2%80%94%20notify%20me%20on%20publication"
                 className="underline"
-                style={{ fontSize: 16, fontWeight: 500 }}
+                style={{
+                  fontSize: 16,
+                  fontWeight: 500,
+                  color: 'var(--color-paper-on-ink)',
+                  textDecorationColor: 'var(--color-accent)',
+                  textUnderlineOffset: 4,
+                }}
               >
                 Notify me when the food standard publishes →
               </Link>
             </p>
-            <p className="mt-3">
+            <p className="mt-4">
               <Link
                 href="/about"
-                className="text-[color:var(--color-mute)] underline"
-                style={{ fontSize: 14 }}
+                className="underline"
+                style={{
+                  fontSize: 14,
+                  color: 'var(--color-paper-on-ink)',
+                  opacity: 0.7,
+                  textUnderlineOffset: 4,
+                }}
               >
                 Read why this is a public standard →
               </Link>
@@ -147,7 +314,7 @@ export default function Pricing() {
       {/* Grandfathered customer disclosure — calm, fairness commitment. */}
       <section
         aria-label="Grandfathered customers"
-        className="bg-[color:var(--color-paper-2)] border-y border-[color:var(--color-line)]"
+        className="bg-[color:var(--color-paper-2)] border-b border-[color:var(--color-line)]"
       >
         <div className="mx-auto max-w-[1280px] px-8 py-12">
           <p className="eyebrow mb-4">Existing subscribers</p>
