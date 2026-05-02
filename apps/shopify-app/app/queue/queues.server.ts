@@ -6,9 +6,17 @@ import {
   type ApplyFixJob,
   type DriftRescoreJob,
   type EnrichBatchJob,
+  type GdprDsarAlertJob,
+  type GdprJob,
+  type GdprShopPurgeJob,
   type ScoreCatalogJob,
   type SyncCatalogJob,
 } from './types';
+
+// 30-day DSAR / redact / purge clock — Shopify Partner-Program contract
+// and the GDPR right-to-erasure window. Lives here because both the
+// webhook handlers and the purge worker reference it.
+export const GDPR_DEADLINE_MS = 30 * 24 * 60 * 60 * 1000;
 
 const connection = () => getRedis();
 
@@ -73,6 +81,20 @@ export const alertsQueue = new Queue<AlertJob>(QUEUE_NAMES.alerts, {
   },
 });
 
+// GDPR queue — DSAR alert jobs run immediately, purge jobs run with a
+// 30-day delay. Retain completed jobs longer than other queues for audit;
+// failures are kept indefinitely (manual-review) by capping attempts low
+// and leaving `removeOnFail` unset so we never drop one silently.
+export const gdprQueue = new Queue<GdprJob>(QUEUE_NAMES.gdpr, {
+  connection: connection(),
+  defaultJobOptions: {
+    attempts: 5,
+    backoff: { type: 'exponential', delay: 30_000 },
+    removeOnComplete: { age: 86_400 * 30, count: 1000 },
+    // intentionally no removeOnFail — failed GDPR jobs require operator triage.
+  },
+});
+
 /**
  * Queue-events subscribers for telemetry — optional, attach in worker process.
  */
@@ -130,5 +152,24 @@ export async function enqueueScore(job: ScoreCatalogJob) {
 export async function enqueueFixTier1(job: ApplyFixJob) {
   return fixTier1Queue.add(`fix-${job.op}`, job, {
     jobId: `fix:${job.op}:${job.fixId}`,
+  });
+}
+
+export async function enqueueGdprDsarAlert(job: GdprDsarAlertJob) {
+  // jobId keyed on the gdprEventId so webhook retries (Shopify will re-deliver
+  // until we 200) don't fan out to multiple operator alerts.
+  return gdprQueue.add('gdpr-dsar-alert', job, {
+    jobId: `gdpr-dsar:${job.gdprEventId}`,
+  });
+}
+
+export async function enqueueGdprShopPurge(
+  job: GdprShopPurgeJob,
+  options: { delayMs?: number } = {},
+) {
+  const delay = options.delayMs ?? GDPR_DEADLINE_MS;
+  return gdprQueue.add('gdpr-shop-purge', job, {
+    jobId: `gdpr-purge:${job.shopDomain}`,
+    delay,
   });
 }

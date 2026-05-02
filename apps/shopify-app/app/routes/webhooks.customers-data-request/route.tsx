@@ -1,5 +1,10 @@
 import type { ActionFunctionArgs } from '@remix-run/node';
 import { authenticate } from '../../shopify.server';
+import { prisma } from '../../db.server';
+import {
+  GDPR_DEADLINE_MS,
+  enqueueGdprDsarAlert,
+} from '../../queue/queues.server';
 
 /**
  * GDPR mandatory webhook: customers/data_request.
@@ -7,7 +12,8 @@ import { authenticate } from '../../shopify.server';
  * See memory/compliance-risk/incident-disclosure.md + memory/product-engineering/security-posture.md.
  *
  * Flintmere does not store end-buyer PII; the response is typically "we do not hold data for this customer."
- * Operator is notified to confirm and reply within the window.
+ * The audit row + queued operator alert give us the durable proof we received the request and acted on it
+ * within the 30-day window.
  */
 export async function action({ request }: ActionFunctionArgs) {
   const { topic, shop, payload } = await authenticate.webhook(request);
@@ -16,11 +22,26 @@ export async function action({ request }: ActionFunctionArgs) {
     return new Response('wrong topic', { status: 400 });
   }
 
-  // Log the request. Operator handles the 30-day response window.
-  // eslint-disable-next-line no-console
-  console.info('[gdpr] customers/data_request', { shop, payload });
+  const receivedAt = new Date();
+  const deadlineAt = new Date(receivedAt.getTime() + GDPR_DEADLINE_MS);
 
-  // TODO(admin-ops): enqueue notification to operator with 30-day deadline.
+  const event = await prisma.gdprEvent.create({
+    data: {
+      shopDomain: shop,
+      topic: 'CUSTOMERS_DATA_REQUEST',
+      payload: payload as object,
+      receivedAt,
+      deadlineAt,
+    },
+  });
+
+  await enqueueGdprDsarAlert({
+    kind: 'dsar-alert',
+    gdprEventId: event.id,
+    shopDomain: shop,
+    topic: 'CUSTOMERS_DATA_REQUEST',
+    deadlineAt: deadlineAt.toISOString(),
+  });
 
   return new Response();
 }

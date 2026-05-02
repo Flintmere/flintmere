@@ -60,6 +60,11 @@ model Shop {
   weeklyDigestEnabled    Boolean   @default(false) @map("weekly_digest_enabled")
   driftAlertsEnabled     Boolean   @default(false) @map("drift_alerts_enabled")
   autoApplyTier1Enabled  Boolean   @default(false) @map("auto_apply_tier1_enabled")
+  // Set when APP_UNINSTALLED enqueues a 30-day data-purge job. Visible to
+  // operators to confirm scheduled erasure ahead of the deadline. Cleared
+  // on reinstall.
+  purgeScheduledAt       DateTime? @map("purge_scheduled_at")
+  purgeCompletedAt       DateTime? @map("purge_completed_at")
 
   products  Product[]
   scores    Score[]
@@ -185,6 +190,32 @@ model WebhookEvent {
   @@index([topic])
   @@index([receivedAt])
   @@map("app_webhook_events")
+}
+
+// ---- GDPR audit trail ----
+// Append-only record of every GDPR-bearing webhook receipt and the
+// downstream durable jobs we scheduled in response. Operator queries this
+// to prove the 30-day DSAR / redact response window was met. Never
+// overwritten — `respondedAt` is set when the operator marks the case
+// closed, but the row stays.
+
+model GdprEvent {
+  id              String    @id @default(cuid())
+  shopDomain      String    @map("shop_domain")
+  topic           String    // CUSTOMERS_DATA_REQUEST | CUSTOMERS_REDACT | SHOP_REDACT | APP_UNINSTALLED
+  shopifyEventId  String?   @map("shopify_event_id")
+  payload         Json
+  receivedAt      DateTime  @default(now()) @map("received_at")
+  deadlineAt      DateTime? @map("deadline_at")     // 30 days from receipt for DSAR + redact
+  jobId           String?   @map("job_id")          // BullMQ job id of the scheduled action
+  respondedAt     DateTime? @map("responded_at")    // operator marks closed
+  notes           String?
+
+  @@index([shopDomain])
+  @@index([topic])
+  @@index([deadlineAt])
+  @@index([receivedAt])
+  @@map("app_gdpr_events")
 }
 
 // ---- Channel Health (AI-attribution layer) ----

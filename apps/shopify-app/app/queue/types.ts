@@ -9,6 +9,7 @@ export const QUEUE_NAMES = {
   fixTier1: 'fix-tier1',
   drift: 'drift',
   alerts: 'alerts',
+  gdpr: 'gdpr',
 } as const;
 
 export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];
@@ -70,3 +71,31 @@ export interface AlertJob {
   kind: 'score-drop' | 'competitor-passed' | 'standards-change';
   payload: Record<string, unknown>;
 }
+
+// ---- GDPR ----
+// Two job shapes share the `gdpr` queue, distinguished by job name:
+//
+//   • dsar-alert  — operator notification for CUSTOMERS_DATA_REQUEST and
+//                   CUSTOMERS_REDACT. Runs immediately. Idempotent on
+//                   gdprEventId so retries don't double-notify.
+//   • shop-purge  — delayed (default 30d) deletion of shop data after
+//                   APP_UNINSTALLED. Idempotent on shopDomain — if the
+//                   shop has already been deleted (e.g. by SHOP_REDACT),
+//                   the job no-ops.
+
+export interface GdprDsarAlertJob {
+  kind: 'dsar-alert';
+  gdprEventId: string;
+  shopDomain: string;
+  topic: 'CUSTOMERS_DATA_REQUEST' | 'CUSTOMERS_REDACT';
+  deadlineAt: string;
+}
+
+export interface GdprShopPurgeJob {
+  kind: 'shop-purge';
+  gdprEventId: string;
+  shopDomain: string;
+  scheduledAt: string;
+}
+
+export type GdprJob = GdprDsarAlertJob | GdprShopPurgeJob;

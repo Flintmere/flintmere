@@ -6,6 +6,7 @@ import { handleSyncCatalog } from './jobs/sync-catalog.server';
 import { handleScoreCatalog } from './jobs/score-catalog.server';
 import { handleDriftRescore } from './jobs/drift-rescore.server';
 import { handleApplyFix } from './jobs/apply-fix.server';
+import { handleGdprJob } from './jobs/gdpr.server';
 
 /**
  * Starts all Flintmere workers. Call from scripts/worker.ts for standalone-process
@@ -37,7 +38,14 @@ export function createWorkers(): { close: () => Promise<void> } {
     concurrency: 2,
   });
 
-  const workers = [sync, score, drift, fixTier1];
+  // GDPR concurrency held low — alerts are cheap, but the purge job runs a
+  // multi-table delete and there's never more than one per shop.
+  const gdpr = new Worker(QUEUE_NAMES.gdpr, async (job) => handleGdprJob(job), {
+    connection,
+    concurrency: 1,
+  });
+
+  const workers = [sync, score, drift, fixTier1, gdpr];
   for (const worker of workers) {
     worker.on('failed', (job, err) => {
       // BullMQ catches the throw and emits 'failed'; Sentry's
