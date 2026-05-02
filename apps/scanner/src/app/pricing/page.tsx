@@ -295,7 +295,7 @@ export default function Pricing() {
             </p>
             <p className="mt-4">
               <Link
-                href="/about"
+                href="/methodology"
                 className="underline"
                 style={{
                   fontSize: 14,
@@ -304,7 +304,7 @@ export default function Pricing() {
                   textUnderlineOffset: 4,
                 }}
               >
-                Read why this is a public standard →
+                Read how we maintain it →
               </Link>
             </p>
           </div>
