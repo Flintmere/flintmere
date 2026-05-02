@@ -50,6 +50,18 @@ Marketing, scanner, and Shopify app (within the Flintmere island) consume these.
 | `ContrastSection` | Two-column "before / after" | 1px vertical `--line` divider, paper and inverted halves |
 | `Manifesto` | Full-bleed ink section | Geist display quote on `--ink`, optional trademark line |
 
+### Site navigation — `SiteHeader`
+
+The marketing-site nav is a comma-list (Batch B redo, 2026-04-29). Item-count discipline (council ruling 2026-05-02 after operator query "is five too many"):
+
+- **Target shape: 3–5 destinations + 1–2 right-aligned actions.** Industry standard — Stripe, Linear, Vercel, Notion, Figma all sit in this band. Tempo at 4+1 (single-pager).
+- **Five is the ceiling, not the target.** Hick's Law adds ~9% decision time at 5→6, ~7% at 6→7. #11 investor voice reads shorter nav as more confident; #3 editorial holds a 4-beat comma-list as cleaner clause than a 5-beat. Miller's 7±2 does NOT apply here (it's a recall limit, not a visible-list limit).
+- **No duplicate destinations.** If two items resolve to the same URL, the second isn't navigation — it's marketing. Move it to body content (homepage, /audit, /pricing). The "App" item was retired 2026-05-02 because it pointed at the same `app.flintmere.com` as "Sign in".
+- **Mobile sheet ceiling: 5–6 items max.** Beyond that, route to footer.
+- **Past five on desktop:** new items go to the mobile sheet only, never extend the desktop comma-list.
+- **Editorial register:** sentence-case, comma-delimited, no pills, no chrome bar. Hover ink → amber.
+- **Current set (locked 2026-05-02):** Audit, Standards, Pricing, Sign in.
+
 ### Rules for primitives
 
 - **Tokens only.** No ad-hoc hex, no ad-hoc spacing. Propose new tokens via `design-token`.

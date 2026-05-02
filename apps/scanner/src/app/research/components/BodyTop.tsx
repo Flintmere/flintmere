@@ -217,7 +217,7 @@ export function BodyTop({ data }: { data: Published }) {
               </p>
             </div>
 
-            <div className="lg:pl-8" style={{ minHeight: 'clamp(0px, 60vh, 720px)' }}>
+            <div className="lg:pl-8 research-median-runway">
               <h2
                 id="median-heading"
                 className="font-sans font-medium tracking-[-0.025em] leading-[1.1] text-[color:var(--color-ink)]"

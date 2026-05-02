@@ -193,16 +193,15 @@ export function FounderStrip() {
           {PROOF_PANELS.map((panel, i) => (
             <li
               key={i}
-              className="font-mono"
+              className="font-mono flintmere-founder-panel"
               style={{
-                minHeight: 'clamp(360px, 60vh, 560px)',
                 border: '1px solid var(--color-line-dark)',
-                padding: 'clamp(28px, 3.5vw, 48px)',
+                padding: 'clamp(24px, 3.5vw, 48px)',
                 color: 'var(--color-paper-on-ink)',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                gap: 'clamp(20px, 3vw, 36px)',
+                gap: 'clamp(16px, 3vw, 36px)',
               }}
             >
               <p

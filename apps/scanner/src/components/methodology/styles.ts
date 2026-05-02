@@ -48,6 +48,26 @@ export const methodologyStyles = `
     border-bottom: 1px solid var(--color-line);
   }
 
+  /* Mobile — the 16:4 ribbon collapses pillars 5/6/7 (bottom row at 30%
+     of total height) to ~28px on a 375px viewport, which is unreadable
+     and visually missing. On phones we drop the sticky behaviour, let
+     the frame grow with content, and give each row an honest minimum
+     so all seven tiles render legibly (operator caught 2026-05-02). */
+  @media (max-width: 768px) {
+    .methodology-treemap-pin {
+      position: static;
+      z-index: auto;
+    }
+    .methodology-treemap-frame {
+      aspect-ratio: auto !important;
+      max-height: none !important;
+    }
+    .methodology-treemap-frame > div {
+      flex-basis: auto !important;
+      min-height: 96px;
+    }
+  }
+
   /* Cascade fade-in for pillar spreads — the numeral, headline, and each
      prose row reveal as the spread enters viewport. Modern browsers get
      the genuine scroll-driven version via animation-timeline; older

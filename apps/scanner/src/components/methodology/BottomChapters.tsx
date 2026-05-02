@@ -168,13 +168,19 @@ export function ChallengeManifesto() {
           {/* `.bracket-inline` provides the [ ] glyphs as ::before/::after
               per the canonical bracket-spacing utility (0.16em em-margin).
               Don't render literal brackets here — that produced the
-              double-bracket bug operator caught 2026-05-02. */}
-          <span
-            className="font-mono inline-block bracket-inline methodology-curtain__anchor"
-          >
-            wrong
+              double-bracket bug operator caught 2026-05-02.
+              The bracket span + trailing period are wrapped in a
+              white-space:nowrap atom so the "." cannot widow onto its own
+              line when the headline wraps on narrow viewports (operator
+              caught 2026-05-02 mobile — full stop alone on a new line). */}
+          <span style={{ whiteSpace: 'nowrap' }}>
+            <span
+              className="font-mono inline-block bracket-inline methodology-curtain__anchor"
+            >
+              wrong
+            </span>
+            .
           </span>
-          .
         </h2>
 
         <div className="grid md:grid-cols-2 gap-x-12 gap-y-8 max-w-[1080px]" style={{ marginTop: 'clamp(48px, 6vw, 96px)' }}>

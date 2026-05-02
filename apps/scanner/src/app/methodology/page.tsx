@@ -132,8 +132,13 @@ export default function Methodology() {
               a typographic anchor at the foot of the hero. Numerals are
               the chapter signature (per Bloomberg-cover register). */}
           <dl
-            className="grid grid-cols-3 gap-x-8 gap-y-4 max-w-[640px] border-t border-[color:var(--color-line)]"
-            style={{ marginTop: 'clamp(48px, 6vw, 88px)', paddingTop: 28 }}
+            className="grid grid-cols-3 gap-x-8 max-w-[640px] border-t border-[color:var(--color-line)]"
+            style={{
+              marginTop: 'clamp(48px, 6vw, 88px)',
+              paddingTop: 28,
+              gridTemplateRows: 'auto auto',
+              rowGap: 16,
+            }}
           >
             <HeroStat label="Composite weight" value="100" suffix="" />
             <HeroStat label="Public-source pillars" value={String(TOTAL_PUBLIC_WEIGHT)} suffix="%" />

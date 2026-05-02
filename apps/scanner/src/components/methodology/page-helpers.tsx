@@ -13,11 +13,24 @@ interface HeroStatProps {
 }
 
 export function HeroStat({ label, value, suffix }: HeroStatProps) {
+  // Subgrid: each HeroStat spans both rows of the parent dl so labels share
+  // the row-1 box and values share the row-2 box across columns. Labels
+  // wrapping to two lines no longer push the value down only in their
+  // column. Without this, "Public-source pillars" wraps and only its own
+  // numeral drops a line — three values misaligned (operator caught
+  // 2026-05-02 mobile).
   return (
-    <div className="flex flex-col gap-1">
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateRows: 'subgrid',
+        gridRow: 'span 2',
+        rowGap: 6,
+      }}
+    >
       <dt
         className="font-mono uppercase text-[color:var(--color-mute-2)]"
-        style={{ fontSize: 11, letterSpacing: '0.16em' }}
+        style={{ fontSize: 11, letterSpacing: '0.16em', alignSelf: 'end' }}
       >
         {label}
       </dt>

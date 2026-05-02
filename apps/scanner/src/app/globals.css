@@ -755,6 +755,22 @@
   }
 }
 
+/* Founder proof panels — three stat cards in the RIGHT column. The
+   `min-height: clamp(360px, 60vh, 560px)` that drove the desktop pin
+   runway also applied on mobile, where no pin is engaged — so on phones
+   the section read as a 1080px+ vertical chain of repetitive giant
+   cards (operator caught 2026-05-02). On mobile the panels size to
+   content with a soft minimum; on desktop they keep the original
+   runway so the LEFT pin has something to scroll past. */
+.flintmere-founder-panel {
+  min-height: clamp(220px, 36vh, 320px);
+}
+@media (min-width: 1024px) {
+  .flintmere-founder-panel {
+    min-height: clamp(360px, 60vh, 560px);
+  }
+}
+
 /* Curtain-pair wrapper retained for editorial grouping (chapters 3 + 4
    as a related pair) but no longer creates a sticky containing block
    since chapter 3 is no longer pinned. Position relative + isolation
@@ -836,6 +852,17 @@
     top: clamp(48px, 8vh, 96px);
     align-self: start;
     height: fit-content;
+  }
+}
+
+/* --- Research median chapter runway --- */
+/* The right column needs scroll runway only when the left column is
+   pinned (≥lg). On mobile the columns stack and any forced min-height
+   creates a long empty page-pocket between the median number and the
+   next chapter — operator caught 2026-05-02. */
+@media (min-width: 1024px) {
+  .research-median-runway {
+    min-height: clamp(0px, 60vh, 720px);
   }
 }
 
