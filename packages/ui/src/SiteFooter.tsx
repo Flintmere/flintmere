@@ -9,9 +9,14 @@ import Link from 'next/link';
  *     is the curtain reveal and on other pages it renders as a normal block.
  *   - Wordmark + captions centred horizontally + vertically; legal nav
  *     centred at bottom.
- *   - Wordmark at locked clamp(80,10vw,160) Geist Mono weight 700 — size
- *     locked per feedback_footer_wordmark_locked.md, weight bumped per
- *     ADR 0021 relaxation-axis allowance.
+ *   - Wordmark at clamp(48,12vw,160) Geist Mono weight 700. Floor lowered
+ *     from 80→48 on 2026-05-02 after operator caught the wordmark
+ *     overflowing the content area on iPhone-class viewports (430px and
+ *     below). The min-80 lock from feedback_footer_wordmark_locked.md was
+ *     amplification-driven on desktop; on phones it cropped the closing
+ *     `]`. The new clamp keeps desktop impact (12vw scales aggressively
+ *     into the 160px ceiling at ≥1280px) while shrinking gracefully into
+ *     the smallest viewports.
  *   - Three-line caption block beneath wordmark — email · Built in [London] ·
  *     legal-entity strip.
  *   - Bottom legal nav — Privacy / Terms / Security / Cookies / DPA / Support
@@ -66,7 +71,7 @@ export function SiteFooter() {
           </Link>
           <span aria-hidden="true">,</span>
           <Link
-            href="/research"
+            href="https://standards.flintmere.com"
             className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >
             Standards
@@ -105,7 +110,7 @@ export function SiteFooter() {
             aria-label="Flintmere home"
             className="flintmere-footer-wordmark font-mono leading-[0.85] tracking-[-0.04em] inline-block"
             style={{
-              fontSize: 'clamp(80px, 10vw, 160px)',
+              fontSize: 'clamp(48px, 12vw, 160px)',
               fontWeight: 700,
             }}
           >

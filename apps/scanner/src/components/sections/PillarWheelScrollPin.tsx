@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useScroll, useMotionValueEvent, useReducedMotion } from 'motion/react';
 import { PillarWheel, type PillarSpec } from './PillarWheel';
 
@@ -20,6 +20,14 @@ import { PillarWheel, type PillarSpec } from './PillarWheel';
  * default click/keyboard interaction model (uncontrolled internal
  * state).
  *
+ * Mobile safety (added 2026-05-02): below the lg breakpoint the
+ * wheel + spotlight panel stacks vertically, and the combined content
+ * exceeds the 100vh sticky child — `overflow: hidden` on the sticky
+ * box clipped the panel's headline + body off-screen ("reads half cut",
+ * operator caught on iPhone 14 Pro Max). The bypass renders the wheel
+ * in normal flow with native click/keyboard nav, same as the
+ * reduced-motion path. No scroll runway, no pin, no clipping.
+ *
  * Tuning:
  *   - SCROLL_PER_PILLAR_VH = 50 — each pillar gets 50vh of scroll
  *     attention. Total chapter 2 scroll runway = pillars.length × 50vh
@@ -27,6 +35,9 @@ import { PillarWheel, type PillarSpec } from './PillarWheel';
  */
 
 const SCROLL_PER_PILLAR_VH = 50;
+// The wheel's lg-breakpoint matches PillarWheel's grid `lg:grid-cols-[1fr_1fr]`.
+// Below this, the side-by-side layout stacks and the 100vh sticky clips.
+const PIN_MIN_VIEWPORT_PX = 1024;
 
 export interface PillarWheelScrollPinProps {
   pillars: PillarSpec[];
@@ -36,6 +47,16 @@ export function PillarWheelScrollPin({ pillars }: PillarWheelScrollPinProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const reducedMotion = useReducedMotion();
+  const [narrowViewport, setNarrowViewport] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mql = window.matchMedia(`(max-width: ${PIN_MIN_VIEWPORT_PX - 1}px)`);
+    const apply = () => setNarrowViewport(mql.matches);
+    apply();
+    mql.addEventListener('change', apply);
+    return () => mql.removeEventListener('change', apply);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -57,11 +78,10 @@ export function PillarWheelScrollPin({ pillars }: PillarWheelScrollPinProps) {
   // gets (containerHeight - 100vh) of scroll runway.
   const runwayVh = 100 + pillars.length * SCROLL_PER_PILLAR_VH;
 
-  // Under reduced-motion, drop the pin entirely and let the wheel render
-  // in normal flow at its natural height. Click/keyboard nav still works
-  // because the controlled prop is `undefined` (passes through to internal
-  // state in PillarWheel).
-  if (reducedMotion) {
+  // Drop the pin entirely on reduced-motion OR narrow viewports. Click/
+  // keyboard nav still works because the controlled prop is `undefined`
+  // (passes through to internal state in PillarWheel).
+  if (reducedMotion || narrowViewport) {
     return <PillarWheel pillars={pillars} />;
   }
 

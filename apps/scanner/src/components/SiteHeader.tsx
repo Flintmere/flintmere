@@ -54,7 +54,10 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'Audit', href: '/audit' },
-  { label: 'Standards', href: '/research' },
+  // Standards routes to the canonical subdomain — DNS provisioned 2026-05-02
+  // (operator-confirmed). Methodology body still references
+  // standards.flintmere.com/food/v1 as the eventual artefact home.
+  { label: 'Standards', href: 'https://standards.flintmere.com', external: true },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Sign in', href: 'https://app.flintmere.com', external: true },
 ];
@@ -218,8 +221,11 @@ export function SiteHeader() {
           >
             <ol className="list-none p-0 m-0">
               {NAV_ITEMS.map((item) => {
+                // Mobile sheet path caption — show the canonical hostname
+                // for external links (multiple subdomains now), and the
+                // pathname for internal routes.
                 const caption = item.external
-                  ? 'app.flintmere.com'
+                  ? new URL(item.href).hostname.replace(/^www\./, '')
                   : item.href;
                 return (
                   <li

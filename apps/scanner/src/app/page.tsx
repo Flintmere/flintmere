@@ -161,8 +161,7 @@ export default function MarketingHome() {
       <section
         id="hero"
         aria-labelledby="hero-heading"
-        className="relative isolate overflow-hidden bg-[color:var(--color-paper)] grid grid-cols-1 lg:grid-cols-[58fr_42fr]"
-        style={{ height: '100vh', minHeight: '640px' }}
+        className="relative isolate overflow-hidden bg-[color:var(--color-paper)] grid grid-cols-1 lg:grid-cols-[58fr_42fr] lg:h-screen lg:min-h-[640px]"
       >
         {/* Photo zone — full-bleed, ink-letterboxed (so asymmetric crops blend
             into the section edge), warm-treated wooden-tray AVIF. No scrim
