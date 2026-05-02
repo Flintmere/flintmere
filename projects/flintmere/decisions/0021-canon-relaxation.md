@@ -35,6 +35,34 @@ Atmosphere only. **Never** on text, borders, CTAs, status indicators. **No** rai
 
 Existing rule: ≤2 brackets per page (Noor's veto from ADR 0003). Replaced by: **≤1 bracket per section, no page-wide cap.** Brackets must still be structural markup (noun, number, identifier, URL, score) per the §Signature §Rules of `tokens.md`. Never decoration. The new rule unlocks `[ 01 ]–[ 07 ]` pillar IDs + content-block keywords + audit-deep CTA bracket without starving the hero/lede zones.
 
+#### Amendment 2026-05-02 — Active-anchor vs recessive comparison-set
+
+The §4 rule "≤1 bracket per section" was authored before the audit-band-triptych shipped (2026-05-01). The triptych renders three brackets simultaneously — `[£197]` / `[£397]` / `[£597]` — as a categorical comparison-set, not as three competing focal anchors. Two of the three are recessive (≈40% opacity, `-webkit-text-stroke` outline only, no fill); one is active (full ink, full weight, the band the user has selected). Visually it reads as one anchor, not three.
+
+The literal reading of "≤1 per section" forbids the triptych. The intent of "≤1 per section" — "no two brackets compete for emphasis in the same viewport" — permits it. The triptych's design proves the gap.
+
+**Updated rule:** ≤1 **active anchor** bracket per section. A **recessive comparison-set** of brackets is permitted when *all* of the following hold:
+
+1. The set is a **categorical comparison** (e.g. price bands, severity tiers, vertical options, plan tiers) where the user's role is to *select one* — not where every member competes equally for attention.
+2. **One member is active** (full ink fill, full weight, full opacity); the rest are **recessive** (outline-only via `-webkit-text-stroke` OR opacity ≤ 0.45 OR mute-coloured fill — visibly demoted from the active member).
+3. The active member is **deterministic** at any given moment (URL state, selected option, default-on-mount). It must not "rotate" or animate between members on its own.
+4. The set members share **identical structural shape** (same bracket character, same bracket spacing, same mono weight, same approximate scale). The visual difference between members is fill/opacity only, not size or stroke weight.
+5. The section invokes the comparison-set under an **extravagant-mode dispatch** (operator-confirmed `design-extravagant` or operator midstream signal "use extravagance"). Default-mode dispatches stay at the strict ≤1 rule — the comparison-set is an explicitly opted-in pattern, not an everyday tool.
+
+**Forbidden:**
+- Recessive brackets used decoratively (no comparative function, just "more brackets for visual interest").
+- Recessive brackets at the same emphasis level as the active one (defeats the active-vs-recessive contract).
+- Comparison-sets larger than 4 members (visual noise; collapses into a list, not a chord).
+- Mixing recessive and active brackets *across* sections of the same page where each section uses the comparison-set pattern (cap at one comparison-set per page; subsequent sections fall back to strict ≤1).
+
+**Surfaces this licenses (as of 2026-05-02):**
+- `/audit` — the band triptych (`[£197]` active by default at Band 2, `[£197]` and `[£597]` recessive). Three members, categorical, URL-bound, identical structural shape. ✓
+- `/pricing` — the Concierge anchor section's `[ from £197 ]` Saks chord stays a single active anchor (no comparison-set on /pricing as of this amendment). The hero's `[ standard ]` is the page's other anchor in a different section. ✓ under base §4 rule.
+
+**Noor's binding condition (#8 VETO carry-over from §1):** the recessive members must hit the contrast floor for *non-text decorative elements* on their wash (≥3:1 against the surface). The recessive treatment via `-webkit-text-stroke` at 1.5–2px ink stroke on paper exceeds 3:1 — verified at amendment time on the audit triptych. AAA reduced-motion contract retained: the recessive→active transition on band selection respects `prefers-reduced-motion: reduce` (instant fill swap, no easing).
+
+**Rationale for the in-place amendment vs new ADR:** the amendment narrows §4's literal text to match its design intent. It does not retract any prior decision and does not introduce a new structural posture. ADR-level supersession (a new ADR 0023 numbered after this) would over-document a pattern that's already fully consistent with the canon's neutral-bold + Apple-bold-restraint posture. Council pre-clear (informal, #7 + #8 + #1) 2026-05-02: amendment ratifies in place.
+
 ### Axis 5 — Line-art / diagrammatic illustration as a second imagery mode
 
 Re-allow line-art / diagrammatic illustration as a second imagery mode **paired with** the photoreal Adobe Stock + product-screenshot rotation already documented in `tokens.md` §Imagery (added 2026-04-26). Line-art is for: technical diagrams, exploded-view product schematics, scanner-result annotation overlays, data-flow illustrations. Hairline strokes, warm ink, optional amber accent, optional sage hairline. **Still banned**: AI-generated imagery on marketing surfaces, identifiable humans without releases.
