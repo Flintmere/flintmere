@@ -118,28 +118,16 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* Vertical selector — URL state (?vertical=food|beauty|apparel|bundle).
-          PricingTiersGrid (below) reads the same hook and renders the
-          appropriate composition. */}
-      <Suspense fallback={null}>
-        <PricingVerticalTabs />
-      </Suspense>
-
-      {/* Tier cards grid — vertical-aware. Food = 4-card recurring grid
-          (Free / Food single / Food agency / Plus). Concierge audit pulled
-          out into its own anchor section below. Beauty / Apparel / Bundle
-          render single-message cards. */}
-      <Suspense fallback={null}>
-        <PricingTiersGrid />
-      </Suspense>
-
-      {/* Concierge audit anchor — extravagant-mode rebuild 2026-05-02.
-          Was 1-of-5 cards in the tier grid; now its own full-width anchor
-          with `[ from £197 ]` Saks chord on paper-2 wash. Bracket budget:
-          this section's 1 active anchor (per ADR 0021 §4 amendment 2026-05-02). */}
+      {/* Concierge audit anchor — page's primary conversion vehicle. Hoisted
+          ABOVE the picker + recurring tiers (was below) per 2026-05-02
+          screenshot review: the only section with a real price was buried
+          below three em-dash placeholders, leaving the visitor with nothing
+          to commit to in the first scroll. Real price first → calibrating
+          subscriptions second → manifesto third. Bracket budget: this
+          section's 1 active anchor (per ADR 0021 §4 amendment 2026-05-02). */}
       <section
         aria-label="Concierge audit"
-        className="relative isolate overflow-hidden bg-[color:var(--color-paper-2)] border-y border-[color:var(--color-line)]"
+        className="relative isolate overflow-hidden bg-[color:var(--color-paper-2)] border-t border-[color:var(--color-line)]"
       >
         <div
           aria-hidden="true"
@@ -161,12 +149,12 @@ export default function Pricing() {
             paddingBottom: 'clamp(72px, 9vw, 128px)',
           }}
         >
-          <p className="eyebrow mb-6">Concierge audit · One-off</p>
+          <p className="eyebrow mb-6">Available now · One-off</p>
           <h2
             className="font-medium tracking-[-0.03em] leading-[1.05] text-[color:var(--color-ink)] max-w-[22ch]"
             style={{ fontSize: 'clamp(32px, 4.5vw, 56px)' }}
           >
-            The audit lands first — letter, fix plan, re-scan.
+            Start with the audit — letter, fix plan, 30-day re-scan.
           </h2>
 
           <div
@@ -201,6 +189,62 @@ export default function Pricing() {
           </div>
         </div>
       </section>
+
+      {/* Recurring subscriptions — narrative pivot. Visitor has seen the
+          one-off audit (real price); now the recurring ladder, which is in
+          calibration. Section header makes the pivot explicit so empty
+          price slots read as "calibrating," not "missing." */}
+      <section
+        aria-label="Recurring subscriptions intro"
+        className="bg-[color:var(--color-paper)] border-t border-[color:var(--color-line)]"
+      >
+        <div
+          className="mx-auto max-w-[1280px]"
+          style={{
+            paddingLeft: 'clamp(24px, 4vw, 64px)',
+            paddingRight: 'clamp(24px, 4vw, 64px)',
+            paddingTop: 'clamp(64px, 8vw, 112px)',
+            paddingBottom: 'clamp(24px, 3vw, 40px)',
+          }}
+        >
+          <p className="eyebrow mb-6">Recurring · Calibrating May–June 2026</p>
+          <h2
+            className="font-medium tracking-[-0.03em] leading-[1.1] text-[color:var(--color-ink)] max-w-[28ch]"
+            style={{ fontSize: 'clamp(28px, 3.6vw, 44px)' }}
+          >
+            Or subscribe — pick the vertical, pick the distribution mode.
+          </h2>
+          <p
+            className="text-[color:var(--color-ink-2)] max-w-[64ch]"
+            style={{
+              marginTop: 'clamp(20px, 3vw, 32px)',
+              fontSize: 16,
+              lineHeight: 1.7,
+            }}
+          >
+            We&rsquo;re calibrating sign-up prices with food merchants this
+            May and June. Tiers below show the shape; the magnitude lands
+            once the willingness-to-pay study closes. Existing subscribers
+            stay grandfathered. Talk to us if you want to be involved.
+          </p>
+        </div>
+      </section>
+
+      {/* Vertical selector — URL state (?vertical=food|beauty|apparel|bundle).
+          PricingTiersGrid (below) reads the same hook and renders the
+          appropriate composition. */}
+      <Suspense fallback={null}>
+        <PricingVerticalTabs />
+      </Suspense>
+
+      {/* Tier cards grid — vertical-aware. Food = 4-card recurring grid
+          (Free / Food single / Food agency / Plus). Beauty / Apparel /
+          Bundle render single-message cards. Magnitudes-pending tiers
+          replace bare em-dash with "Calibrating" amber-tinged label so
+          empty price slots read as "in progress," not "missing." */}
+      <Suspense fallback={null}>
+        <PricingTiersGrid />
+      </Suspense>
 
       {/* "We maintain it" — ink-slab variant per ADR 0021 §7 (extravagant-mode
           rebuild 2026-05-02). Display-700 h2 at clamp(48–96px) per axis 6

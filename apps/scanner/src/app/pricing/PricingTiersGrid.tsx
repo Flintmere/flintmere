@@ -236,20 +236,40 @@ function MagnitudesPendingCard({ tier, mailtoSubject }: MagnitudesPendingCardPro
       >
         {tier.name}
       </h3>
-      <p
-        aria-hidden="true"
-        className="mt-3 text-[color:var(--color-mute)]"
-        style={{
-          fontSize: 'clamp(40px, 5vw, 52px)',
-          fontWeight: 500,
-          letterSpacing: '-0.04em',
-          lineHeight: 1,
-        }}
+      {/* Calibrating-state replaces the prior bare em-dash (was reading as
+          "no price" — visually identical to a missing field). The amber
+          dot + "Calibrating" word reads as in-progress and honest, not
+          empty. The full "May–June 2026" timeline lives in the eyebrow
+          below to anchor the abstract "calibrating" word in calendar
+          time. */}
+      <div
+        className="mt-3 flex items-center gap-3"
+        aria-describedby={subId}
       >
-        —
-      </p>
+        <span
+          aria-hidden="true"
+          style={{
+            display: 'inline-block',
+            width: 10,
+            height: 10,
+            borderRadius: '50%',
+            background: 'var(--color-accent)',
+          }}
+        />
+        <p
+          style={{
+            fontSize: 'clamp(28px, 3.4vw, 36px)',
+            fontWeight: 500,
+            letterSpacing: '-0.025em',
+            lineHeight: 1,
+            color: 'var(--color-ink)',
+          }}
+        >
+          Calibrating
+        </p>
+      </div>
       <p id={subId} className="eyebrow mt-3 text-[color:var(--color-mute-2)]">
-        PRICING FINALISING — MAY–JUNE 2026
+        PRICING FINALISES MAY–JUNE 2026
       </p>
       <p
         className="mt-6 text-[color:var(--color-ink-2)]"
@@ -299,20 +319,24 @@ function PlusAnchorCard({ tier }: PlusAnchorCardProps) {
       >
         {tier.name}
       </h3>
+      {/* Plus anchor — "From £1,200/mo" rendered as a real value; the price
+          IS published per ADR 0017 (anchor floor disclosed, full ladder on
+          enquiry). No "calibrating" treatment needed here — Plus has a
+          public floor. */}
       <p
-        aria-hidden="true"
-        className="mt-3 text-[color:var(--color-mute)]"
+        className="mt-3"
         style={{
-          fontSize: 'clamp(40px, 5vw, 52px)',
+          fontSize: 'clamp(28px, 3.4vw, 36px)',
           fontWeight: 500,
-          letterSpacing: '-0.04em',
+          letterSpacing: '-0.025em',
           lineHeight: 1,
+          color: 'var(--color-ink)',
         }}
       >
-        —
+        From £1,200<span style={{ fontSize: '0.5em', color: 'var(--color-mute)', marginLeft: 4 }}>/mo</span>
       </p>
       <p id={subId} className="eyebrow mt-3 text-[color:var(--color-mute-2)]">
-        ANCHOR — FROM £1,200/MO ON ENQUIRY
+        ANCHOR — ON ENQUIRY
       </p>
       <p
         className="mt-6 text-[color:var(--color-ink-2)]"
