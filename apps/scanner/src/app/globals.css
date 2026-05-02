@@ -715,6 +715,18 @@
   justify-content: center;
 }
 
+/* Default paper paint on every direct child of .flintmere-main except the
+   sticky-curtain footer. The curtain mechanic relies on each section being
+   opaque so the wordmark (z-index -1) only shows once content peels off-top.
+   Without this default, sections that omit their own background let the
+   wordmark bleed through mid-scroll (regression observed on /scan results
+   2026-05-02). :where() keeps specificity at 0 so any explicit background
+   utility class (e.g. bg-[color:var(--color-ink)] on the homepage ink
+   column) overrides without effort. */
+:where(.flintmere-main > *:not(.flintmere-footer-sticky)) {
+  background: var(--color-paper);
+}
+
 /* Chapter 3 (FounderStrip) uses mechanic #5 dual-column pin + scrollable
    companion (per memory/design/scroll-choreographies.md, redesigned
    2026-04-29 after #2 sticky-top scroll-over was downgraded for content

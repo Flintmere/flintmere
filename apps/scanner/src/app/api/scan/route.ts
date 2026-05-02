@@ -45,7 +45,9 @@ export async function POST(req: NextRequest) {
   // Bot scans bypass the rate limit — they're already scheduled by the
   // operator with their own concurrency floor. Human submissions go through
   // both the per-IP bucket and the per-domain dedupe TTL.
-  if (source === 'user') {
+  // Dev bypass: limiter is anti-abuse, not anti-self. Local testing of the
+  // same shop in tight windows is normal; only enforce in production.
+  if (source === 'user' && process.env.NODE_ENV === 'production') {
     const limit = checkScanRateLimit({ ip, normalisedDomain });
     if (!limit.ok) {
       const message =
