@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Bracket, SiteFooter } from '@flintmere/ui';
 import { ViewportReveal } from '@/components/ViewportReveal';
+import { MarketingStickyCta } from '@/components/MarketingStickyCta';
 import { BandTriptych } from './BandTriptych';
 import { CTAButton, DeliverableLift } from './audit-motion';
 import { CONCIERGE_DELIVERABLE_LIST } from '@/lib/copy';
@@ -61,6 +62,7 @@ export default function Audit() {
       <a href="#hero" className="skip-link">
         Skip to content
       </a>
+      <MarketingStickyCta href="#checkout" label="Book the audit · £197" glyph="↑" />
       <ViewportReveal>
         {/* Chapter 1 — Hero. Single typographic canvas. The value
             proposition lands as one read, not as a six-word cascade. */}

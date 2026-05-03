@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Bracket, SiteFooter } from '@flintmere/ui';
 import { ViewportReveal } from '@/components/ViewportReveal';
 import { HeroParallaxFigure } from '@/components/HeroParallaxFigure';
+import { MarketingStickyCta } from '@/components/MarketingStickyCta';
 import { type PillarSpec } from '@/components/sections/PillarWheel';
 import { PillarWheelScrollPin } from '@/components/sections/PillarWheelScrollPin';
 import { FounderStrip } from '@/components/sections/FounderStrip';
@@ -133,6 +134,7 @@ export default function MarketingHome() {
   return (
     <main id="main" className="flintmere-main">
       <a href="#hero" className="skip-link">Skip to content</a>
+      <MarketingStickyCta href="/scan" label="Run a free scan" glyph="→" />
       <ViewportReveal>
       {/* Chapter 1 — Hero (Modern House split + Pentagram Saks logotype scale +
           A24 single-film credit). Second dispatch under design-extravagant
