@@ -22,6 +22,7 @@ import { AUDIT_BANDS, type AuditBand } from '@/lib/audit-pricing';
 export function ConciergeBands() {
   return (
     <section
+      id="concierge-bands"
       aria-labelledby="concierge-bands-heading"
       className="bg-[color:var(--color-paper-2)] border-y border-[color:var(--color-line)]"
     >

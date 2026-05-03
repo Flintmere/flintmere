@@ -30,10 +30,8 @@
  */
 
 import { useCallback, useEffect, useId, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   AUDIT_BANDS,
-  type AuditBand,
   type AuditBandSlug,
 } from '@/lib/audit-pricing';
 import { track } from '@/lib/plausible';
@@ -53,10 +51,8 @@ function isAuditBandSlug(value: string | null): value is AuditBandSlug {
 }
 
 export function BandTriptych() {
-  const reduce = useReducedMotion();
   const [bandSlug, setBandSlug] = useState<AuditBandSlug>(DEFAULT_BAND);
   const liveId = useId();
-  const groupName = useId();
 
   // Read ?band= URL param on mount and pre-select the requested band.
   // Bridges the /pricing → /audit deep-link path: clicking a specific
@@ -129,192 +125,51 @@ export function BandTriptych() {
         Three working days
       </p>
 
-      {/* Band-switcher — demoted to disclosure. The user does NOT need
-          to interact with this to pay; band-1 is the default and most
-          merchants belong here. Shown for those who need to escalate to
-          band-2 (1,501–5,000 SKUs) or band-3 (5,001+, bespoke quote). */}
-      <fieldset
+      {/* Band-change round-trip — top-tier checkout playbook (Stripe,
+          Apple, Linear, Notion, Vercel, Shop Pay) puts comparison on
+          the pricing surface and never re-presents it mid-checkout.
+          /pricing owns the 3-band comparison; /audit owns conversion.
+          Users who landed on band-1 by default and need to escalate
+          round-trip to /pricing#concierge-bands. ~3 seconds of friction
+          for the minority who need it; net win on flow clarity. */}
+      <p
         data-reveal
+        className="font-mono uppercase"
         style={{
-          border: 0,
-          padding: 0,
-          margin: 0,
-          marginTop: 'clamp(56px, 7vw, 96px)',
+          marginTop: 'clamp(40px, 5vw, 64px)',
+          fontSize: 'clamp(11px, 1vw, 13px)',
+          letterSpacing: '0.18em',
+          fontWeight: 500,
+          color: 'var(--color-mute-2)',
           ['--reveal-delay' as string]: '320ms',
         }}
       >
-        <legend
-          className="font-mono uppercase"
+        <span aria-hidden="true">// </span>
+        {`Currently: ${selected.label} · ${selected.priceDisplay} · ${selected.skuRangeLabel}.`}
+        {' '}
+        <a
+          href="/pricing#concierge-bands"
           style={{
-            fontSize: 'clamp(11px, 1vw, 13px)',
-            letterSpacing: '0.18em',
-            fontWeight: 500,
-            color: 'var(--color-mute-2)',
-            marginBottom: 'clamp(20px, 2.5vw, 32px)',
-            padding: 0,
+            color: 'var(--color-ink)',
+            textDecoration: 'underline',
+            textUnderlineOffset: 4,
           }}
         >
-          <span aria-hidden="true">// </span>different size catalogue? change band
-        </legend>
+          Wrong size? Compare bands →
+        </a>
+      </p>
 
-        <div
-          role="radiogroup"
-          aria-label="Audit band"
-          className="band-triptych-grid"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 0,
-            borderTop: '1px solid var(--color-line)',
-            borderBottom: '1px solid var(--color-line)',
-          }}
-        >
-          {AUDIT_BANDS.map((band, idx) => (
-            <BandColumn
-              key={band.slug}
-              band={band}
-              isSelected={band.slug === bandSlug}
-              groupName={groupName}
-              isFirst={idx === 0}
-              isLast={idx === AUDIT_BANDS.length - 1}
-              reducedMotion={!!reduce}
-              onSelect={() => handleBandChange(band.slug)}
-            />
-          ))}
-        </div>
-
-        {/* ARIA-live region — natural-sentence announcement on change.
-            Polite, not assertive. Visually hidden via .sr-only. */}
-        <p
-          id={liveId}
-          aria-live="polite"
-          aria-atomic="true"
-          className="sr-only"
-        >
-          {`${selected.label} selected — ${selected.priceDisplay} — ${selected.skuRangeLabel}, ${selected.hoursEstimate}.`}
-        </p>
-      </fieldset>
-    </>
-  );
-}
-
-interface BandColumnProps {
-  band: AuditBand;
-  isSelected: boolean;
-  groupName: string;
-  isFirst: boolean;
-  isLast: boolean;
-  reducedMotion: boolean;
-  onSelect: () => void;
-}
-
-function BandColumn({
-  band,
-  isSelected,
-  groupName,
-  isFirst,
-  isLast: _isLast,
-  reducedMotion: _reducedMotion,
-  onSelect,
-}: BandColumnProps) {
-  const inputId = `band-chord-${band.slug}`;
-
-  return (
-    <label
-      htmlFor={inputId}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 8,
-        cursor: 'pointer',
-        padding: 'clamp(20px, 2.4vw, 28px) clamp(20px, 2.4vw, 32px)',
-        borderLeft: isFirst ? 'none' : '1px solid var(--color-line-soft)',
-        background: isSelected ? 'var(--color-paper-2)' : 'transparent',
-        position: 'relative',
-        transition: 'background-color 0.2s ease',
-      }}
-    >
-      <input
-        id={inputId}
-        type="radio"
-        name={groupName}
-        value={band.slug}
-        checked={isSelected}
-        onChange={onSelect}
+      {/* ARIA-live region — natural-sentence announcement on
+          programmatic band change (URL param). Polite, not assertive.
+          Visually hidden via .sr-only. */}
+      <p
+        id={liveId}
+        aria-live="polite"
+        aria-atomic="true"
         className="sr-only"
-      />
-
-      {/* Caption row — band label + SKU range, mono caps */}
-      <span
-        aria-hidden="true"
-        style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: 'clamp(10px, 0.9vw, 12px)',
-          letterSpacing: '0.16em',
-          textTransform: 'uppercase',
-          fontWeight: 500,
-          color: 'var(--color-mute)',
-          lineHeight: 1.3,
-        }}
       >
-        {band.label} · {band.skuRangeLabel}
-      </span>
-
-      {/* Price — solid mono at human-readable scale (not saks-heroic).
-          Always solid ink; never outline-stroke. The chip is a
-          switcher, not a brand-mark moment. */}
-      <span
-        aria-hidden="true"
-        style={{
-          fontFamily: 'var(--font-mono)',
-          fontWeight: 700,
-          fontSize: 'clamp(28px, 3.4vw, 44px)',
-          letterSpacing: '-0.03em',
-          lineHeight: 1,
-          color: 'var(--color-ink)',
-        }}
-      >
-        {band.priceDisplay}
-      </span>
-
-      {/* Hours line — micro mono caption */}
-      <span
-        aria-hidden="true"
-        style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: 'clamp(10px, 0.85vw, 11px)',
-          letterSpacing: '0.16em',
-          textTransform: 'uppercase',
-          color: 'var(--color-mute-2)',
-          lineHeight: 1.3,
-          marginTop: 4,
-        }}
-      >
-        {band.hoursEstimate}
-      </span>
-
-      {/* Sage under-tick — selected only. Static (not animated) — the
-          switcher is below the fold; reveal motion is overproduced. */}
-      {isSelected && (
-        <span
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 'clamp(20px, 2.4vw, 32px)',
-            width: 32,
-            height: 2,
-            background: 'var(--color-accent-sage)',
-            opacity: 0.9,
-          }}
-        />
-      )}
-
-      {/* SR-only accessible name — full canonical band info per
-          Noor P0. */}
-      <span className="sr-only">
-        {`${band.label}, ${band.priceDisplay}, ${band.skuRangeLabel}, ${band.hoursEstimate}.`}
-      </span>
-    </label>
+        {`${selected.label} selected — ${selected.priceDisplay} — ${selected.skuRangeLabel}, ${selected.hoursEstimate}.`}
+      </p>
+    </>
   );
 }
