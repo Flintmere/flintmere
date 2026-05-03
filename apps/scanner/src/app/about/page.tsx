@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Bracket, SiteFooter } from '@flintmere/ui';
-import { SiteHeader } from '@/components/SiteHeader';
 
 /**
  * /about — How Flintmere decides.
@@ -53,10 +52,6 @@ const LAST_UPDATED = '2026-05-01';
 export default function About() {
   return (
     <>
-      <a href="#main" className="skip-link">
-        Skip to content
-      </a>
-      <SiteHeader />
       <main
         id="main"
         className="flintmere-main bg-[color:var(--color-paper)]"

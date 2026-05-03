@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { Bracket, SiteFooter } from '@flintmere/ui';
-import { SiteHeader } from '@/components/SiteHeader';
 import { ContactForm } from '@/components/ContactForm';
 import { ALL_TOPICS } from '@/lib/contact-routing';
 import type { ContactTopic } from '@/generated/prisma';
@@ -42,10 +41,6 @@ export default async function ContactPage({
 
   return (
     <>
-      <a href="#main" className="skip-link">
-        Skip to content
-      </a>
-      <SiteHeader />
       <main
         id="main"
         className="flintmere-main bg-[color:var(--color-paper)]"

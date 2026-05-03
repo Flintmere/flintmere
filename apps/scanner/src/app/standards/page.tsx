@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { Bracket, SiteFooter } from '@flintmere/ui';
-import { SiteHeader } from '@/components/SiteHeader';
 import { ContactForm } from '@/components/ContactForm';
 
 /**
@@ -42,10 +41,6 @@ export const metadata: Metadata = {
 export default function StandardsHolding() {
   return (
     <>
-      <a href="#main" className="skip-link">
-        Skip to content
-      </a>
-      <SiteHeader />
       <main
         id="main"
         className="flintmere-main bg-[color:var(--color-paper)]"
