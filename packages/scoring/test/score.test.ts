@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { scoreCatalog } from '../src/score.js';
 import { cleanProduct, makeCatalog, noGtinProduct } from './fixtures/products.js';
+import {
+  makeAdminContext,
+  standardFoodMetafields,
+} from './fixtures/admin-context.js';
 
 describe('scoreCatalog', () => {
   it('returns a composite score and seven pillars', () => {
@@ -47,6 +51,32 @@ describe('scoreCatalog', () => {
     expect(attributes?.locked).toBe(true);
     expect(mapping?.locked).toBe(true);
     expect(checkout?.locked).toBe(true);
+  });
+
+  it('scores attributes, mapping, and checkout when adminContext is provided', () => {
+    const catalog = makeCatalog([cleanProduct]);
+    const adminContext = makeAdminContext({
+      metafieldsByProduct: { [cleanProduct.id]: standardFoodMetafields },
+      googleProductCategoryByProduct: {
+        [cleanProduct.id]:
+          'Home & Garden > Kitchen & Dining > Kitchen Appliances > Coffee Grinders',
+      },
+      checkoutContext: { customerAccountsVersion: 'NEW_CUSTOMER_ACCOUNTS' },
+    });
+    const result = scoreCatalog(catalog, { adminContext });
+    const attributes = result.pillars.find((p) => p.pillar === 'attributes');
+    const mapping = result.pillars.find((p) => p.pillar === 'mapping');
+    const checkout = result.pillars.find(
+      (p) => p.pillar === 'checkout-eligibility',
+    );
+    expect(attributes?.locked).toBe(false);
+    expect(attributes?.score).toBeGreaterThan(90);
+    expect(mapping?.locked).toBe(false);
+    expect(mapping?.score).toBe(100);
+    expect(checkout?.locked).toBe(false);
+    expect(checkout?.score).toBe(100);
+    // Composite must climb meaningfully when all seven pillars score.
+    expect(result.score).toBeGreaterThan(90);
   });
 
   it('a catalog of noGtin product scores lower than clean', () => {

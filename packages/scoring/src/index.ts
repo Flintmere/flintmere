@@ -3,6 +3,9 @@ export { scoreIdentifiers } from './pillars/identifiers.js';
 export { scoreTitles, titleWordCount } from './pillars/titles.js';
 export { scoreConsistency } from './pillars/consistency.js';
 export { scoreCrawlability } from './pillars/crawlability.js';
+export { scoreAttributes } from './pillars/attributes.js';
+export { scoreMapping } from './pillars/mapping.js';
+export { scoreCheckout } from './pillars/checkout.js';
 export { estimateSuppression } from './pillars/suppression-estimate.js';
 export { estimateAov } from './pillars/aov-estimate.js';
 export { isValidGtin, gtinLength } from './utils/gtin.js';
@@ -31,6 +34,9 @@ export type {
   Issue,
   Severity,
   ScoreOptions,
+  AdminContextInput,
+  AdminMetafield,
+  AdminCheckoutContext,
   SuppressionEstimate,
   AovEstimate,
   RevenueEstimate,

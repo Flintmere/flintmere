@@ -29,13 +29,10 @@
  *   - Without SHOPIFY_ADMIN_TOKEN: public /products.json scan — four
  *     pillars run (identifiers, titles, consistency, crawlability).
  *     Attributes, GMC mapping, and checkout eligibility stay locked.
- *   - With SHOPIFY_ADMIN_TOKEN: Admin GraphQL pull — same four pillars
- *     plus richer metafield + GMC-category + checkout-context data
- *     surfaced in the summary for the operator to fold into the letter.
- *     The three pillars stay structurally locked in the scoring engine
- *     for now (their checker implementations land in the next iteration);
- *     the admin pull populates the data they need so the next change is
- *     pure-engine work.
+ *   - With SHOPIFY_ADMIN_TOKEN: Admin GraphQL pull — all seven pillars
+ *     graded, including structured attributes, GMC mapping, and checkout
+ *     eligibility against measured admin data. The summary breaks down
+ *     the underlying signals so the operator can fold them into the letter.
  */
 
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -157,7 +154,16 @@ async function main(): Promise<void> {
 
   console.log(`Scoring…`);
   const catalog = admin?.catalog ?? { shopDomain: domain, products, scoredAt: new Date().toISOString() };
-  const score = scoreCatalog(catalog, { crawlability: crawl });
+  const score = scoreCatalog(catalog, {
+    crawlability: crawl,
+    adminContext: admin
+      ? {
+          metafieldsByProduct: admin.metafieldsByProduct,
+          googleProductCategoryByProduct: admin.googleProductCategoryByProduct,
+          checkoutContext: admin.checkoutContext,
+        }
+      : undefined,
+  });
 
   const rows = buildProductRows(products, score.issues, domain);
 
@@ -336,7 +342,7 @@ function buildSummary(
 
   if (admin) {
     lines.push('');
-    lines.push('## Admin-only data (token-captured, awaiting pillar implementations)');
+    lines.push('## Admin-only signal breakdown');
     lines.push('');
 
     const productsWithMetafields = Array.from(admin.metafieldsByProduct.values()).filter((m) => m.length > 0).length;
@@ -344,17 +350,17 @@ function buildSummary(
     const totalProducts = admin.catalog.products.length;
 
     lines.push(
-      `- **Structured-attribute coverage:** ${productsWithMetafields}/${totalProducts} products have at least one metafield. Sample namespaces: ${sampleMetafieldNamespaces(admin)}.`,
+      `- **Structured-attribute coverage:** ${productsWithMetafields}/${totalProducts} products carry at least one metafield. Sample namespaces: ${sampleMetafieldNamespaces(admin)}.`,
     );
     lines.push(
-      `- **Google product category coverage:** ${productsWithGmcCategory}/${totalProducts} products have a category set. ${productsWithGmcCategory === 0 ? '*All uncategorised — high-priority finding for the letter.*' : ''}`,
+      `- **Google product category coverage:** ${productsWithGmcCategory}/${totalProducts} products have a category set.${productsWithGmcCategory === 0 ? ' *All uncategorised — high-priority finding for the letter.*' : ''}`,
     );
     lines.push(
-      `- **Customer-accounts version:** ${admin.checkoutContext.customerAccountsVersion ?? 'not exposed by API version'} (relevant to checkout-eligibility for the agent-readiness pillar).`,
+      `- **Customer-accounts version:** ${admin.checkoutContext.customerAccountsVersion ?? 'not exposed by this API version'}.`,
     );
     lines.push('');
     lines.push(
-      `*The structured-attribute, GMC-mapping, and checkout-eligibility pillars are still locked in the scoring engine — the admin data above is for the operator to fold into the letter manually until the pillar checkers ship.*`,
+      `*All three pillars are now graded — see the pillar table above. The signal counts here are the underlying inputs, useful when writing the letter.*`,
     );
   }
 
@@ -363,7 +369,7 @@ function buildSummary(
   lines.push('');
   if (admin) {
     lines.push(
-      'The merchant provided an Admin token, so the metafield, GMC-category, and checkout-context data above is measured. Use those numbers in the letter alongside the four scored pillars.',
+      'The merchant provided an Admin token, so all seven pillars are graded against measured data. The pillar table reflects the full composite; use the per-product CSV to identify the worst offenders by severity.',
     );
   } else {
     lines.push(

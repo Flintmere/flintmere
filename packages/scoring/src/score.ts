@@ -1,6 +1,9 @@
+import { scoreAttributes } from './pillars/attributes.js';
+import { scoreCheckout } from './pillars/checkout.js';
 import { scoreConsistency } from './pillars/consistency.js';
 import { scoreCrawlability } from './pillars/crawlability.js';
 import { scoreIdentifiers } from './pillars/identifiers.js';
+import { scoreMapping } from './pillars/mapping.js';
 import { scoreTitles } from './pillars/titles.js';
 import {
   PILLAR_WEIGHTS,
@@ -32,9 +35,15 @@ export function scoreCatalog(
     ? applyLock(scoreCrawlability(options.crawlability), locked)
     : lockedPillar('crawlability', 'crawlability-not-fetched');
 
-  const attributes = lockedPillar('attributes', 'requires-install');
-  const mapping = lockedPillar('mapping', 'requires-install');
-  const checkout = lockedPillar('checkout-eligibility', 'requires-install');
+  const attributes = options.adminContext
+    ? applyLock(scoreAttributes(input, options.adminContext), locked)
+    : lockedPillar('attributes', 'requires-install');
+  const mapping = options.adminContext
+    ? applyLock(scoreMapping(input, options.adminContext), locked)
+    : lockedPillar('mapping', 'requires-install');
+  const checkout = options.adminContext
+    ? applyLock(scoreCheckout(input, options.adminContext), locked)
+    : lockedPillar('checkout-eligibility', 'requires-install');
 
   const pillars: PillarResult[] = [
     identifiers,

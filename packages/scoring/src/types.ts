@@ -121,6 +121,38 @@ export interface CrawlabilityInput {
 export interface ScoreOptions {
   locked?: readonly PillarId[];
   crawlability?: CrawlabilityInput;
+  adminContext?: AdminContextInput;
+}
+
+// ---- Admin-context input (Shopify Admin GraphQL pull) ----
+// Side-channel data that unlocks the three pillars locked under
+// `requires-install` on a public scan: structured attributes, GMC
+// mapping, and checkout eligibility. Shape mirrors what
+// `apps/scanner/src/lib/shopify-admin-fetcher.ts#AdminFetchedCatalog`
+// produces — Maps keyed by the same numeric product id `ProductInput.id`
+// uses, plus a shop-level checkout-context bag.
+//
+// When `adminContext` is absent on `ScoreOptions`, the three pillars
+// stay locked with `lockedReason: 'requires-install'`. When present,
+// they grade the data — even if the data shows complete absence
+// (no metafields, no GMC categories, etc.) — because that absence is
+// the honest, scoreable signal the audit is meant to surface.
+export interface AdminMetafield {
+  namespace: string;
+  key: string;
+  type: string;
+  value: string;
+}
+
+export interface AdminCheckoutContext {
+  requiresCustomerAccount: boolean | null;
+  customerAccountsVersion: string | null;
+}
+
+export interface AdminContextInput {
+  metafieldsByProduct: Map<string, AdminMetafield[]>;
+  googleProductCategoryByProduct: Map<string, string | null>;
+  checkoutContext: AdminCheckoutContext;
 }
 
 // ---- Suppression-estimate (dead-inventory wedge) ----
