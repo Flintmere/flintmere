@@ -140,12 +140,13 @@ export function SiteFooter() {
               letterSpacing: '0.04em',
             }}
           >
-            <a
-              href="mailto:hello@flintmere.com"
+            <Link
+              href="/contact"
               className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
+              aria-label="Contact Flintmere — opens contact form"
             >
               hello@flintmere.com
-            </a>
+            </Link>
             <p>
               Built in{' '}
               <span className="font-mono" aria-hidden="true">
