@@ -132,7 +132,7 @@ const PILLARS: PillarSpec[] = [
 
 export default function MarketingHome() {
   return (
-    <main id="main" className="flintmere-main">
+    <main id="main" className="flintmere-main flintmere-main--curtain">
       <a href="#hero" className="skip-link">Skip to content</a>
       <MarketingStickyCta href="/scan" label="Run a free scan" glyph="→" />
       <ViewportReveal>

@@ -727,9 +727,18 @@
    Paints below sibling sections (z:-1), above main's background, so the
    wordmark close is uncovered when content scrolls off-top.
 
-   Scoped to .flintmere-main descendants so any surface that opts out
-   (404) renders without the curtain. */
-.flintmere-main .flintmere-footer-sticky {
+   OPT-IN via the .flintmere-main--curtain modifier. Default behaviour
+   (just .flintmere-main) renders the footer as a normal block at the
+   end of content — no sticky, no z-index reordering, no bleed-through.
+
+   Why opt-in. Curtain mode requires every section above the footer to
+   paint paper edge-to-edge OR the dark footer (bg-ink) shows through
+   in any auto-margin gap (operator caught 2026-05-03 on /scan,
+   /for/food-and-drink, /audit, /pricing — every page using max-w'd
+   centred sections leaks the dark footer in the left/right margins).
+   Pages with full-bleed cinematic chapters (homepage) opt in; pages
+   with max-w'd content columns don't. */
+.flintmere-main--curtain .flintmere-footer-sticky {
   position: sticky;
   bottom: 0;
   z-index: -1;
