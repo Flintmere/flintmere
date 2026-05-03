@@ -50,6 +50,74 @@ export default function RootLayout({
       }}
     >
       <body>
+        {/* JSON-LD Organization + WebSite schema. AI-shopping crawlers and
+            Google rich-result eligibility both consume this; absence is
+            ironic for a catalog-AI-readiness product. Single source — if
+            entity details change, also update /about + /privacy + /terms. */}
+        <Script
+          id="ld-organization"
+          type="application/ld+json"
+          strategy="beforeInteractive"
+        >
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@graph': [
+              {
+                '@type': 'Organization',
+                '@id': 'https://flintmere.com/#organization',
+                name: 'Flintmere',
+                legalName: 'Eazy Access Ltd',
+                url: 'https://flintmere.com',
+                logo: 'https://flintmere.com/icon.png',
+                founder: { '@type': 'Person', name: 'John Morris' },
+                foundingDate: '2021',
+                identifier: [
+                  {
+                    '@type': 'PropertyValue',
+                    propertyID: 'Companies House',
+                    value: '13205428',
+                  },
+                ],
+                address: {
+                  '@type': 'PostalAddress',
+                  streetAddress: '71–75 Shelton Street, Covent Garden',
+                  addressLocality: 'London',
+                  postalCode: 'WC2H 9JQ',
+                  addressCountry: 'GB',
+                },
+                sameAs: ['https://github.com/Flintmere'],
+              },
+              {
+                '@type': 'WebSite',
+                '@id': 'https://flintmere.com/#website',
+                url: 'https://flintmere.com',
+                name: 'Flintmere',
+                publisher: { '@id': 'https://flintmere.com/#organization' },
+                inLanguage: 'en-GB',
+                potentialAction: {
+                  '@type': 'SearchAction',
+                  target: 'https://flintmere.com/scan?shop={shop_url}',
+                  'query-input': 'required name=shop_url',
+                },
+              },
+              {
+                '@type': 'SoftwareApplication',
+                name: 'Flintmere Scanner',
+                applicationCategory: 'BusinessApplication',
+                operatingSystem: 'Web',
+                url: 'https://flintmere.com/scan',
+                publisher: { '@id': 'https://flintmere.com/#organization' },
+                offers: {
+                  '@type': 'Offer',
+                  price: '0',
+                  priceCurrency: 'GBP',
+                  description:
+                    'Free 60-second AI-readiness audit for any public Shopify store.',
+                },
+              },
+            ],
+          })}
+        </Script>
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:bg-[color:var(--color-ink)] focus:px-3 focus:py-2 focus:text-[color:var(--color-paper)]"
