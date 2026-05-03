@@ -118,13 +118,19 @@ export default function Support() {
 
       <Clause n="04" heading="Status and uptime">
         <p>
-          Live service status is published at{' '}
-          <a href="https://status.flintmere.com" className="underline">
-            status.flintmere.com
-          </a>
-          . Incidents are posted there within 10 minutes of detection. Root-
-          cause post-mortems follow within 5 working days for any Severity 1
-          or 2 incident.
+          Scanner uptime is monitored externally by BetterStack with
+          three-minute health checks; the on-call operator is paged
+          within nine minutes of a sustained outage. We do not yet
+          operate a public status page &mdash; if an incident affects
+          you, we email you directly. Root-cause post-mortems follow
+          within 5 working days for any Severity 1 or 2 incident and
+          are sent to affected customers; you can request the latest
+          via our{' '}
+          <a href="/contact?topic=general" className="underline">
+            contact form
+          </a>{' '}
+          (General topic). A public status page is on the pre-launch
+          roadmap.
         </p>
       </Clause>
 
