@@ -78,9 +78,12 @@ export function ConciergeBands() {
 
 function BandCard({ band }: { band: AuditBand }) {
   const priceId = `concierge-${band.slug}-price`;
-  const ctaHref = band.isBespoke
-    ? `/audit?band=${band.slug}#bands`
-    : `/audit?band=${band.slug}`;
+  // All bands deep-link to the checkout section; the BandTriptych
+  // reads ?band= on mount and pre-selects, so the user lands on the
+  // form already configured for their chosen band — no extra click.
+  // Bespoke (band-3) routes through the same anchor; CheckoutCard
+  // renders the bespoke-quote variant when the band is band-3.
+  const ctaHref = `/audit?band=${band.slug}#checkout`;
   const ctaLabel = band.isBespoke ? 'Request a quote →' : 'Book the audit →';
 
   return (

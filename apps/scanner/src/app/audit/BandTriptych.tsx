@@ -29,7 +29,7 @@
  * extravagant relaxation; ADR 0021 §1 amendment pending.
  */
 
-import { useCallback, useId, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   AUDIT_BANDS,
@@ -48,11 +48,29 @@ import { CheckoutCard } from './CheckoutCard';
 // self-attestation accepts the operational catch.
 const DEFAULT_BAND: AuditBandSlug = 'band-1';
 
+function isAuditBandSlug(value: string | null): value is AuditBandSlug {
+  return value === 'band-1' || value === 'band-2' || value === 'band-3';
+}
+
 export function BandTriptych() {
   const reduce = useReducedMotion();
   const [bandSlug, setBandSlug] = useState<AuditBandSlug>(DEFAULT_BAND);
   const liveId = useId();
   const groupName = useId();
+
+  // Read ?band= URL param on mount and pre-select the requested band.
+  // Bridges the /pricing → /audit deep-link path: clicking a specific
+  // band card on /pricing lands the user on /audit?band=band-X#checkout
+  // with that band already selected — no second click. window.location
+  // over useSearchParams to avoid forcing the route into Suspense.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const requested = new URLSearchParams(window.location.search).get('band');
+    if (isAuditBandSlug(requested) && requested !== DEFAULT_BAND) {
+      setBandSlug(requested);
+      track('band_preselected', { band: requested });
+    }
+  }, []);
 
   const selected = AUDIT_BANDS.find((b) => b.slug === bandSlug)!;
 
