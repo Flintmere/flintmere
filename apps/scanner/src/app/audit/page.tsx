@@ -215,7 +215,7 @@ export default function Audit() {
                 ['--reveal-delay' as string]: `${D_EYEBROW}ms`,
               }}
             >
-              <span aria-hidden="true">// </span>the cost
+              <span aria-hidden="true">// </span>book
             </p>
 
             <h2
@@ -228,7 +228,7 @@ export default function Audit() {
                 ['--reveal-delay' as string]: `${D_HEADLINE}ms`,
               }}
             >
-              Three bands. Pick yours.
+              Pay. Done in three working days.
             </h2>
 
             <BandTriptych />

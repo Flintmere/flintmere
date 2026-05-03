@@ -87,16 +87,60 @@ export function BandTriptych() {
 
   return (
     <>
-      {/* Triptych — three saks chords. The grid IS the SKU-range axis.
-          Click any chord to select. */}
+      {/* CheckoutCard FIRST — the page is a checkout, not a band picker.
+          Council 2026-05-03 (#15 PM, #36 SRE, #34 QE, #10 Eng, #11 Founder,
+          #7 Ops, #8 Noor, #9 Legal, #22 Marketing — verdict A): single
+          flow, ExpressCheckoutElement + PaymentElement above the fold,
+          band-switcher demoted below as the secondary disclosure. Top-tier
+          checkout archetype (Apple One, Stripe Atlas, Linear, Notion,
+          Shop Pay) — never put a comparison spread between intent and
+          submit. */}
+      <div
+        data-reveal
+        style={{
+          marginTop: 'clamp(40px, 5vw, 72px)',
+          maxWidth: 720,
+          ['--reveal-delay' as string]: '160ms',
+        }}
+      >
+        <CheckoutCard bandSlug={bandSlug} onBandChange={handleBandChange} />
+      </div>
+
+      {/* Micro-strip — reassurance row, single read */}
+      <p
+        data-reveal
+        className="font-mono uppercase"
+        aria-label="One-time payment, no VAT, thirty-day refund, three working days"
+        style={{
+          marginTop: 'clamp(32px, 4vw, 56px)',
+          fontSize: 'clamp(11px, 1vw, 13px)',
+          letterSpacing: '0.18em',
+          fontWeight: 500,
+          color: 'var(--color-ink)',
+          ['--reveal-delay' as string]: '240ms',
+        }}
+      >
+        One-time
+        <span className="mx-3" aria-hidden="true" style={{ color: 'var(--color-mute-2)' }}>·</span>
+        No VAT
+        <span className="mx-3" aria-hidden="true" style={{ color: 'var(--color-mute-2)' }}>·</span>
+        30-day refund
+        <span className="mx-3" aria-hidden="true" style={{ color: 'var(--color-mute-2)' }}>·</span>
+        Three working days
+      </p>
+
+      {/* Band-switcher — demoted to disclosure. The user does NOT need
+          to interact with this to pay; band-1 is the default and most
+          merchants belong here. Shown for those who need to escalate to
+          band-2 (1,501–5,000 SKUs) or band-3 (5,001+, bespoke quote). */}
       <fieldset
         data-reveal
         style={{
           border: 0,
           padding: 0,
           margin: 0,
-          marginTop: 'clamp(48px, 6vw, 96px)',
-          ['--reveal-delay' as string]: '240ms',
+          marginTop: 'clamp(56px, 7vw, 96px)',
+          ['--reveal-delay' as string]: '320ms',
         }}
       >
         <legend
@@ -110,7 +154,7 @@ export function BandTriptych() {
             padding: 0,
           }}
         >
-          <span aria-hidden="true">// </span>pick a band — the price is the choice
+          <span aria-hidden="true">// </span>different size catalogue? change band
         </legend>
 
         <div
@@ -150,41 +194,6 @@ export function BandTriptych() {
           {`${selected.label} selected — ${selected.priceDisplay} — ${selected.skuRangeLabel}, ${selected.hoursEstimate}.`}
         </p>
       </fieldset>
-
-      {/* Micro-strip — reassurance row, single read */}
-      <p
-        data-reveal
-        className="font-mono uppercase"
-        aria-label="One-time payment, no VAT, thirty-day refund, three working days"
-        style={{
-          marginTop: 'clamp(32px, 4vw, 56px)',
-          fontSize: 'clamp(11px, 1vw, 13px)',
-          letterSpacing: '0.18em',
-          fontWeight: 500,
-          color: 'var(--color-ink)',
-          ['--reveal-delay' as string]: '320ms',
-        }}
-      >
-        One-time
-        <span className="mx-3" aria-hidden="true" style={{ color: 'var(--color-mute-2)' }}>·</span>
-        No VAT
-        <span className="mx-3" aria-hidden="true" style={{ color: 'var(--color-mute-2)' }}>·</span>
-        30-day refund
-        <span className="mx-3" aria-hidden="true" style={{ color: 'var(--color-mute-2)' }}>·</span>
-        Three working days
-      </p>
-
-      {/* CheckoutCard — controlled. Receives bandSlug + onBandChange. */}
-      <div
-        data-reveal
-        style={{
-          marginTop: 'clamp(48px, 6vw, 88px)',
-          maxWidth: 720,
-          ['--reveal-delay' as string]: '400ms',
-        }}
-      >
-        <CheckoutCard bandSlug={bandSlug} onBandChange={handleBandChange} />
-      </div>
     </>
   );
 }
