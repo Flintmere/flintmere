@@ -20,7 +20,9 @@
     "benchmark:scan:food": "FILTER_VERTICAL=food-and-drink CONCURRENCY=1 PACE_MS=2500 tsx scripts/batch-scan.ts",
     "cohort:design-partners": "tsx scripts/export-design-partner-cohort.ts",
     "cohort:diagnose": "tsx scripts/cohort-funnel-diagnose.ts",
-    "purge:contact-threads": "tsx scripts/purge-contact-threads.ts"
+    "purge:contact-threads": "tsx scripts/purge-contact-threads.ts",
+    "audit:csv": "tsx scripts/export-audit-csv.ts",
+    "audit:deliver": "tsx scripts/audit-deliver.ts"
   },
   "dependencies": {
     "@flintmere/scoring": "workspace:*",

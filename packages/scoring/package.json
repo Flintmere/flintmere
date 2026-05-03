@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "description": "Flintmere six-pillar scoring engine. Pure TypeScript; no framework deps.",
+  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

@@ -106,6 +106,11 @@ export async function sendConciergeCustomerEmail(
           <tr>
             <td style="padding:0 32px 24px 32px;">
               <p style="margin:0;font-size:14px;line-height:1.55;color:#5A5C64;">If the shop URL above is wrong, just reply to this email and I&rsquo;ll fix it before I start. Stripe has sent a separate receipt for your records.</p>
+              <div style="margin-top:24px;padding:18px;border:1px solid #D5D2C8;">
+                <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;margin-bottom:6px;">Optional · ~4 minutes</div>
+                <p style="margin:0 0 8px 0;font-size:14px;line-height:1.55;color:#141518;">Want the full <strong>seven-pillar</strong> read instead of four? A read-only Shopify Admin token lets us measure your structured attributes, Google category mapping, and checkout readiness directly. Without it, those three pillars stay directional, not measured.</p>
+                <p style="margin:0 0 12px 0;font-size:14px;line-height:1.55;color:#141518;">Create a private app in your Shopify admin (Settings → Apps and sales channels → Develop apps → Create app), tick the <code>read_products</code> + <code>read_product_listings</code> + <code>read_metafields</code> scopes, install it, copy the <code>shpat_</code> token. Paste at <a href="https://flintmere.com/secret" style="color:#0A0A0B;text-decoration:underline;">flintmere.com/secret</a> &mdash; encrypted in your browser, key never reaches us &mdash; and reply to this email with the URL it gives you. We click it once, the link burns, the token never sits in any inbox or log in plaintext.</p>
+              </div>
               ${optionalCallBlockHtml}
             </td>
           </tr>
@@ -144,6 +149,13 @@ Here's what happens next, in order:
 
 If the shop URL above is wrong, just reply to this email and I'll fix it
 before I start. Stripe has sent a separate receipt for your records.
+
+Optional (~4 minutes): for the full seven-pillar read instead of four,
+create a read-only Shopify Admin token (Settings → Apps and sales
+channels → Develop apps → Create app; scopes: read_products,
+read_product_listings, read_metafields), paste it at
+flintmere.com/secret — encrypted in your browser, key never reaches
+us — and reply to this email with the URL it generates.
 ${optionalCallBlockText}
 — ${JOHN_SIGNATURE_NAME}, ${JOHN_SIGNATURE_TITLE}
 ${JOHN_SIGNATURE_REPLY_INVITE}

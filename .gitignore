@@ -95,3 +95,6 @@ data/benchmark/*
 # Recruitment cohort exports — contain merchant emails (PII)
 data/recruitment/*
 !data/recruitment/README.md
+
+# Concierge audit working data (per-merchant CSV + summary outputs)
+data/audits/*

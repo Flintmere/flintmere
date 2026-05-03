@@ -20,6 +20,11 @@ function client(): Resend | null {
   return instance;
 }
 
+export interface SendEmailAttachment {
+  filename: string;
+  content: Buffer;
+}
+
 export interface SendEmailInput {
   to: string;
   subject: string;
@@ -28,6 +33,7 @@ export interface SendEmailInput {
   /** Optional headers (we use List-Unsubscribe for one-click PECR/GDPR compliance). */
   headers?: Record<string, string>;
   tags?: Array<{ name: string; value: string }>;
+  attachments?: SendEmailAttachment[];
 }
 
 export interface SendEmailResult {
@@ -67,6 +73,10 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
     text: input.text,
     headers: input.headers,
     tags: input.tags,
+    attachments: input.attachments?.map((a) => ({
+      filename: a.filename,
+      content: a.content,
+    })),
   });
 
   if (result.error) {
