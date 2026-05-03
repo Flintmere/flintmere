@@ -96,7 +96,11 @@ export default function RootLayout({
                 inLanguage: 'en-GB',
                 potentialAction: {
                   '@type': 'SearchAction',
-                  target: 'https://flintmere.com/scan?shop={shop_url}',
+                  // SearchAction target is the scanner host where the
+                  // search action actually executes — even though the
+                  // WebSite entity itself is the brand site.
+                  target:
+                    'https://audit.flintmere.com/scan?shop={shop_url}',
                   'query-input': 'required name=shop_url',
                 },
               },
@@ -105,7 +109,12 @@ export default function RootLayout({
                 name: 'Flintmere Scanner',
                 applicationCategory: 'BusinessApplication',
                 operatingSystem: 'Web',
-                url: 'https://flintmere.com/scan',
+                // Scanner lives on the audit. subdomain per the C1
+                // host-routing architecture (council 2026-05-03). The
+                // Organization and WebSite entities stay on flintmere.com
+                // (the brand domain) — only the SoftwareApplication URL
+                // moves.
+                url: 'https://audit.flintmere.com/scan',
                 publisher: { '@id': 'https://flintmere.com/#organization' },
                 offers: {
                   '@type': 'Offer',
