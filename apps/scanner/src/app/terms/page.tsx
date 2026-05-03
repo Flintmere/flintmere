@@ -132,6 +132,25 @@ export default function Terms() {
             Submit malware, probe for vulnerabilities outside a disclosed
             programme, or interfere with service availability.
           </li>
+          <li>
+            Use the one-time-secret tool at{' '}
+            <code>flintmere.com/secret</code> for anything other than
+            one-shot transfer of sensitive values between consenting
+            parties — credentials, configuration values, API keys,
+            short-lived secrets. Acceptable: handing a read-only Shopify
+            Admin token to the Flintmere audit team, sharing a recovery
+            phrase with a colleague who&rsquo;s expecting it, sending a
+            CI deploy key to a teammate. Not acceptable: anonymous
+            paste-hosting, distribution to recipients who haven&rsquo;t
+            agreed to receive it, illegal content, harassment, threats,
+            doxxing material, or any payload that would breach UK law if
+            read out in plain text. Abuse is grounds for permanent ban
+            from all Flintmere surfaces. We cannot read ciphertext at
+            rest, but rate-limit metadata, IP-hash logs, and
+            recipient-side reports give us enough signal to investigate
+            abuse and cooperate with lawful UK law-enforcement requests
+            within ICO and UK GDPR bounds.
+          </li>
         </ul>
       </Clause>
 

@@ -63,6 +63,13 @@ export function SiteFooter() {
           </Link>
           <span aria-hidden="true" className="hidden sm:inline">,</span>
           <Link
+            href="/secret"
+            className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
+          >
+            One-time secret
+          </Link>
+          <span aria-hidden="true" className="hidden sm:inline">,</span>
+          <Link
             href="/audit"
             className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >

@@ -12,7 +12,7 @@ export default function Privacy() {
     <LegalShell
       eyebrow="Privacy"
       title="How we handle your data."
-      summary="We collect only what we need to score and fix your product catalog. We do not sell data, ever. We host in the UK/EU, we delete tokens within 60 seconds of uninstall, and you can ask us to delete everything else at any time by sending a message via our contact form (Privacy topic)."
+      summary="We collect only what we need to score and fix your product catalog. We do not sell data, ever. We host in the UK/EU, we delete tokens within 60 seconds of uninstall, our free one-time-secret tool at /secret encrypts in your browser so we never hold the key, and you can ask us to delete everything else at any time by sending a message via our contact form (Privacy topic)."
       lastUpdated="2026-05-03"
       anchorNumeral="01"
     >
@@ -246,7 +246,51 @@ export default function Privacy() {
         </p>
       </Clause>
 
-      <Clause n="10" heading="Changes to this policy">
+      <Clause n="10" heading="One-time-secret service">
+        <p>
+          We operate a free one-time-secret tool at{' '}
+          <code>flintmere.com/secret</code> for transferring sensitive
+          values from sender to recipient through a single-use URL. We
+          built it originally for handing read-only Shopify Admin API
+          tokens to the audit team during concierge fulfilment, and it
+          stayed nice enough to publish — anyone can use it for any
+          one-shot secret transfer between consenting parties. The flow
+          is <strong>zero-knowledge by design</strong>:
+        </p>
+        <ul className="mt-4 list-disc pl-6 space-y-2">
+          <li>
+            Encryption happens in your browser before anything leaves
+            your device. We use AES-256-GCM via the Web Crypto API.
+          </li>
+          <li>
+            The decryption key sits in the URL fragment (the part after{' '}
+            <code>#</code>), which by RFC 3986 §3.5 is never sent to our
+            servers. We hold the ciphertext only and have no way to
+            decrypt past secrets, even with full database access.
+          </li>
+          <li>
+            <strong>Retention:</strong> each secret burns on first read
+            (atomic claim — only one viewer wins) or expires 24 hours
+            after creation, whichever comes first. After consumption or
+            expiry, only an opaque ID and timestamps remain in the
+            database for ~30 days for abuse investigation, never the
+            ciphertext.
+          </li>
+          <li>
+            <strong>What we log:</strong> a SHA-256 hash of the IP
+            address that created the secret (for rate limiting), and the
+            consumption timestamp. Never the secret content; we cannot
+            log what we cannot read.
+          </li>
+        </ul>
+        <p className="mt-4">
+          Acceptable-use rules — what the tool is for, and what gets you
+          banned — live in our{' '}
+          <a href="/terms" className="underline">Terms</a> (clause 05).
+        </p>
+      </Clause>
+
+      <Clause n="11" heading="Changes to this policy">
         <p>
           If we make material changes, we&rsquo;ll email Shopify app users 30
           days in advance and update the &ldquo;Last updated&rdquo; date at

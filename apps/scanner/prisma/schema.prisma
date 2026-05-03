@@ -144,3 +144,23 @@ model ContactMessage {
   @@index([createdAt])
   @@map("scanner_contact_messages")
 }
+
+/// One-time secret handoff. Used primarily for concierge-audit token
+/// transfer (merchant pastes their Shopify Admin API token, gets a
+/// single-use URL, sends URL to operator via email reply). Burned on
+/// first read; deleted-on-burn would also work but we keep the row so
+/// re-clicks return a useful "already consumed" signal instead of 404.
+/// Server-side AES-256-GCM at rest with key from env var
+/// ONETIMESECRET_KEY (32 bytes hex). Default TTL 24 hours.
+model OneTimeSecret {
+  id         String    @id @default(cuid())
+  ciphertext Bytes
+  iv         Bytes
+  authTag    Bytes     @map("auth_tag")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  expiresAt  DateTime  @map("expires_at")
+  consumedAt DateTime? @map("consumed_at")
+
+  @@index([expiresAt])
+  @@map("scanner_one_time_secrets")
+}
