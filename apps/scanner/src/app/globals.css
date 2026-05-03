@@ -952,10 +952,17 @@
   display: inline-block;
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: clamp(64px, 9vw, 144px);
+  /* Was clamp(64px, 9vw, 144px); brackets overflowed column width
+     on desktop because `bracket-inline` adds `[` + `]` pseudo-
+     elements at the same scale (~150% total chord width vs
+     £197 alone). Reduced to clamp(56px, 7vw, 112px) — heroic
+     scale preserved, fits inside the ~360px column content area
+     at the canon's 1280px hero width. */
+  font-size: clamp(56px, 7vw, 112px);
   letter-spacing: -0.04em;
   line-height: 0.9;
   transition: color 320ms ease, -webkit-text-stroke-color 320ms ease;
+  max-width: 100%;
 }
 
 .band-chord-numeral--selected {
