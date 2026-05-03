@@ -5,7 +5,7 @@ import { Bracket, SiteFooter } from '@flintmere/ui';
 import { ViewportReveal } from '@/components/ViewportReveal';
 import { MarketingStickyCta } from '@/components/MarketingStickyCta';
 import { BandTriptych } from './BandTriptych';
-import { CTAButton, DeliverableLift } from './audit-motion';
+import { DeliverableLift } from './audit-motion';
 import { CONCIERGE_DELIVERABLE_LIST } from '@/lib/copy';
 
 export const metadata: Metadata = {
@@ -59,139 +59,27 @@ const D_PRIMARY = STEP * 3;
 export default function Audit() {
   return (
     <main id="main" className="flintmere-main">
-      <a href="#hero" className="skip-link">
+      <a href="#checkout" className="skip-link">
         Skip to content
       </a>
       <MarketingStickyCta href="#checkout" label="Book the audit · £197" glyph="↑" />
       <ViewportReveal>
-        {/* Chapter 1 — Hero. Single typographic canvas. The value
-            proposition lands as one read, not as a six-word cascade. */}
-        <section
-          id="hero"
-          aria-labelledby="audit-heading"
-          className="relative isolate overflow-hidden bg-[color:var(--color-paper)] flex flex-col"
-          style={{ minHeight: 'min(100vh, 880px)' }}
-        >
-          <div
-            className="relative flex flex-col justify-center mx-auto w-full max-w-[1280px]"
-            style={{
-              flex: 1,
-              paddingLeft: 'clamp(32px, 5vw, 96px)',
-              paddingRight: 'clamp(32px, 4vw, 64px)',
-              paddingTop: 'clamp(96px, 12vh, 160px)',
-              paddingBottom: 'clamp(72px, 10vh, 120px)',
-            }}
-          >
-            <p
-              data-reveal
-              aria-label="Flintmere concierge audit, from one hundred and ninety-seven pounds, three working days"
-              className="font-mono uppercase"
-              style={{
-                fontSize: 'clamp(11px, 1vw, 13px)',
-                letterSpacing: '0.18em',
-                fontWeight: 500,
-                color: 'var(--color-mute)',
-                marginBottom: 'clamp(32px, 4vw, 56px)',
-                ['--reveal-delay' as string]: `${D_EYEBROW}ms`,
-              }}
-            >
-              Flintmere · Concierge audit · from £197 · 3 working days
-            </p>
+        {/* Hero IS the checkout. Council 2026-05-04 (8-0):
+            Apple One / Stripe Atlas / Linear / Notion / Vercel / Shop
+            Pay archetype — the conversion page's hero is the form,
+            not a sales chapter above the form. The previous Chapter 1
+            hero ("Want us to read your store [ for you ]?" + "See the
+            bands ↓") was deleted; brand voice survives in the price-
+            chord brand-mark inside BandTriptych. Chapters 2–5
+            (deliverables, how-it-works, trust, FAQ) sit below-fold as
+            supplementary read. */}
 
-            <h1
-              id="audit-heading"
-              data-reveal
-              className="font-sans tracking-[-0.04em] leading-[0.88] text-[color:var(--color-ink)]"
-              style={{
-                fontSize: 'clamp(56px, 8vw, 128px)',
-                maxWidth: '14ch',
-                fontWeight: 700,
-                ['--reveal-delay' as string]: `${D_HEADLINE}ms`,
-              }}
-            >
-              Want us to read your store{' '}
-              <Bracket size="saks">for you</Bracket>?
-            </h1>
-
-            <p
-              data-reveal
-              className="font-sans"
-              style={{
-                marginTop: 'clamp(28px, 3vw, 48px)',
-                maxWidth: '52ch',
-                fontSize: 'clamp(16px, 1.15vw, 19px)',
-                lineHeight: 1.55,
-                fontWeight: 400,
-                color: 'var(--color-mute)',
-                ['--reveal-delay' as string]: `${D_SUPPORT}ms`,
-              }}
-            >
-              We read your catalog product by product, write a detailed
-              letter pointing at exactly what to fix, and send a per-product
-              CSV with the worst offenders already drafted for you. No call.
-              No screen-share. Three working days.
-            </p>
-
-            <div
-              data-reveal
-              className="flex flex-wrap items-center gap-x-6 gap-y-3"
-              style={{
-                marginTop: 'clamp(32px, 4vw, 56px)',
-                ['--reveal-delay' as string]: `${D_PRIMARY}ms`,
-              }}
-            >
-              <CTAButton
-                href="#checkout"
-                className="inline-flex items-center gap-3 px-7 py-3.5 bg-[color:var(--color-accent)] text-[color:var(--color-accent-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-ink)] hover:text-[color:var(--color-paper)] transition-colors duration-[var(--duration-instant)]"
-              >
-                See the bands
-                <span aria-hidden="true">↓</span>
-              </CTAButton>
-              <Link
-                href="/scan"
-                className="font-mono uppercase"
-                style={{
-                  fontSize: 'clamp(11px, 1vw, 13px)',
-                  letterSpacing: '0.18em',
-                  fontWeight: 500,
-                  color: 'var(--color-mute)',
-                  textDecoration: 'underline',
-                  textUnderlineOffset: 4,
-                }}
-              >
-                Or run the free scan first
-              </Link>
-            </div>
-
-            <div
-              data-reveal
-              aria-hidden="true"
-              className="absolute h-[2px]"
-              style={{
-                left: 'clamp(32px, 5vw, 96px)',
-                bottom: 'clamp(32px, 4vw, 56px)',
-                width: 'clamp(160px, 14vw, 280px)',
-                background: 'var(--color-accent-sage)',
-                opacity: 0.85,
-                ['--reveal-delay' as string]: `${D_PRIMARY}ms`,
-              }}
-            />
-          </div>
-        </section>
-
-        {/* Chapter 2 — The price chord, as a triptych. The configurator
-            IS the visual anchor: three saks chords visible at once
-            across a grid that encodes the SKU-range axis (smallest →
-            largest, left → right). Selection swaps which chord carries
-            full ink fill + sage under-tick + paper-2 column wash; the
-            others remain visible as outline-stroke recessive states.
-
-            Per design-extravagant 2026-05-01 — bracket budget relaxed
-            to permit comparison-set brackets in the recessive form.
-            ADR 0021 §1 amendment pending operator codification. */}
+        {/* Chapter 1 (the only chapter above the fold) — checkout
+            composition. BandTriptych owns the heroic price chord
+            `[ £197 ]` (h1) + value-prop line + CheckoutCard. */}
         <section
           id="checkout"
-          aria-labelledby="price-heading"
+          aria-labelledby="audit-hero"
           className="relative bg-[color:var(--color-paper)]"
         >
           <div
@@ -199,37 +87,25 @@ export default function Audit() {
             style={{
               paddingLeft: 'clamp(24px, 5vw, 64px)',
               paddingRight: 'clamp(24px, 5vw, 64px)',
-              paddingTop: 'clamp(72px, 10vh, 128px)',
-              paddingBottom: 'clamp(72px, 10vh, 128px)',
+              paddingTop: 'clamp(48px, 7vh, 96px)',
+              paddingBottom: 'clamp(56px, 9vh, 112px)',
             }}
           >
             <p
               data-reveal
               className="font-mono uppercase"
+              aria-label="Flintmere concierge audit, three working days"
               style={{
                 fontSize: 'clamp(11px, 1.2vw, 13px)',
                 letterSpacing: '0.18em',
                 color: 'var(--color-mute)',
                 fontWeight: 500,
-                marginBottom: 'clamp(28px, 3vw, 48px)',
+                marginBottom: 'clamp(20px, 2.5vw, 32px)',
                 ['--reveal-delay' as string]: `${D_EYEBROW}ms`,
               }}
             >
-              <span aria-hidden="true">// </span>book
+              Flintmere · Concierge audit · 3 working days
             </p>
-
-            <h2
-              id="price-heading"
-              data-reveal
-              className="font-sans font-medium tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)]"
-              style={{
-                fontSize: 'clamp(40px, 5vw, 80px)',
-                maxWidth: '20ch',
-                ['--reveal-delay' as string]: `${D_HEADLINE}ms`,
-              }}
-            >
-              Pay. Done in three working days.
-            </h2>
 
             <BandTriptych />
           </div>

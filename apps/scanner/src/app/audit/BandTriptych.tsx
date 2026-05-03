@@ -81,20 +81,72 @@ export function BandTriptych() {
     [],
   );
 
+  // Selected band drives the heroic price chord + the value-prop
+  // copy. Defaults reflect band-1 deliverable (10 drafted fixes) and
+  // scope (full per-product); upgrades to 25 drafted fixes / sample
+  // for band-2/3 when the URL pre-select fires.
+  const heroPrice = selected.priceDisplay;
+  const fixCount = selected.deliverable.fullyDraftedFixCount;
+  const isSample = selected.deliverable.auditScope === 'representative-sample';
+  const valueLine = isSample
+    ? `Representative-sample audit. ${fixCount} fully-drafted fixes. Three working days.`
+    : `Per-product audit. ${fixCount} fully-drafted fixes. Three working days.`;
+
   return (
     <>
-      {/* CheckoutCard FIRST — the page is a checkout, not a band picker.
-          Council 2026-05-03 (#15 PM, #36 SRE, #34 QE, #10 Eng, #11 Founder,
-          #7 Ops, #8 Noor, #9 Legal, #22 Marketing — verdict A): single
-          flow, ExpressCheckoutElement + PaymentElement above the fold,
-          band-switcher demoted below as the secondary disclosure. Top-tier
-          checkout archetype (Apple One, Stripe Atlas, Linear, Notion,
-          Shop Pay) — never put a comparison spread between intent and
-          submit. */}
+      {/* Heroic price chord — the page's brand-mark moment. The price
+          IS the chord (replaces the previous `[ for you ]` voice
+          chord on the deleted Chapter 1 hero). Dynamically reflects
+          the selected band — band-1 default shows £197; band-2/3
+          upgrade in place when ?band= URL param fires. Council
+          2026-05-04 ratified hero-IS-checkout archetype. */}
+      <h1
+        id="audit-hero"
+        data-reveal
+        className="font-sans tracking-[-0.04em] leading-[0.88] text-[color:var(--color-ink)]"
+        style={{
+          fontSize: 'clamp(56px, 9vw, 144px)',
+          maxWidth: '14ch',
+          fontWeight: 700,
+          margin: 0,
+          ['--reveal-delay' as string]: '0ms',
+        }}
+      >
+        <span
+          className="bracket flintmere-outline-shimmer"
+          style={{
+            fontSize: 'clamp(56px, 9vw, 144px)',
+            letterSpacing: '-0.02em',
+            lineHeight: 1,
+            display: 'inline-block',
+          }}
+        >
+          {heroPrice}
+        </span>
+      </h1>
+
+      {/* Value-prop line — single read, dynamic per band */}
+      <p
+        data-reveal
+        style={{
+          marginTop: 'clamp(20px, 2.5vw, 32px)',
+          maxWidth: '50ch',
+          fontSize: 'clamp(15px, 1.1vw, 18px)',
+          lineHeight: 1.55,
+          fontWeight: 400,
+          color: 'var(--color-mute)',
+          ['--reveal-delay' as string]: '80ms',
+        }}
+      >
+        {valueLine}
+      </p>
+
+      {/* CheckoutCard — the form. ExpressCheckoutElement + PaymentElement
+          + Email + Shop URL fields + submit. */}
       <div
         data-reveal
         style={{
-          marginTop: 'clamp(40px, 5vw, 72px)',
+          marginTop: 'clamp(36px, 4vw, 56px)',
           maxWidth: 720,
           ['--reveal-delay' as string]: '160ms',
         }}
