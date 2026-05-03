@@ -89,6 +89,8 @@ Production values in Coolify environment configuration. Rotation schedule docume
   - `flintmere-app-web` — Dockerfile at `apps/shopify-app/Dockerfile` → `app.flintmere.com` (Remix + OAuth + webhooks; runs `prisma migrate deploy` on start)
   - `flintmere-app-worker` — Dockerfile at `apps/shopify-app/Dockerfile.worker` → no public route (BullMQ consumer; bulk-sync, scoring, drift-rescore)
   - Postgres 16 + Redis 7 via Coolify one-click services
+- **Scheduled tasks (Coolify, attached to `flintmere-scanner` service):**
+  - `purge:contact-threads` — daily at 03:15 Europe/London. Hard-deletes resolved contact-form threads older than 24 months from last contact (`/privacy` clause 04 retention promise). Runs `pnpm --filter scanner purge:contact-threads`. Idempotent. Set `DRY_RUN=true` env on the scheduled-task to validate before enabling deletion.
 
 ## Related
 

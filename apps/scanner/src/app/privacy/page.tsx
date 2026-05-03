@@ -113,11 +113,13 @@ export default function Privacy() {
           </li>
           <li>
             <strong>Contact form messages:</strong> kept while the conversation
-            is open. Resolved threads are retained for up to 24 months from
-            last contact for follow-up and audit, then purged. The IP-hash and
-            user-agent on each row are kept only as long as the message itself.
-            Right to erasure (clause 09) applies — request deletion at any
-            time and we honour it within 30 days.
+            is open. Resolved threads (responded, archived, or marked spam)
+            are retained for up to 24 months from last contact, then hard-
+            deleted by a daily scheduled job. Open threads (new or
+            acknowledged) are not purged on a schedule — those still need a
+            reply. The IP-hash and user-agent on each row are deleted with
+            the row. Right to erasure (clause 09) applies — request deletion
+            at any time and we honour it within 30 days.
           </li>
           <li>
             <strong>Shopify access token:</strong> scrubbed within 60 seconds
