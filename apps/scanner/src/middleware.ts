@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import {
   rewritePathForHost,
   targetHostForRedirect,
-} from './src/lib/host-routing';
+} from './lib/host-routing';
 
 /**
  * Host-routing middleware — implements the C1 architecture
