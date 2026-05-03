@@ -25,9 +25,19 @@ import {
  * inside the container is the internal service name.
  */
 export function middleware(request: NextRequest): NextResponse {
+  // Three fallbacks in priority order. Coolify/Traefik should set
+  // `x-forwarded-host` to the originally-requested public host; that
+  // is the canonical signal. Direct `host` is the container-internal
+  // service name when behind a proxy, but in some Coolify configs it
+  // mirrors the public host. `nextUrl.hostname` is Next's parsed URL
+  // hostname — useful as a last resort if both headers are mangled.
+  // Empirical bug 2026-05-03: standards.flintmere.com/ rendered the
+  // marketing homepage in production, suggesting at least one of the
+  // header signals was not arriving as expected for the third host.
   const forwardedHost = request.headers.get('x-forwarded-host');
   const directHost = request.headers.get('host');
-  const requestHost = (forwardedHost ?? directHost ?? '').toLowerCase();
+  const urlHost = request.nextUrl.hostname;
+  const requestHost = (forwardedHost ?? directHost ?? urlHost ?? '').toLowerCase();
 
   if (!requestHost) return NextResponse.next();
 
@@ -39,7 +49,15 @@ export function middleware(request: NextRequest): NextResponse {
     redirectUrl.host = target;
     redirectUrl.protocol = 'https:';
     redirectUrl.port = '';
-    return NextResponse.redirect(redirectUrl, 301);
+    const redirectResponse = NextResponse.redirect(redirectUrl, 301);
+    annotateHostDiagnostics(redirectResponse, {
+      forwardedHost,
+      directHost,
+      urlHost,
+      detected: requestHost,
+      decision: `redirect:${target}`,
+    });
+    return redirectResponse;
   }
 
   // Same-host rewrite — currently only standards.flintmere.com/ → /standards.
@@ -50,10 +68,50 @@ export function middleware(request: NextRequest): NextResponse {
   if (rewriteTo) {
     const url = request.nextUrl.clone();
     url.pathname = rewriteTo;
-    return NextResponse.rewrite(url);
+    const rewriteResponse = NextResponse.rewrite(url);
+    annotateHostDiagnostics(rewriteResponse, {
+      forwardedHost,
+      directHost,
+      urlHost,
+      detected: requestHost,
+      decision: `rewrite:${rewriteTo}`,
+    });
+    return rewriteResponse;
   }
 
-  return NextResponse.next();
+  const passResponse = NextResponse.next();
+  annotateHostDiagnostics(passResponse, {
+    forwardedHost,
+    directHost,
+    urlHost,
+    detected: requestHost,
+    decision: 'pass',
+  });
+  return passResponse;
+}
+
+/**
+ * Adds diagnostic headers so the operator can `curl -I` against any
+ * surface and see exactly what the middleware saw. Cheap insurance
+ * for any future host-routing bug — header noise is a non-issue,
+ * blind production debugging is. Strip after the C1 routing has
+ * settled (track via incident-history.md).
+ */
+function annotateHostDiagnostics(
+  response: NextResponse,
+  diag: {
+    forwardedHost: string | null;
+    directHost: string | null;
+    urlHost: string | null;
+    detected: string;
+    decision: string;
+  },
+): void {
+  response.headers.set('x-flintmere-host-fwd', diag.forwardedHost ?? '');
+  response.headers.set('x-flintmere-host-direct', diag.directHost ?? '');
+  response.headers.set('x-flintmere-host-url', diag.urlHost ?? '');
+  response.headers.set('x-flintmere-host-detected', diag.detected);
+  response.headers.set('x-flintmere-host-decision', diag.decision);
 }
 
 /**
