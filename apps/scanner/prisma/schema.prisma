@@ -101,3 +101,46 @@ model ConciergeAudit {
   @@index([status])
   @@map("scanner_concierge_audits")
 }
+
+enum ContactTopic {
+  general
+  privacy
+  security
+  billing
+  legal
+  plus
+  concierge
+  partnership
+}
+
+enum ContactStatus {
+  new
+  acknowledged
+  responded
+  archived
+  spam
+}
+
+model ContactMessage {
+  id             String        @id @default(cuid())
+  topic          ContactTopic
+  name           String
+  email          String
+  company        String?
+  shopifyDomain  String?       @map("shopify_domain")
+  message        String        @db.Text
+  status         ContactStatus @default(new)
+  routedTo       String        @map("routed_to")
+  source         String?
+  ipHash         String?       @map("ip_hash")
+  userAgent      String?       @map("user_agent")
+  acknowledgedAt DateTime?     @map("acknowledged_at")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  @@index([topic])
+  @@index([status])
+  @@index([email])
+  @@index([createdAt])
+  @@map("scanner_contact_messages")
+}
