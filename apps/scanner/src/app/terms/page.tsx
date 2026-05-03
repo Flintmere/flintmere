@@ -37,8 +37,12 @@ export default function Terms() {
           <li>
             <strong>Shopify app</strong> at <code>app.flintmere.com</code>: a
             catalog scoring and fixing tool installed from the Shopify App
-            Store. Plans are Free, Growth (£79/mo), Scale (£249/mo), Agency
-            (£499/mo), and Plus (from £1,500/mo).
+            Store. New sign-ups choose from the food-vertical ladder
+            (waitlist while pricing finalises in May&ndash;June 2026) or the
+            Plus tier (from &pound;1,200/mo on enquiry, private beta).
+            Existing Growth (&pound;79/mo), Scale (&pound;249/mo), and Agency
+            (&pound;499/mo) plans are grandfathered for current subscribers
+            and not offered to new sign-ups.
           </li>
           <li>
             <strong>Concierge audits</strong>: a one-off written audit

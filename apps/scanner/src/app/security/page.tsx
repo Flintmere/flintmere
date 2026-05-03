@@ -104,10 +104,16 @@ export default function Security() {
 
       <Clause n="09" heading="Incident response">
         <p>
-          We maintain a written incident-response runbook. On confirmed
-          personal-data breach, we notify the ICO within 72 hours as required
-          by UK GDPR Article 33, and affected individuals without undue delay
-          where there is a high risk.
+          We maintain a written incident-response runbook. Where Flintmere is
+          the controller, we notify the ICO within 72 hours of a confirmed
+          personal-data breach as required by UK GDPR Article 33, and affected
+          individuals without undue delay where there is a high risk.
+        </p>
+        <p className="mt-4">
+          Where Flintmere is the processor for a merchant&rsquo;s data, we
+          notify the merchant (the controller) within 24 hours of becoming
+          aware of a breach, so the merchant can satisfy its own Article 33
+          deadline. See the DPA, Clause 05.
         </p>
         <p className="mt-4">
           Shopify partners are notified via the Partner Dashboard per

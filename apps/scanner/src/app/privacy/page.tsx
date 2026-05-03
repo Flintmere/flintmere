@@ -127,8 +127,13 @@ export default function Privacy() {
             for Tier 2 enrichments.
           </li>
           <li>
-            <strong>Microsoft Azure OpenAI</strong> (swedencentral) — LLM
-            fallback.
+            <strong>OpenAI, OpenAI Ireland Operations Limited</strong> (US
+            routing) &mdash; LLM fallback when Vertex AI errors. Project-scoped
+            key, <code>store: false</code> on every request to suppress
+            application-state retention. OpenAI&rsquo;s separate
+            abuse-monitoring retention (up to 30 days) applies; we do not have
+            a Zero Data Retention amendment on this account tier. Triggered
+            on &lt;1% of LLM calls. Per ADR 0010.
           </li>
           <li>
             <strong>Resend</strong> (EU) — transactional email (report

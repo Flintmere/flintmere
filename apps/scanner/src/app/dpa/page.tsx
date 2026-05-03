@@ -100,8 +100,12 @@ export default function DPA() {
             reasonable request
           </li>
           <li>
-            Notify the Controller without undue delay of any personal data
-            breach (within 24 hours of Flintmere becoming aware)
+            Notify the Controller within 24 hours of becoming aware of any
+            personal data breach affecting Controller data, so the Controller
+            can satisfy its own UK GDPR Article 33 72-hour notification
+            deadline. Where Flintmere is the controller for its own data
+            subjects, the 72-hour ICO notification commitment in the Security
+            Posture (Clause 09) applies.
           </li>
           <li>
             On termination, delete or return all personal data as required by

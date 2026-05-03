@@ -91,7 +91,7 @@ export default function Support() {
             </p>
           </div>
           <div className="grid grid-cols-[180px_1fr] gap-4 p-4 border-b border-[color:var(--color-line-soft)]">
-            <p><strong>Plus from £1,500/mo</strong></p>
+            <p><strong>Plus from £1,200/mo</strong></p>
             <p>
               Contractual SLA per order form. Named contact with mobile
               number. Monthly review call.
