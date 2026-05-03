@@ -214,37 +214,24 @@ function BandColumn({
   groupName,
   isFirst,
   isLast: _isLast,
-  reducedMotion,
+  reducedMotion: _reducedMotion,
   onSelect,
 }: BandColumnProps) {
   const inputId = `band-chord-${band.slug}`;
-  // Band 3 chord shortens to "£597+" at saks scale; the full
-  // priceDisplay surfaces in the CheckoutCard's bespoke fork and in
-  // the SR-only sentence below.
-  const chordText = band.isBespoke ? '£597+' : band.priceDisplay;
 
   return (
     <label
       htmlFor={inputId}
-      className={
-        isSelected
-          ? 'band-chord band-chord--selected'
-          : 'band-chord band-chord--recessive'
-      }
       style={{
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        textAlign: 'center',
+        gap: 8,
         cursor: 'pointer',
-        padding:
-          'clamp(40px, 5vw, 72px) clamp(16px, 2vw, 32px) clamp(32px, 4vw, 56px) clamp(16px, 2vw, 32px)',
+        padding: 'clamp(20px, 2.4vw, 28px) clamp(20px, 2.4vw, 32px)',
         borderLeft: isFirst ? 'none' : '1px solid var(--color-line-soft)',
         background: isSelected ? 'var(--color-paper-2)' : 'transparent',
         position: 'relative',
-        transition:
-          'background-color 0.32s ease, color 0.32s ease',
+        transition: 'background-color 0.2s ease',
       }}
     >
       <input
@@ -257,100 +244,74 @@ function BandColumn({
         className="sr-only"
       />
 
-      {/* Saks chord — bracket + price at heroic scale.
-          Selected: full ink fill (color: var(--color-ink)).
-          Unselected: text fill transparent + 1px mute-2 stroke.
-          Both states are aria-hidden — the SR-only sentence below
-          carries the meaning per Noor P0. */}
+      {/* Caption row — band label + SKU range, mono caps */}
       <span
         aria-hidden="true"
-        className={
-          isSelected
-            ? 'band-chord-numeral band-chord-numeral--selected bracket-inline'
-            : 'band-chord-numeral band-chord-numeral--recessive bracket-inline'
-        }
-      >
-        {chordText}
-      </span>
-
-      {/* Sage under-tick — selected only. AnimatePresence + layout
-          props give the FLIP-style slide between columns on switch.
-          Reduced-motion: layout=false → instant. */}
-      <AnimatePresence initial={false}>
-        {isSelected && (
-          <motion.span
-            key="band-under-tick"
-            layout={!reducedMotion}
-            layoutId={reducedMotion ? undefined : 'band-under-tick'}
-            initial={reducedMotion ? false : { opacity: 0 }}
-            animate={reducedMotion ? undefined : { opacity: 0.85 }}
-            exit={reducedMotion ? undefined : { opacity: 0 }}
-            transition={
-              reducedMotion
-                ? { duration: 0 }
-                : { type: 'spring', stiffness: 220, damping: 24, mass: 0.9 }
-            }
-            aria-hidden="true"
-            style={{
-              display: 'block',
-              width: 'min(80%, 240px)',
-              height: 2,
-              background: 'var(--color-accent-sage)',
-              marginTop: 16,
-              opacity: 0.85,
-            }}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Mono label cluster. AA contrast on every text role here. */}
-      <div
         style={{
-          marginTop: isSelected ? 24 : 'clamp(28px, 3vw, 40px)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 6,
+          fontFamily: 'var(--font-mono)',
+          fontSize: 'clamp(10px, 0.9vw, 12px)',
+          letterSpacing: '0.16em',
+          textTransform: 'uppercase',
+          fontWeight: 500,
+          color: 'var(--color-mute)',
+          lineHeight: 1.3,
         }}
       >
+        {band.label} · {band.skuRangeLabel}
+      </span>
+
+      {/* Price — solid mono at human-readable scale (not saks-heroic).
+          Always solid ink; never outline-stroke. The chip is a
+          switcher, not a brand-mark moment. */}
+      <span
+        aria-hidden="true"
+        style={{
+          fontFamily: 'var(--font-mono)',
+          fontWeight: 700,
+          fontSize: 'clamp(28px, 3.4vw, 44px)',
+          letterSpacing: '-0.03em',
+          lineHeight: 1,
+          color: 'var(--color-ink)',
+        }}
+      >
+        {band.priceDisplay}
+      </span>
+
+      {/* Hours line — micro mono caption */}
+      <span
+        aria-hidden="true"
+        style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: 'clamp(10px, 0.85vw, 11px)',
+          letterSpacing: '0.16em',
+          textTransform: 'uppercase',
+          color: 'var(--color-mute-2)',
+          lineHeight: 1.3,
+          marginTop: 4,
+        }}
+      >
+        {band.hoursEstimate}
+      </span>
+
+      {/* Sage under-tick — selected only. Static (not animated) — the
+          switcher is below the fold; reveal motion is overproduced. */}
+      {isSelected && (
         <span
+          aria-hidden="true"
           style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: 'clamp(11px, 1vw, 13px)',
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-            fontWeight: 500,
-            color: isSelected ? 'var(--color-ink)' : 'var(--color-mute)',
+            position: 'absolute',
+            bottom: 0,
+            left: 'clamp(20px, 2.4vw, 32px)',
+            width: 32,
+            height: 2,
+            background: 'var(--color-accent-sage)',
+            opacity: 0.9,
           }}
-        >
-          {band.label}
-        </span>
-        <span
-          style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: 'clamp(15px, 1.2vw, 18px)',
-            letterSpacing: '-0.01em',
-            fontWeight: 500,
-            color: isSelected ? 'var(--color-ink)' : 'var(--color-mute)',
-          }}
-        >
-          {band.skuRangeLabel}
-        </span>
-        <span
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: 'clamp(11px, 0.9vw, 12px)',
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: 'var(--color-mute-2)',
-          }}
-        >
-          {band.hoursEstimate}
-        </span>
-      </div>
+        />
+      )}
 
       {/* SR-only accessible name — full canonical band info per
-          Noor P0 (saks numeral is aria-hidden; this carries the
-          meaning to assistive tech). */}
+          Noor P0. */}
       <span className="sr-only">
         {`${band.label}, ${band.priceDisplay}, ${band.skuRangeLabel}, ${band.hoursEstimate}.`}
       </span>
