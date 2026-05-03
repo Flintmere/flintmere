@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { SiteFooter } from '@flintmere/ui';
 import { SecretRevealClient } from './SecretRevealClient';
 
 export const metadata: Metadata = {
@@ -31,6 +32,7 @@ export default async function SecretRevealPage({ params }: Params) {
       <div className="mx-auto w-full max-w-[640px]">
         <SecretRevealClient id={id} />
       </div>
+      <SiteFooter />
     </main>
   );
 }

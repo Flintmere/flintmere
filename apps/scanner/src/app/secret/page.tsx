@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { SiteFooter } from '@flintmere/ui';
 import { SecretForm } from './SecretForm';
 
 export const metadata: Metadata = {
@@ -106,6 +107,7 @@ export default function SecretPage() {
           <a href="/privacy" className="underline">privacy</a>.
         </p>
       </div>
+      <SiteFooter />
     </main>
   );
 }
