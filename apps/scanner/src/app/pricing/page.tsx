@@ -4,7 +4,8 @@ import { Suspense } from 'react';
 import { Bracket, SiteFooter } from '@flintmere/ui';
 import { PricingVerticalTabs } from '@/components/PricingVerticalTabs';
 import { PricingTiersGrid } from './PricingTiersGrid';
-import { AUDIT_BANDS } from '@/lib/audit-pricing';
+import { ConciergeBands } from './ConciergeBands';
+import { PlusAnchor } from './PlusAnchor';
 
 export const metadata: Metadata = {
   title: 'Pricing',
@@ -46,20 +47,6 @@ const FAQS = [
     a: "Don't. Amazon, Google Shopping, and Shopify Catalog increasingly verify against GS1's database. Fake barcodes get listings suppressed. Buy legitimate GTINs from your local GS1 office — we'll route you to the right one.",
   },
 ];
-
-function conciergeBandsProse(): string {
-  const lines = AUDIT_BANDS.map((b) => {
-    if (b.isBespoke) {
-      const price = b.priceDisplay.match(/£[\d,]+/)?.[0] ?? '£597';
-      return `from ${price} bespoke (${b.skuLowerBound.toLocaleString()}+)`;
-    }
-    const upper = b.skuUpperBound?.toLocaleString();
-    const lower = b.skuLowerBound > 0 ? b.skuLowerBound.toLocaleString() : null;
-    const range = lower ? `${lower}–${upper}` : `≤${upper}`;
-    return `${b.priceDisplay} (${range})`;
-  });
-  return `Three SKU bands — ${lines.join(', ')}.`;
-}
 
 export default function Pricing() {
   return (
@@ -113,99 +100,36 @@ export default function Pricing() {
               color: 'var(--color-mute)',
             }}
           >
-            The vertical standard licensed sets the axis. Distribution mode sets the multiplier. Forward pricing finalising May–June 2026 — existing customers grandfathered at original prices.
+            Two surfaces priced today &mdash; band-laddered concierge audits and the Plus anchor. The recurring food tier is calibrating with the merchants joining now; existing subscribers stay grandfathered at original prices.
           </p>
         </div>
       </section>
 
+      {/* Concierge audit band ladder — primary anchor (Option B verdict
+          2026-05-03). Real-priced surface; leads the page so the eye
+          lands on £197 / £397 / £597+ before any calibrating slot. */}
+      <ConciergeBands />
+
+      {/* Plus tier anchor — secondary heroic surface. Real-priced
+          (£1,200/mo floor per ADR 0017). */}
+      <PlusAnchor />
+
       {/* Vertical selector — URL state (?vertical=food|beauty|apparel|bundle).
-          PricingTiersGrid (below) reads the same hook and renders the
-          appropriate composition. Picker comes BEFORE the vertical-specific
-          tier content so non-food visitors land on their selected vertical's
-          content directly (was: picker buried below Concierge anchor + intro
-          for food users; left non-food pages feeling empty). */}
+          Demoted below the real-priced anchors per Option B; visitors who
+          want the recurring story still get a dedicated vertical surface,
+          just not the page lede. */}
       <Suspense fallback={null}>
         <PricingVerticalTabs />
       </Suspense>
 
-      {/* Tier cards grid — vertical-aware.
-          food   → calibrating-frame intro + 4-card recurring grid (Free /
-                   Food single / Food agency / Plus). The "Calibrating
-                   May–June 2026" framing baked into the section header so
-                   empty price slots read as in-progress, not missing.
-          non-food → heroic full-width single-message section (was a small
-                     card buried in a wide container; non-food pages now
-                     read as first-class). */}
+      {/* Vertical-specific surface.
+          food    → cohort invitation block (no tier cards, no informal
+                    £X anchors — council binding rules from the
+                    2026-05-03 re-scope verdict).
+          non-food → heroic single-message section. */}
       <Suspense fallback={null}>
         <PricingTiersGrid />
       </Suspense>
-
-      {/* Concierge audit anchor — universal cross-vertical real-price
-          option. Sits AFTER the vertical-specific content so each vertical
-          page renders its own content first, then the audit as the
-          available-now action. Bracket budget: this section's 1 active
-          anchor (per ADR 0021 §4 amendment 2026-05-02). */}
-      <section
-        aria-label="Concierge audit"
-        className="relative isolate overflow-hidden bg-[color:var(--color-paper-2)] border-y border-[color:var(--color-line)]"
-      >
-        <div
-          aria-hidden="true"
-          className="absolute pointer-events-none"
-          style={{
-            inset: 0,
-            background: 'var(--gradient-amber-radial)',
-            transform: 'translate(0, 10%) scale(1.1)',
-            opacity: 0.6,
-          }}
-        />
-
-        <div
-          className="relative mx-auto max-w-[1280px]"
-          style={{
-            paddingLeft: 'clamp(24px, 4vw, 64px)',
-            paddingRight: 'clamp(24px, 4vw, 64px)',
-            paddingTop: 'clamp(72px, 9vw, 128px)',
-            paddingBottom: 'clamp(72px, 9vw, 128px)',
-          }}
-        >
-          <p className="eyebrow mb-6">Concierge audit · Available now · One-off</p>
-          <h2
-            className="font-medium tracking-[-0.03em] leading-[1.05] text-[color:var(--color-ink)] max-w-[22ch]"
-            style={{ fontSize: 'clamp(32px, 4.5vw, 56px)' }}
-          >
-            Skip the wait — book the audit.
-          </h2>
-
-          <div style={{ marginTop: 'clamp(40px, 5vw, 72px)' }}>
-            <Bracket size="saks">from £197</Bracket>
-          </div>
-
-          <p
-            className="text-[color:var(--color-ink-2)]"
-            style={{
-              marginTop: 'clamp(32px, 4vw, 48px)',
-              maxWidth: '60ch',
-              fontSize: 17,
-              lineHeight: 1.55,
-            }}
-          >
-            {conciergeBandsProse()} Written audit letter, per-product fix CSV, 30-day plan, 30-day re-scan. Delivered in three working days.
-          </p>
-
-          <div
-            className="flex flex-col sm:flex-row gap-4"
-            style={{ marginTop: 'clamp(32px, 4vw, 48px)' }}
-          >
-            <Link href="/audit" className="btn btn-accent whitespace-nowrap">
-              Book the audit →
-            </Link>
-            <Link href="/audit#bands" className="btn whitespace-nowrap">
-              See the bands →
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* "We maintain it" — ink-slab variant per ADR 0021 §7 (extravagant-mode
           rebuild 2026-05-02). Display-700 h2 at clamp(48–96px) per axis 6

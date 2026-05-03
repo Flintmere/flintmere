@@ -1,42 +1,33 @@
 'use client';
 
 /**
- * PricingTiersGrid — vertical-aware tier card composition for /pricing.
+ * PricingTiersGrid — vertical-aware cohort/message section for /pricing.
  *
- * Spec: context/design/specs/2026-05-01-pricing-magnitudes-pending-delta.md
- *       (inherits 2026-04-26-pricing-food-first.md §Section 4).
- *
- * Reads URL vertical state via usePricingVertical() — same hook as
- * PricingVerticalTabs so both components stay in lockstep on URL change.
+ * Re-scoped 2026-05-03 (Standing Council Option B verdict). The page
+ * now leads with real-priced anchors (concierge band ladder + Plus) at
+ * the top of /pricing/page.tsx; this component handles the demoted
+ * vertical-specific surface that follows.
  *
  * Composition by vertical:
- *   - food   → 4-card recurring-tier grid (Free / Food single / Food agency / Plus).
- *              Concierge audit pulled out into its own full-width anchor section
- *              in page.tsx (extravagant-mode rebuild 2026-05-02 — bracket-2 chord
- *              now lands at Saks scale on a dedicated section, not as 1-of-5
- *              competing tier cards).
- *   - beauty → single-message card (standard in development).
- *   - apparel → single-message card (standard in development).
- *   - bundle → single-message card (waiting on beauty cadence).
+ *   - food    → cohort invitation block. No tier cards, no calibrating
+ *               number anchors (council binding rule: "joining now
+ *               shapes the price you'll pay" framing, no `from £X`
+ *               back-door anchoring). Free scan stays as the
+ *               affordance for browsers; the calibrating recurring
+ *               tiers are framed as cohort joinable, not waitlist.
+ *   - beauty  → message-card (standard in development).
+ *   - apparel → message-card (standard in development).
+ *   - bundle  → message-card (waiting on beauty cadence).
  *
- * Magnitudes-pending discipline (ADR 0020): forward food tiers carry
- * basePlatform: null in pricing.ts; this component renders them with "—"
- * display + "PRICING FINALISING — MAY–JUNE 2026" sub-line + waitlist mailto
- * CTA. No committed prices. WTP study calibrates magnitudes, not this surface.
+ * Reads URL vertical state via usePricingVertical() — same hook as
+ * PricingVerticalTabs so both stay in lockstep on URL change.
  */
 
 import Link from 'next/link';
+import { Bracket } from '@flintmere/ui';
 import { usePricingVertical } from '@/lib/use-vertical';
-import { tierBySlug, type Tier } from '@/lib/pricing';
 import type { PricingVerticalId } from '@/lib/vertical';
 
-/**
- * Every "talk to the team" / "join the waitlist" CTA routes through the
- * contact form (`memory/feedback_no_mailto_links_anywhere.md`, locked
- * 2026-05-03). Topic dictates which inbox catches it — `general` for
- * roadmap / waitlist enquiries, `plus` for the Plus tier, `billing` for
- * existing-customer billing.
- */
 function contactLink(topic: 'general' | 'plus' | 'billing'): string {
   return `/contact?topic=${topic}`;
 }
@@ -45,22 +36,16 @@ export function PricingTiersGrid() {
   const { selected } = usePricingVertical();
 
   if (selected === 'food') {
-    return <FoodTierGrid />;
+    return <FoodCohortInvitation />;
   }
   return <NonFoodMessage vertical={selected} />;
 }
 
-function FoodTierGrid() {
-  const free = tierBySlug('free');
-  const foodSingle = tierBySlug('food-single');
-  const foodAgency = tierBySlug('food-agency');
-  const plus = tierBySlug('plus');
-
-  if (!free || !foodSingle || !foodAgency || !plus) return null;
-
+function FoodCohortInvitation() {
+  const explainerId = 'food-cohort-explainer';
   return (
     <section
-      aria-label="Food recurring tiers"
+      aria-labelledby="food-cohort-heading"
       className="bg-[color:var(--color-paper)]"
     >
       <div
@@ -68,40 +53,129 @@ function FoodTierGrid() {
         style={{
           paddingLeft: 'clamp(24px, 4vw, 64px)',
           paddingRight: 'clamp(24px, 4vw, 64px)',
-          paddingTop: 'clamp(48px, 6vw, 96px)',
-          paddingBottom: 'clamp(64px, 8vw, 112px)',
+          paddingTop: 'clamp(72px, 9vw, 128px)',
+          paddingBottom: 'clamp(72px, 9vw, 128px)',
         }}
       >
-        {/* Calibrating-frame header — anchors the empty price slots in
-            calendar time. The "Calibrating" word in MagnitudesPendingCard
-            reads against this frame, not as null. */}
-        <p className="eyebrow mb-4">Recurring · Calibrating May–June 2026</p>
+        <p className="eyebrow mb-6">Food recurring · Joining the cohort</p>
         <h2
-          className="font-medium tracking-[-0.03em] leading-[1.1] text-[color:var(--color-ink)] max-w-[28ch]"
-          style={{ fontSize: 'clamp(26px, 3.2vw, 38px)' }}
+          id="food-cohort-heading"
+          className="font-medium tracking-[-0.03em] leading-[1.0] text-[color:var(--color-ink)] max-w-[20ch]"
+          style={{ fontSize: 'clamp(36px, 5.2vw, 72px)' }}
         >
-          Or subscribe — pick the distribution mode.
+          Joining now shapes the{' '}
+          <Bracket size="display">price</Bracket>
+          {' '}you&rsquo;ll pay.
         </h2>
         <p
+          id={explainerId}
           className="text-[color:var(--color-ink-2)] max-w-[64ch]"
           style={{
-            marginTop: 'clamp(16px, 2vw, 24px)',
-            fontSize: 16,
-            lineHeight: 1.7,
+            marginTop: 'clamp(28px, 3vw, 40px)',
+            fontSize: 17,
+            lineHeight: 1.55,
           }}
         >
-          We&rsquo;re calibrating sign-up prices with food merchants this May and June. Tiers below show the shape; magnitudes land once the WTP study closes. Existing subscribers stay grandfathered.
+          We&rsquo;re calibrating recurring sign-up prices with the food
+          merchants joining May and June 2026. The number lands once we
+          know what the work costs us and what the merchants we&rsquo;re
+          serving would actually pay. Cohort merchants stay grandfathered
+          at the calibration price &mdash; whatever it lands at.
         </p>
 
         <div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid md:grid-cols-2 gap-6"
           style={{ marginTop: 'clamp(40px, 5vw, 64px)' }}
         >
-          <FreeCard tier={free} />
-          <MagnitudesPendingCard tier={foodSingle} />
-          <MagnitudesPendingCard tier={foodAgency} />
-          <PlusAnchorCard tier={plus} />
+          <article
+            className="border border-[color:var(--color-line)] bg-[color:var(--color-paper)] p-6 flex flex-col"
+            style={{ minHeight: 280 }}
+            aria-labelledby="food-cohort-free-name"
+            aria-describedby={explainerId}
+          >
+            <p className="eyebrow text-[color:var(--color-mute-2)]">Always free</p>
+            <h3
+              id="food-cohort-free-name"
+              className="mt-3"
+              style={{
+                fontSize: 'clamp(28px, 3.2vw, 36px)',
+                fontWeight: 500,
+                letterSpacing: '-0.025em',
+                lineHeight: 1.05,
+              }}
+            >
+              Run the scan. Read your score.
+            </h3>
+            <p
+              className="mt-4 text-[color:var(--color-ink-2)]"
+              style={{ fontSize: 14, lineHeight: 1.55 }}
+            >
+              Four public-source pillars, no install, 60 seconds. Free
+              forever; the recurring tiers add daily monitoring,
+              auto-fixes, and the seven-pillar score.
+            </p>
+            <Link
+              href="/scan"
+              className="btn btn-accent mt-auto"
+              style={{ marginTop: 'auto' }}
+            >
+              Run the free scan →
+            </Link>
+          </article>
+
+          <article
+            className="border border-[color:var(--color-line)] bg-[color:var(--color-paper)] p-6 flex flex-col"
+            style={{ minHeight: 280 }}
+            aria-labelledby="food-cohort-recurring-name"
+            aria-describedby={explainerId}
+          >
+            <p className="eyebrow text-[color:var(--color-mute-2)]">
+              Calibration cohort · Single store + agency
+            </p>
+            <h3
+              id="food-cohort-recurring-name"
+              className="mt-3"
+              style={{
+                fontSize: 'clamp(28px, 3.2vw, 36px)',
+                fontWeight: 500,
+                letterSpacing: '-0.025em',
+                lineHeight: 1.05,
+              }}
+            >
+              Reserve a place; help set the price.
+            </h3>
+            <p
+              className="mt-4 text-[color:var(--color-ink-2)]"
+              style={{ fontSize: 14, lineHeight: 1.55 }}
+            >
+              Daily drift monitoring, auto-fixes, the full seven-pillar
+              score, and grandfathered cohort pricing once May&ndash;June
+              calibration closes. Single-store and agency tiers ship
+              together.
+            </p>
+            <Link
+              href={contactLink('general')}
+              className="btn mt-auto"
+              style={{ marginTop: 'auto' }}
+            >
+              Join the cohort →
+            </Link>
+          </article>
         </div>
+
+        <p
+          className="text-[color:var(--color-mute)] max-w-[64ch]"
+          style={{
+            marginTop: 'clamp(32px, 4vw, 48px)',
+            fontSize: 13,
+            lineHeight: 1.55,
+          }}
+        >
+          Existing Growth, Scale, Agency, and Plus subscribers from
+          before 2026-04-26 stay at their original prices indefinitely.
+          Plus is on the anchor above; band-laddered concierge audits
+          are the available-now action.
+        </p>
       </div>
     </section>
   );
@@ -199,7 +273,7 @@ const NON_FOOD_CONTENT: Partial<Record<PricingVerticalId, NonFoodContent>> = {
     eyebrow: 'FOOD + BEAUTY BUNDLE',
     headline: 'Bundle pricing arrives once the beauty cadence is committed.',
     body:
-      'Stores selling both food and beauty SKUs will get a bundle price — second vertical at a discount — once the beauty regulatory standard publishes its first cadence. For now, the food tiers above apply if food is your primary catalog. Talk to the team if you sell both and need unified pricing today.',
+      'Stores selling both food and beauty SKUs will get a bundle price — second vertical at a discount — once the beauty regulatory standard publishes its first cadence. For now, the food cohort applies if food is your primary catalog. Talk to the team if you sell both and need unified pricing today.',
     primaryCta: { label: 'See food pricing →', href: '/pricing?vertical=food' },
     secondaryCta: {
       label: 'Talk to the team →',
@@ -207,207 +281,3 @@ const NON_FOOD_CONTENT: Partial<Record<PricingVerticalId, NonFoodContent>> = {
     },
   },
 };
-
-interface FreeCardProps {
-  tier: Tier;
-}
-
-function FreeCard({ tier }: FreeCardProps) {
-  return (
-    <article
-      data-hover-lift
-      className="border border-[color:var(--color-line)] bg-[color:var(--color-paper)] p-6 flex flex-col"
-      style={{ minHeight: 360 }}
-      aria-labelledby={`tier-${tier.slug}-name`}
-    >
-      <h3
-        id={`tier-${tier.slug}-name`}
-        style={{ fontSize: 22, fontWeight: 500, letterSpacing: '-0.015em' }}
-      >
-        {tier.name}
-      </h3>
-      <p
-        className="mt-3"
-        style={{
-          fontSize: 'clamp(40px, 5vw, 52px)',
-          fontWeight: 500,
-          letterSpacing: '-0.04em',
-          lineHeight: 1,
-        }}
-      >
-        £0
-      </p>
-      <p className="eyebrow mt-3 text-[color:var(--color-mute-2)]">PER MONTH</p>
-      <p
-        className="mt-6 text-[color:var(--color-ink-2)]"
-        style={{ fontSize: 14, lineHeight: 1.55 }}
-      >
-        {tier.blurb}
-      </p>
-      <ul
-        className="mt-6 list-none p-0 m-0 space-y-2 text-[color:var(--color-ink-2)]"
-        style={{ fontSize: 13, lineHeight: 1.5 }}
-      >
-        {tier.features.slice(0, 3).map((f) => (
-          <li key={f} className="flex gap-3">
-            <span aria-hidden="true" style={{ color: 'var(--color-mute-2)' }}>—</span>
-            <span>{f}</span>
-          </li>
-        ))}
-      </ul>
-      <Link href="/scan" className="btn btn-accent mt-auto pt-3" style={{ marginTop: 'auto' }}>
-        Run the free scan →
-      </Link>
-    </article>
-  );
-}
-
-interface MagnitudesPendingCardProps {
-  tier: Tier;
-}
-
-function MagnitudesPendingCard({ tier }: MagnitudesPendingCardProps) {
-  const subId = `tier-${tier.slug}-subprice`;
-  return (
-    <article
-      data-hover-lift
-      className="border border-[color:var(--color-line)] bg-[color:var(--color-paper)] p-6 flex flex-col"
-      style={{ minHeight: 360 }}
-      aria-labelledby={`tier-${tier.slug}-name`}
-    >
-      <h3
-        id={`tier-${tier.slug}-name`}
-        aria-describedby={subId}
-        style={{ fontSize: 22, fontWeight: 500, letterSpacing: '-0.015em' }}
-      >
-        {tier.name}
-      </h3>
-      {/* Calibrating-state replaces the prior bare em-dash (was reading as
-          "no price" — visually identical to a missing field). The amber
-          dot + "Calibrating" word reads as in-progress and honest, not
-          empty. The full "May–June 2026" timeline lives in the eyebrow
-          below to anchor the abstract "calibrating" word in calendar
-          time. */}
-      <div
-        className="mt-3 flex items-center gap-3"
-        aria-describedby={subId}
-      >
-        <span
-          aria-hidden="true"
-          style={{
-            display: 'inline-block',
-            width: 10,
-            height: 10,
-            borderRadius: '50%',
-            background: 'var(--color-accent)',
-          }}
-        />
-        <p
-          style={{
-            fontSize: 'clamp(28px, 3.4vw, 36px)',
-            fontWeight: 500,
-            letterSpacing: '-0.025em',
-            lineHeight: 1,
-            color: 'var(--color-ink)',
-          }}
-        >
-          Calibrating
-        </p>
-      </div>
-      <p id={subId} className="eyebrow mt-3 text-[color:var(--color-mute-2)]">
-        PRICING FINALISES MAY–JUNE 2026
-      </p>
-      <p
-        className="mt-6 text-[color:var(--color-ink-2)]"
-        style={{ fontSize: 14, lineHeight: 1.55 }}
-      >
-        {tier.blurb}
-      </p>
-      <ul
-        className="mt-6 list-none p-0 m-0 space-y-2 text-[color:var(--color-ink-2)]"
-        style={{ fontSize: 13, lineHeight: 1.5 }}
-      >
-        {tier.features.slice(0, 3).map((f) => (
-          <li key={f} className="flex gap-3">
-            <span aria-hidden="true" style={{ color: 'var(--color-mute-2)' }}>—</span>
-            <span>{f}</span>
-          </li>
-        ))}
-      </ul>
-      <Link
-        href={contactLink('general')}
-        className="btn mt-auto"
-        style={{ marginTop: 'auto' }}
-      >
-        Join the waitlist →
-      </Link>
-    </article>
-  );
-}
-
-interface PlusAnchorCardProps {
-  tier: Tier;
-}
-
-function PlusAnchorCard({ tier }: PlusAnchorCardProps) {
-  const subId = `tier-${tier.slug}-subprice`;
-  return (
-    <article
-      data-hover-lift
-      className="border border-[color:var(--color-line)] bg-[color:var(--color-paper)] p-6 flex flex-col"
-      style={{ minHeight: 360 }}
-      aria-labelledby={`tier-${tier.slug}-name`}
-    >
-      <h3
-        id={`tier-${tier.slug}-name`}
-        aria-describedby={subId}
-        style={{ fontSize: 22, fontWeight: 500, letterSpacing: '-0.015em' }}
-      >
-        {tier.name}
-      </h3>
-      {/* Plus anchor — "From £1,200/mo" rendered as a real value; the price
-          IS published per ADR 0017 (anchor floor disclosed, full ladder on
-          enquiry). No "calibrating" treatment needed here — Plus has a
-          public floor. */}
-      <p
-        className="mt-3"
-        style={{
-          fontSize: 'clamp(28px, 3.4vw, 36px)',
-          fontWeight: 500,
-          letterSpacing: '-0.025em',
-          lineHeight: 1,
-          color: 'var(--color-ink)',
-        }}
-      >
-        From £1,200<span style={{ fontSize: '0.5em', color: 'var(--color-mute)', marginLeft: 4 }}>/mo</span>
-      </p>
-      <p id={subId} className="eyebrow mt-3 text-[color:var(--color-mute-2)]">
-        ANCHOR — ON ENQUIRY
-      </p>
-      <p
-        className="mt-6 text-[color:var(--color-ink-2)]"
-        style={{ fontSize: 14, lineHeight: 1.55 }}
-      >
-        {tier.blurb}
-      </p>
-      <ul
-        className="mt-6 list-none p-0 m-0 space-y-2 text-[color:var(--color-ink-2)]"
-        style={{ fontSize: 13, lineHeight: 1.5 }}
-      >
-        {tier.features.slice(0, 3).map((f) => (
-          <li key={f} className="flex gap-3">
-            <span aria-hidden="true" style={{ color: 'var(--color-mute-2)' }}>—</span>
-            <span>{f}</span>
-          </li>
-        ))}
-      </ul>
-      <Link
-        href={contactLink('plus')}
-        className="btn mt-auto"
-        style={{ marginTop: 'auto' }}
-      >
-        Talk to the team →
-      </Link>
-    </article>
-  );
-}
