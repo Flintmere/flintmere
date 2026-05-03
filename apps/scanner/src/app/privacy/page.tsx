@@ -13,7 +13,7 @@ export default function Privacy() {
       eyebrow="Privacy"
       title="How we handle your data."
       summary="We collect only what we need to score and fix your product catalog. We do not sell data, ever. We host in the UK/EU, we delete tokens within 60 seconds of uninstall, and you can ask us to delete everything else at any time by emailing privacy@flintmere.com."
-      lastUpdated="2026-04-23"
+      lastUpdated="2026-05-03"
       anchorNumeral="01"
     >
       <Clause n="01" heading="Who we are">

@@ -13,7 +13,7 @@ export default function Support() {
       eyebrow="Support"
       title="How to get help."
       summary="One inbox per topic, real humans reading. Support is support@flintmere.com. Security is security@flintmere.com. Billing is billing@flintmere.com. We reply within one working day on the free scanner, same day on paid plans. The team reads every email for the first hundred customers."
-      lastUpdated="2026-04-23"
+      lastUpdated="2026-05-03"
       anchorNumeral="06"
     >
       <Clause n="01" heading="Who answers">

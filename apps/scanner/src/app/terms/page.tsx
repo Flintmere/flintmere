@@ -13,7 +13,7 @@ export default function Terms() {
       eyebrow="Terms"
       title="The rules of the road."
       summary="Plain terms: you pay, we score and fix your catalog. 30-day full refund if you change your mind. You own your data, we own our software. We can&rsquo;t be responsible for more than you paid us in the last 12 months. If we disagree, English law applies."
-      lastUpdated="2026-04-23"
+      lastUpdated="2026-05-03"
       anchorNumeral="02"
     >
       <Clause n="01" heading="Who these terms are with">

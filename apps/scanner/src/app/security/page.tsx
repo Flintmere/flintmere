@@ -13,7 +13,7 @@ export default function Security() {
       eyebrow="Security"
       title="What we do to protect your store."
       summary="Shopify access tokens are encrypted at rest with a key stored outside the database. Every webhook is HMAC-verified. Everything on the wire uses TLS 1.2 or better. We scan dependencies automatically and have a written incident-response runbook. If you find a vulnerability, email security@flintmere.com and we&rsquo;ll respond within 24 hours."
-      lastUpdated="2026-04-23"
+      lastUpdated="2026-05-03"
       anchorNumeral="03"
     >
       <Clause n="01" heading="Encryption at rest">

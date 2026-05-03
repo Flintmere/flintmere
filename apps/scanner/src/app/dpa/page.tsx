@@ -13,7 +13,7 @@ export default function DPA() {
       eyebrow="DPA"
       title="Data Processing Agreement."
       summary="You are the controller, we are the processor. This page is the full written DPA that applies when you install the Shopify app or take out a paid plan. It covers why we process, for how long, who helps us, how we protect the data, and how we handle transfers out of the UK/EU."
-      lastUpdated="2026-04-23"
+      lastUpdated="2026-05-03"
       anchorNumeral="05"
     >
       <Clause n="01" heading="Parties and scope">
