@@ -22,7 +22,8 @@
     "cohort:diagnose": "tsx scripts/cohort-funnel-diagnose.ts",
     "purge:contact-threads": "tsx scripts/purge-contact-threads.ts",
     "audit:csv": "tsx scripts/export-audit-csv.ts",
-    "audit:deliver": "tsx scripts/audit-deliver.ts"
+    "audit:deliver": "tsx scripts/audit-deliver.ts",
+    "audit:sla-monitor": "tsx scripts/concierge-sla-monitor.ts"
   },
   "dependencies": {
     "@flintmere/scoring": "workspace:*",

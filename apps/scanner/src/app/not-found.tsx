@@ -1,11 +1,7 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
-import Link from 'next/link';
 import { Bracket } from '@flintmere/ui';
-import {
-  MARKETING_HOST,
-  SCANNER_HOST,
-} from '@/lib/host-routing';
+import { MARKETING_HOST, SCANNER_HOST } from '@/lib/host-routing';
 import { marketingUrl, scannerUrl } from '@/lib/host-url';
 
 // Root not-found. Without this, Next.js's built-in default emits a stray
@@ -13,12 +9,28 @@ import { marketingUrl, scannerUrl } from '@/lib/host-url';
 // metadata, leaving conflicting tags on every 404. This component takes
 // ownership: clean noindex, no conflicting title.
 //
-// Host-aware copy per C1 (council 2026-05-03): if the request hit the
-// marketing host but the URL looks like a scanner route (or vice versa),
-// the page suggests the right host. Better than a generic 404.
+// Composition (council 2026-05-03 — A24 + Bloomberg + Cereal references):
+// hairline-framed monospace credit strip top + bottom; left-offset
+// heroic [ 404 ] in the saks-bracket variant (auto-applies the canon
+// outline-shimmer); host-aware paragraph; two CTAs; film-credits closer.
+// Non-linear by deliberate offset, not by motion.
 export const metadata: Metadata = {
   title: 'Not found',
   robots: { index: false, follow: false },
+};
+
+const RULE_STYLE: React.CSSProperties = {
+  height: 1,
+  background: 'var(--color-ink)',
+  width: '100%',
+};
+
+const CREDIT_STRIP_STYLE: React.CSSProperties = {
+  fontFamily: 'var(--font-mono)',
+  fontSize: 11,
+  letterSpacing: '0.18em',
+  textTransform: 'uppercase',
+  color: 'var(--color-ink-2)',
 };
 
 export default async function NotFound() {
@@ -34,22 +46,68 @@ export default async function NotFound() {
   const onScanner = requestHost === SCANNER_HOST;
   const otherHost = onScanner ? MARKETING_HOST : SCANNER_HOST;
   const otherSurface = onScanner
-    ? 'pricing, the methodology, and the research benchmark'
-    : 'the scanner, the concierge audit, and the bot policy page';
+    ? 'pricing, the methodology, or the research benchmark'
+    : 'the scanner, the concierge audit, or the bot policy';
+
+  const year = new Date().getUTCFullYear();
 
   return (
     <main id="main">
-      <section className="mx-auto max-w-[1280px] px-8 py-24 md:py-32">
-        <p className="eyebrow text-[color:var(--color-ink-2)] mb-8">404</p>
-        <h1 className="max-w-[20ch]">
-          The page you wanted isn&rsquo;t <Bracket>here</Bracket>.
-        </h1>
-        <p
-          className="mt-8 max-w-[52ch] text-[color:var(--color-ink-2)]"
-          style={{ fontSize: 18, lineHeight: 1.5 }}
+      <section
+        className="mx-auto max-w-[1280px] px-6 md:px-8"
+        style={{ paddingTop: 'clamp(48px, 8vh, 96px)', paddingBottom: 'clamp(48px, 8vh, 96px)' }}
+      >
+        {/* Top credit strip — A24 cover-card eyebrow */}
+        <div style={RULE_STYLE} aria-hidden="true" />
+        <div
+          className="flex items-center justify-between"
+          style={{ ...CREDIT_STRIP_STYLE, paddingTop: 12, paddingBottom: 12 }}
         >
-          {requestHost ? (
-            <>
+          <span>Flintmere</span>
+          <span className="hidden sm:inline">Not found · roll continues</span>
+          <span>{year}</span>
+        </div>
+        <div style={RULE_STYLE} aria-hidden="true" />
+
+        {/* Heroic [ 404 ] — saks bracket auto-applies outline-shimmer.
+            Left-offset (justify-start) instead of centred — Bloomberg-cover
+            move; the whitespace on the right is part of the composition. */}
+        <div
+          className="flex items-end justify-start"
+          style={{ minHeight: 'clamp(220px, 38vh, 460px)', paddingTop: 'clamp(40px, 8vh, 96px)' }}
+        >
+          <h1
+            className="m-0"
+            style={{ lineHeight: 0.9, marginLeft: '-0.06em' }}
+            aria-label="404 not found"
+          >
+            <Bracket size="saks">404</Bracket>
+          </h1>
+        </div>
+
+        {/* The sentence + host paragraph. Sits below the hero, indented to
+            match the bracket's optical left edge. */}
+        <div className="max-w-[56ch]" style={{ paddingTop: 'clamp(24px, 4vh, 48px)' }}>
+          <p
+            className="m-0"
+            style={{
+              fontSize: 'clamp(22px, 2.6vw, 32px)',
+              lineHeight: 1.2,
+              fontWeight: 500,
+              color: 'var(--color-ink)',
+            }}
+          >
+            The page you wanted isn&rsquo;t here.
+          </p>
+          {requestHost && (
+            <p
+              className="mt-4 m-0"
+              style={{
+                fontSize: 17,
+                lineHeight: 1.55,
+                color: 'var(--color-ink-2)',
+              }}
+            >
               You&rsquo;re on{' '}
               <span style={{ fontFamily: 'var(--font-mono)' }}>
                 {requestHost}
@@ -62,22 +120,30 @@ export default async function NotFound() {
                 {otherHost}
               </a>
               . Otherwise the URL is wrong or the page has moved.
-            </>
-          ) : (
-            <>The URL is wrong, or the page has moved.</>
+            </p>
           )}
-        </p>
-        <div className="mt-12 flex flex-wrap gap-3">
-          <a href={scannerUrl('/scan')} className="btn btn-accent">
-            Run the free scan →
-          </a>
-          <a href={marketingUrl('/pricing')} className="btn">
-            See pricing
-          </a>
-          <a href={marketingUrl('/')} className="btn">
-            Back to home
-          </a>
+
+          <div className="mt-10 flex flex-wrap gap-3">
+            <a href={scannerUrl('/scan')} className="btn btn-accent">
+              Run the free scan →
+            </a>
+            <a href={marketingUrl('/')} className="btn">
+              Back to home
+            </a>
+          </div>
         </div>
+
+        {/* Bottom credit strip — film-credits closer */}
+        <div style={{ ...RULE_STYLE, marginTop: 'clamp(64px, 12vh, 144px)' }} aria-hidden="true" />
+        <div
+          className="flex items-center justify-between"
+          style={{ ...CREDIT_STRIP_STYLE, paddingTop: 12, paddingBottom: 12 }}
+        >
+          <span>404 · {requestHost || 'unknown host'}</span>
+          <span className="hidden sm:inline">A Flintmere production</span>
+          <span>{year}</span>
+        </div>
+        <div style={RULE_STYLE} aria-hidden="true" />
       </section>
     </main>
   );
