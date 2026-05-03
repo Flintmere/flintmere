@@ -105,10 +105,10 @@ export function SiteFooter() {
           </Link>
           <span aria-hidden="true" className="hidden sm:inline">,</span>
           <Link
-            href="https://app.flintmere.com"
+            href="/for/plus"
             className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >
-            App
+            App (Plus beta)
           </Link>
         </nav>
 

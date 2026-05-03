@@ -95,11 +95,19 @@
     background: var(--color-paper);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    /* Canon is paper. Tell the browser explicitly so OS-level dark mode
+       does not auto-darken our chrome (UA scrollbars, form controls,
+       and Chrome's auto-dark-mode shimming when the flag is on). */
+    color-scheme: light;
   }
 
   body {
     margin: 0;
     padding: 0;
+    /* Defence-in-depth: html already paints paper, but if any layout
+       gives body a stacking context that occludes html (e.g. a
+       full-bleed sticky), body must not show through as transparent. */
+    background: var(--color-paper);
   }
 
   h1, h2, h3, h4, h5, h6 {

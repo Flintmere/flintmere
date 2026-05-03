@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
@@ -32,6 +32,15 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+};
+
+// Declare the canon as a light-scheme surface. Without this, browsers
+// in OS-level dark mode (especially Chrome with auto-dark-mode) tint
+// the viewport — operator caught vertical pages showing black margins
+// outside the paper content column on macOS dark mode 2026-05-03.
+export const viewport: Viewport = {
+  colorScheme: 'light',
+  themeColor: '#f7f7f4',
 };
 
 export default function RootLayout({
