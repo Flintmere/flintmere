@@ -97,7 +97,7 @@ export function CTA() {
             <span aria-hidden="true">→</span>
           </Link>
           <Link
-            href="/audit"
+            href="/audit#checkout"
             className="inline-flex items-center gap-3 px-7 py-3.5 border border-[color:var(--color-paper)] text-[color:var(--color-paper)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)]"
           >
             Or book the concierge audit (from £197)

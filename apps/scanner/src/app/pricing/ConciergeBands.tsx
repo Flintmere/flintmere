@@ -54,7 +54,7 @@ export function ConciergeBands() {
           One-off audit; you self-attest your band at checkout. Full
           deliverable + offer detail on the{' '}
           <Link
-            href="/audit"
+            href="/audit#checkout"
             className="underline"
             style={{ textDecorationColor: 'var(--color-accent)', textUnderlineOffset: 4 }}
           >

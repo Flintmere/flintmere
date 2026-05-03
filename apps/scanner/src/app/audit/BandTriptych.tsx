@@ -39,7 +39,14 @@ import {
 import { track } from '@/lib/plausible';
 import { CheckoutCard } from './CheckoutCard';
 
-const DEFAULT_BAND: AuditBandSlug = 'band-2'; // BUSINESS.md target cohort
+// Default band drives the headline price the user sees on land. Anchored
+// to band-1 (£197) to match the "from £197" marketing copy across the
+// site — defaulting higher creates sticker shock at the conversion
+// moment. Council 2026-05-03 (#15 PM, #5 Pricing, #22 Marketing,
+// #37 Consumer Psych): minimum-friction default; merchants self-attest
+// up to band-2/band-3 via the band switcher. ADR 0022 §Customer
+// self-attestation accepts the operational catch.
+const DEFAULT_BAND: AuditBandSlug = 'band-1';
 
 export function BandTriptych() {
   const reduce = useReducedMotion();

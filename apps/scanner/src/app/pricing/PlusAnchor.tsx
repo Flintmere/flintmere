@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Bracket } from '@flintmere/ui';
 
 /**
  * Plus tier anchor — secondary heroic surface on /pricing per the
@@ -77,12 +76,31 @@ export function PlusAnchor() {
           </div>
         </div>
         <div className="lg:justify-self-end lg:text-right">
-          <Bracket size="saks">From £1,200</Bracket>
-          <p
-            className="eyebrow mt-3 text-[color:var(--color-mute-2)]"
-            style={{ marginTop: 24 }}
+          {/* Solid heroic price chord — saks-scale outline-shimmer reads
+              airy at price-tag scale, undersells the £1,200 anchor.
+              Council 2026-05-03: solid Geist Mono 700 at clamp(56-128px)
+              creates the visual weight the price needs against the
+              left-column display headline. */}
+          <div
+            aria-label="From one thousand two hundred pounds per month"
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontWeight: 700,
+              fontSize: 'clamp(56px, 8vw, 128px)',
+              letterSpacing: '-0.04em',
+              lineHeight: 0.95,
+              color: 'var(--color-ink)',
+            }}
           >
-            PER MONTH · ANCHOR ON ENQUIRY
+            <span className="bracket-char" style={{ marginRight: '0.16em' }} aria-hidden="true">[</span>
+            From £1,200
+            <span className="bracket-char" style={{ marginLeft: '0.16em' }} aria-hidden="true">]</span>
+          </div>
+          <p
+            className="eyebrow text-[color:var(--color-mute-2)]"
+            style={{ marginTop: 'clamp(16px, 2vw, 28px)' }}
+          >
+            / month · anchor on enquiry
           </p>
         </div>
       </div>

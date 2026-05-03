@@ -107,7 +107,7 @@ export default function FlintmereForPlus() {
           <Link href="/scan" className="btn btn-accent">
             Scan my Plus store →
           </Link>
-          <Link href="/audit" className="btn">
+          <Link href="/audit#checkout" className="btn">
             Book a bespoke concierge audit
           </Link>
         </div>
@@ -164,7 +164,7 @@ export default function FlintmereForPlus() {
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
-              href="/audit"
+              href="/audit#checkout"
               className="btn"
               style={{
                 background: 'var(--color-accent)',

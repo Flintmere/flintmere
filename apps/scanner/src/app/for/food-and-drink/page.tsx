@@ -178,7 +178,7 @@ export default async function FlintmereForFoodAndDrink() {
           <Link href="/scan" className="btn btn-accent">
             Scan my food store →
           </Link>
-          <Link href="/audit" className="btn">
+          <Link href="/audit#checkout" className="btn">
             Book a concierge audit (from £197)
           </Link>
         </div>
@@ -300,7 +300,7 @@ export default async function FlintmereForFoodAndDrink() {
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
-              href="/audit"
+              href="/audit#checkout"
               className="btn"
               style={{
                 background: 'var(--color-accent)',

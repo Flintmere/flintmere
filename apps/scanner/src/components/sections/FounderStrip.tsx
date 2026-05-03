@@ -171,7 +171,7 @@ export function FounderStrip() {
 
           <div style={{ marginTop: 'clamp(40px, 5vw, 72px)' }}>
             <Link
-              href="/audit"
+              href="/audit#checkout"
               className="inline-flex items-center gap-3 px-7 py-3.5 border border-[color:var(--color-paper-on-ink)] text-[color:var(--color-paper-on-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper-on-ink)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)] ease-[cubic-bezier(0.4,0,0.2,1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
             >
               Book the concierge audit (from £197)

@@ -117,7 +117,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
           >
             Want the full fix plan instead of the summary?{' '}
             <Link
-              href="/audit"
+              href="/audit#checkout"
               style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}
             >
               Book the concierge audit (from £197) →
@@ -206,7 +206,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
             scope bespoke from £597.
           </p>
           <Link
-            href="/audit"
+            href="/audit#checkout"
             style={{
               display: 'inline-block',
               marginTop: 20,
