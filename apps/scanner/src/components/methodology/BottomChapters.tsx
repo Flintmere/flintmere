@@ -188,9 +188,9 @@ export function ChallengeManifesto() {
             className="text-[color:var(--color-mute-inv)]"
             style={{ fontSize: 'clamp(16px, 1.4vw, 19px)', lineHeight: 1.55 }}
           >
-            Email{' '}
+            Send a message via our{' '}
             <a
-              href="mailto:hello@flintmere.com?subject=Score%20challenge"
+              href="/contact?topic=general"
               style={{
                 color: 'var(--color-accent)',
                 textDecoration: 'underline',
@@ -198,7 +198,7 @@ export function ChallengeManifesto() {
                 fontWeight: 500,
               }}
             >
-              hello@flintmere.com
+              contact form
             </a>
             {' '}with your store, the disputed pillar, and your reasoning. We respond within five business days with the underlying data we read and the rule we applied.
           </p>
@@ -258,10 +258,10 @@ export function BottomCta() {
             Run a free scan &rarr;
           </Link>
           <a
-            href="mailto:hello@flintmere.com?subject=Methodology%20question"
+            href="/contact?topic=general"
             className="btn whitespace-nowrap"
           >
-            Email regulatory affairs &rarr;
+            Ask regulatory affairs &rarr;
           </a>
         </div>
       </div>

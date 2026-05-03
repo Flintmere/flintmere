@@ -123,11 +123,11 @@ export default function Security() {
 
       <Clause n="10" heading="Responsible disclosure">
         <p>
-          We welcome security research. Email{' '}
-          <a href="mailto:security@flintmere.com" className="underline">
-            security@flintmere.com
+          We welcome security research. Send findings via our{' '}
+          <a href="/contact?topic=security" className="underline">
+            contact form
           </a>{' '}
-          with findings. We will:
+          (Security topic). We will:
         </p>
         <ul className="mt-4 list-disc pl-6 space-y-2">
           <li>Acknowledge your report within 24 hours</li>
@@ -150,11 +150,11 @@ export default function Security() {
           We&rsquo;re a small team. We are not currently ISO 27001 certified
           or SOC 2 audited. We do not claim PCI-DSS compliance because Stripe
           handles payment card data directly and we never see it. If your
-          procurement requires a formal audit, contact us at{' '}
-          <a href="mailto:security@flintmere.com" className="underline">
-            security@flintmere.com
+          procurement requires a formal audit, reach us via our{' '}
+          <a href="/contact?topic=security" className="underline">
+            contact form
           </a>{' '}
-          — we can walk you through our security questionnaire.
+          (Security topic) — we can walk you through our security questionnaire.
         </p>
       </Clause>
     </LegalShell>

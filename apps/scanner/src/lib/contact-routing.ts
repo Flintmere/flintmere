@@ -2,12 +2,18 @@
  * Contact-form topic → inbox routing.
  *
  * The contact form is the ONLY public route to any Flintmere inbox — no
- * mailto: links anywhere on the site, no exceptions (per
- * `memory/feedback_no_mailto_links_anywhere.md`, locked 2026-05-03). All
- * form submissions land in scanner_contact_messages and the route handler
+ * mailto: links anywhere on the site, no exceptions for security / press /
+ * billing (per `memory/feedback_no_mailto_links_anywhere.md`, locked
+ * 2026-05-03; mailto sweep landed Phase 2 2026-05-03). All form
+ * submissions land in scanner_contact_messages and the route handler
  * forwards each to the inbox below by topic. The persisted row keeps
  * `routed_to` for traceability so historical routing decisions stay
  * auditable when the matrix changes.
+ *
+ * Sole non-surface mailto in the codebase: the `List-Unsubscribe` header
+ * in `app/api/lead/route.ts` carries both an HTTPS unsubscribe URL and a
+ * `mailto:` form per RFC 8058 — that's an outbound email-delivery
+ * standard, not a public site link, and is not in scope for the rule.
  */
 
 import { ContactTopic } from '@/generated/prisma';

@@ -53,7 +53,7 @@ export type TierSlug =
 
 export type TierVertical = 'food' | 'beauty' | 'apparel' | 'bundle' | 'all' | null
 
-export type TierCTAKind = 'link' | 'waitlist' | 'mailto'
+export type TierCTAKind = 'link' | 'waitlist' | 'contact'
 
 export interface TierCTA {
   kind: TierCTAKind
@@ -104,10 +104,13 @@ export interface Tier {
   cta: TierCTA
 }
 
-const SALES_EMAIL = 'john@flintmere.com'
-
-function mailtoLink(subject: string): string {
-  return `mailto:${SALES_EMAIL}?subject=${encodeURIComponent(subject)}`
+/**
+ * Every "talk to the team" CTA on /pricing routes through the contact form
+ * (`memory/feedback_no_mailto_links_anywhere.md`, locked 2026-05-03). Topic
+ * dictates which inbox the message lands in — see `lib/contact-routing.ts`.
+ */
+function contactLink(topic: 'billing' | 'plus' | 'general'): string {
+  return `/contact?topic=${topic}`
 }
 
 const WAITLIST_CTA: TierCTA = {
@@ -165,9 +168,9 @@ export const TIERS: Tier[] = [
       'Weekly drift alerts',
     ],
     cta: {
-      kind: 'mailto',
+      kind: 'contact',
       label: 'Existing customer billing →',
-      href: mailtoLink('Flintmere Growth — billing query'),
+      href: contactLink('billing'),
       note: 'In-flight subscriptions only. New sign-ups: see the food vertical ladder.',
     },
   },
@@ -192,9 +195,9 @@ export const TIERS: Tier[] = [
       'Bulk sync SLA: 1K products within 2h',
     ],
     cta: {
-      kind: 'mailto',
+      kind: 'contact',
       label: 'Existing customer billing →',
-      href: mailtoLink('Flintmere Scale — billing query'),
+      href: contactLink('billing'),
       note: 'In-flight subscriptions only. New sign-ups: see the food vertical ladder.',
     },
   },
@@ -218,9 +221,9 @@ export const TIERS: Tier[] = [
       'Agency dashboard',
     ],
     cta: {
-      kind: 'mailto',
+      kind: 'contact',
       label: 'Existing customer billing →',
-      href: mailtoLink('Flintmere Agency — billing query'),
+      href: contactLink('billing'),
       note: 'In-flight subscriptions only. New agency sign-ups: see the food agency ladder.',
     },
   },
@@ -244,9 +247,9 @@ export const TIERS: Tier[] = [
       '50K SKU support',
     ],
     cta: {
-      kind: 'mailto',
+      kind: 'contact',
       label: 'Talk to the team →',
-      href: mailtoLink('Flintmere Plus — enquiry'),
+      href: contactLink('plus'),
       note: 'Private beta. From £1,200/mo on enquiry. We reply within two working days.',
     },
   },

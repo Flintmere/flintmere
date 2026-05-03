@@ -105,11 +105,11 @@ export default function Cookies() {
 
       <Clause n="07" heading="Questions">
         <p>
-          Write to{' '}
-          <a href="mailto:privacy@flintmere.com" className="underline">
-            privacy@flintmere.com
+          Send a message via our{' '}
+          <a href="/contact?topic=privacy" className="underline">
+            contact form
           </a>{' '}
-          if you find a cookie not listed here — it would be a bug.
+          (Privacy topic) if you find a cookie not listed here — it would be a bug.
         </p>
       </Clause>
     </LegalShell>

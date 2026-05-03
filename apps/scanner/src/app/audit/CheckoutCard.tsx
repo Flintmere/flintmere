@@ -38,7 +38,6 @@ import {
 } from '@stripe/react-stripe-js';
 import { track } from '@/lib/plausible';
 import {
-  AUDIT_BESPOKE_ENQUIRY_EMAIL,
   bandBySlug,
   type AuditBand,
   type AuditBandSlug,
@@ -190,9 +189,9 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
           className="text-[color:var(--color-ink-2)]"
           style={{ fontSize: 14, lineHeight: 1.55, padding: 32 }}
         >
-          Payment is temporarily unavailable. Email{' '}
-          <a href="mailto:hello@flintmere.com" className="underline">
-            hello@flintmere.com
+          Payment is temporarily unavailable. Send us a message via our{' '}
+          <a href="/contact?topic=billing" className="underline">
+            contact form
           </a>{' '}
           and we&rsquo;ll invoice you directly.
         </p>
@@ -226,10 +225,6 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
 
   // Bespoke band — swap the form for an enquiry block.
   if (selectedBand?.isBespoke) {
-    const subject = encodeURIComponent(
-      'Concierge audit — Band 3 enquiry (5,001+ SKUs)',
-    );
-    const mailto = `mailto:${AUDIT_BESPOKE_ENQUIRY_EMAIL}?subject=${subject}`;
     return (
       <CardShell>
         <div style={{ padding: '28px 32px 32px 32px' }}>
@@ -261,7 +256,7 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
             reply within two working days with a fixed-fee quote.
           </p>
           <a
-            href={mailto}
+            href="/contact?topic=concierge"
             className="btn btn-accent w-full justify-center"
             onClick={() =>
               track('concierge_clicked', {
@@ -271,7 +266,7 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
               })
             }
           >
-            Email {AUDIT_BESPOKE_ENQUIRY_EMAIL} →
+            Open the bespoke-quote contact form →
           </a>
         </div>
       </CardShell>

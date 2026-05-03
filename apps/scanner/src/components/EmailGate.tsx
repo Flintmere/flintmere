@@ -346,12 +346,12 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
             maxWidth: '52ch',
           }}
         >
-          Prefer to talk first? Email{' '}
+          Prefer to talk first? Reach us via our{' '}
           <a
-            href={`mailto:hello@flintmere.com?subject=Scan%20of%20${encodeURIComponent(shopDomain)}`}
+            href="/contact?topic=general"
             style={{ color: 'var(--color-paper)', textDecoration: 'underline' }}
           >
-            hello@flintmere.com
+            contact form
           </a>{' '}
           and tell us what you need. {REPLY_SLA}
         </p>

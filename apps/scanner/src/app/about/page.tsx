@@ -445,7 +445,7 @@ export default function About() {
           }}
         >
           <a
-            href="mailto:hello@flintmere.com?subject=Flintmere%20%E2%80%94%20enquiry"
+            href="/contact?topic=general"
             className="inline-flex items-baseline gap-x-2 font-medium text-[color:var(--color-ink)] hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
             style={{
               fontSize: '18px',

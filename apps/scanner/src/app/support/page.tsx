@@ -26,44 +26,50 @@ export default function Support() {
       </Clause>
 
       <Clause n="02" heading="How to reach us">
+        <p>
+          Every message goes through our{' '}
+          <a href="/contact" className="underline">contact form</a>. Pick the
+          topic that fits and the message lands in the right inbox — we reply
+          within two working days.
+        </p>
         <div className="mt-4 border border-[color:var(--color-line)]">
           <div className="grid grid-cols-[auto_1fr] gap-4 p-4 border-b border-[color:var(--color-line-soft)]">
             <p className="eyebrow" style={{ color: 'var(--color-mute)' }}>Product / how-to</p>
             <p>
-              <a href="mailto:support@flintmere.com" className="underline">
-                support@flintmere.com
+              <a href="/contact?topic=general" className="underline">
+                Open the contact form (General topic) →
               </a>
             </p>
           </div>
           <div className="grid grid-cols-[auto_1fr] gap-4 p-4 border-b border-[color:var(--color-line-soft)]">
             <p className="eyebrow" style={{ color: 'var(--color-mute)' }}>Billing and refunds</p>
             <p>
-              <a href="mailto:billing@flintmere.com" className="underline">
-                billing@flintmere.com
+              <a href="/contact?topic=billing" className="underline">
+                Open the contact form (Billing topic) →
               </a>
             </p>
           </div>
           <div className="grid grid-cols-[auto_1fr] gap-4 p-4 border-b border-[color:var(--color-line-soft)]">
             <p className="eyebrow" style={{ color: 'var(--color-mute)' }}>Privacy and GDPR</p>
             <p>
-              <a href="mailto:privacy@flintmere.com" className="underline">
-                privacy@flintmere.com
+              <a href="/contact?topic=privacy" className="underline">
+                Open the contact form (Privacy topic) →
               </a>
             </p>
           </div>
           <div className="grid grid-cols-[auto_1fr] gap-4 p-4 border-b border-[color:var(--color-line-soft)]">
             <p className="eyebrow" style={{ color: 'var(--color-mute)' }}>Security disclosure</p>
             <p>
-              <a href="mailto:security@flintmere.com" className="underline">
-                security@flintmere.com
+              <a href="/contact?topic=security" className="underline">
+                Open the contact form (Security topic) →
               </a>
             </p>
           </div>
           <div className="grid grid-cols-[auto_1fr] gap-4 p-4">
             <p className="eyebrow" style={{ color: 'var(--color-mute)' }}>Legal and contracts</p>
             <p>
-              <a href="mailto:legal@flintmere.com" className="underline">
-                legal@flintmere.com
+              <a href="/contact?topic=legal" className="underline">
+                Open the contact form (Legal topic) →
               </a>
             </p>
           </div>
@@ -147,11 +153,12 @@ export default function Support() {
       <Clause n="06" heading="Feature requests">
         <p>
           We take feature requests seriously — many shipped features came
-          from a customer email. Send them to{' '}
-          <a href="mailto:support@flintmere.com" className="underline">
-            support@flintmere.com
+          from a customer message. Send them via our{' '}
+          <a href="/contact?topic=general" className="underline">
+            contact form
           </a>{' '}
-          with the word <em>&ldquo;feature&rdquo;</em> in the subject line.
+          (General topic) with the word <em>&ldquo;feature&rdquo;</em> in your
+          message.
           We read them all and publish a quarterly roadmap summary.
         </p>
       </Clause>

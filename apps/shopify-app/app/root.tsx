@@ -29,19 +29,16 @@ function App() {
 
 // Root error boundary. Pure Polaris (chrome, not brand island per
 // design-app-surface skill spec 2026-04-25). Captures to Sentry via
-// captureRemixErrorBoundaryError; surfaces an 8-char Sentry event reference
-// in the body and includes the full event ID in the support mailto subject
-// so help@ can pull the trace immediately.
+// captureRemixErrorBoundaryError; surfaces the full Sentry event reference
+// in the body so the merchant can paste it into the contact form. Per
+// `memory/feedback_no_mailto_links_anywhere.md` (2026-05-03), the support
+// route from inside the embedded app is a new-tab navigation to the
+// public contact form on flintmere.com (cross-origin from the Shopify
+// admin iframe — must open in a new tab).
 export const ErrorBoundary = () => {
   const error = useRouteError();
   captureRemixErrorBoundaryError(error);
   const eventId = Sentry.lastEventId();
-  const refShort = eventId ? eventId.slice(0, 8) : null;
-
-  const subject = eventId
-    ? `Flintmere — error ref ${eventId}`
-    : 'Flintmere — embedded app error';
-  const mailto = `mailto:help@flintmere.com?subject=${encodeURIComponent(subject)}`;
 
   return (
     <Page narrowWidth>
@@ -56,17 +53,17 @@ export const ErrorBoundary = () => {
             }}
             secondaryAction={{
               content: 'Contact support',
-              url: mailto,
-              external: false,
+              url: 'https://flintmere.com/contact?topic=general',
+              external: true,
             }}
           >
             <BlockStack gap="200">
               <Text as="p" variant="bodyMd">
-                Try reloading. If it keeps happening, send us the reference below and we&rsquo;ll dig in.
+                Try reloading. If it keeps happening, paste the reference below into the contact form and we&rsquo;ll dig in.
               </Text>
-              {refShort ? (
+              {eventId ? (
                 <Text as="p" variant="bodySm" tone="subdued">
-                  Reference: <code>{refShort}</code>
+                  Reference: <code>{eventId}</code>
                 </Text>
               ) : (
                 <Text as="p" variant="bodySm" tone="subdued">

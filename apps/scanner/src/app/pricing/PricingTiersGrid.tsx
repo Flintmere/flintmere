@@ -30,10 +30,15 @@ import { usePricingVertical } from '@/lib/use-vertical';
 import { tierBySlug, type Tier } from '@/lib/pricing';
 import type { PricingVerticalId } from '@/lib/vertical';
 
-const SALES_EMAIL = 'hello@flintmere.com';
-
-function mailto(subject: string): string {
-  return `mailto:${SALES_EMAIL}?subject=${encodeURIComponent(subject)}`;
+/**
+ * Every "talk to the team" / "join the waitlist" CTA routes through the
+ * contact form (`memory/feedback_no_mailto_links_anywhere.md`, locked
+ * 2026-05-03). Topic dictates which inbox catches it — `general` for
+ * roadmap / waitlist enquiries, `plus` for the Plus tier, `billing` for
+ * existing-customer billing.
+ */
+function contactLink(topic: 'general' | 'plus' | 'billing'): string {
+  return `/contact?topic=${topic}`;
 }
 
 export function PricingTiersGrid() {
@@ -93,8 +98,8 @@ function FoodTierGrid() {
           style={{ marginTop: 'clamp(40px, 5vw, 64px)' }}
         >
           <FreeCard tier={free} />
-          <MagnitudesPendingCard tier={foodSingle} mailtoSubject="Flintmere food single — waitlist" />
-          <MagnitudesPendingCard tier={foodAgency} mailtoSubject="Flintmere food agency — waitlist" />
+          <MagnitudesPendingCard tier={foodSingle} />
+          <MagnitudesPendingCard tier={foodAgency} />
           <PlusAnchorCard tier={plus} />
         </div>
       </div>
@@ -174,7 +179,7 @@ const NON_FOOD_CONTENT: Partial<Record<PricingVerticalId, NonFoodContent>> = {
     primaryCta: { label: 'Run a free scan →', href: '/scan' },
     secondaryCta: {
       label: 'Talk to the team →',
-      href: mailto('Flintmere — beauty timeline enquiry'),
+      href: contactLink('general'),
     },
   },
   apparel: {
@@ -186,7 +191,7 @@ const NON_FOOD_CONTENT: Partial<Record<PricingVerticalId, NonFoodContent>> = {
     primaryCta: { label: 'Run a free scan →', href: '/scan' },
     secondaryCta: {
       label: 'Talk to the team →',
-      href: mailto('Flintmere — apparel timeline enquiry'),
+      href: contactLink('general'),
     },
   },
   bundle: {
@@ -198,7 +203,7 @@ const NON_FOOD_CONTENT: Partial<Record<PricingVerticalId, NonFoodContent>> = {
     primaryCta: { label: 'See food pricing →', href: '/pricing?vertical=food' },
     secondaryCta: {
       label: 'Talk to the team →',
-      href: mailto('Flintmere — food + beauty bundle enquiry'),
+      href: contactLink('general'),
     },
   },
 };
@@ -259,10 +264,9 @@ function FreeCard({ tier }: FreeCardProps) {
 
 interface MagnitudesPendingCardProps {
   tier: Tier;
-  mailtoSubject: string;
 }
 
-function MagnitudesPendingCard({ tier, mailtoSubject }: MagnitudesPendingCardProps) {
+function MagnitudesPendingCard({ tier }: MagnitudesPendingCardProps) {
   const subId = `tier-${tier.slug}-subprice`;
   return (
     <article
@@ -331,7 +335,7 @@ function MagnitudesPendingCard({ tier, mailtoSubject }: MagnitudesPendingCardPro
         ))}
       </ul>
       <Link
-        href={mailto(mailtoSubject)}
+        href={contactLink('general')}
         className="btn mt-auto"
         style={{ marginTop: 'auto' }}
       >
@@ -398,7 +402,7 @@ function PlusAnchorCard({ tier }: PlusAnchorCardProps) {
         ))}
       </ul>
       <Link
-        href={mailto('Flintmere Plus — enquiry')}
+        href={contactLink('plus')}
         className="btn mt-auto"
         style={{ marginTop: 'auto' }}
       >

@@ -285,7 +285,7 @@ export default function Pricing() {
           <div className="lg:pt-16">
             <p>
               <Link
-                href="mailto:hello@flintmere.com?subject=Flintmere%20food%20standard%20%E2%80%94%20notify%20me%20on%20publication"
+                href="/contact?topic=general"
                 className="underline"
                 style={{
                   fontSize: 16,

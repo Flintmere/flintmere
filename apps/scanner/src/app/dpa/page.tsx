@@ -229,11 +229,11 @@ export default function DPA() {
         <p>
           Installing the Shopify app or accepting a paid subscription is
           treated as acceptance of this DPA on behalf of the Controller.
-          Plus customers who require a countersigned copy should email{' '}
-          <a href="mailto:legal@flintmere.com" className="underline">
-            legal@flintmere.com
-          </a>
-          ; we will return a signed PDF within 5 working days.
+          Plus customers who require a countersigned copy should reach us via our{' '}
+          <a href="/contact?topic=legal" className="underline">
+            contact form
+          </a>{' '}
+          (Legal topic); we will return a signed PDF within 5 working days.
         </p>
       </Clause>
     </LegalShell>

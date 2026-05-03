@@ -99,15 +99,6 @@ export const AUDIT_BANDS: AuditBand[] = [
 ]
 
 /**
- * The team inbox used by the bespoke-quote flow. Routes to the team
- * (not the founder personally) per BUSINESS.md:19 — customer-facing
- * surfaces use the team-orientated framing. Distinct from the
- * SALES_EMAIL constant in `lib/pricing.ts`, which routes Agency /
- * Enterprise / Plus sales conversations to the founder.
- */
-export const AUDIT_BESPOKE_ENQUIRY_EMAIL = 'hello@flintmere.com'
-
-/**
  * The audit-band slug used as Stripe PaymentIntent metadata key. Lives
  * on the Charge under `metadata.audit_band`. Surfaced as a constant so
  * the API, webhook, and any reporting query reference the same key.

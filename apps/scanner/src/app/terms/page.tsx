@@ -60,11 +60,11 @@ export default function Terms() {
           You must be at least 18 and authorised to bind the business you
           represent. You are responsible for the security of your Shopify
           store&rsquo;s access and for the actions of anyone you grant access
-          to Flintmere. Tell us immediately at{' '}
-          <a href="mailto:security@flintmere.com" className="underline">
-            security@flintmere.com
+          to Flintmere. Tell us immediately via our{' '}
+          <a href="/contact?topic=security" className="underline">
+            contact form
           </a>{' '}
-          if you suspect unauthorised access.
+          (Security topic) if you suspect unauthorised access.
         </p>
       </Clause>
 
@@ -85,14 +85,14 @@ export default function Terms() {
           </li>
           <li>
             <strong>30-day refund.</strong> If you pay Flintmere directly and
-            are not satisfied, email{' '}
-            <a href="mailto:billing@flintmere.com" className="underline">
-              billing@flintmere.com
+            are not satisfied, send a message via our{' '}
+            <a href="/contact?topic=billing" className="underline">
+              contact form
             </a>{' '}
-            within 30 days of your first payment for a full refund, no
-            questions. Shopify-billed charges follow Shopify&rsquo;s refund
-            process; we&rsquo;ll approve reasonable requests within the same
-            window.
+            (Billing topic) within 30 days of your first payment for a full
+            refund, no questions. Shopify-billed charges follow Shopify&rsquo;s
+            refund process; we&rsquo;ll approve reasonable requests within the
+            same window.
           </li>
           <li>
             Cancel any time. Paid-through access remains until the end of the
@@ -219,19 +219,13 @@ export default function Terms() {
 
       <Clause n="12" heading="Contact">
         <p>
-          Billing:{' '}
-          <a href="mailto:billing@flintmere.com" className="underline">
-            billing@flintmere.com
-          </a>
-          . Legal:{' '}
-          <a href="mailto:legal@flintmere.com" className="underline">
-            legal@flintmere.com
-          </a>
-          . Security:{' '}
-          <a href="mailto:security@flintmere.com" className="underline">
-            security@flintmere.com
-          </a>
-          .
+          Reach us via our{' '}
+          <a href="/contact" className="underline">contact form</a>
+          {' '}— pick the{' '}
+          <a href="/contact?topic=billing" className="underline">Billing</a>,{' '}
+          <a href="/contact?topic=legal" className="underline">Legal</a>, or{' '}
+          <a href="/contact?topic=security" className="underline">Security</a>{' '}
+          topic depending on what you need.
         </p>
       </Clause>
     </LegalShell>

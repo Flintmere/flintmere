@@ -99,14 +99,14 @@ export function BlockSnippet() {
           }}
         >
           We respect robots.txt. New directives are picked up within 24 hours.
-          To remove existing data from the benchmark entirely, email{' '}
+          To remove existing data from the benchmark entirely, contact us via our{' '}
           <a
-            href="mailto:hello@flintmere.com?subject=FlintmereBot%20opt-out"
+            href="/contact?topic=privacy"
             className="underline hover:text-[color:var(--color-ink)] transition-colors"
           >
-            hello@flintmere.com
+            contact form
           </a>{' '}
-          — we reply within two working days.
+          (Privacy topic) — we reply within two working days.
         </p>
       </div>
     </section>
