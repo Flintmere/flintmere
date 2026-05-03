@@ -1,77 +1,71 @@
 import Link from 'next/link';
-import { Bracket } from '@flintmere/ui';
 import { AUDIT_BANDS, type AuditBand } from '@/lib/audit-pricing';
 
 /**
- * Concierge audit band ladder — primary anchor on /pricing per the
- * Standing Council's Option B verdict on the 2026-05-03 re-scope. The
- * page now leads with the surfaces that have real prices today (this
- * + Plus); the calibrating food tiers were demoted to a cohort
- * invitation below.
+ * Concierge audit band ladder — primary pricing-comparison surface on
+ * /pricing per the Standing Council's Option B verdict on the
+ * 2026-05-03 re-scope.
  *
- * Three SKU-banded cards (Band 1 £197 / Band 2 £397 / Band 3 from £597
- * bespoke). Source of truth: AUDIT_BANDS in lib/audit-pricing.ts (ADR
- * 0022). The section's heroic anchor is the page's bracket-2 chord —
- * Saks-scale `[ from £197 ]` placed alongside the prose.
+ * IMPORTANT: this section is /pricing's COMPARISON treatment (here are
+ * the three bands, pick yours), NOT a re-statement of /audit's hero.
+ * /audit is the conversion surface and owns the heroic Saks chord
+ * `[ for you ]` + the value-prop prose ("written letter, per-product
+ * fix CSV, no call, no screen-share, three working days"). /pricing
+ * trims to: a one-line comparison framing, the three SKU bands as
+ * cards, and per-band CTAs that hand off to /audit. Borrowing
+ * /audit's chord here makes both pages read identically at the fold —
+ * which is what we just fixed.
+ *
+ * Source of truth: AUDIT_BANDS in lib/audit-pricing.ts (ADR 0022).
  */
 
 export function ConciergeBands() {
   return (
     <section
       aria-labelledby="concierge-bands-heading"
-      className="relative isolate overflow-hidden bg-[color:var(--color-paper-2)] border-y border-[color:var(--color-line)]"
+      className="bg-[color:var(--color-paper-2)] border-y border-[color:var(--color-line)]"
     >
       <div
-        aria-hidden="true"
-        className="absolute pointer-events-none"
-        style={{
-          inset: 0,
-          background: 'var(--gradient-amber-radial)',
-          transform: 'translate(0, -10%) scale(1.1)',
-          opacity: 0.6,
-        }}
-      />
-
-      <div
-        className="relative mx-auto max-w-[1280px]"
+        className="mx-auto max-w-[1280px]"
         style={{
           paddingLeft: 'clamp(24px, 4vw, 64px)',
           paddingRight: 'clamp(24px, 4vw, 64px)',
-          paddingTop: 'clamp(72px, 9vw, 128px)',
-          paddingBottom: 'clamp(72px, 9vw, 128px)',
+          paddingTop: 'clamp(64px, 8vw, 112px)',
+          paddingBottom: 'clamp(64px, 8vw, 112px)',
         }}
       >
         <p className="eyebrow mb-6">Concierge audit · Available now · One-off</p>
-        <div className="grid lg:grid-cols-[1.4fr_1fr] gap-12 items-end">
-          <h2
-            id="concierge-bands-heading"
-            className="font-medium tracking-[-0.03em] leading-[1.0] text-[color:var(--color-ink)] max-w-[18ch]"
-            style={{ fontSize: 'clamp(40px, 6vw, 88px)' }}
-          >
-            Skip the wait — book the audit.
-          </h2>
-          <div>
-            <Bracket size="saks">from £197</Bracket>
-          </div>
-        </div>
-
+        <h2
+          id="concierge-bands-heading"
+          className="font-medium tracking-[-0.03em] leading-[1.05] text-[color:var(--color-ink)] max-w-[24ch]"
+          style={{ fontSize: 'clamp(28px, 3.6vw, 52px)' }}
+        >
+          Three bands. Pick by catalog size.
+        </h2>
         <p
           className="text-[color:var(--color-ink-2)]"
           style={{
-            marginTop: 'clamp(32px, 4vw, 48px)',
+            marginTop: 'clamp(20px, 2.5vw, 32px)',
             maxWidth: '60ch',
-            fontSize: 17,
+            fontSize: 16,
             lineHeight: 1.55,
           }}
         >
-          Written audit letter, per-product fix CSV, 30-day plan, 30-day
-          re-scan. Delivered in three working days. Pick your band by
-          catalog size; you self-attest at checkout.
+          One-off audit; you self-attest your band at checkout. Full
+          deliverable + offer detail on the{' '}
+          <Link
+            href="/audit"
+            className="underline"
+            style={{ textDecorationColor: 'var(--color-accent)', textUnderlineOffset: 4 }}
+          >
+            audit page
+          </Link>
+          .
         </p>
 
         <div
           className="grid grid-cols-1 md:grid-cols-3 gap-6"
-          style={{ marginTop: 'clamp(48px, 5vw, 72px)' }}
+          style={{ marginTop: 'clamp(40px, 5vw, 64px)' }}
         >
           {AUDIT_BANDS.map((band) => (
             <BandCard key={band.slug} band={band} />
