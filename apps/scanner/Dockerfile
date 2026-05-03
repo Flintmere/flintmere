@@ -25,6 +25,14 @@ WORKDIR /repo
 # Tier-1 build optimisation 2026-04-29 — skip Next.js telemetry HTTP call
 # during build (~1-2s; opt-out per https://nextjs.org/telemetry).
 ENV NEXT_TELEMETRY_DISABLED=1
+# Lift Node heap ceiling for Next.js standalone trace collection.
+# Default ~1.5GB heap is tight for monorepo @vercel/nft tracing; OOM
+# manifests as silent SIGKILL during "Collecting build traces" with
+# exit 255 and no error written. 4GB headroom is safe on 8GB droplets;
+# can be lowered to 2048 if memory pressure forces it. Caught after
+# 244882b's deploy died at the trace-collection step on Coolify
+# (deployment-lr8dcsq16zzb0ll5zwd2ug9i 2026-05-03).
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 COPY --from=deps /repo/node_modules ./node_modules
 COPY --from=deps /repo/apps/scanner/node_modules ./apps/scanner/node_modules
 COPY --from=deps /repo/packages ./packages
