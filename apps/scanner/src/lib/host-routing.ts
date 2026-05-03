@@ -1,30 +1,47 @@
 /**
  * Host routing — single source of truth for which routes live on which host.
  *
- * Per the council-ratified C1 architecture (2026-05-03):
- *   flintmere.com           — marketing surfaces (homepage, /about, /pricing,
- *                             /research, /methodology, /for/*, legal pages)
- *   audit.flintmere.com     — scanner surfaces (/scan, /audit, /score/[shop],
- *                             /bot, /unsubscribe)
- *   both hosts              — APIs (/api/*), Next.js assets, metadata files
- *                             (sitemap, robots, opengraph, icons)
+ * Per the council-ratified C1 architecture (2026-05-03, extended to a third
+ * host on 2026-05-03):
+ *   flintmere.com               — marketing surfaces (homepage, /about,
+ *                                 /pricing, /research, /methodology, /for/*,
+ *                                 legal pages, /contact)
+ *   audit.flintmere.com         — scanner surfaces (/scan, /audit,
+ *                                 /score/[shop], /bot, /unsubscribe)
+ *   standards.flintmere.com     — the food regulatory standard. Phase 1
+ *                                 ships a holding page at the root; Phase 2
+ *                                 (post-ingestion-engine, June 2026+) lands
+ *                                 the actual taxonomy under the same
+ *                                 routing scaffold.
+ *   all hosts                   — APIs (/api/*), Next.js assets, metadata
+ *                                 files (sitemap, robots, opengraph, icons)
  *
- * Cross-host requests get 301'd to the canonical host for the next 90 days
- * (until 2026-08-03) so old bookmarks / backlinks survive the migration.
- * After that window, re-evaluate via Plausible: if cross-host hits are
- * <1% of traffic, switch to 404 for stricter routing. TODO: 2026-08-03.
+ * Cross-host requests get 301'd to the canonical host. Standards-host root
+ * (`/`) is rewritten internally to `/standards` by middleware so the actual
+ * page can live at `apps/scanner/src/app/standards/page.tsx` without
+ * colliding with the marketing root.
  *
- * Why this file exists, not three constants in middleware.ts:
- * route classification needs to be testable without spinning up Next.js
- * middleware. Helpers below take a pathname, return a host or null.
+ * Cross-host 90-day window: 2026-05-03 → 2026-08-03. After that, evaluate
+ * via Plausible whether to flip to 404 instead of 301. TODO: 2026-08-03.
+ *
+ * Why this file exists, not constants in middleware.ts: route classification
+ * needs to be testable without spinning up Next.js middleware. Helpers
+ * below take a pathname, return a host or null.
  */
 
 export const MARKETING_HOST = 'flintmere.com';
 export const SCANNER_HOST = 'audit.flintmere.com';
+export const STANDARDS_HOST = 'standards.flintmere.com';
+
+export const KNOWN_HOSTS: readonly string[] = [
+  MARKETING_HOST,
+  SCANNER_HOST,
+  STANDARDS_HOST,
+];
 
 /**
  * Routes that live on `flintmere.com`. Hitting one of these on
- * `audit.flintmere.com` → 301 to flintmere.com.
+ * `audit.flintmere.com` or `standards.flintmere.com` → 301 to flintmere.com.
  *
  * Order matters: prefix matches are evaluated longest-first so `/for/plus`
  * resolves before `/for`. Keep this list manually sorted longest-first.
@@ -51,7 +68,7 @@ export const MARKETING_ROUTES: readonly string[] = [
 
 /**
  * Routes that live on `audit.flintmere.com`. Hitting one of these on
- * `flintmere.com` → 301 to audit.flintmere.com.
+ * `flintmere.com` or `standards.flintmere.com` → 301 to audit.flintmere.com.
  */
 export const SCANNER_ROUTES: readonly string[] = [
   '/audit/success',
@@ -62,7 +79,15 @@ export const SCANNER_ROUTES: readonly string[] = [
   '/unsubscribe',
 ];
 
-/** Path prefixes that are allowed on both hosts (APIs, assets, metadata). */
+/**
+ * Routes that live on `standards.flintmere.com`. Note: the canonical URL
+ * for the root is `https://standards.flintmere.com/` — middleware rewrites
+ * the request to `/standards` internally so the page can coexist with
+ * the marketing root in the same app tree.
+ */
+export const STANDARDS_ROUTES: readonly string[] = ['/standards'];
+
+/** Path prefixes that are allowed on every host (APIs, assets, metadata). */
 export const HOST_AGNOSTIC_PREFIXES: readonly string[] = [
   '/api/',
   '/_next/',
@@ -76,12 +101,21 @@ export const HOST_AGNOSTIC_PREFIXES: readonly string[] = [
   '/manifest',
 ];
 
-export type HostAssignment = 'marketing' | 'scanner' | 'both' | 'unknown';
+export type HostAssignment =
+  | 'marketing'
+  | 'scanner'
+  | 'standards'
+  | 'both'
+  | 'unknown';
 
 /**
  * Classify a pathname → which host owns it. Used by middleware to decide
  * whether to 301-redirect a request, and by metadata helpers to compute the
  * canonical host for a given route.
+ *
+ * Path-only — no host context. The standards-host root (`/`) is handled by
+ * a middleware rewrite, not by this classifier (the root is always
+ * 'marketing' here).
  */
 export function classifyRoute(pathname: string): HostAssignment {
   // Normalise — strip trailing slash except for root, lowercase for the
@@ -93,6 +127,14 @@ export function classifyRoute(pathname: string): HostAssignment {
   for (const prefix of HOST_AGNOSTIC_PREFIXES) {
     if (path.startsWith(prefix) || path === prefix.replace(/\/$/, '')) {
       return 'both';
+    }
+  }
+
+  // Standards — match before scanner/marketing so /standards isn't picked
+  // up as an unknown marketing path.
+  for (const route of STANDARDS_ROUTES) {
+    if (path === route || path.startsWith(`${route}/`)) {
+      return 'standards';
     }
   }
 
@@ -127,36 +169,71 @@ export function classifyRoute(pathname: string): HostAssignment {
 export function canonicalHost(pathname: string): string {
   const klass = classifyRoute(pathname);
   if (klass === 'scanner') return SCANNER_HOST;
+  if (klass === 'standards') return STANDARDS_HOST;
   return MARKETING_HOST;
 }
 
 /**
  * Whether a request on `requestHost` for `pathname` should be 301'd to a
  * different host. Returns the target host if so, null if the request is
- * already on the right host (or the route is host-agnostic).
+ * already on the right host (or the route is host-agnostic, or the request
+ * is on a non-canonical host like localhost / Coolify preview).
+ *
+ * Special case for the standards-host root: returns null. Middleware
+ * rewrites `standards.flintmere.com/` → `/standards` internally rather
+ * than redirecting; the page lives at `apps/scanner/src/app/standards/`.
  */
 export function targetHostForRedirect(
   requestHost: string,
   pathname: string,
 ): string | null {
-  const klass = classifyRoute(pathname);
-  if (klass === 'both' || klass === 'unknown') return null;
-
-  const target = klass === 'scanner' ? SCANNER_HOST : MARKETING_HOST;
   // Strip any port for comparison (e.g. `flintmere.com:443` → `flintmere.com`).
   const normalisedRequest = requestHost.split(':')[0]?.toLowerCase() ?? '';
-  if (normalisedRequest === target) return null;
 
   // Only redirect when the request is actually on one of OUR known hosts.
-  // If it's on localhost / preview deploy / unknown host, leave it alone —
-  // local dev expects both routes to work on a single origin, and preview
-  // URLs shouldn't 301 to production.
-  if (
-    normalisedRequest !== MARKETING_HOST &&
-    normalisedRequest !== SCANNER_HOST
-  ) {
+  // localhost / preview deploys / unknown hosts are passed through — local
+  // dev expects all routes to work on a single origin.
+  if (!KNOWN_HOSTS.includes(normalisedRequest)) {
     return null;
   }
 
+  // Standards-host root → no redirect. Middleware rewrites internally.
+  if (normalisedRequest === STANDARDS_HOST && (pathname === '/' || pathname === '')) {
+    return null;
+  }
+
+  const klass = classifyRoute(pathname);
+  if (klass === 'both' || klass === 'unknown') return null;
+
+  const target =
+    klass === 'scanner'
+      ? SCANNER_HOST
+      : klass === 'standards'
+        ? STANDARDS_HOST
+        : MARKETING_HOST;
+
+  if (normalisedRequest === target) return null;
+
   return target;
+}
+
+/**
+ * Whether a request on `requestHost` for `pathname` should be rewritten
+ * (internally re-routed without changing the URL the user sees) rather
+ * than served directly. Returns the rewrite target path if so, null
+ * otherwise.
+ *
+ * The only rewrite today: `standards.flintmere.com/` → `/standards`.
+ * This lets the standards holding page live at
+ * `apps/scanner/src/app/standards/page.tsx` while the user-facing URL
+ * remains the clean root.
+ */
+export function rewritePathForHost(
+  requestHost: string,
+  pathname: string,
+): string | null {
+  const normalisedRequest = requestHost.split(':')[0]?.toLowerCase() ?? '';
+  if (normalisedRequest !== STANDARDS_HOST) return null;
+  if (pathname === '/' || pathname === '') return '/standards';
+  return null;
 }

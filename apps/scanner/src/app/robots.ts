@@ -1,6 +1,11 @@
 import type { MetadataRoute } from 'next';
 import { headers } from 'next/headers';
-import { MARKETING_HOST, SCANNER_HOST } from '@/lib/host-routing';
+import {
+  MARKETING_HOST,
+  SCANNER_HOST,
+  STANDARDS_HOST,
+  KNOWN_HOSTS,
+} from '@/lib/host-routing';
 
 // Per-host robots.txt. Each host advertises its own sitemap (the
 // per-host sitemap.ts emits only that host's routes).
@@ -19,15 +24,17 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     .split(':')[0]!
     .toLowerCase();
 
-  const host =
-    requestHost === SCANNER_HOST ? SCANNER_HOST : MARKETING_HOST;
+  const host = KNOWN_HOSTS.includes(requestHost) ? requestHost : MARKETING_HOST;
 
   return {
     rules: [
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/score/*/raw'],
+        disallow:
+          host === SCANNER_HOST
+            ? ['/api/', '/score/*/raw']
+            : ['/api/'],
       },
     ],
     sitemap: `https://${host}/sitemap.xml`,

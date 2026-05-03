@@ -4,12 +4,14 @@ import { prisma } from '@/lib/db';
 import {
   MARKETING_HOST,
   SCANNER_HOST,
+  STANDARDS_HOST,
 } from '@/lib/host-routing';
 
 // Per-host sitemap. Reads x-forwarded-host (Coolify/Traefik) before
 // falling back to the host header. Each host emits ONLY the routes that
 // live on it — flintmere.com lists marketing surfaces, audit.flintmere.com
-// lists scanner surfaces + opt-in /score pages.
+// lists scanner surfaces + opt-in /score pages, standards.flintmere.com
+// lists the food regulatory standard surface.
 //
 // `force-dynamic` because we read request headers + a live DB query.
 export const dynamic = 'force-dynamic';
@@ -31,6 +33,7 @@ const MARKETING_SITEMAP_ROUTES: RouteEntry[] = [
   { path: '/for/apparel', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/for/plus', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/contact', changeFrequency: 'yearly', priority: 0.4 },
   { path: '/support', changeFrequency: 'monthly', priority: 0.4 },
   { path: '/security', changeFrequency: 'yearly', priority: 0.3 },
   { path: '/privacy', changeFrequency: 'yearly', priority: 0.2 },
@@ -45,6 +48,13 @@ const SCANNER_SITEMAP_ROUTES: RouteEntry[] = [
   { path: '/bot', changeFrequency: 'yearly', priority: 0.3 },
 ];
 
+// Phase 1: only the holding page. Phase 2 (post-ingestion-engine) lands
+// the actual taxonomy under /food, /food/allergens, /food/origin etc. —
+// added here when the routes go live.
+const STANDARDS_SITEMAP_ROUTES: RouteEntry[] = [
+  { path: '/', changeFrequency: 'monthly', priority: 1.0 },
+];
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const hdrs = await headers();
@@ -56,11 +66,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .split(':')[0]!
     .toLowerCase();
 
-  const isScannerHost = requestHost === SCANNER_HOST;
-  const host = isScannerHost ? SCANNER_HOST : MARKETING_HOST;
-  const base = `https://${host}`;
+  if (requestHost === STANDARDS_HOST) {
+    const base = `https://${STANDARDS_HOST}`;
+    return STANDARDS_SITEMAP_ROUTES.map((r) => ({
+      url: `${base}${r.path}`,
+      lastModified: now,
+      changeFrequency: r.changeFrequency,
+      priority: r.priority,
+    }));
+  }
 
-  if (isScannerHost) {
+  if (requestHost === SCANNER_HOST) {
+    const base = `https://${SCANNER_HOST}`;
     const publicScores = await prisma.scan.findMany({
       where: {
         publishPublicPage: true,
@@ -92,6 +109,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
   }
 
+  const base = `https://${MARKETING_HOST}`;
   return MARKETING_SITEMAP_ROUTES.map((r) => ({
     url: `${base}${r.path}`,
     lastModified: now,

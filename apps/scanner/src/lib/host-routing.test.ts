@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   MARKETING_HOST,
   SCANNER_HOST,
+  STANDARDS_HOST,
   canonicalHost,
   classifyRoute,
+  rewritePathForHost,
   targetHostForRedirect,
 } from './host-routing';
 
@@ -24,6 +26,7 @@ describe('classifyRoute', () => {
     ['/cookies', 'marketing'],
     ['/security', 'marketing'],
     ['/support', 'marketing'],
+    ['/contact', 'marketing'],
   ])('classifies %s as marketing', (path, expected) => {
     expect(classifyRoute(path)).toBe(expected);
   });
@@ -40,8 +43,17 @@ describe('classifyRoute', () => {
   });
 
   it.each([
+    ['/standards', 'standards'],
+    ['/standards/food', 'standards'],
+    ['/standards/food/allergens', 'standards'],
+  ])('classifies %s as standards', (path, expected) => {
+    expect(classifyRoute(path)).toBe(expected);
+  });
+
+  it.each([
     ['/api/scan', 'both'],
     ['/api/lead', 'both'],
+    ['/api/contact', 'both'],
     ['/api/healthz', 'both'],
     ['/api/webhooks/stripe', 'both'],
     ['/sitemap.xml', 'both'],
@@ -70,6 +82,7 @@ describe('classifyRoute', () => {
   it('handles trailing slashes', () => {
     expect(classifyRoute('/about/')).toBe('marketing');
     expect(classifyRoute('/scan/')).toBe('scanner');
+    expect(classifyRoute('/standards/')).toBe('standards');
   });
 
   it('does not match / as a prefix for everything', () => {
@@ -92,6 +105,11 @@ describe('canonicalHost', () => {
     expect(canonicalHost('/about')).toBe(MARKETING_HOST);
   });
 
+  it('returns standards host for standards routes', () => {
+    expect(canonicalHost('/standards')).toBe(STANDARDS_HOST);
+    expect(canonicalHost('/standards/food')).toBe(STANDARDS_HOST);
+  });
+
   it('returns marketing host for unknown routes (brand-first)', () => {
     expect(canonicalHost('/unknown-route')).toBe(MARKETING_HOST);
   });
@@ -112,33 +130,92 @@ describe('targetHostForRedirect', () => {
     expect(targetHostForRedirect(SCANNER_HOST, '/about')).toBe(MARKETING_HOST);
   });
 
+  it('redirects standards-route hits on marketing host to standards host', () => {
+    expect(targetHostForRedirect(MARKETING_HOST, '/standards')).toBe(STANDARDS_HOST);
+    expect(targetHostForRedirect(MARKETING_HOST, '/standards/food')).toBe(STANDARDS_HOST);
+  });
+
+  it('redirects standards-route hits on scanner host to standards host', () => {
+    expect(targetHostForRedirect(SCANNER_HOST, '/standards')).toBe(STANDARDS_HOST);
+  });
+
+  it('redirects scanner-route hits on standards host to scanner host', () => {
+    expect(targetHostForRedirect(STANDARDS_HOST, '/scan')).toBe(SCANNER_HOST);
+  });
+
+  it('redirects marketing-route hits on standards host to marketing host', () => {
+    expect(targetHostForRedirect(STANDARDS_HOST, '/pricing')).toBe(MARKETING_HOST);
+    expect(targetHostForRedirect(STANDARDS_HOST, '/about')).toBe(MARKETING_HOST);
+  });
+
+  it('does not redirect the standards-host root (handled by middleware rewrite)', () => {
+    expect(targetHostForRedirect(STANDARDS_HOST, '/')).toBeNull();
+    expect(targetHostForRedirect(STANDARDS_HOST, '')).toBeNull();
+  });
+
   it('does not redirect when route is on the right host already', () => {
     expect(targetHostForRedirect(MARKETING_HOST, '/pricing')).toBeNull();
     expect(targetHostForRedirect(SCANNER_HOST, '/scan')).toBeNull();
+    expect(targetHostForRedirect(STANDARDS_HOST, '/standards')).toBeNull();
   });
 
   it('does not redirect both-classified routes', () => {
     expect(targetHostForRedirect(MARKETING_HOST, '/api/scan')).toBeNull();
     expect(targetHostForRedirect(SCANNER_HOST, '/sitemap.xml')).toBeNull();
+    expect(targetHostForRedirect(STANDARDS_HOST, '/api/contact')).toBeNull();
   });
 
   it('does not redirect unknown routes (let the 404 handler render)', () => {
     expect(targetHostForRedirect(MARKETING_HOST, '/random')).toBeNull();
     expect(targetHostForRedirect(SCANNER_HOST, '/random')).toBeNull();
+    expect(targetHostForRedirect(STANDARDS_HOST, '/random')).toBeNull();
   });
 
   it('does not redirect from non-canonical hosts (preview / localhost)', () => {
     expect(targetHostForRedirect('localhost:3001', '/scan')).toBeNull();
     expect(targetHostForRedirect('preview-abc.coolify.app', '/pricing')).toBeNull();
+    expect(targetHostForRedirect('preview-abc.coolify.app', '/standards')).toBeNull();
   });
 
   it('strips port from request host for comparison', () => {
     expect(targetHostForRedirect('flintmere.com:443', '/pricing')).toBeNull();
     expect(targetHostForRedirect('flintmere.com:443', '/scan')).toBe(SCANNER_HOST);
+    expect(targetHostForRedirect('standards.flintmere.com:443', '/')).toBeNull();
   });
 
   it('case-insensitive on host comparison', () => {
     expect(targetHostForRedirect('FLINTMERE.COM', '/pricing')).toBeNull();
     expect(targetHostForRedirect('Audit.Flintmere.Com', '/scan')).toBeNull();
+    expect(targetHostForRedirect('Standards.Flintmere.Com', '/')).toBeNull();
+  });
+});
+
+describe('rewritePathForHost', () => {
+  it('rewrites the standards-host root to /standards', () => {
+    expect(rewritePathForHost(STANDARDS_HOST, '/')).toBe('/standards');
+    expect(rewritePathForHost(STANDARDS_HOST, '')).toBe('/standards');
+  });
+
+  it('rewrites with port stripped and case-insensitive', () => {
+    expect(rewritePathForHost('Standards.Flintmere.Com:443', '/')).toBe(
+      '/standards',
+    );
+  });
+
+  it('does not rewrite non-root paths on standards host', () => {
+    expect(rewritePathForHost(STANDARDS_HOST, '/standards')).toBeNull();
+    expect(rewritePathForHost(STANDARDS_HOST, '/standards/food')).toBeNull();
+    expect(rewritePathForHost(STANDARDS_HOST, '/about')).toBeNull();
+  });
+
+  it('does not rewrite anything on marketing or scanner hosts', () => {
+    expect(rewritePathForHost(MARKETING_HOST, '/')).toBeNull();
+    expect(rewritePathForHost(MARKETING_HOST, '/standards')).toBeNull();
+    expect(rewritePathForHost(SCANNER_HOST, '/')).toBeNull();
+  });
+
+  it('does not rewrite from non-canonical hosts', () => {
+    expect(rewritePathForHost('localhost:3001', '/')).toBeNull();
+    expect(rewritePathForHost('preview-abc.coolify.app', '/')).toBeNull();
   });
 });

@@ -16,7 +16,12 @@
  * from inside the scanner stays a Link.
  */
 
-import { MARKETING_HOST, SCANNER_HOST, canonicalHost } from './host-routing';
+import {
+  MARKETING_HOST,
+  SCANNER_HOST,
+  STANDARDS_HOST,
+  canonicalHost,
+} from './host-routing';
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -41,6 +46,23 @@ export function marketingUrl(path: string): string {
 export function scannerUrl(path: string): string {
   if (!isProd) return path.startsWith('/') ? path : `/${path}`;
   return absolute(SCANNER_HOST, path);
+}
+
+/**
+ * URL for a standards-host route. Use from anywhere on the site that
+ * links into the food regulatory standard. Note: the canonical root is
+ * `https://standards.flintmere.com/` — pass `/` and middleware rewrites
+ * to the internal `/standards` page on the standards host.
+ */
+export function standardsUrl(path: string): string {
+  if (!isProd) {
+    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    // In dev, root requests resolve to the actual page path so the page
+    // renders without spinning up middleware host-rewrite.
+    if (cleanPath === '/' || cleanPath === '') return '/standards';
+    return cleanPath;
+  }
+  return absolute(STANDARDS_HOST, path);
 }
 
 /**

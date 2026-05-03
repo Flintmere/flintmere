@@ -1,21 +1,24 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { targetHostForRedirect } from './src/lib/host-routing';
+import {
+  rewritePathForHost,
+  targetHostForRedirect,
+} from './src/lib/host-routing';
 
 /**
  * Host-routing middleware — implements the C1 architecture
- * (council-ratified 2026-05-03). One Next.js app serves two hosts; this
- * middleware 301-redirects requests that arrive on the wrong host for
- * the route they're asking for.
+ * (council-ratified 2026-05-03, extended to three hosts 2026-05-03).
+ * One Next.js app serves three hosts:
  *
  *   GET https://audit.flintmere.com/pricing  → 301 https://flintmere.com/pricing
  *   GET https://flintmere.com/scan           → 301 https://audit.flintmere.com/scan
+ *   GET https://standards.flintmere.com/     → rewrite → /standards (internal)
  *
  * Routes classified as 'both' (APIs, assets, metadata files) and 'unknown'
- * routes are passed through. Local dev (`localhost:*`) is also passed
- * through — single-origin convenience.
+ * routes are passed through. Local dev (`localhost:*`) and Coolify preview
+ * URLs are also passed through — single-origin convenience.
  *
- * 90-day window: 2026-05-03 → 2026-08-03. After that, evaluate via
- * Plausible whether to flip cross-host requests to 404 instead of 301.
+ * Cross-host 301 90-day window: 2026-05-03 → 2026-08-03. After that,
+ * evaluate via Plausible whether to flip cross-host requests to 404.
  *
  * Reads the `x-forwarded-host` header before falling back to `host` —
  * Coolify's Traefik sets the forwarded header; the underlying `host`
@@ -28,15 +31,29 @@ export function middleware(request: NextRequest): NextResponse {
 
   if (!requestHost) return NextResponse.next();
 
+  // Cross-host 301 takes precedence — no point rewriting if we're about
+  // to redirect away.
   const target = targetHostForRedirect(requestHost, request.nextUrl.pathname);
-  if (!target) return NextResponse.next();
+  if (target) {
+    const redirectUrl = new URL(request.nextUrl.toString());
+    redirectUrl.host = target;
+    redirectUrl.protocol = 'https:';
+    redirectUrl.port = '';
+    return NextResponse.redirect(redirectUrl, 301);
+  }
 
-  const redirectUrl = new URL(request.nextUrl.toString());
-  redirectUrl.host = target;
-  redirectUrl.protocol = 'https:';
-  redirectUrl.port = '';
+  // Same-host rewrite — currently only standards.flintmere.com/ → /standards.
+  const rewriteTo = rewritePathForHost(
+    requestHost,
+    request.nextUrl.pathname,
+  );
+  if (rewriteTo) {
+    const url = request.nextUrl.clone();
+    url.pathname = rewriteTo;
+    return NextResponse.rewrite(url);
+  }
 
-  return NextResponse.redirect(redirectUrl, 301);
+  return NextResponse.next();
 }
 
 /**
