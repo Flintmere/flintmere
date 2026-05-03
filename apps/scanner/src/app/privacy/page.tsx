@@ -12,7 +12,7 @@ export default function Privacy() {
     <LegalShell
       eyebrow="Privacy"
       title="How we handle your data."
-      summary="We collect only what we need to score and fix your product catalog. We do not sell data, ever. We host in the UK/EU, we delete tokens within 60 seconds of uninstall, and you can ask us to delete everything else at any time by emailing privacy@flintmere.com."
+      summary="We collect only what we need to score and fix your product catalog. We do not sell data, ever. We host in the UK/EU, we delete tokens within 60 seconds of uninstall, and you can ask us to delete everything else at any time by sending a message via our contact form (Privacy topic)."
       lastUpdated="2026-05-03"
       anchorNumeral="01"
     >
@@ -26,15 +26,16 @@ export default function Privacy() {
           the Shopify app at <code>app.flintmere.com</code>.
         </p>
         <p className="mt-4">
-          Questions, access requests, or complaints:{' '}
-          <a href="mailto:privacy@flintmere.com" className="underline">
-            privacy@flintmere.com
-          </a>. Accountable director: John Morris.
+          Questions, access requests, or complaints: send a message via our{' '}
+          <a href="/contact?topic=privacy" className="underline">
+            contact form
+          </a>{' '}
+          (Privacy topic). Accountable director: John Morris.
         </p>
       </Clause>
 
       <Clause n="02" heading="What data we collect">
-        <p>We collect three categories of data:</p>
+        <p>We collect four categories of data:</p>
         <ul className="mt-4 list-disc pl-6 space-y-2">
           <li>
             <strong>Scanner input.</strong> The Shopify store URL you submit,
@@ -47,6 +48,14 @@ export default function Privacy() {
             full report, we store that email, the scan ID it relates to, and
             your stated consent flags. That&rsquo;s it — we do not ask for
             your name, company size, or phone number.
+          </li>
+          <li>
+            <strong>Contact form messages.</strong> If you send us a message
+            via the contact form, we store your name, email, message, optional
+            company and Shopify domain, the topic you picked, and a SHA-256
+            hash of your IP address (no raw IP) plus your user agent for abuse
+            investigation. The IP-hash signal used to rate-limit the form
+            itself lives only in process memory and is never written to disk.
           </li>
           <li>
             <strong>Shopify app data.</strong> If you install the Shopify app,
@@ -76,6 +85,12 @@ export default function Privacy() {
             box before we send the report.
           </li>
           <li>
+            <strong>Contact form messages:</strong> legitimate interest — you
+            sent us a message asking for a reply, so we have a clear basis to
+            handle it. Where the message becomes a continuing conversation,
+            performance of pre-contractual or contractual steps applies.
+          </li>
+          <li>
             <strong>Shopify app:</strong> contract performance — we cannot
             deliver the service you installed without processing the catalog
             data.
@@ -95,6 +110,14 @@ export default function Privacy() {
           <li>
             <strong>Email leads:</strong> until you unsubscribe (one-click RFC
             8058 in every report email), then purged within 30 days.
+          </li>
+          <li>
+            <strong>Contact form messages:</strong> kept while the conversation
+            is open. Resolved threads are retained for up to 24 months from
+            last contact for follow-up and audit, then purged. The IP-hash and
+            user-agent on each row are kept only as long as the message itself.
+            Right to erasure (clause 09) applies — request deletion at any
+            time and we honour it within 30 days.
           </li>
           <li>
             <strong>Shopify access token:</strong> scrubbed within 60 seconds
@@ -189,8 +212,9 @@ export default function Privacy() {
           <li>Withdraw consent at any time</li>
         </ul>
         <p className="mt-4">
-          Email <a href="mailto:privacy@flintmere.com" className="underline">privacy@flintmere.com</a>.
-          We respond within 30 days and usually within three working days.
+          Send a message via our{' '}
+          <a href="/contact?topic=privacy" className="underline">contact form</a>{' '}
+          (Privacy topic). We respond within 30 days and usually within three working days.
         </p>
         <p className="mt-4">
           If you&rsquo;re not satisfied with our response you can complain to
