@@ -22,8 +22,9 @@
  * checkout API.
  */
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
+import { TurnstileWidget } from '@/components/TurnstileWidget';
 import {
   loadStripe,
   type Appearance,
@@ -129,6 +130,7 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
   const [email, setEmail] = useState('');
   const [shopUrl, setShopUrl] = useState('');
   const [state, setState] = useState<CardState>({ kind: 'collect' });
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   const selectedBand = useMemo(() => bandBySlug(bandSlug), [bandSlug]);
 
@@ -140,6 +142,10 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
     telemetry('concierge-checkout-start', { band: bandSlug });
     track('concierge_clicked', { shop: shopUrl.trim(), band: bandSlug });
 
+    const turnstileInput = formRef.current?.querySelector<HTMLInputElement>(
+      'input[name="cf-turnstile-response"]',
+    );
+
     try {
       const res = await fetch('/api/concierge/checkout', {
         method: 'POST',
@@ -148,6 +154,7 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
           email: email.trim(),
           shopUrl: shopUrl.trim(),
           bandSlug,
+          turnstileToken: turnstileInput?.value ?? '',
         }),
       });
       const body = await res.json();
@@ -161,7 +168,7 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
           kind: 'error',
           message:
             body?.message ??
-            'Could not start checkout. Try again, or email hello@flintmere.com.',
+            'Could not start checkout. Try again, or contact us via /contact?topic=billing.',
         });
         return;
       }
@@ -280,7 +287,7 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
 
   return (
     <CardShell>
-      <form onSubmit={handleStart} style={{ padding: '28px 32px 32px 32px' }}>
+      <form ref={formRef} onSubmit={handleStart} style={{ padding: '28px 32px 32px 32px' }}>
         <div style={{ display: 'grid', gap: 18 }}>
           <div>
             <label htmlFor="audit-email" className="eyebrow block mb-2">
@@ -317,11 +324,15 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
           </div>
         </div>
 
+        <div style={{ marginTop: 20 }}>
+          <TurnstileWidget />
+        </div>
+
         <button
           type="submit"
           disabled={state.kind === 'loading'}
           className="btn btn-accent w-full justify-center"
-          style={{ marginTop: 24 }}
+          style={{ marginTop: 20 }}
         >
           {ctaLabel}
         </button>

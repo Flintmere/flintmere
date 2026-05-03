@@ -6,6 +6,7 @@ import {
   STRIPE_BAND_METADATA_KEY,
   type AuditBandSlug,
 } from '@/lib/audit-pricing';
+import { verifyTurnstile } from '@/lib/turnstile';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,6 +15,7 @@ const BodySchema = z.object({
   email: z.string().email(),
   shopUrl: z.string().min(4).max(512),
   bandSlug: z.enum(['band-1', 'band-2', 'band-3']),
+  turnstileToken: z.string().optional().nullable(),
 });
 
 /**
@@ -33,7 +35,8 @@ export async function POST(req: NextRequest) {
       {
         ok: false,
         code: 'stripe-not-configured',
-        message: 'Stripe is not configured yet. Email hello@flintmere.com to book directly.',
+        message:
+          'Stripe is not configured yet. Use /contact?topic=billing to book directly.',
       },
       { status: 503 },
     );
@@ -42,16 +45,33 @@ export async function POST(req: NextRequest) {
   let email: string;
   let shopUrl: string;
   let bandSlug: AuditBandSlug;
+  let turnstileToken: string | null | undefined;
 
   try {
     const json = BodySchema.parse(await req.json());
     email = json.email.toLowerCase();
     shopUrl = json.shopUrl.trim();
     bandSlug = json.bandSlug;
+    turnstileToken = json.turnstileToken;
   } catch {
     return NextResponse.json(
       { ok: false, code: 'bad-request', message: 'Check your email, shop URL, and band selection.' },
       { status: 400 },
+    );
+  }
+
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null;
+  const turnstile = await verifyTurnstile(turnstileToken, ip);
+  if (!turnstile.ok) {
+    return NextResponse.json(
+      {
+        ok: false,
+        code: 'turnstile-failed',
+        reason: turnstile.reason,
+        message: 'Verification failed. Please refresh the page and try again.',
+      },
+      { status: 403 },
     );
   }
 
@@ -71,7 +91,8 @@ export async function POST(req: NextRequest) {
       {
         ok: false,
         code: 'bespoke-band',
-        message: 'Band 3 is a bespoke quote. Email hello@flintmere.com to start.',
+        message:
+          'Band 3 is a bespoke quote. Start at /contact?topic=audit.',
       },
       { status: 400 },
     );

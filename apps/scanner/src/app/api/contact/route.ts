@@ -9,6 +9,7 @@ import {
 import { inboxForTopic, ALL_TOPICS } from '@/lib/contact-routing';
 import { checkContactRateLimit } from '@/lib/contact-rate-limit';
 import { hashIp } from '@/lib/hash';
+import { verifyTurnstile } from '@/lib/turnstile';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -35,6 +36,10 @@ const BodySchema = z.object({
   dwellMs: z.number().int().min(0).max(24 * 60 * 60 * 1000),
   // Caller-provided source label (e.g. "/security inline embed").
   source: z.string().trim().max(120).optional().nullable(),
+  // Cloudflare Turnstile token, captured from the widget at submit time.
+  // Optional in the schema so dev/test environments without keys still
+  // round-trip; the verifyTurnstile helper bypasses when unset.
+  turnstileToken: z.string().optional().nullable(),
 });
 
 export async function POST(req: NextRequest) {
@@ -66,6 +71,20 @@ export async function POST(req: NextRequest) {
 
   const ip =
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null;
+
+  const turnstile = await verifyTurnstile(body.turnstileToken, ip);
+  if (!turnstile.ok) {
+    return NextResponse.json(
+      {
+        ok: false,
+        code: 'turnstile-failed',
+        reason: turnstile.reason,
+        message:
+          'Verification failed. Please refresh the page and try again.',
+      },
+      { status: 403 },
+    );
+  }
 
   const rate = checkContactRateLimit({ ip, email: body.email });
   if (!rate.ok) {

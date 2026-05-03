@@ -30,13 +30,13 @@ import type { ScanState } from '@/components/scan/types';
 export default function ScanPage() {
   const [state, setState] = useState<ScanState>({ phase: 'idle' });
 
-  const runScan = async (url: string) => {
+  const runScan = async (url: string, turnstileToken: string) => {
     setState({ phase: 'scanning', url });
     try {
       const res = await fetch('/api/scan', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ shopUrl: url }),
+        body: JSON.stringify({ shopUrl: url, turnstileToken }),
       });
       const body = await res.json();
       if (!res.ok) {

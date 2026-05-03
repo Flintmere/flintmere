@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Bracket } from '@flintmere/ui';
 import { ALL_TOPICS, labelForTopic } from '@/lib/contact-routing';
 import type { ContactTopic } from '@/generated/prisma';
+import { TurnstileWidget } from '@/components/TurnstileWidget';
 
 export interface ContactFormProps {
   /** Preselect a topic (e.g. "security" on /security inline embed). */
@@ -37,6 +38,7 @@ export function ContactForm({
   const [website, setWebsite] = useState(''); // honeypot
   const [state, setState] = useState<FormState>({ phase: 'idle' });
   const mountedAt = useRef<number>(Date.now());
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   useEffect(() => {
     mountedAt.current = Date.now();
@@ -58,6 +60,10 @@ export function ContactForm({
       return;
     }
     setState({ phase: 'submitting' });
+    const turnstileInput = formRef.current?.querySelector<HTMLInputElement>(
+      'input[name="cf-turnstile-response"]',
+    );
+    const turnstileToken = turnstileInput?.value ?? '';
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
@@ -72,6 +78,7 @@ export function ContactForm({
           website,
           dwellMs: Date.now() - mountedAt.current,
           source: source ?? null,
+          turnstileToken,
         }),
       });
       const body = await res.json().catch(() => ({}));
@@ -126,6 +133,7 @@ export function ContactForm({
 
   return (
     <form
+      ref={formRef}
       onSubmit={submit}
       noValidate
       style={{
@@ -263,6 +271,8 @@ export function ContactForm({
           />
         </label>
       </div>
+
+      <TurnstileWidget />
 
       {state.phase === 'error' ? (
         <p

@@ -6,6 +6,7 @@ import { fetchCrawlability } from '@/lib/crawlability-fetcher';
 import { fetchCatalog, ShopifyFetchError } from '@/lib/shopify-fetcher';
 import { hashIp } from '@/lib/hash';
 import { checkScanRateLimit } from '@/lib/rate-limit';
+import { verifyTurnstile } from '@/lib/turnstile';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,6 +15,10 @@ export const maxDuration = 60;
 const BodySchema = z.object({
   shopUrl: z.string().min(1).max(512),
   vertical: z.string().min(1).max(64).optional(),
+  // Cloudflare Turnstile token from the public form. Optional in the
+  // schema so operator-driven bot scans (FlintmereBot UA) and dev/test
+  // round-trip without keys; verifyTurnstile bypasses below.
+  turnstileToken: z.string().optional().nullable(),
 });
 
 export async function POST(req: NextRequest) {
@@ -41,6 +46,24 @@ export async function POST(req: NextRequest) {
   const vertical = source === 'bot' ? (body.vertical ?? null) : null;
 
   const normalisedDomain = body.shopUrl.toLowerCase().trim();
+
+  // Turnstile verification — same gate as the rate limit: bot scans
+  // (operator-curated FlintmereBot UA) skip the human-form CAPTCHA.
+  if (source === 'user') {
+    const turnstile = await verifyTurnstile(body.turnstileToken, ip);
+    if (!turnstile.ok) {
+      return NextResponse.json(
+        {
+          ok: false,
+          code: 'turnstile-failed',
+          reason: turnstile.reason,
+          message:
+            'Verification failed. Please refresh the page and try again.',
+        },
+        { status: 403 },
+      );
+    }
+  }
 
   // Bot scans bypass the rate limit — they're already scheduled by the
   // operator with their own concurrency floor. Human submissions go through
