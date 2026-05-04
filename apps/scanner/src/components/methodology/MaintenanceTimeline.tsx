@@ -30,10 +30,10 @@ interface TimelineBeat {
 
 const BEATS: TimelineBeat[] = [
   { version: 'v0.x', date: 'Mar 2026', iso: '2026-03-01', status: 'past' },
-  { version: 'v1', date: 'May 2026', iso: '2026-05-02', status: 'now' },
-  { version: 'v1.1', date: 'Nov 2026', iso: '2026-11-01', status: 'future' },
-  { version: 'v2', date: 'May 2027', iso: '2027-05-01', status: 'future' },
-  { version: 'v2.1', date: 'Nov 2027', iso: '2027-11-01', status: 'future' },
+  { version: 'v1', date: 'Target Q3 2026', iso: '2026-09-01', status: 'future' },
+  { version: 'v1.1', date: 'Mar 2027', iso: '2027-03-01', status: 'future' },
+  { version: 'v2', date: 'Sep 2027', iso: '2027-09-01', status: 'future' },
+  { version: 'v2.1', date: 'Mar 2028', iso: '2028-03-01', status: 'future' },
 ];
 
 export function MaintenanceTimeline() {
@@ -46,7 +46,7 @@ export function MaintenanceTimeline() {
   return (
     <figure
       className="my-12"
-      aria-label="Half-yearly publication timeline. v1 lands May 2026; v1.1 in November 2026; v2 in May 2027."
+      aria-label="Half-yearly publication timeline. v1 publishes Q3 2026 (pending); v1.1 March 2027; v2 September 2027."
     >
       <svg
         viewBox="0 0 1200 140"
@@ -136,7 +136,7 @@ export function MaintenanceTimeline() {
         })}
       </svg>
       <figcaption className="sr-only">
-        Half-yearly publication cadence. Versions: {BEATS.map((b) => `${b.version} ${b.date}`).join(', ')}. Currently on v1.
+        Half-yearly publication cadence. Versions: {BEATS.map((b) => `${b.version} ${b.date}`).join(', ')}. v1 is pending publication (target Q3 2026); v0.x is the operator-internal pre-release.
       </figcaption>
     </figure>
   );

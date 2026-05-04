@@ -49,7 +49,7 @@ const PROOF_PANELS: ProofPanel[] = [
     metric: '47 →',
     metricAccent: '89',
     label: 'Catalog readiness score',
-    sub: '14-day audit window · representative example',
+    sub: 'Three-working-day audit window · representative example',
   },
   {
     metric: '£3,240',
@@ -60,7 +60,7 @@ const PROOF_PANELS: ProofPanel[] = [
   {
     metric: '1 letter · 1 CSV',
     label: 'Per-product write-up + structured data file',
-    sub: 'Yours to keep, on day fourteen',
+    sub: 'Yours to keep, on day three',
   },
 ];
 

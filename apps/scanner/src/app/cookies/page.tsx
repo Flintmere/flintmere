@@ -35,36 +35,17 @@ export default function Cookies() {
         </p>
       </Clause>
 
-      <Clause n="03" heading="Cookies on audit.flintmere.com (scanner)">
+      <Clause n="03" heading="Cookies on flintmere.com and audit.flintmere.com (marketing + scanner)">
         <p>
-          The public scanner sets exactly one cookie:
+          The marketing site and the public scanner set <strong>no cookies</strong>.
+          CSRF protection on the scan form is enforced by a request-origin
+          check, not by a cookie. Scan results are stored server-side, indexed
+          by a short random ID — that ID lives in the URL, not in a cookie.
         </p>
-        <div className="mt-4 border border-[color:var(--color-line)]">
-          <div className="grid grid-cols-[auto_1fr] gap-4 p-4 border-b border-[color:var(--color-line-soft)]">
-            <p className="eyebrow" style={{ color: 'var(--color-mute)' }}>Name</p>
-            <p><code>flintmere_csrf</code></p>
-          </div>
-          <div className="grid grid-cols-[auto_1fr] gap-4 p-4 border-b border-[color:var(--color-line-soft)]">
-            <p className="eyebrow" style={{ color: 'var(--color-mute)' }}>Purpose</p>
-            <p>CSRF protection on the scan form and email submission.</p>
-          </div>
-          <div className="grid grid-cols-[auto_1fr] gap-4 p-4 border-b border-[color:var(--color-line-soft)]">
-            <p className="eyebrow" style={{ color: 'var(--color-mute)' }}>Category</p>
-            <p>Strictly necessary (no consent required under PECR / UK GDPR).</p>
-          </div>
-          <div className="grid grid-cols-[auto_1fr] gap-4 p-4 border-b border-[color:var(--color-line-soft)]">
-            <p className="eyebrow" style={{ color: 'var(--color-mute)' }}>Lifetime</p>
-            <p>Session (cleared when you close the tab).</p>
-          </div>
-          <div className="grid grid-cols-[auto_1fr] gap-4 p-4">
-            <p className="eyebrow" style={{ color: 'var(--color-mute)' }}>Attributes</p>
-            <p><code>HttpOnly</code>, <code>Secure</code>, <code>SameSite=Lax</code></p>
-          </div>
-        </div>
         <p className="mt-4">
-          We do not set analytics or tracking cookies on the scanner. Scan
-          results are stored server-side, indexed by a short random ID — that
-          ID lives in the URL, not in a cookie.
+          For product analytics we use <strong>Plausible (EU, cookieless)</strong>.
+          No cookies are set, no cross-site tracking is performed, no IP
+          addresses are stored. Per ADR 0013.
         </p>
       </Clause>
 
@@ -74,11 +55,6 @@ export default function Cookies() {
           token (issued by Shopify Admin) to authenticate requests. This is
           scoped to the Shopify admin and is not accessible from our marketing
           or scanner surfaces.
-        </p>
-        <p className="mt-4">
-          For product analytics we use <strong>Plausible (EU, cookieless)</strong>.
-          No cookies are set, no cross-site tracking is performed, no IPs are
-          stored. Per ADR 0013.
         </p>
       </Clause>
 
@@ -95,10 +71,9 @@ export default function Cookies() {
 
       <Clause n="06" heading="How to control cookies">
         <p>
-          The single functional cookie is required for the scanner to
-          function. You can block all cookies in your browser settings, but
-          the scanner form will refuse to submit. For any future non-essential
-          cookie (we have none today), we will present a consent banner and
+          We set no cookies on the marketing site or scanner today, so
+          there is nothing to block. For any future non-essential cookie
+          (we have none today), we will present a consent banner and
           honour GPC (Global Privacy Control) signals.
         </p>
       </Clause>
