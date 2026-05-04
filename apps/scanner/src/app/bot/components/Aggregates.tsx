@@ -118,6 +118,19 @@ export function Aggregates() {
           and the single biggest catalog mistake by category. Never a list of
           stores by grade.
         </p>
+
+        <div
+          data-reveal
+          className="mt-10 lg:mt-12 flex flex-wrap gap-3"
+          style={{ ['--reveal-delay' as string]: `${bracketDelay + 1100}ms` }}
+        >
+          <Link href="/scan" className="btn btn-accent">
+            Scan your store →
+          </Link>
+          <Link href="/for/food-and-drink" className="btn">
+            See what your vertical scored →
+          </Link>
+        </div>
       </div>
     </section>
   );

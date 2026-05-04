@@ -183,7 +183,11 @@ export function BodyBottom({ data }: { data: Published }) {
                     fontSize: 'clamp(11px, 1vw, 13px)',
                     letterSpacing: '0.18em',
                     fontWeight: 500,
-                    color: 'var(--color-accent-ink)',
+                    color: 'var(--color-ink)',
+                    textDecoration: 'underline',
+                    textDecorationColor: 'var(--color-accent)',
+                    textDecorationThickness: '2px',
+                    textUnderlineOffset: 6,
                   }}
                 >
                   Read the {v.label.toLowerCase()} breakdown →

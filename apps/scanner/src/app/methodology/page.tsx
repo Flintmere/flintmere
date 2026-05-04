@@ -59,9 +59,9 @@ import { methodologyStyles } from '@/components/methodology/styles';
  */
 
 export const metadata: Metadata = {
-  title: 'Methodology — How Flintmere scores and maintains',
+  title: 'Methodology — How Flintmere scores Shopify catalogs for AI shopping agents',
   description:
-    'How Flintmere computes the seven-pillar catalog readiness score, where the regulatory data comes from, how the food catalog standard is maintained, and what the score does not measure.',
+    'How Flintmere computes the seven-pillar catalog readiness score for UK food merchants pushing to Google Merchant Center, Amazon Fresh, Ocado, Deliveroo, and AI shopping agents — sources, cadence, public change log, conflicts of interest, and what we do not measure.',
   alternates: { canonical: 'https://flintmere.com/methodology' },
 };
 
@@ -185,7 +185,27 @@ export default function Methodology() {
               lineHeight: 1.7,
             }}
           >
-            The composite score is a weighted average of the seven pillars below. Public scans (no Shopify install) measure the four pillars that read from public sources — identifiers, titles, consistency, and crawlability — and report a partial score against {TOTAL_PUBLIC_WEIGHT}% of the weight. The remaining {100 - TOTAL_PUBLIC_WEIGHT}% (attributes, mapping, checkout eligibility) is reachable only after the Shopify app is installed, since those signals come from authenticated Admin-API reads.
+            The composite score is a weighted average of the seven pillars below.
+          </p>
+          <p
+            className="text-[color:var(--color-ink-2)] max-w-[64ch]"
+            style={{
+              marginTop: 'clamp(16px, 2vw, 20px)',
+              fontSize: 16,
+              lineHeight: 1.7,
+            }}
+          >
+            Public scans read four pillars from public sources &mdash; identifiers, titles, consistency, and crawlability &mdash; and report a partial score against {TOTAL_PUBLIC_WEIGHT}% of the weight. No Shopify install is required.
+          </p>
+          <p
+            className="text-[color:var(--color-ink-2)] max-w-[64ch]"
+            style={{
+              marginTop: 'clamp(16px, 2vw, 20px)',
+              fontSize: 16,
+              lineHeight: 1.7,
+            }}
+          >
+            The remaining {100 - TOTAL_PUBLIC_WEIGHT}% &mdash; attributes, category mapping, and checkout eligibility &mdash; is reachable only after the Shopify app is installed, since those signals come from authenticated Admin-API reads.
           </p>
         </div>
 
@@ -317,7 +337,17 @@ export default function Methodology() {
               lineHeight: 1.7,
             }}
           >
-            The food catalog standard is a JSON Schema plus a human-readable spec defining what a complete food product record looks like for UK Shopify merchants pushing to Google Merchant Center, Amazon Fresh, Ocado, Deliveroo, and emerging AI shopping channels. Fields, types, allowed values, regulatory citations, and version history. It publishes at <span className="font-mono" style={{ fontSize: '0.92em' }}>standards.flintmere.com/food/v1</span>.
+            The food catalog standard is a JSON Schema plus a human-readable spec. It defines what a complete food product record looks like for UK Shopify merchants &mdash; fields, types, allowed values, regulatory citations, and version history.
+          </p>
+          <p
+            className="text-[color:var(--color-ink-2)] max-w-[64ch]"
+            style={{
+              marginTop: 'clamp(16px, 2vw, 20px)',
+              fontSize: 16,
+              lineHeight: 1.7,
+            }}
+          >
+            One standard, five channels: Google Merchant Center, Amazon Fresh, Ocado, Deliveroo, and the emerging AI shopping agents. It publishes at <span className="font-mono" style={{ fontSize: '0.92em' }}>standards.flintmere.com/food/v1</span>.
           </p>
           <p
             className="text-[color:var(--color-ink-2)] max-w-[64ch]"

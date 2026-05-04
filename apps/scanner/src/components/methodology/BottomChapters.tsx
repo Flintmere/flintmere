@@ -221,7 +221,7 @@ export function ChallengeManifesto() {
 export function BottomCta() {
   return (
     <section
-      aria-label="Run a free scan"
+      aria-label="Apply the methodology to your store"
       className="bg-[color:var(--color-paper)] border-t border-[color:var(--color-line)]"
     >
       <div
@@ -234,7 +234,7 @@ export function BottomCta() {
         }}
       >
         <h2
-          className="font-medium text-[color:var(--color-ink)] max-w-[20ch]"
+          className="font-medium text-[color:var(--color-ink)] max-w-[22ch]"
           style={{
             fontSize: 'clamp(32px, 4.4vw, 56px)',
             letterSpacing: '-0.03em',
@@ -242,32 +242,53 @@ export function BottomCta() {
             fontWeight: 700,
           }}
         >
-          Now run the scan and see your score.
+          Now apply it to your store.
         </h2>
         <p
-          className="text-[color:var(--color-ink-2)] max-w-[58ch]"
+          className="text-[color:var(--color-ink-2)] max-w-[60ch]"
           style={{
             marginTop: 'clamp(20px, 2.4vw, 32px)',
             fontSize: 16,
-            lineHeight: 1.55,
+            lineHeight: 1.6,
           }}
         >
-          You read how we measure. The scan takes 60 seconds and reads the four public-source pillars without an install. The full seven-pillar score lands when you install the Shopify app.
+          You read how we measure. The concierge audit walks the seven pillars
+          across your catalog product by product and lands a per-product fix
+          plan in three working days &mdash; from &pound;197. Or run a free
+          scan first and see the four public-source pillars in 60 seconds.
         </p>
         <div
           className="flex flex-col sm:flex-row gap-4"
           style={{ marginTop: 'clamp(28px, 3vw, 40px)' }}
         >
-          <Link href="/scan" className="btn btn-accent whitespace-nowrap">
-            Run a free scan &rarr;
+          <Link
+            href="/audit#checkout"
+            className="btn btn-accent whitespace-nowrap"
+          >
+            Book the concierge audit &mdash; from &pound;197 &rarr;
           </Link>
+          <Link href="/scan" className="btn whitespace-nowrap">
+            Run a free scan first &rarr;
+          </Link>
+        </div>
+        <p
+          className="text-[color:var(--color-mute)]"
+          style={{
+            marginTop: 'clamp(20px, 2vw, 28px)',
+            fontSize: 14,
+            lineHeight: 1.55,
+          }}
+        >
+          Have a regulatory or methodology question?{' '}
           <a
             href="/contact?topic=general"
-            className="btn whitespace-nowrap"
+            className="underline hover:text-[color:var(--color-ink)] transition-colors"
+            style={{ textUnderlineOffset: 4 }}
           >
-            Ask regulatory affairs &rarr;
-          </a>
-        </div>
+            Talk to us
+          </a>{' '}
+          &mdash; we route methodology queries to regulatory affairs.
+        </p>
       </div>
     </section>
   );
