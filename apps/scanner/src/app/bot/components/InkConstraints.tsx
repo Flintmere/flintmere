@@ -103,7 +103,7 @@ export function InkConstraints() {
                   color: 'var(--color-mute-inv)',
                 }}
               >
-                [ {String(idx + 1).padStart(2, '0')} ]
+                <span className="bracket-inline">{String(idx + 1).padStart(2, '0')}</span>
               </span>
               <p
                 className="font-sans font-medium tracking-[-0.015em]"

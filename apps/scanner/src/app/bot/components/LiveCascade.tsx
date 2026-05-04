@@ -338,7 +338,7 @@ export function LiveCascade() {
                     marginBottom: 12,
                   }}
                 >
-                  [ {ex.numeral} ] · {ex.label}
+                  <span className="bracket-inline">{ex.numeral}</span> · {ex.label}
                 </p>
                 <CodePanel example={ex} preFired />
               </li>
@@ -403,7 +403,7 @@ export function LiveCascade() {
                   color: 'var(--color-ink)',
                 }}
               >
-                [ {current.numeral} / 03 ]
+                <span className="bracket-inline">{current.numeral} / 03</span>
               </p>
               <p
                 aria-live="polite"
