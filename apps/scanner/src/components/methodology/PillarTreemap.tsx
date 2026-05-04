@@ -197,7 +197,7 @@ function TreemapTile({ pillar, isFirstInRow, isActive }: TreemapTileProps) {
         className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
         style={{
           background: 'var(--color-accent-soft)',
-          transition: 'opacity 200ms ease',
+          transition: 'opacity var(--duration-short) ease',
         }}
       />
 

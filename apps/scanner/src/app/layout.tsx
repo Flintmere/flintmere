@@ -40,6 +40,8 @@ export const metadata: Metadata = {
 // outside the paper content column on macOS dark mode 2026-05-03.
 export const viewport: Viewport = {
   colorScheme: 'light',
+  // Mirrors --color-paper. Next.js Metadata.themeColor doesn't accept CSS
+  // variables; if --color-paper changes in globals.css @theme, update here too.
   themeColor: '#f7f7f4',
 };
 

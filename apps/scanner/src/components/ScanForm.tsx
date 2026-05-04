@@ -44,7 +44,7 @@ export function ScanForm({
         style={{
           border: '2px solid var(--color-ink)',
           boxShadow: 'var(--shadow-paper-1)',
-          transition: 'box-shadow 240ms cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'box-shadow var(--duration-short) var(--ease-sharp)',
         }}
       >
         <input

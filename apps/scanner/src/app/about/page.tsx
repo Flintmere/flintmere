@@ -480,8 +480,8 @@ function ProcurementLink({ href, label }: ProcurementLinkProps) {
     <li>
       <Link
         href={href}
-        className="text-[color:var(--color-ink)] hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
-        style={{ fontSize: '14px', textDecoration: 'underline' }}
+        className="underline text-[color:var(--color-ink)] hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
+        style={{ fontSize: '14px' }}
       >
         {label} →
       </Link>

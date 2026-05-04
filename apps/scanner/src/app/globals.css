@@ -525,6 +525,17 @@
    Sections opt-in via the [data-reveal] attribute. Stagger via --reveal-delay
    custom property set inline on the element (canon-acceptable inline style:
    it's a CSS variable, not arbitrary visual values).
+
+   Canonical delay grammar (per /audit/page.tsx structure, applies to all
+   marketing surfaces unless deliberately deviated with a comment):
+       0ms     section eyebrow
+       80ms    headline
+       160ms   supporting paragraph / hairline
+       240ms   CTA / first list item
+       +80ms   each subsequent list item
+   /research is the documented exception — research-as-film cinema-mode
+   surfaces use longer cues (120ms eyebrow, 500ms bracket, 1400ms+ words).
+
    The global prefers-reduced-motion block at line 115 scales transition-duration
    to 0.01ms — reduced-motion users land on the end-state instantly. */
 [data-reveal] {

@@ -83,10 +83,16 @@ export default function FlintmereForPlus() {
         <p className="eyebrow mb-6">
           For Shopify Plus · £5M–£200M revenue · 1,000–50,000 SKUs
         </p>
-        <h1 className="max-w-[20ch]">
-          Seven-figure catalogs don&rsquo;t lose agents to{' '}
-          <Bracket>algorithms</Bracket>. They lose them to catalog drift.
+        <h1 className="font-sans tracking-[-0.04em] leading-[0.88] text-[color:var(--color-ink)] mt-2">
+          <Bracket size="saks">catalog</Bracket>
         </h1>
+        <p
+          className="mt-6 max-w-[42ch] font-sans font-medium tracking-[-0.02em] leading-[1.05] text-[color:var(--color-ink)]"
+          style={{ fontSize: 'clamp(20px, 2.4vw, 32px)' }}
+        >
+          Seven-figure catalogs don&rsquo;t lose agents to algorithms. They lose
+          them to catalog drift.
+        </p>
         <p
           className="mt-8 max-w-[58ch] text-[color:var(--color-ink-2)]"
           style={{ fontSize: 18, lineHeight: 1.55 }}
@@ -106,7 +112,57 @@ export default function FlintmereForPlus() {
         </div>
       </section>
 
-      <hr className="rule" />
+      <section
+        aria-label="Plus is bespoke"
+        className="border-y border-[color:var(--color-line)] bg-[color:var(--color-paper-2)]"
+      >
+        <div className="mx-auto max-w-[1280px] px-8 py-20 grid md:grid-cols-[auto_1fr_auto] gap-10 items-end">
+          <div>
+            <p className="eyebrow mb-4">Plus engagement</p>
+            <p
+              style={{
+                fontSize: 'clamp(56px, 9vw, 144px)',
+                fontWeight: 500,
+                letterSpacing: '-0.04em',
+                lineHeight: 0.92,
+              }}
+            >
+              Bespoke
+              <span
+                aria-hidden="true"
+                className="inline-block align-baseline ml-2"
+                style={{
+                  width: '0.22em',
+                  height: '2px',
+                  background: 'var(--color-accent)',
+                  transform: 'translateY(-0.22em)',
+                }}
+              />
+            </p>
+            <p
+              className="eyebrow mt-3 text-[color:var(--color-mute)]"
+              style={{ fontSize: 12 }}
+            >
+              from £1,200/mo · anchor on enquiry
+            </p>
+          </div>
+          <p
+            className="max-w-[48ch] pb-4 text-[color:var(--color-ink-2)]"
+            style={{ fontSize: 17, lineHeight: 1.5, letterSpacing: '-0.01em' }}
+          >
+            Plus engagements are scoped per merchant — onboarding, attribute
+            templates, support, SLA, DPA terms. No fixed plan. No public
+            ladder. We learn your catalog, agree the scope, contract
+            transparently.
+          </p>
+          <Link
+            href="/contact?topic=plus"
+            className="btn btn-accent whitespace-nowrap self-end pb-4"
+          >
+            Talk to the team →
+          </Link>
+        </div>
+      </section>
 
       <section aria-label="Plus-scale mistakes" className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-20">
         <p className="eyebrow mb-6">Eight Plus-scale mistakes</p>

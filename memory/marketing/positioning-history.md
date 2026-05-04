@@ -50,6 +50,17 @@ Current anchored positioning statements — load-bearing for all downstream copy
 
 <!-- New entries appended below by the positioning skill. -->
 
+### 2026-05-04 — /for/* saks-chord nouns (Q4 of design-system audit)
+
+- Message: per-vertical saks-scale brand-mark chord at the hero of each /for/* page.
+  - /for/food-and-drink → `[ allergen ]` (existing default chord elevated to saks; primary FSA / Natasha's Law anxiety word)
+  - /for/beauty → `[ INCI ]` (existing default chord elevated; professional ingredients shorthand)
+  - /for/apparel → `[ size ]` (existing default chord elevated; #1 structured-data field)
+  - /for/plus → `[ catalog ]` (CHANGE from `[ algorithms ]`; saks chords name the asset Flintmere protects, not the enemy)
+- Context: design-system audit Q4 dispatched 2026-05-04; council ratified Position A (elevate /for/* heroes to saks-scale matching flagship-page rhetoric). Positioning skill picks the noun per vertical.
+- Audience: mid-market Shopify merchant (food/beauty/apparel) + Shopify Plus enterprise.
+- Outcome: implementation gates on this decision — saks elevation lands in a follow-up commit; /for/plus h1 reshapes from sentence to single-noun chord with sentence becoming the deck.
+
 ## Changelog
 
 - 2026-04-19: Initial Flintmere positioning log. Seeded with canon-and-signature lock (ADR 0003), GTIN honesty as differentiator, Channel Health as retention story.

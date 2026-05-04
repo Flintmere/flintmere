@@ -150,10 +150,16 @@ export default async function FlintmereForBeauty() {
         <p className="eyebrow mb-6">
           For beauty brands · 20–2,000 SKUs · £500K–£30M revenue
         </p>
-        <h1 className="max-w-[22ch]">
-          Beauty catalogs don&rsquo;t lose on shade. They lose on a missing{' '}
-          <Bracket>INCI</Bracket> field.
+        <h1 className="font-sans tracking-[-0.04em] leading-[0.88] text-[color:var(--color-ink)] mt-2">
+          <Bracket size="saks">INCI</Bracket>
         </h1>
+        <p
+          className="mt-6 max-w-[42ch] font-sans font-medium tracking-[-0.02em] leading-[1.05] text-[color:var(--color-ink)]"
+          style={{ fontSize: 'clamp(20px, 2.4vw, 32px)' }}
+        >
+          Beauty catalogs don&rsquo;t lose on shade. They lose on a missing INCI
+          field.
+        </p>
         <p
           className="mt-8 max-w-[58ch] text-[color:var(--color-ink-2)]"
           style={{ fontSize: 18, lineHeight: 1.55 }}

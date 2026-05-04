@@ -2,6 +2,11 @@ import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
+// Hex values below mirror --color-paper / --color-ink / --color-accent.
+// Next.js OG generation runs in an Edge/satori context that doesn't read
+// CSS variables; literal hex is the only option. Keep in sync with
+// globals.css @theme if those tokens change.
+
 export const alt = 'Flintmere — catalog readiness for AI agents';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';

@@ -151,10 +151,16 @@ export default async function FlintmereForFoodAndDrink() {
         <p className="eyebrow mb-6">
           For food &amp; drink brands · 50–5,000 SKUs · £250K–£25M revenue
         </p>
-        <h1 className="max-w-[22ch]">
-          Food catalogs don&rsquo;t lose on taste. They lose on a missing{' '}
-          <Bracket>allergen</Bracket> field.
+        <h1 className="font-sans tracking-[-0.04em] leading-[0.88] text-[color:var(--color-ink)] mt-2">
+          <Bracket size="saks">allergen</Bracket>
         </h1>
+        <p
+          className="mt-6 max-w-[42ch] font-sans font-medium tracking-[-0.02em] leading-[1.05] text-[color:var(--color-ink)]"
+          style={{ fontSize: 'clamp(20px, 2.4vw, 32px)' }}
+        >
+          Food catalogs don&rsquo;t lose on taste. They lose on a missing
+          allergen field.
+        </p>
         <p
           className="mt-8 max-w-[58ch] text-[color:var(--color-ink-2)]"
           style={{ fontSize: 18, lineHeight: 1.55 }}

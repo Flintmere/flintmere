@@ -383,7 +383,7 @@ function ClosingCaption({ opacity }: { opacity: number }) {
         fontWeight: 700,
         lineHeight: 1.6,
         opacity,
-        transition: 'opacity 0.2s linear',
+        transition: 'opacity var(--duration-short) linear',
       }}
     >
       // this is what an AI agent reads on your store.
