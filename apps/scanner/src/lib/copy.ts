@@ -25,14 +25,21 @@ export const AUTHORITY_LINE =
 // signatures (1:1 procurement) keep the named director.
 export const REPLY_SLA = 'The team usually replies within two working days.'
 
-// First-person sign-off for every customer-facing email. Founder
-// identity is John Morris; company legal entity is Eazy Access Ltd.
-// Email is 1:1 procurement-disclosure surface per BUSINESS.md:19, so
-// the named director identity holds here even though marketing copy
-// flips to "we" / "the team."
-export const JOHN_SIGNATURE_NAME = 'John Morris'
-export const JOHN_SIGNATURE_TITLE = 'Flintmere founder'
-export const JOHN_SIGNATURE_REPLY_INVITE = 'Reply direct. We read every one.'
+// Sign-off for every customer-facing email. Founder identity is
+// Abdur-Rahman Morris; company legal entity is Eazy Access Ltd. Email
+// is 1:1 procurement-disclosure surface per BUSINESS.md:19, so the
+// named director identity holds here even though marketing copy flips
+// to "we" / "the team." The TEAM_LINE caption ("for the Flintmere team")
+// preserves team-voice attribution beneath the signed name.
+//
+// Signature mark: when FOUNDER_SIGNATURE_IMAGE_URL is set, emails render
+// that image (transparent PNG / SVG, ~200×60). When unset, emails fall
+// back to the heroic bracket-signature pattern — canon-aligned, plaintext-
+// safe, no asset dependency.
+export const FOUNDER_SIGNATURE_NAME = 'Abdur-Rahman Morris'
+export const FOUNDER_SIGNATURE_TEAM_LINE = 'For the Flintmere team'
+export const FOUNDER_SIGNATURE_REPLY_INVITE = 'Reply direct. We read every one.'
+export const FOUNDER_SIGNATURE_IMAGE_URL: string | null = 'https://flintmere.com/signature-arm.png'
 
 // The concierge deliverable. Written audit — no video, no call —
 // delivered by the Flintmere team. Every customer-facing surface that

@@ -23,7 +23,7 @@ import { Bracket, SiteFooter } from '@flintmere/ui';
  *
  * Council framing rule (BUSINESS.md §Decision-making framework, LOAD-BEARING):
  *   - "I" / "founder" / "John" banned EXCEPT in the Section 4 procurement-
- *     disclosure paragraph where John Morris is named once as accountable
+ *     disclosure paragraph where Abdur-Rahman Morris is named once as accountable
  *     director.
  *
  * Type-only hero — photoreal slot deferred. Per the spec hero photoreal is
@@ -159,7 +159,7 @@ export default function About() {
 
         {/* ──────────────────────────────────────────────────────────────
             Section 4 — Who we are (THE procurement-disclosure paragraph)
-            Council framing rule load-bearing here. John Morris is named
+            Council framing rule load-bearing here. Abdur-Rahman Morris is named
             ONCE on this page, in this paragraph, as accountable director.
             ────────────────────────────────────────────────────────────── */}
         <section
@@ -204,12 +204,14 @@ export default function About() {
             <strong className="font-medium text-[color:var(--color-ink)]">
               Eazy Access Ltd
             </strong>
-            , a UK-registered company. The accountable director on company
-            filings is{' '}
+            , a UK-registered company.{' '}
             <strong className="font-medium text-[color:var(--color-ink)]">
-              John Morris
-            </strong>
-            . The decision-making model is the{' '}
+              Abdur-Rahman Morris
+            </strong>{' '}
+            owns Eazy Access Ltd and works on Flintmere as its initial
+            engineer; he&rsquo;s the accountable director on company filings
+            and a member of the team — not a sole principal. The decision-making
+            model is the{' '}
             <strong className="font-medium text-[color:var(--color-ink)]">
               Flintmere Standing Council
             </strong>{' '}
@@ -384,7 +386,7 @@ export default function About() {
               />
               <ProcurementRow
                 label="Accountable director"
-                value="John Morris"
+                value="Abdur-Rahman Morris"
               />
             </dl>
 

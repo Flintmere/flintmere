@@ -116,7 +116,7 @@ export function ConflictsChapter() {
         <ul className="methodology-list" style={{ marginTop: 'clamp(28px, 4vw, 48px)' }}>
           <DashLi>Flintmere is <strong style={{ fontWeight: 500, color: 'var(--color-ink)' }}>not affiliated with GS1</strong>. We do not sell GTINs. We route merchants to their local GS1 office (GS1 UK for UK-based merchants).</DashLi>
           <DashLi>Flintmere does <strong style={{ fontWeight: 500, color: 'var(--color-ink)' }}>not take affiliate commissions</strong> from certification bodies, regulatory consultants, GS1 offices, or platform integrations. We monetise via subscriptions, audits, and embedded apps only.</DashLi>
-          <DashLi>Flintmere is a trading name of <strong style={{ fontWeight: 500, color: 'var(--color-ink)' }}>Eazy Access Ltd</strong>, Companies House 13205428, registered office 71&ndash;75 Shelton Street, Covent Garden, London, WC2H 9JQ. Accountable director: John Morris. Eazy Access Ltd is not VAT-registered, so prices shown are the full price.</DashLi>
+          <DashLi>Flintmere is a trading name of <strong style={{ fontWeight: 500, color: 'var(--color-ink)' }}>Eazy Access Ltd</strong>, Companies House 13205428, registered office 71&ndash;75 Shelton Street, Covent Garden, London, WC2H 9JQ. Accountable director: Abdur-Rahman Morris. Eazy Access Ltd is not VAT-registered, so prices shown are the full price.</DashLi>
           <DashLi>The standard is published openly. Anyone may cite it without permission; anyone may build a competing scoring tool against the same regulatory sources. We do not own the regulations; we curate the structure.</DashLi>
         </ul>
       </div>

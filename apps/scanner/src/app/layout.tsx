@@ -80,7 +80,7 @@ export default function RootLayout({
                 legalName: 'Eazy Access Ltd',
                 url: 'https://flintmere.com',
                 logo: 'https://flintmere.com/icon.png',
-                founder: { '@type': 'Person', name: 'John Morris' },
+                founder: { '@type': 'Person', name: 'Abdur-Rahman Morris' },
                 foundingDate: '2021',
                 identifier: [
                   {

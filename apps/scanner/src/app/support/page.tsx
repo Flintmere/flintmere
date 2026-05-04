@@ -18,10 +18,10 @@ export default function Support() {
     >
       <Clause n="01" heading="Who answers">
         <p>
-          Flintmere is run by a small team in the UK. John Morris (founder)
-          personally reads and replies to support for the first hundred paying
-          customers. As the team grows, support will shift to a rota with the
-          same response standards.
+          Flintmere is run by a small team in the UK. The team reads and
+          replies to every support email — no ticket queues, no first-line
+          script, no chatbot triage. While the team is small, response is
+          fast and personal; as the team grows, the same standards hold.
         </p>
       </Clause>
 

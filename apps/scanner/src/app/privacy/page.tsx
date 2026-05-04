@@ -30,7 +30,7 @@ export default function Privacy() {
           <a href="/contact?topic=privacy" className="underline">
             contact form
           </a>{' '}
-          (Privacy topic). Accountable director: John Morris.
+          (Privacy topic). Accountable director: Abdur-Rahman Morris.
         </p>
       </Clause>
 
