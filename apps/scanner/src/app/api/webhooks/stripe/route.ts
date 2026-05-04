@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     );
     return NextResponse.json(
       { ok: false, code: 'bad-signature' },
-      { status: 401 },
+      { status: 400 },
     );
   }
 
