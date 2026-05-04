@@ -143,6 +143,51 @@ Inherited from the allowanceguard reference kit — do not re-introduce in Flint
 
 If found in inherited skill copy, migrate or delete.
 
+## Council decisions — design-system audit 2026-05-04
+
+Four canon questions surfaced by the design-system audit on 2026-05-04. Each decided by the relevant council seats; positions ratified, implementations landed in commits referenced.
+
+### Q1 — `.eyebrow` colour (Position A — `--color-mute`)
+
+The canonical `.eyebrow` class lifted from `--color-mute-2` (≈3.5:1) to `--color-mute` (≈6.3:1). At 11px on paper, mute-2 fails WCAG AA's 4.5:1 floor; Noor (#8) veto binding. mute still recedes 1.6 stops below ink — eyebrows still read as chrome, not as content. Aligns with `.eyebrow-hero` and `.eyebrow-micro` which already shipped on mute. Removed four redundant `text-[color:var(--color-mute-2)]` overrides on `.eyebrow` consumers in `pricing/{PricingTiersGrid,ConciergeBands,PlusAnchor}` that were forcing the canon back to the failing colour. Commit: `a519583`.
+
+### Q2 — h1 ladder tokens (Position A — three tokens)
+
+Three tokens for hero h1 across marketing surfaces, defined in `globals.css @theme`:
+
+- `--scale-h1-saks: clamp(56px, 9vw, 144px)` — top-tier conversion / brand-mark moment. Used: `/audit` BandTriptych.
+- `--scale-h1-anchor: clamp(48px, 7vw, 112px)` — primary marketing hero. Used: `/`, `/pricing`, `/scan`, `/standards`, `/about`, `/methodology`.
+- `--scale-h1-page: clamp(40px, 7vw, 96px)` — secondary editorial / vertical landings. Used: `/contact`, `/for/*` (via default `h1` rule).
+
+Per-page deviation allowed when intentional, with a code comment explaining why. Default `h1` rule in `globals.css @layer base` left at `clamp(48px, 9vw, 96px)` — covers `/for/*` and any unstyled hero; effectively the page register.
+
+### Q3 — Section padding tokens (Position A — vw, two registers)
+
+Standardised on `vw` per Maren / Kael / Noor:
+
+- `--space-section-top-anchor: clamp(80px, 10vw, 160px)` — primary section breathing.
+- `--space-section-top-secondary: clamp(56px, 8vw, 96px)` — between-chapter rhythm.
+
+Rationale: `vw` scales coherently with `vw`-based type clamps; `vh` is unstable on iOS Safari (URL-bar collapse changes vh mid-scroll, producing section-height jumps).
+
+Grandfathered exceptions (kept on vh deliberately, not drift):
+- `/research/components/*` — cinema-mode pacing requires vh-tracked section heights for stage choreography.
+- `/audit` page sections — bespoke conversion-page pacing predates the tokens.
+
+New marketing sections use the tokens by default. Migrations of grandfathered sites can be opportunistic — Task 8 in the design-system-audit follow-up backlog.
+
+### Q4 — `/for/*` saks-bracket policy (Position A — elevate, deferred to positioning)
+
+Decision: each `/for/*` page hero gets one saks-scale bracket as the cover-art moment, matching flagship-page rhetoric. Plus additionally gets a "Plus is bespoke" anchor section replacing the BENCHMARK band that food/beauty/apparel carry.
+
+Per-vertical noun choice deferred to the `positioning` skill — the strongest single noun per vertical is editorial work, not design work:
+- `/for/plus`: `[ Plus ]` or `[ catalog ]` candidates
+- `/for/food-and-drink`: `[ allergens ]` or `[ provenance ]` candidates
+- `/for/beauty`: `[ shades ]` or `[ INCI ]` candidates
+- `/for/apparel`: `[ size ]` or `[ composition ]` candidates
+
+Implementation gated on positioning sign-off; not landed in this audit batch.
+
 ## Where to look first
 
 - Token question → `tokens.md`, then `apps/*/src/app/globals.css` (once it exists)

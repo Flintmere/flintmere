@@ -94,7 +94,7 @@ export default function ScanPage() {
           <h1
             id="scan-heading"
             className="font-medium tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)] max-w-[16ch]"
-            style={{ fontSize: 'clamp(40px, 7vw, 112px)' }}
+            style={{ fontSize: 'var(--scale-h1-anchor)' }}
           >
             Which of your products are{' '}
             <Bracket size="saks">suppressed</Bracket>

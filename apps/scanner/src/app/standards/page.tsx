@@ -69,7 +69,7 @@ export default function StandardsHolding() {
             id="standards-heading"
             className="font-medium text-[color:var(--color-ink)] max-w-[18ch]"
             style={{
-              fontSize: 'clamp(56px, 9vw, 112px)',
+              fontSize: 'var(--scale-h1-anchor)',
               letterSpacing: '-0.04em',
               lineHeight: 0.98,
             }}

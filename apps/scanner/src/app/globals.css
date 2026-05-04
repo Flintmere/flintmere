@@ -91,6 +91,29 @@
      CSS-filter approximation of the warm tonal grade applied at asset-prep
      time. Final grading happens in Lightroom; this is a runtime fallback. */
   --image-treatment-warm: saturate(0.88) contrast(1.03) sepia(0.04);
+
+  /* --- h1 ladder (Council 2026-05-04, Q2 Position A) ---
+     Three registers for hero h1 across marketing surfaces. Pages pick one;
+     deviations need a code comment explaining why.
+       saks    — top-tier conversion / brand-mark moment (audit BandTriptych)
+       anchor  — primary marketing hero (homepage, /pricing, /scan, /standards)
+       page    — secondary editorial / vertical landings (/about, /contact,
+                 /methodology, /for/*) */
+  --scale-h1-saks: clamp(56px, 9vw, 144px);
+  --scale-h1-anchor: clamp(48px, 7vw, 112px);
+  --scale-h1-page: clamp(40px, 7vw, 96px);
+
+  /* --- Section padding (Council 2026-05-04, Q3 Position A) ---
+     Standardised on vw — coherent with vw-based type clamps and stable
+     across iOS Safari URL-bar collapse (vh would shift mid-scroll).
+       anchor    — primary section breathing (heroes, conversion bands)
+       secondary — between-chapter rhythm
+     New marketing sections use these tokens. Existing vh-based sections
+     in /research (cinema-mode) and /audit (bespoke conversion-page
+     pacing) are grandfathered as deliberate. New or refactored sections
+     migrate to these tokens by default. */
+  --space-section-top-anchor: clamp(80px, 10vw, 160px);
+  --space-section-top-secondary: clamp(56px, 8vw, 96px);
 }
 
 @layer base {

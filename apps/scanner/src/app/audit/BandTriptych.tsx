@@ -105,7 +105,7 @@ export function BandTriptych() {
         data-reveal
         className="font-sans tracking-[-0.04em] leading-[0.88] text-[color:var(--color-ink)]"
         style={{
-          fontSize: 'clamp(56px, 9vw, 144px)',
+          fontSize: 'var(--scale-h1-saks)',
           maxWidth: '14ch',
           fontWeight: 700,
           margin: 0,
@@ -115,7 +115,7 @@ export function BandTriptych() {
         <span
           className="bracket flintmere-outline-shimmer"
           style={{
-            fontSize: 'clamp(56px, 9vw, 144px)',
+            fontSize: 'var(--scale-h1-saks)',
             letterSpacing: '-0.02em',
             lineHeight: 1,
             display: 'inline-block',

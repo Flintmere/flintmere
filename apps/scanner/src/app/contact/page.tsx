@@ -65,7 +65,7 @@ export default async function ContactPage({
             id="contact-heading"
             className="font-medium text-[color:var(--color-ink)] max-w-[20ch]"
             style={{
-              fontSize: 'clamp(48px, 7vw, 80px)',
+              fontSize: 'var(--scale-h1-page)',
               letterSpacing: '-0.035em',
               lineHeight: 1.0,
             }}

@@ -80,7 +80,7 @@ export default function About() {
             id="hero-heading"
             className="font-medium text-[color:var(--color-ink)] max-w-[20ch]"
             style={{
-              fontSize: 'clamp(56px, 8vw, 96px)',
+              fontSize: 'var(--scale-h1-anchor)',
               letterSpacing: '-0.035em',
               lineHeight: 1.0,
             }}

@@ -83,7 +83,7 @@ export default function Pricing() {
           <h1
             id="pricing-heading"
             className="font-sans tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)] max-w-[18ch]"
-            style={{ fontSize: 'clamp(40px, 7vw, 112px)', fontWeight: 700 }}
+            style={{ fontSize: 'var(--scale-h1-anchor)', fontWeight: 700 }}
           >
             Pick the{' '}
             <Bracket size="saks">standard</Bracket>

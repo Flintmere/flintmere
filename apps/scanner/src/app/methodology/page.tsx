@@ -109,7 +109,7 @@ export default function Methodology() {
           <h1
             id="hero-heading"
             className="font-sans tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)] max-w-[18ch]"
-            style={{ fontSize: 'clamp(40px, 7.6vw, 128px)', fontWeight: 700 }}
+            style={{ fontSize: 'var(--scale-h1-anchor)', fontWeight: 700 }}
           >
             How we compute the score and maintain the{' '}
             <Bracket size="saks">standard</Bracket>.

@@ -228,7 +228,7 @@ export default function MarketingHome() {
             <h1
               id="hero-heading"
               className="font-sans tracking-[-0.04em] leading-[0.88] text-[color:var(--color-ink)] max-w-[14ch]"
-              style={{ fontSize: 'clamp(48px, 7vw, 112px)', fontWeight: 700 }}
+              style={{ fontSize: 'var(--scale-h1-anchor)', fontWeight: 700 }}
             >
               Which of your products are{' '}
               <Bracket size="saks">suppressed</Bracket>
