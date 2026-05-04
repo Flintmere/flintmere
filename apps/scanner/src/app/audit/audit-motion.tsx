@@ -20,7 +20,7 @@
  * No spring runs, no transform applies, no opacity transition fires.
  */
 
-import { useReducedMotion, motion } from 'framer-motion';
+import { useReducedMotion, motion } from 'motion/react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
