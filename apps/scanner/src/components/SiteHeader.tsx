@@ -160,7 +160,8 @@ export function SiteHeader() {
               fontSize: 12,
               letterSpacing: '0.18em',
               fontWeight: 500,
-              padding: '4px 0',
+              padding: '14px 8px',
+              minHeight: 44,
             }}
           >
             Menu
@@ -206,7 +207,8 @@ export function SiteHeader() {
                 fontSize: 12,
                 letterSpacing: '0.18em',
                 fontWeight: 500,
-                padding: '4px 0',
+                padding: '14px 8px',
+                minHeight: 44,
               }}
             >
               Close

@@ -205,8 +205,9 @@ export function SecretRevealClient({ id }: { id: string }) {
             letterSpacing: '0.14em',
             paddingLeft: 22,
             paddingRight: 22,
-            paddingTop: 12,
-            paddingBottom: 12,
+            paddingTop: 14,
+            paddingBottom: 14,
+            minHeight: 44,
           }}
         >
           {copied ? 'Copied' : 'Copy secret'}
@@ -268,8 +269,9 @@ export function SecretRevealClient({ id }: { id: string }) {
           letterSpacing: '0.14em',
           paddingLeft: 22,
           paddingRight: 22,
-          paddingTop: 12,
-          paddingBottom: 12,
+          paddingTop: 14,
+          paddingBottom: 14,
+          minHeight: 44,
         }}
       >
         {state.kind === 'consuming' ? 'Decrypting…' : 'Reveal secret →'}

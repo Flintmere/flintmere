@@ -716,8 +716,8 @@ export function PillarWheel({
                 style={{
                   top: 'clamp(20px, 2vw, 32px)',
                   right: 'clamp(20px, 2vw, 32px)',
-                  width: '40px',
-                  height: '40px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '999px',
                   border: '1px solid var(--color-ink)',
                   background: 'var(--color-paper)',
