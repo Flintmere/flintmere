@@ -49,17 +49,31 @@ function deliverableLineForBand(slug: AuditBandSlug): string {
   return `you get a written audit letter, a per-product fix CSV (with the worst ${worstN} products drafted for you), a 30-day fix sequence, and the right GS1 UK barcode path. No video, no call — just the data.`;
 }
 
+export interface ConciergeInvoiceLink {
+  /** Customer-facing URL to view the hosted invoice. */
+  hostedUrl: string;
+  /** Direct PDF download URL. */
+  pdfUrl: string;
+  /** Stripe-assigned invoice number (e.g. "FLINT-0042"). */
+  number: string;
+}
+
 export interface ConciergeCustomerInput {
   to: string;
   shopUrl: string;
   calendlyUrl: string | null;
   bandSlug: AuditBandSlug;
+  /** Optional. When present, renders an "Invoice (PDF)" block above the
+   * signature. When null/omitted, the email still ships — Stripe's auto
+   * receipt covers the customer's records, and the operator can manually
+   * issue an invoice from the Stripe Dashboard if asked. */
+  invoice?: ConciergeInvoiceLink | null;
 }
 
 export async function sendConciergeCustomerEmail(
   input: ConciergeCustomerInput,
 ): Promise<SendEmailResult> {
-  const { to, shopUrl, calendlyUrl, bandSlug } = input;
+  const { to, shopUrl, calendlyUrl, bandSlug, invoice } = input;
   const safeShop = esc(shopUrl);
   const band = bandBySlug(bandSlug);
   const priceLine = bandPriceLine(bandSlug);
@@ -72,6 +86,25 @@ export async function sendConciergeCustomerEmail(
     : '';
   const callFootnoteText = calendlyUrl
     ? `\nPrefer voice? Book a quick call: ${calendlyUrl}\n`
+    : '';
+
+  const invoiceBlockHtml = invoice
+    ? `<tr>
+            <td style="padding:0 32px 24px 32px;">
+              <div style="padding:18px;border:1px solid #D5D2C8;background:#FAFAF8;">
+                <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;margin-bottom:8px;">Invoice · ${esc(invoice.number)}</div>
+                <p style="margin:0 0 12px 0;font-size:14px;line-height:1.55;color:#141518;">A formal invoice is attached to your booking — full Eazy Access Ltd company details, line-item description, and statement-descriptor reference for your accounts team.</p>
+                <p style="margin:0;font-size:14px;line-height:1.55;">
+                  <a href="${esc(invoice.pdfUrl)}" style="color:#0A0A0B;text-decoration:underline;font-weight:500;">Download invoice (PDF) →</a>
+                  &nbsp;·&nbsp;
+                  <a href="${esc(invoice.hostedUrl)}" style="color:#5A5C64;text-decoration:underline;">View online</a>
+                </p>
+              </div>
+            </td>
+          </tr>`
+    : '';
+  const invoiceBlockText = invoice
+    ? `\nInvoice ${invoice.number} (PDF): ${invoice.pdfUrl}\nView online: ${invoice.hostedUrl}\n`
     : '';
 
   const html = `<!doctype html>
@@ -113,6 +146,7 @@ export async function sendConciergeCustomerEmail(
               </div>
             </td>
           </tr>
+          ${invoiceBlockHtml}
           <tr>
             <td style="padding:28px 32px 28px 32px;border-top:1px solid #D5D2C8;">
               ${
@@ -154,7 +188,7 @@ Here's what happens next, in order:
 
 If the shop URL above is wrong, just reply to this email and we'll fix
 it before the team starts. Stripe has sent a separate receipt for your
-records.
+records.${invoiceBlockText}
 
 Optional (~4 minutes): for the full seven-pillar read instead of four,
 create a read-only Shopify Admin token (Settings → Apps and sales

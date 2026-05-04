@@ -10,6 +10,7 @@ interface Captured {
 async function loadWithCaptureSendEmail(): Promise<{
   send: (args: {
     bandSlug: 'band-1' | 'band-2' | 'band-3';
+    invoice?: { hostedUrl: string; pdfUrl: string; number: string } | null;
   }) => Promise<Captured>;
   sendOps: (args: {
     bandSlug: 'band-1' | 'band-2' | 'band-3';
@@ -36,13 +37,14 @@ async function loadWithCaptureSendEmail(): Promise<{
   }));
   const mod = await import('./concierge-email');
   return {
-    send: async ({ bandSlug }) => {
+    send: async ({ bandSlug, invoice }) => {
       captured.length = 0;
       await mod.sendConciergeCustomerEmail({
         to: 'merchant@store.com',
         shopUrl: 'meridian-coffee.myshopify.com',
         calendlyUrl: null,
         bandSlug,
+        invoice: invoice ?? null,
       });
       return captured[0]!;
     },
@@ -100,6 +102,35 @@ describe('sendConciergeCustomerEmail', () => {
     expect(c.text).toContain('representative sample');
     expect(c.text).toContain('worst 25 products drafted');
     expect(c.html).toContain('representative sample');
+  });
+
+  it('renders the invoice block (PDF + view-online links + invoice number) when invoice is present', async () => {
+    const { send } = await loadWithCaptureSendEmail();
+    const c = await send({
+      bandSlug: 'band-1',
+      invoice: {
+        hostedUrl: 'https://invoice.stripe.com/i/acct_x/test_y',
+        pdfUrl: 'https://pay.stripe.com/invoice/test_y/pdf',
+        number: 'FLINT-0042',
+      },
+    });
+
+    expect(c.html).toContain('FLINT-0042');
+    expect(c.html).toContain('https://pay.stripe.com/invoice/test_y/pdf');
+    expect(c.html).toContain('Download invoice (PDF)');
+    expect(c.html).toContain('https://invoice.stripe.com/i/acct_x/test_y');
+
+    expect(c.text).toContain('FLINT-0042');
+    expect(c.text).toContain('https://pay.stripe.com/invoice/test_y/pdf');
+  });
+
+  it('omits the invoice block when invoice is null (graceful degrade)', async () => {
+    const { send } = await loadWithCaptureSendEmail();
+    const c = await send({ bandSlug: 'band-1', invoice: null });
+
+    expect(c.html).not.toContain('Download invoice');
+    expect(c.html).not.toContain('FLINT-');
+    expect(c.text).not.toContain('Invoice ');
   });
 });
 

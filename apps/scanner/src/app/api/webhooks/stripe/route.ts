@@ -6,6 +6,7 @@ import {
   sendConciergeCustomerEmail,
   sendConciergeOpsEmail,
 } from '@/lib/concierge-email';
+import { createConciergeInvoice } from '@/lib/stripe-invoice';
 import {
   STRIPE_BAND_METADATA_KEY,
   type AuditBandSlug,
@@ -62,10 +63,10 @@ export async function POST(req: NextRequest) {
   try {
     if (event.type === 'payment_intent.succeeded') {
       const intent = event.data.object as Stripe.PaymentIntent;
-      await handleConciergePaymentIntent(intent);
+      await handleConciergePaymentIntent(stripe, intent);
     } else if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
-      await handleConciergeCheckout(session);
+      await handleConciergeCheckout(stripe, session);
     }
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -84,6 +85,7 @@ export async function POST(req: NextRequest) {
 }
 
 async function handleConciergePaymentIntent(
+  stripe: Stripe,
   intent: Stripe.PaymentIntent,
 ): Promise<void> {
   if (intent.metadata?.kind !== 'concierge-audit') return;
@@ -99,6 +101,7 @@ async function handleConciergePaymentIntent(
   if (!email || !shopUrl) return;
 
   await finaliseConciergeBooking({
+    stripe,
     email,
     shopUrl,
     paymentIntentId: intent.id,
@@ -107,6 +110,7 @@ async function handleConciergePaymentIntent(
 }
 
 async function handleConciergeCheckout(
+  stripe: Stripe,
   session: Stripe.Checkout.Session,
 ): Promise<void> {
   if (session.metadata?.kind !== 'concierge-audit') return;
@@ -118,7 +122,13 @@ async function handleConciergeCheckout(
 
   if (!email || !shopUrl || !paymentIntentId) return;
 
-  await finaliseConciergeBooking({ email, shopUrl, paymentIntentId, bandSlug });
+  await finaliseConciergeBooking({
+    stripe,
+    email,
+    shopUrl,
+    paymentIntentId,
+    bandSlug,
+  });
 }
 
 /**
@@ -136,12 +146,13 @@ function readBandSlug(
 }
 
 async function finaliseConciergeBooking(args: {
+  stripe: Stripe;
   email: string;
   shopUrl: string;
   paymentIntentId: string;
   bandSlug: AuditBandSlug;
 }): Promise<void> {
-  const { email, shopUrl, paymentIntentId, bandSlug } = args;
+  const { stripe, email, shopUrl, paymentIntentId, bandSlug } = args;
 
   const row = await prisma.conciergeAudit.upsert({
     where: { stripePaymentIntentId: paymentIntentId },
@@ -156,11 +167,30 @@ async function finaliseConciergeBooking(args: {
 
   if (row.notificationSentAt) return;
 
+  // Issue the branded Stripe Invoice as a downloadable artefact for the
+  // merchant's accounts team. Failure here doesn't block the email send —
+  // the customer's already paid, the row exists, and Stripe's auto-receipt
+  // covers their proof-of-purchase. Operator can hand-create from the
+  // dashboard if the API call ever fails.
+  const invoice = await createConciergeInvoice({
+    stripe,
+    email,
+    shopUrl,
+    paymentIntentId,
+    bandSlug,
+  });
+
   const calendlyUrl = process.env.CALENDLY_CONCIERGE_URL || null;
   const opsEmail = process.env.CONCIERGE_OPS_EMAIL || process.env.RESEND_REPLY_TO || 'hello@flintmere.com';
 
   const [customerResult, opsResult] = await Promise.all([
-    sendConciergeCustomerEmail({ to: email, shopUrl, calendlyUrl, bandSlug }),
+    sendConciergeCustomerEmail({
+      to: email,
+      shopUrl,
+      calendlyUrl,
+      bandSlug,
+      invoice,
+    }),
     sendConciergeOpsEmail({
       to: opsEmail,
       customerEmail: email,

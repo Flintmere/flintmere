@@ -131,6 +131,9 @@ describe('POST /api/webhooks/stripe', () => {
       sendConciergeCustomerEmail: sendCustomer,
       sendConciergeOpsEmail: sendOps,
     }));
+    vi.doMock('@/lib/stripe-invoice', () => ({
+      createConciergeInvoice: vi.fn().mockResolvedValue(null),
+    }));
 
     const { POST } = await import('./route');
     const res = await POST(makeRequest());
@@ -163,6 +166,135 @@ describe('POST /api/webhooks/stripe', () => {
     vi.doUnmock('@/lib/stripe');
     vi.doUnmock('@/lib/db');
     vi.doUnmock('@/lib/concierge-email');
+    vi.doUnmock('@/lib/stripe-invoice');
+  });
+
+  it('issues a Stripe invoice and threads URL into the customer email', async () => {
+    setupEnv();
+    vi.resetModules();
+    const upsert = vi.fn().mockResolvedValue({ id: 'ca_inv', notificationSentAt: null });
+    const update = vi.fn().mockResolvedValue({});
+    const sendCustomer = vi.fn().mockResolvedValue({ sent: true });
+    const sendOps = vi.fn().mockResolvedValue({ sent: true });
+    const createInvoice = vi.fn().mockResolvedValue({
+      hostedUrl: 'https://invoice.stripe.com/i/acct_x/test_y',
+      pdfUrl: 'https://pay.stripe.com/invoice/test_y/pdf',
+      number: 'FLINT-0001',
+    });
+
+    const event = {
+      id: 'evt_invoice_test',
+      type: 'payment_intent.succeeded',
+      data: {
+        object: {
+          id: 'pi_invoice',
+          metadata: {
+            kind: 'concierge-audit',
+            email: 'merchant@store.com',
+            shop_url: 'meridian-coffee.myshopify.com',
+            audit_band: 'band-2',
+          },
+        },
+      },
+    };
+    const constructEvent = vi.fn().mockReturnValue(event);
+
+    vi.doMock('@/lib/stripe', () => ({
+      getStripe: () => ({ webhooks: { constructEvent } }),
+    }));
+    vi.doMock('@/lib/db', () => ({
+      prisma: { conciergeAudit: { upsert, update } },
+    }));
+    vi.doMock('@/lib/concierge-email', () => ({
+      sendConciergeCustomerEmail: sendCustomer,
+      sendConciergeOpsEmail: sendOps,
+    }));
+    vi.doMock('@/lib/stripe-invoice', () => ({
+      createConciergeInvoice: createInvoice,
+    }));
+
+    const { POST } = await import('./route');
+    const res = await POST(makeRequest());
+
+    expect(res.status).toBe(200);
+    expect(createInvoice).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: 'merchant@store.com',
+        shopUrl: 'meridian-coffee.myshopify.com',
+        paymentIntentId: 'pi_invoice',
+        bandSlug: 'band-2',
+      }),
+    );
+    expect(sendCustomer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        invoice: expect.objectContaining({
+          hostedUrl: 'https://invoice.stripe.com/i/acct_x/test_y',
+          pdfUrl: 'https://pay.stripe.com/invoice/test_y/pdf',
+          number: 'FLINT-0001',
+        }),
+      }),
+    );
+
+    vi.doUnmock('@/lib/stripe');
+    vi.doUnmock('@/lib/db');
+    vi.doUnmock('@/lib/concierge-email');
+    vi.doUnmock('@/lib/stripe-invoice');
+  });
+
+  it('booking still completes when invoice creation fails (graceful degrade)', async () => {
+    setupEnv();
+    vi.resetModules();
+    const upsert = vi.fn().mockResolvedValue({ id: 'ca_noinv', notificationSentAt: null });
+    const update = vi.fn().mockResolvedValue({});
+    const sendCustomer = vi.fn().mockResolvedValue({ sent: true });
+    const sendOps = vi.fn().mockResolvedValue({ sent: true });
+    const createInvoice = vi.fn().mockResolvedValue(null);
+
+    const event = {
+      id: 'evt_noinvoice',
+      type: 'payment_intent.succeeded',
+      data: {
+        object: {
+          id: 'pi_noinvoice',
+          metadata: {
+            kind: 'concierge-audit',
+            email: 'merchant@store.com',
+            shop_url: 'meridian-coffee.myshopify.com',
+            audit_band: 'band-1',
+          },
+        },
+      },
+    };
+    const constructEvent = vi.fn().mockReturnValue(event);
+
+    vi.doMock('@/lib/stripe', () => ({
+      getStripe: () => ({ webhooks: { constructEvent } }),
+    }));
+    vi.doMock('@/lib/db', () => ({
+      prisma: { conciergeAudit: { upsert, update } },
+    }));
+    vi.doMock('@/lib/concierge-email', () => ({
+      sendConciergeCustomerEmail: sendCustomer,
+      sendConciergeOpsEmail: sendOps,
+    }));
+    vi.doMock('@/lib/stripe-invoice', () => ({
+      createConciergeInvoice: createInvoice,
+    }));
+
+    const { POST } = await import('./route');
+    const res = await POST(makeRequest());
+
+    expect(res.status).toBe(200);
+    expect(createInvoice).toHaveBeenCalledTimes(1);
+    expect(sendCustomer).toHaveBeenCalledWith(
+      expect.objectContaining({ invoice: null }),
+    );
+    expect(update).toHaveBeenCalledTimes(1); // notificationSentAt still flipped
+
+    vi.doUnmock('@/lib/stripe');
+    vi.doUnmock('@/lib/db');
+    vi.doUnmock('@/lib/concierge-email');
+    vi.doUnmock('@/lib/stripe-invoice');
   });
 
   it('idempotent replay — duplicate event for same intent skips email send when notificationSentAt already set', async () => {
