@@ -98,12 +98,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Full per-charge `statement_descriptor` overrides the account default
+  // (shared with Eazy Access Ltd's other businesses) so Flintmere customers
+  // see "FLINTMERE AUDIT B1" on their bank statement instead of the parent
+  // "EAZYACCESS LTD" line. Stripe requires this descriptor to be approved
+  // once at the account level via Settings → Public details → Statement
+  // descriptors → Add custom descriptor. Max 22 chars total. The band
+  // suffix gives the bookkeeper enough context to reconcile.
   const intent = await stripe.paymentIntents.create({
     amount: band.pricePence,
     currency: 'gbp',
     receipt_email: email,
     description: `Flintmere concierge audit (${band.label}) — written deliverable in three working days`,
-    statement_descriptor_suffix: `AUDIT-B${bandSlug === 'band-1' ? '1' : '2'}`,
+    statement_descriptor: `FLINTMERE AUDIT B${bandSlug === 'band-1' ? '1' : '2'}`,
     automatic_payment_methods: { enabled: true },
     metadata: {
       kind: 'concierge-audit',

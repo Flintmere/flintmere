@@ -150,7 +150,7 @@ describe('concierge checkout route', () => {
     expect(metadata.audit_band).toBe('band-1');
     expect(metadata.band_label).toBe('Band 1');
     expect(metadata.kind).toBe('concierge-audit');
-    expect(args.statement_descriptor_suffix).toBe('AUDIT-B1');
+    expect(args.statement_descriptor).toBe('FLINTMERE AUDIT B1');
 
     vi.doUnmock('@/lib/stripe');
   });
@@ -193,7 +193,7 @@ describe('concierge checkout route', () => {
     const metadata = args.metadata as Record<string, string>;
     expect(metadata.audit_band).toBe('band-2');
     expect(metadata.band_label).toBe('Band 2');
-    expect(args.statement_descriptor_suffix).toBe('AUDIT-B2');
+    expect(args.statement_descriptor).toBe('FLINTMERE AUDIT B2');
 
     vi.doUnmock('@/lib/stripe');
   });
