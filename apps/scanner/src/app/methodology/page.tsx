@@ -291,13 +291,8 @@ export default function Methodology() {
               />
             </picture>
             <figcaption
-              className="font-mono uppercase text-[color:var(--color-mute-2)]"
-              style={{
-                fontSize: 11,
-                letterSpacing: '0.16em',
-                marginTop: 12,
-                textAlign: 'right',
-              }}
+              className="eyebrow-micro"
+              style={{ marginTop: 12, textAlign: 'right' }}
             >
               Catalog data, made of physical things
             </figcaption>
@@ -397,10 +392,7 @@ export default function Methodology() {
                 key={src.url}
                 className="methodology-sources__row group grid md:grid-cols-[200px_1.4fr_2fr] gap-6 py-7 border-t border-[color:var(--color-line-soft)] first:border-t-0 items-baseline"
               >
-                <p
-                  className="font-mono uppercase text-[color:var(--color-mute-2)]"
-                  style={{ fontSize: 11, letterSpacing: '0.16em' }}
-                >
+                <p className="eyebrow-micro">
                   {src.domain}
                 </p>
                 <p style={{ fontSize: 17, fontWeight: 500 }}>

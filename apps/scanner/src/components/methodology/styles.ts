@@ -185,7 +185,7 @@ export const methodologyStyles = `
     transform: translateX(4px);
   }
   .methodology-sources__row:hover {
-    background: rgba(248, 191, 36, 0.04);
+    background: var(--color-accent-soft);
   }
 
   @media (prefers-reduced-motion: reduce) {

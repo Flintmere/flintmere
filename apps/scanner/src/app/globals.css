@@ -18,6 +18,10 @@
   --color-ink-3: #26272b;
   --color-line: #0a0a0b;
   --color-line-dark: #26272b;
+  /* Hairline divider for ink-surface compositions (EmailGate door split,
+     report-email HTML border-tops). Paper-tinted at 15% alpha — visible
+     against ink, soft enough to read as a divider not a rule. */
+  --color-line-inv: rgba(250, 247, 242, 0.15);
 
   /* --- Mute --- */
   --color-mute: #5a5c64;
@@ -32,6 +36,13 @@
   /* Amber ≈ 11:1 on ink (AAA), ≈ 1.7:1 on paper (never use for text on paper). */
   --color-accent: #f8bf24;
   --color-accent-ink: #0a0a0b;
+  /* Amber alpha ladder — three registers for atmosphere/wash/emphasis.
+     Decorative only; never carries meaning. soft = subtle background tint
+     (EmailGate doors, methodology cells); glow = visible amber wash
+     (treemap active state); strong = emphatic moment (timeline highlight). */
+  --color-accent-soft: rgba(248, 191, 36, 0.06);
+  --color-accent-glow: rgba(248, 191, 36, 0.16);
+  --color-accent-strong: rgba(248, 191, 36, 0.25);
 
   /* --- Accent (Sage — second brand colour, decorative-only, ADR 0021) ---
      AA on paper (~5.5:1). Forbidden on score rings, severity dots, status
@@ -210,7 +221,18 @@
   margin-left: 0.16em;
 }
 
-/* --- Eyebrow (micro uppercase mono) --- */
+/* --- Eyebrow registers (micro uppercase mono) ---
+   Three sizes for the three roles encountered across the codebase:
+     .eyebrow         11px / 0.14em / mute-2 — the default; section eyebrows.
+     .eyebrow-micro   10-11px / 0.16em / mute-2 — figure captions, ordinal
+                      markers, very-small metadata. Tighter scale + slightly
+                      wider tracking for legibility at the smaller size.
+     .eyebrow-hero    clamp(11,1.2vw,13px) / 0.18em / mute — heroic-section
+                      eyebrows that scale with viewport. Mute (not mute-2) to
+                      lift contrast at the larger sizes where the eyebrow
+                      reads as content rather than chrome.
+   Pre-existing inline `font-mono uppercase` patterns with hand-rolled
+   font-size + letter-spacing are drift; migrate to the closest register. */
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -218,6 +240,24 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-mute-2);
+}
+
+.eyebrow-micro {
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 0.85vw, 11px);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+}
+
+.eyebrow-hero {
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 1.2vw, 13px);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-mute);
 }
 
 /* --- Button primitive (scanner CTA) --- */

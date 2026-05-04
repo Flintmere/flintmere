@@ -56,12 +56,8 @@ export default async function ContactPage({
           }}
         >
           <p
-            className="font-mono uppercase text-[color:var(--color-mute-2)]"
-            style={{
-              fontSize: '11px',
-              letterSpacing: '0.16em',
-              marginBottom: 'clamp(28px, 4vw, 56px)',
-            }}
+            className="eyebrow-micro"
+            style={{ marginBottom: 'clamp(28px, 4vw, 56px)' }}
           >
             Contact.
           </p>

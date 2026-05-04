@@ -165,7 +165,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
             marginTop: 32,
             padding: '28px',
             border: '1px solid var(--color-accent)',
-            background: 'rgba(248, 191, 36, 0.06)',
+            background: 'var(--color-accent-soft)',
           }}
         >
           <p
@@ -230,7 +230,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
           style={{
             marginTop: 28,
             paddingTop: 28,
-            borderTop: '1px solid var(--color-line-inv, rgba(250,247,242,0.15))',
+            borderTop: '1px solid var(--color-line-inv)',
           }}
         >
           <p

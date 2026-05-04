@@ -67,7 +67,7 @@ export function DeliverableLift({ children, delayMs }: DeliverableLiftProps) {
       }
       whileHover={{
         y: -2,
-        boxShadow: '0 6px 20px -12px rgba(10, 10, 11, 0.18)',
+        boxShadow: 'var(--shadow-paper-1)',
         transition: { type: 'spring', stiffness: 320, damping: 26 },
       }}
       whileTap={{

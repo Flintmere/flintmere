@@ -278,7 +278,7 @@ export function ContactForm({
         <p
           role="alert"
           style={{
-            color: 'var(--color-error, #B23B2E)',
+            color: 'var(--color-alert)',
             fontSize: 13,
             margin: 0,
           }}
@@ -358,7 +358,7 @@ function Field({
 
 const inputStyle: React.CSSProperties = {
   appearance: 'none',
-  background: '#fff',
+  background: 'var(--color-paper)',
   color: 'var(--color-ink)',
   border: '1px solid var(--color-line)',
   padding: '10px 12px',

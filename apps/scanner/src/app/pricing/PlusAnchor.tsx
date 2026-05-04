@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Bracket } from '@flintmere/ui';
 
 /**
  * Plus tier anchor — secondary heroic surface on /pricing per the
@@ -92,9 +93,7 @@ export function PlusAnchor() {
               color: 'var(--color-ink)',
             }}
           >
-            <span className="bracket-char" style={{ marginRight: '0.16em' }} aria-hidden="true">[</span>
-            From £1,200
-            <span className="bracket-char" style={{ marginLeft: '0.16em' }} aria-hidden="true">]</span>
+            <Bracket>From £1,200</Bracket>
           </div>
           <p
             className="eyebrow text-[color:var(--color-mute-2)]"

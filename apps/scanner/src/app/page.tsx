@@ -320,14 +320,8 @@ export default function MarketingHome() {
         >
           <p
             data-reveal
-            className="font-mono uppercase mb-12 lg:mb-16"
-            style={{
-              fontSize: 'clamp(11px, 1.2vw, 13px)',
-              letterSpacing: '0.18em',
-              color: 'var(--color-mute)',
-              fontWeight: 500,
-              ['--reveal-delay' as string]: '60ms',
-            }}
+            className="eyebrow-hero mb-12 lg:mb-16"
+            style={{ ['--reveal-delay' as string]: '60ms' }}
           >
             // the seven checks
           </p>

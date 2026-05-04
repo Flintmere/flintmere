@@ -7,6 +7,7 @@ import {
   type BenchmarkRow,
 } from '@/lib/benchmark-summary';
 import { BENCHMARK_FLOOR, BENCHMARK_PUBLISH_FLOOR } from '@/lib/copy';
+import { MistakeRow, type Mistake } from '@/components/sections/MistakeRow';
 
 export const metadata: Metadata = {
   title: 'Flintmere for food & drink — allergens, nutrition, provenance, agent-ready',
@@ -16,14 +17,6 @@ export const metadata: Metadata = {
 
 // Belt-and-braces: render per request so build never hits the DB.
 export const dynamic = 'force-dynamic';
-
-interface Mistake {
-  n: string;
-  title: string;
-  symptom: string;
-  pillar: string;
-  fix: string;
-}
 
 // Eight food-and-drink-specific mistakes. Observable in real UK Shopify
 // catalogs across specialty coffee, wine + spirits, condiments, pantry,
@@ -326,48 +319,5 @@ export default async function FlintmereForFoodAndDrink() {
 
       <SiteFooter />
     </main>
-  );
-}
-
-function MistakeRow({ mistake }: { mistake: Mistake }) {
-  return (
-    <li className="grid grid-cols-[80px_1fr_200px] gap-8 py-9 items-start max-md:grid-cols-1 max-md:gap-4">
-      <span
-        aria-hidden="true"
-        className="bracket-inline"
-        style={{
-          fontSize: 40,
-          fontWeight: 500,
-          letterSpacing: '-0.04em',
-          lineHeight: 1,
-        }}
-      >
-        {mistake.n}
-      </span>
-      <div>
-        <h3
-          className="mb-3"
-          style={{ fontSize: 22, letterSpacing: '-0.015em', lineHeight: 1.2 }}
-        >
-          {mistake.title}
-        </h3>
-        <p
-          className="text-[color:var(--color-ink-2)] mb-3"
-          style={{ fontSize: 15, lineHeight: 1.55 }}
-        >
-          {mistake.symptom}
-        </p>
-        <p
-          className="text-[color:var(--color-mute)]"
-          style={{ fontSize: 14, lineHeight: 1.5 }}
-        >
-          <strong className="text-[color:var(--color-ink)]">Flintmere:</strong>{' '}
-          {mistake.fix}
-        </p>
-      </div>
-      <p className="eyebrow text-right max-md:text-left">
-        Check · {mistake.pillar}
-      </p>
-    </li>
   );
 }

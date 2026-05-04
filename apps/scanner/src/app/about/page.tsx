@@ -71,12 +71,8 @@ export default function About() {
           }}
         >
           <p
-            className="font-mono uppercase text-[color:var(--color-mute-2)]"
-            style={{
-              fontSize: '11px',
-              letterSpacing: '0.16em',
-              marginBottom: 'clamp(28px, 4vw, 56px)',
-            }}
+            className="eyebrow-micro"
+            style={{ marginBottom: 'clamp(28px, 4vw, 56px)' }}
           >
             About.
           </p>
@@ -119,8 +115,7 @@ export default function About() {
           }}
         >
           <p
-            className="font-mono uppercase text-[color:var(--color-mute-2)]"
-            style={{ fontSize: '11px', letterSpacing: '0.16em' }}
+            className="eyebrow-micro"
           >
             What we do.
           </p>
@@ -181,8 +176,7 @@ export default function About() {
           }}
         >
           <p
-            className="font-mono uppercase text-[color:var(--color-mute-2)]"
-            style={{ fontSize: '11px', letterSpacing: '0.16em' }}
+            className="eyebrow-micro"
           >
             Who we are.
           </p>
@@ -246,8 +240,7 @@ export default function About() {
           }}
         >
           <p
-            className="font-mono uppercase text-[color:var(--color-mute-2)]"
-            style={{ fontSize: '11px', letterSpacing: '0.16em' }}
+            className="eyebrow-micro"
           >
             How we decide.
           </p>
@@ -338,8 +331,7 @@ export default function About() {
             }}
           >
             <p
-              className="font-mono uppercase text-[color:var(--color-mute-2)]"
-              style={{ fontSize: '11px', letterSpacing: '0.16em' }}
+              className="eyebrow-micro"
             >
               Procurement.
             </p>
@@ -465,10 +457,7 @@ interface ProcurementRowProps {
 function ProcurementRow({ label, value }: ProcurementRowProps) {
   return (
     <>
-      <dt
-        className="font-mono uppercase text-[color:var(--color-mute-2)]"
-        style={{ fontSize: '11px', letterSpacing: '0.12em', lineHeight: 1.5 }}
-      >
+      <dt className="eyebrow-micro" style={{ lineHeight: 1.5 }}>
         {label}
       </dt>
       <dd

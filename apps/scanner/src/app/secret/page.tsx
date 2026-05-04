@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { SiteFooter } from '@flintmere/ui';
+import { Bracket, SiteFooter } from '@flintmere/ui';
 import { SecretForm } from './SecretForm';
 
 export const metadata: Metadata = {
@@ -44,15 +44,7 @@ export default function SecretPage() {
             marginBottom: 'clamp(20px, 2.5vw, 32px)',
           }}
         >
-          Share a secret{' '}
-          <span className="font-mono font-bold" aria-hidden="true">
-            [
-          </span>
-          once
-          <span className="font-mono font-bold" aria-hidden="true">
-            ]
-          </span>
-          .
+          Share a secret <Bracket>once</Bracket>.
         </h1>
 
         <p

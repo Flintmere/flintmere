@@ -69,10 +69,7 @@ export function ScanForm({
           type="submit"
           disabled={isSubmitting}
           className="scan-form__submit btn btn-accent justify-center"
-          style={{
-            fontSize: 13,
-            letterSpacing: '0.08em',
-          }}
+          style={{ fontSize: 13 }}
         >
           {isSubmitting ? 'Scanning…' : 'Scan my store →'}
         </button>

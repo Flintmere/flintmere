@@ -185,7 +185,7 @@ function TreemapTile({ pillar, isFirstInRow, isActive }: TreemapTileProps) {
         padding: 'clamp(12px, 1.6vw, 22px)',
         textDecoration: 'none',
         color: 'inherit',
-        background: isActive ? 'rgba(248, 191, 36, 0.16)' : 'transparent',
+        background: isActive ? 'var(--color-accent-glow)' : 'transparent',
         transition:
           'background-color 320ms cubic-bezier(0.2, 0.6, 0.2, 1)',
       }}
@@ -196,7 +196,7 @@ function TreemapTile({ pillar, isFirstInRow, isActive }: TreemapTileProps) {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
         style={{
-          background: 'rgba(248, 191, 36, 0.06)',
+          background: 'var(--color-accent-soft)',
           transition: 'opacity 200ms ease',
         }}
       />
@@ -217,7 +217,6 @@ function TreemapTile({ pillar, isFirstInRow, isActive }: TreemapTileProps) {
               letterSpacing: '0.18em',
               padding: '2px 6px',
               background: 'var(--color-accent)',
-              borderRadius: 1,
             }}
           >
             READING

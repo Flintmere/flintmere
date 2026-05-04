@@ -1,20 +1,13 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Bracket, SiteFooter } from '@flintmere/ui';
+import { MistakeRow, type Mistake } from '@/components/sections/MistakeRow';
 
 export const metadata: Metadata = {
   title: 'Flintmere for Shopify Plus — seven-figure catalogs, agent-ready',
   description:
     'The catalog mistakes that quietly cost Plus brands share-of-shelf in AI shopping agents — and the Flintmere checks that detect them.',
 };
-
-interface Mistake {
-  n: string;
-  title: string;
-  symptom: string;
-  pillar: string;
-  fix: string;
-}
 
 const MISTAKES: Mistake[] = [
   {
@@ -190,48 +183,5 @@ export default function FlintmereForPlus() {
 
       <SiteFooter />
     </main>
-  );
-}
-
-function MistakeRow({ mistake }: { mistake: Mistake }) {
-  return (
-    <li className="grid grid-cols-[80px_1fr_200px] gap-8 py-9 items-start max-md:grid-cols-1 max-md:gap-4">
-      <span
-        aria-hidden="true"
-        className="bracket-inline"
-        style={{
-          fontSize: 40,
-          fontWeight: 500,
-          letterSpacing: '-0.04em',
-          lineHeight: 1,
-        }}
-      >
-        {mistake.n}
-      </span>
-      <div>
-        <h3
-          className="mb-3"
-          style={{ fontSize: 22, letterSpacing: '-0.015em', lineHeight: 1.2 }}
-        >
-          {mistake.title}
-        </h3>
-        <p
-          className="text-[color:var(--color-ink-2)] mb-3"
-          style={{ fontSize: 15, lineHeight: 1.55 }}
-        >
-          {mistake.symptom}
-        </p>
-        <p
-          className="text-[color:var(--color-mute)]"
-          style={{ fontSize: 14, lineHeight: 1.5 }}
-        >
-          <strong className="text-[color:var(--color-ink)]">Flintmere:</strong>{' '}
-          {mistake.fix}
-        </p>
-      </div>
-      <p className="eyebrow text-right max-md:text-left">
-        Check · {mistake.pillar}
-      </p>
-    </li>
   );
 }

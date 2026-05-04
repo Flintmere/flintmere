@@ -267,7 +267,6 @@ export function FounderStrip() {
           <li
             style={{
               fontSize: '11px',
-              letterSpacing: '0.04em',
               lineHeight: 1.55,
               color: 'var(--color-mute-inv)',
               fontFamily: 'var(--font-mono)',

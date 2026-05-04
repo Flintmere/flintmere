@@ -22,7 +22,7 @@
  * checkout API.
  */
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { TurnstileWidget } from '@/components/TurnstileWidget';
 import {
@@ -133,6 +133,35 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
   const formRef = useRef<HTMLFormElement | null>(null);
 
   const selectedBand = useMemo(() => bandBySlug(bandSlug), [bandSlug]);
+
+  // Read ?email= and ?shop= URL params on mount and pre-fill the form.
+  // Bridges /scan-results → /audit deep-link path: scanner-results CTAs
+  // can pass `?band=…&shop=<myshop.myshopify.com>&email=<merchant@…>` so
+  // the merchant lands at a half-completed checkout. Server renders
+  // empty (SSR) and we hydrate via effect to avoid a hydration mismatch.
+  // Effect-based, not lazy useState initializer, for that reason.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const emailParam = params.get('email')?.trim() ?? '';
+    const shopParam = params.get('shop')?.trim() ?? '';
+    let prefilledEmail = false;
+    let prefilledShop = false;
+    if (emailParam) {
+      setEmail(emailParam);
+      prefilledEmail = true;
+    }
+    if (shopParam) {
+      setShopUrl(shopParam);
+      prefilledShop = true;
+    }
+    if (prefilledEmail || prefilledShop) {
+      track('audit_prefill_applied', {
+        from_email: prefilledEmail,
+        from_shop: prefilledShop,
+      });
+    }
+  }, []);
 
   async function handleStart(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -368,7 +397,7 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
 }
 
 const inputStyle: React.CSSProperties = {
-  background: '#ffffff',
+  background: 'var(--color-paper)',
   border: '1px solid var(--color-line)',
   padding: '14px 16px',
   fontFamily: 'var(--font-mono)',
@@ -380,7 +409,7 @@ function CardShell({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        background: '#ffffff',
+        background: 'var(--color-paper)',
         border: '1px solid var(--color-ink)',
         maxWidth: 640,
         margin: '0 auto',
@@ -659,7 +688,7 @@ function PayStep({ returnUrl, band }: { returnUrl: string; band: AuditBand }) {
           fontFamily: 'var(--font-mono)',
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
-          color: 'var(--color-mute-2)',
+          color: 'var(--color-mute)',
           textAlign: 'center',
         }}
       >

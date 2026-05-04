@@ -93,13 +93,9 @@ export default function Audit() {
           >
             <p
               data-reveal
-              className="font-mono uppercase"
+              className="eyebrow-hero"
               aria-label="Flintmere concierge audit, three working days"
               style={{
-                fontSize: 'clamp(11px, 1.2vw, 13px)',
-                letterSpacing: '0.18em',
-                color: 'var(--color-mute)',
-                fontWeight: 500,
                 marginBottom: 'clamp(20px, 2.5vw, 32px)',
                 ['--reveal-delay' as string]: `${D_EYEBROW}ms`,
               }}
@@ -129,12 +125,8 @@ export default function Audit() {
           >
             <p
               data-reveal
-              className="font-mono uppercase"
+              className="eyebrow-hero"
               style={{
-                fontSize: 'clamp(11px, 1.2vw, 13px)',
-                letterSpacing: '0.18em',
-                color: 'var(--color-mute)',
-                fontWeight: 500,
                 marginBottom: 'clamp(28px, 3vw, 48px)',
                 ['--reveal-delay' as string]: `${D_EYEBROW}ms`,
               }}
@@ -194,15 +186,7 @@ export default function Audit() {
                   priority={false}
                 />
               </div>
-              <figcaption
-                className="mt-3 font-mono uppercase"
-                style={{
-                  fontSize: 'clamp(10px, 0.85vw, 11px)',
-                  letterSpacing: '0.18em',
-                  fontWeight: 500,
-                  color: 'var(--color-mute-2)',
-                }}
-              >
+              <figcaption className="mt-3 eyebrow-micro">
                 <span aria-hidden="true">// </span>figure{' '}
                 <Bracket>01</Bracket>
                 <span className="mx-2" aria-hidden="true">·</span>
@@ -218,7 +202,7 @@ export default function Audit() {
                 fontSize: 'clamp(12px, 1vw, 13px)',
                 lineHeight: 1.6,
                 letterSpacing: '0.02em',
-                color: 'var(--color-mute-2)',
+                color: 'var(--color-mute)',
                 maxWidth: '64ch',
                 ['--reveal-delay' as string]: `${D_PRIMARY}ms`,
               }}
@@ -238,18 +222,8 @@ export default function Audit() {
             >
               {CONCIERGE_DELIVERABLE_LIST.map((item, idx) => (
                 <DeliverableLift key={item.title} delayMs={idx * 60}>
-                  <p
-                    className="font-mono uppercase"
-                    style={{
-                      fontSize: 'clamp(11px, 1vw, 13px)',
-                      letterSpacing: '0.18em',
-                      fontWeight: 500,
-                      color: 'var(--color-mute-2)',
-                    }}
-                  >
-                    <span aria-hidden="true">[ </span>
-                    {String(idx + 1).padStart(2, '0')}
-                    <span aria-hidden="true"> ]</span>
+                  <p className="eyebrow-hero">
+                    <Bracket>{String(idx + 1).padStart(2, '0')}</Bracket>
                   </p>
                   <p
                     className="font-sans font-medium tracking-[-0.02em] leading-[1.05] text-[color:var(--color-ink)] mt-4"
@@ -290,12 +264,8 @@ export default function Audit() {
           >
             <p
               data-reveal
-              className="font-mono uppercase"
+              className="eyebrow-hero"
               style={{
-                fontSize: 'clamp(11px, 1.2vw, 13px)',
-                letterSpacing: '0.18em',
-                color: 'var(--color-mute)',
-                fontWeight: 500,
                 marginBottom: 'clamp(28px, 3vw, 48px)',
                 ['--reveal-delay' as string]: `${D_EYEBROW}ms`,
               }}
@@ -354,15 +324,14 @@ export default function Audit() {
                 >
                   <span
                     className="font-mono"
-                    aria-hidden="true"
                     style={{
                       fontSize: 'clamp(20px, 2vw, 28px)',
                       letterSpacing: '0.04em',
                       fontWeight: 500,
-                      color: 'var(--color-mute-2)',
+                      color: 'var(--color-mute)',
                     }}
                   >
-                    [ {String(idx + 1).padStart(2, '0')} ]
+                    <Bracket>{String(idx + 1).padStart(2, '0')}</Bracket>
                   </span>
                   <p
                     className="font-sans font-medium tracking-[-0.015em] text-[color:var(--color-ink)]"

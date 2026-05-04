@@ -2,8 +2,8 @@
  * The legibility-bracket signature primitive.
  *
  * Canonical spec: memory/design/tokens.md §Signature.
- * Rule: one bracket per section, two per page max. Bracket nouns / numbers / identifiers,
- * never verbs or fillers.
+ * Rule: one anchor bracket per section. No page-wide cap (ADR 0021 §1).
+ * Bracket nouns / numbers / identifiers, never verbs or fillers.
  *
  * Accessibility rules (memory/design/accessibility.md §The legibility bracket):
  * - On body prose and headings: brackets are part of the sentence. Let screen readers announce them.

@@ -78,7 +78,7 @@ export function MaintenanceTimeline() {
                   cx={cx}
                   cy={70}
                   r={18}
-                  fill="rgba(248, 191, 36, 0.25)"
+                  fill="var(--color-accent-strong)"
                 />
               ) : null}
               <circle

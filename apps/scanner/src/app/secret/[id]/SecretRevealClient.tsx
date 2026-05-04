@@ -135,12 +135,9 @@ export function SecretRevealClient({ id }: { id: string }) {
     return (
       <>
         <p
-          className="font-mono uppercase"
+          className="eyebrow-hero"
           style={{
-            fontSize: 'clamp(11px, 1vw, 13px)',
-            letterSpacing: '0.18em',
             color: 'var(--color-accent-sage)',
-            fontWeight: 600,
             marginBottom: 'clamp(20px, 2.5vw, 32px)',
           }}
         >
