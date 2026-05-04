@@ -164,20 +164,24 @@ export function ChallengeManifesto() {
             fontWeight: 700,
           }}
         >
-          If we got your score{' '}
-          {/* `.bracket-inline` provides the [ ] glyphs as ::before/::after
-              per the canonical bracket-spacing utility (0.16em em-margin).
-              Don't render literal brackets here — that produced the
-              double-bracket bug operator caught 2026-05-02.
-              The bracket span + trailing period are wrapped in a
+          {/* Saks chord names the asset (Flintmere's commitment), not the
+              enemy. Earlier `[ wrong ]` framed the merchant's complaint;
+              `[ rewrite ]` names what Flintmere does about it. Per saved
+              memory `feedback_saks_chords_name_assets_not_enemies`. The
+              bracket span + trailing period are wrapped in a
               white-space:nowrap atom so the "." cannot widow onto its own
               line when the headline wraps on narrow viewports (operator
-              caught 2026-05-02 mobile — full stop alone on a new line). */}
+              caught 2026-05-02 mobile — full stop alone on a new line).
+              `.bracket-inline` provides the [ ] glyphs via ::before/::after
+              per the canonical bracket-spacing utility (0.16em em-margin) —
+              don't render literal brackets here (double-bracket bug,
+              operator caught 2026-05-02). */}
+          If we got it wrong, we{' '}
           <span style={{ whiteSpace: 'nowrap' }}>
             <span
               className="font-mono inline-block bracket-inline methodology-curtain__anchor"
             >
-              wrong
+              rewrite
             </span>
             .
           </span>

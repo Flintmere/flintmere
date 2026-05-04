@@ -1,13 +1,22 @@
-import { NumeralCountUp } from '@flintmere/ui';
-
 /**
  * /bot Chapter 5 — Rate-limit numerals (Bloomberg-cover triad).
  *
- * Three big mono numerals laid horizontally — `2s`, `<20`, `1`. NumeralCountUp
- * drives them on viewport entry per ADR 0021 axis 8 (numerals-count-up motion
- * pattern). Mute-2 captions beneath each cell. Sage hairline above the triad.
+ * Three big mono numerals laid horizontally — `2s`, `≤20`, `1`. Mute-2
+ * captions beneath each cell. Sage hairline above the triad.
  *
- * Mechanic #7 cascade + numerals-count-up.
+ * Static numerals — count-up animation removed 2026-05-04. The count-up
+ * pattern interpolates from 0 to the final value, but for these
+ * limit-numerals the start state read as broken: `0s` (no rate limit =
+ * the opposite of polite), `<0` (mathematical nonsense — the parser
+ * splits "<20" into prefix=`<` digit=`20`, then animates the digit from
+ * 0), and `0 revisits` (reads as missing data). Council #16 Visual +
+ * #11 Voice + #37 Consumer Psychology: animated start state must read
+ * coherently at every frame; for limit-values that's not achievable.
+ * Bloomberg-cover register stays — the typography is the signature, the
+ * motion was incidental. ADR 0021 axis 8 documents count-up as
+ * permitted, not required.
+ *
+ * Mechanic #7 cascade only (no numerals-count-up).
  */
 
 interface Cell {
@@ -23,7 +32,7 @@ const CELLS: Cell[] = [
     caption: '// per host',
   },
   {
-    numeral: '<20',
+    numeral: '≤20',
     label: 'URLs fetched',
     caption: '// per visit',
   },
@@ -112,12 +121,12 @@ export function Limits() {
                 style={{
                   fontSize: 'clamp(72px, 9vw, 160px)',
                   lineHeight: 0.85,
+                  fontVariantNumeric: 'tabular-nums',
                 }}
               >
-                <NumeralCountUp
-                  value={cell.numeral}
-                  className="inline-block"
-                />
+                <span aria-hidden="true" className="inline-block">
+                  {cell.numeral}
+                </span>
               </p>
               <p
                 className="font-sans mt-4 text-[color:var(--color-ink-2)]"

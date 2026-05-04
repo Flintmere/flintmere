@@ -350,6 +350,13 @@ export function BodyBottom({ data }: { data: Published }) {
 
           <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-x-12 lg:gap-x-20 gap-y-12 items-start">
             <div className="research-chapter-pinned">
+              {/* h2 + deck pattern. Earlier composition packed three
+                  clauses into one h2 with a mid-sentence bracket and
+                  bullet separators — wrapped 5–6 lines on desktop with
+                  awkward break points (operator caught 2026-05-04). The
+                  bracket lands cleanly on its own line; the two cadence
+                  facts move into a deck below. Council #16 Visual
+                  hierarchy + #18 IA. */}
               <h2
                 id="methodology-heading"
                 data-reveal
@@ -360,9 +367,23 @@ export function BodyBottom({ data }: { data: Published }) {
                   ['--reveal-delay' as string]: '200ms',
                 }}
               >
-                Scanned by <Bracket>FlintmereBot</Bracket> · aggregate-published ·
-                refreshed monthly.
+                Scanned by <Bracket>FlintmereBot</Bracket>.
               </h2>
+              <p
+                data-reveal
+                className="font-sans"
+                style={{
+                  marginTop: 'clamp(20px, 2vw, 28px)',
+                  fontSize: 'clamp(16px, 1.2vw, 20px)',
+                  lineHeight: 1.45,
+                  fontWeight: 400,
+                  color: 'var(--color-mute)',
+                  letterSpacing: '-0.01em',
+                  ['--reveal-delay' as string]: '320ms',
+                }}
+              >
+                Aggregate-only. Refreshed monthly.
+              </p>
 
               <div
                 data-reveal

@@ -41,7 +41,8 @@ export const metadata: Metadata = {
  *                        light up amber as the parser walks them. (#4 + #8)
  *   4. Ink-slab        — what we never touch. Paper-on-ink, four declarative
  *                        rows, sage hairline anchor.
- *   5. Limits          — three Bloomberg-cover numerals (NumeralCountUp).
+ *   5. Limits          — three Bloomberg-cover numerals (static; count-up
+ *                        retired 2026-05-04 — see Limits.tsx header).
  *   6. Block snippet   — robots.txt opt-out as the typographic image.
  *   7. Aggregates      — the closing argument; default-size bracket on
  *                        `[ store's name ]`.
