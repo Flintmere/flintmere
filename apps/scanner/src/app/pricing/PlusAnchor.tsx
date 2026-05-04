@@ -96,7 +96,7 @@ export function PlusAnchor() {
             <Bracket>From £1,200</Bracket>
           </div>
           <p
-            className="eyebrow text-[color:var(--color-mute-2)]"
+            className="eyebrow"
             style={{ marginTop: 'clamp(16px, 2vw, 28px)' }}
           >
             / month · anchor on enquiry

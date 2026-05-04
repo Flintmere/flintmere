@@ -114,7 +114,7 @@ function BandCard({ band }: { band: AuditBand }) {
       >
         {band.priceDisplay}
       </p>
-      <p className="eyebrow mt-3 text-[color:var(--color-mute-2)]">
+      <p className="eyebrow mt-3">
         {band.skuRangeLabel}
       </p>
       <ul

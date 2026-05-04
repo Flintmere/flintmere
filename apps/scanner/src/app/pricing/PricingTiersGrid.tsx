@@ -93,7 +93,7 @@ function FoodCohortInvitation() {
             aria-labelledby="food-cohort-free-name"
             aria-describedby={explainerId}
           >
-            <p className="eyebrow text-[color:var(--color-mute-2)]">Always free</p>
+            <p className="eyebrow">Always free</p>
             <h3
               id="food-cohort-free-name"
               className="mt-3"
@@ -129,7 +129,7 @@ function FoodCohortInvitation() {
             aria-labelledby="food-cohort-recurring-name"
             aria-describedby={explainerId}
           >
-            <p className="eyebrow text-[color:var(--color-mute-2)]">
+            <p className="eyebrow">
               Calibration cohort · Single store + agency
             </p>
             <h3
