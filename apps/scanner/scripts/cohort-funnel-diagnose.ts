@@ -46,8 +46,8 @@ async function main(): Promise<void> {
       _count: { _all: true },
     });
 
-    const leadsWithFoodScan = await prisma.lead.count({
-      where: { unsubscribedAt: null, scan: { vertical: 'food' } },
+    const leadsWithFoodVerticalScan = await prisma.lead.count({
+      where: { unsubscribedAt: null, scan: { vertical: 'food-and-drink' } },
     });
 
     const leadsWithSkuRange = await prisma.lead.count({
@@ -92,7 +92,9 @@ async function main(): Promise<void> {
     console.log('');
     console.log('Active leads × scan filters:');
     console.log(`  scan complete:               ${leadsCompleteScans}`);
-    console.log(`  scan vertical = food:        ${leadsWithFoodScan}`);
+    console.log(
+      `  scan vertical = food-and-drink: ${leadsWithFoodVerticalScan}`,
+    );
     console.log(`  scan productCount 100..5000: ${leadsWithSkuRange}`);
     console.log('');
     console.log(`Concierge audits (all):        ${conciergeAll}`);

@@ -19,8 +19,11 @@
  *   OUTPUT=data/benchmark/scans.jsonl
  *   CONCURRENCY=4
  *   PER_SCAN_BUDGET_MS=70000         timeout per request (scanner cap is 60s)
- *   PACE_MS=0                        sleep between scans; set 3000+ to avoid
- *                                    Shopify edge per-IP throttle on big runs
+ *   PACE_MS=0                        delay after each worker completes one scan;
+ *                                    use CONCURRENCY=1 + PACE_MS=2500 for gentle
+ *                                    sequential pacing (Shopify edge kindness).
+ *   FILTER_VERTICAL=food-and-drink   only process rows whose CSV vertical matches
+ *                                    (exact string — use slug from research/data.ts).
  *   RESUME=true                      skip domains ALREADY OK in OUTPUT (failed
  *                                    rows auto-retry; no manual wipe needed)
  *
@@ -56,6 +59,7 @@ const PER_SCAN_BUDGET_MS = Number(
 );
 const PACE_MS = Number(process.env.PACE_MS ?? DEFAULT_PACE_MS);
 const RESUME = (process.env.RESUME ?? 'true') !== 'false';
+const FILTER_VERTICAL = process.env.FILTER_VERTICAL?.trim();
 
 interface Store {
   shopDomain: string;
@@ -92,7 +96,14 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const stores = parseStoresCsv(await readFile(INPUT, 'utf8'));
+  let stores = parseStoresCsv(await readFile(INPUT, 'utf8'));
+  if (FILTER_VERTICAL) {
+    const before = stores.length;
+    stores = stores.filter((s) => s.vertical === FILTER_VERTICAL);
+    console.log(
+      `[batch-scan] FILTER_VERTICAL=${FILTER_VERTICAL} · kept ${stores.length}/${before} CSV rows`,
+    );
+  }
   if (stores.length === 0) {
     console.error('[batch-scan] no stores parsed from input');
     process.exit(1);
@@ -118,16 +129,16 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  let done = alreadyDone.size;
   let ok = 0;
   let errors = 0;
+  let completedThisRun = 0;
   const startedAt = new Date().toISOString();
   const byErrorCode: Record<string, number> = {};
 
   await runPool(todo, CONCURRENCY, async (store) => {
     const row = await scanOne(store);
     await appendFile(OUTPUT, JSON.stringify(row) + '\n', 'utf8');
-    done += 1;
+    completedThisRun += 1;
     if (row.outcome.kind === 'ok') ok += 1;
     else {
       errors += 1;
@@ -135,9 +146,9 @@ async function main(): Promise<void> {
         row.outcome.kind === 'timeout' ? 'timeout' : row.outcome.code;
       byErrorCode[code] = (byErrorCode[code] ?? 0) + 1;
     }
-    if (done % 10 === 0 || done === stores.length) {
+    if (completedThisRun % 10 === 0 || completedThisRun === todo.length) {
       console.log(
-        `[batch-scan] progress ${done}/${stores.length} · ok=${ok} · errors=${errors}`,
+        `[batch-scan] progress ${completedThisRun}/${todo.length} · ok=${ok} · errors=${errors}`,
       );
     }
     if (PACE_MS > 0) {
@@ -158,9 +169,10 @@ async function main(): Promise<void> {
         perScanBudgetMs: PER_SCAN_BUDGET_MS,
         paceMs: PACE_MS,
         totals: {
-          stores: stores.length,
+          storesInInput: stores.length,
+          filterVertical: FILTER_VERTICAL ?? null,
           alreadyDone: alreadyDone.size,
-          attempted: todo.length,
+          attemptedThisRun: todo.length,
           ok,
           errors,
         },
