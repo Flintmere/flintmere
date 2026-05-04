@@ -18,9 +18,10 @@
 
 import { bandBySlug, bandPriceLine, type AuditBandSlug } from './audit-pricing';
 import {
-  JOHN_SIGNATURE_NAME,
-  JOHN_SIGNATURE_REPLY_INVITE,
-  JOHN_SIGNATURE_TITLE,
+  FOUNDER_SIGNATURE_IMAGE_URL,
+  FOUNDER_SIGNATURE_NAME,
+  FOUNDER_SIGNATURE_REPLY_INVITE,
+  FOUNDER_SIGNATURE_TEAM_LINE,
   REPLY_SLA,
 } from './copy';
 import { sendEmail, type SendEmailResult } from './resend';
@@ -66,15 +67,11 @@ export async function sendConciergeCustomerEmail(
   const deliverableLine = deliverableLineForBand(bandSlug);
   const safeDeliverableHtml = esc(deliverableLine);
 
-  const optionalCallBlockHtml = calendlyUrl
-    ? `<div style="margin-top:24px;padding:18px;border:1px solid #D5D2C8;">
-         <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;margin-bottom:6px;">Optional</div>
-         <p style="margin:0 0 12px 0;font-size:14px;line-height:1.55;color:#141518;">If it&rsquo;s easier, book a 15-minute call to walk me through the store. Most people skip this — the URL is all I need.</p>
-         <a href="${esc(calendlyUrl)}" style="display:inline-block;color:#0A0A0B;font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:0.04em;text-transform:uppercase;text-decoration:underline;">Book the 15-minute call →</a>
-       </div>`
+  const callFootnoteHtml = calendlyUrl
+    ? `<p style="margin:18px 0 0 0;font-size:12px;line-height:1.55;color:#5A5C64;">Prefer voice? <a href="${esc(calendlyUrl)}" style="color:#0A0A0B;text-decoration:underline;">Book a quick call</a>.</p>`
     : '';
-  const optionalCallBlockText = calendlyUrl
-    ? `\nOptional: if it's easier, book a 15-minute call to walk me through the store. Most people skip this — the URL is all I need. ${calendlyUrl}\n`
+  const callFootnoteText = calendlyUrl
+    ? `\nPrefer voice? Book a quick call: ${calendlyUrl}\n`
     : '';
 
   const html = `<!doctype html>
@@ -84,8 +81,10 @@ export async function sendConciergeCustomerEmail(
       <tr><td align="center">
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background:#FFFFFF;border:1px solid #0A0A0B;">
           <tr>
-            <td style="padding:28px 32px 8px 32px;border-bottom:1px solid #0A0A0B;">
-              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;">Flintmere concierge audit · ${esc(bandLabel)} · ${esc(shopUrl)}</div>
+            <td style="padding:32px 32px 12px 32px;border-bottom:1px solid #0A0A0B;">
+              <div style="font-family:ui-monospace,Menlo,monospace;font-size:14px;letter-spacing:-0.01em;color:#0A0A0B;font-weight:500;">Flintmere&nbsp;]</div>
+              <div style="margin-top:6px;margin-bottom:18px;width:48px;height:2px;background:#F8BF24;font-size:0;line-height:0;">&nbsp;</div>
+              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;">Concierge audit · ${esc(bandLabel)} · ${esc(shopUrl)}</div>
               <div style="margin-top:12px;font-size:26px;font-weight:500;letter-spacing:-0.02em;color:#0A0A0B;">
                 You&rsquo;re <span style="font-family:ui-monospace,Menlo,monospace;font-weight:700;">[&nbsp;in&nbsp;]</span>. Payment confirmed.
               </div>
@@ -93,31 +92,37 @@ export async function sendConciergeCustomerEmail(
           </tr>
           <tr>
             <td style="padding:24px 32px;">
-              <p style="margin:0;font-size:16px;line-height:1.55;color:#141518;">Thanks for trusting me with this. Your ${esc(priceLine)} ${esc(bandLabel)} booking is confirmed.</p>
+              <p style="margin:0;font-size:16px;line-height:1.55;color:#141518;">Thanks for trusting us with this. Your ${esc(priceLine)} ${esc(bandLabel)} booking is confirmed.</p>
               <p style="margin:16px 0 0 0;font-size:16px;line-height:1.55;color:#141518;">Here&rsquo;s what happens next, in order:</p>
               <ol style="margin:12px 0 0 0;padding-left:20px;font-size:15px;line-height:1.6;color:#141518;">
-                <li><strong>Today:</strong> I start reading <strong>${safeShop}</strong>. Every product, the structured data, how AI agents see your site.</li>
+                <li><strong>Today:</strong> the team starts reading <strong>${safeShop}</strong>. Every product, the structured data, how AI agents see your site.</li>
                 <li><strong>Within three working days:</strong> ${safeDeliverableHtml}</li>
                 <li><strong>Day 30:</strong> the scanner re-runs and emails you a progress report, so you know whether the fixes moved the score.</li>
-                <li><strong>Any time:</strong> reply with questions. I read every one.</li>
+                <li><strong>Any time:</strong> reply with questions. The team reads every one.</li>
               </ol>
             </td>
           </tr>
           <tr>
             <td style="padding:0 32px 24px 32px;">
-              <p style="margin:0;font-size:14px;line-height:1.55;color:#5A5C64;">If the shop URL above is wrong, just reply to this email and I&rsquo;ll fix it before I start. Stripe has sent a separate receipt for your records.</p>
+              <p style="margin:0;font-size:14px;line-height:1.55;color:#5A5C64;">If the shop URL above is wrong, just reply to this email and we&rsquo;ll fix it before the team starts. Stripe has sent a separate receipt for your records.</p>
               <div style="margin-top:24px;padding:18px;border:1px solid #D5D2C8;">
                 <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;margin-bottom:6px;">Optional · ~4 minutes</div>
                 <p style="margin:0 0 8px 0;font-size:14px;line-height:1.55;color:#141518;">Want the full <strong>seven-pillar</strong> read instead of four? A read-only Shopify Admin token lets us measure your structured attributes, Google category mapping, and checkout readiness directly. Without it, those three pillars stay directional, not measured.</p>
-                <p style="margin:0 0 12px 0;font-size:14px;line-height:1.55;color:#141518;">Create a private app in your Shopify admin (Settings → Apps and sales channels → Develop apps → Create app), tick the <code>read_products</code> + <code>read_product_listings</code> + <code>read_metafields</code> scopes, install it, copy the <code>shpat_</code> token. Paste at <a href="https://flintmere.com/secret" style="color:#0A0A0B;text-decoration:underline;">flintmere.com/secret</a> &mdash; encrypted in your browser, key never reaches us &mdash; and reply to this email with the URL it gives you. We click it once, the link burns, the token never sits in any inbox or log in plaintext.</p>
+                <p style="margin:0 0 8px 0;font-size:14px;line-height:1.55;color:#141518;">Create a private app in your Shopify admin (Settings → Apps and sales channels → Develop apps → Create app), tick the <code>read_products</code> + <code>read_product_listings</code> + <code>read_metafields</code> scopes, install it, copy the <code>shpat_</code> token. Paste at <a href="https://flintmere.com/secret" style="color:#0A0A0B;text-decoration:underline;">flintmere.com/secret</a> &mdash; encrypted in your browser, key never reaches us &mdash; and reply to this email with the URL it gives you. We click it once, the link burns, the token never sits in any inbox or log in plaintext.</p>
+                <p style="margin:0;font-size:13px;line-height:1.55;color:#5A5C64;">Step-by-step with screenshots: <a href="https://help.shopify.com/en/manual/apps/app-types/custom-apps" style="color:#0A0A0B;text-decoration:underline;">Shopify Help Centre — create a custom app →</a></p>
               </div>
-              ${optionalCallBlockHtml}
             </td>
           </tr>
           <tr>
-            <td style="padding:20px 32px 24px 32px;border-top:1px solid #D5D2C8;">
-              <p style="margin:0;font-size:15px;color:#141518;line-height:1.55;">— ${esc(JOHN_SIGNATURE_NAME)}, ${esc(JOHN_SIGNATURE_TITLE)}</p>
-              <p style="margin:6px 0 0 0;font-size:13px;color:#8B8D95;line-height:1.55;">${esc(JOHN_SIGNATURE_REPLY_INVITE)}</p>
+            <td style="padding:28px 32px 28px 32px;border-top:1px solid #D5D2C8;">
+              ${
+                FOUNDER_SIGNATURE_IMAGE_URL
+                  ? `<img src="${esc(FOUNDER_SIGNATURE_IMAGE_URL)}" alt="${esc(FOUNDER_SIGNATURE_NAME)}" width="200" height="60" style="display:block;height:auto;width:200px;max-width:200px;margin:0 0 6px 0;">`
+                  : `<div style="font-family:ui-monospace,Menlo,monospace;font-size:32px;font-weight:600;letter-spacing:-0.01em;color:#0A0A0B;margin:0 0 4px 0;">[&nbsp;${esc(FOUNDER_SIGNATURE_NAME)}&nbsp;]</div>`
+              }
+              <p style="margin:0;font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;">${esc(FOUNDER_SIGNATURE_TEAM_LINE)}</p>
+              <p style="margin:14px 0 0 0;font-size:13px;color:#8B8D95;line-height:1.55;">${esc(FOUNDER_SIGNATURE_REPLY_INVITE)}</p>
+              ${callFootnoteHtml}
             </td>
           </tr>
           <tr>
@@ -133,22 +138,23 @@ export async function sendConciergeCustomerEmail(
 
   const text = `Flintmere concierge audit — you're in. Payment confirmed.
 
-Thanks for trusting me with this. Your ${priceLine} ${bandLabel} booking is confirmed.
+Thanks for trusting us with this. Your ${priceLine} ${bandLabel} booking is confirmed.
 
 Here's what happens next, in order:
 
-1. Today: I start reading ${shopUrl}. Every product, the structured
-   data, how AI agents see your site.
+1. Today: the team starts reading ${shopUrl}. Every product, the
+   structured data, how AI agents see your site.
 
 2. Within three working days: ${deliverableLine}
 
 3. Day 30: the scanner re-runs and emails you a progress report, so
    you know whether the fixes moved the score.
 
-4. Any time: reply with questions. I read every one.
+4. Any time: reply with questions. The team reads every one.
 
-If the shop URL above is wrong, just reply to this email and I'll fix it
-before I start. Stripe has sent a separate receipt for your records.
+If the shop URL above is wrong, just reply to this email and we'll fix
+it before the team starts. Stripe has sent a separate receipt for your
+records.
 
 Optional (~4 minutes): for the full seven-pillar read instead of four,
 create a read-only Shopify Admin token (Settings → Apps and sales
@@ -156,10 +162,15 @@ channels → Develop apps → Create app; scopes: read_products,
 read_product_listings, read_metafields), paste it at
 flintmere.com/secret — encrypted in your browser, key never reaches
 us — and reply to this email with the URL it generates.
-${optionalCallBlockText}
-— ${JOHN_SIGNATURE_NAME}, ${JOHN_SIGNATURE_TITLE}
-${JOHN_SIGNATURE_REPLY_INVITE}
 
+Step-by-step with screenshots:
+https://help.shopify.com/en/manual/apps/app-types/custom-apps
+
+[ ${FOUNDER_SIGNATURE_NAME} ]
+${FOUNDER_SIGNATURE_TEAM_LINE}
+
+${FOUNDER_SIGNATURE_REPLY_INVITE}
+${callFootnoteText}
 —
 Flintmere is a trading name of Eazy Access Ltd · flintmere.com`;
 

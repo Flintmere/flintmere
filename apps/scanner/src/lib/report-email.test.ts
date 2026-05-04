@@ -86,10 +86,12 @@ describe('buildReportEmail', () => {
     expect(email.html).toContain('from £197');
   });
 
-  it('signs off from John Morris', () => {
+  it('signs off from the named founder for the Flintmere team', () => {
     const email = buildReportEmail({ score: makeScore(), ...baseInput });
-    expect(email.html).toContain('John Morris');
-    expect(email.text).toContain('John Morris');
+    expect(email.html).toContain('Abdur-Rahman Morris');
+    expect(email.text).toContain('Abdur-Rahman Morris');
+    expect(email.html).toContain('For the Flintmere team');
+    expect(email.text).toContain('For the Flintmere team');
   });
 
   it('translates the missing-gtin code into founder-speak', () => {

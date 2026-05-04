@@ -43,31 +43,20 @@ export default async function AuditSuccess({ searchParams }: Props) {
         </p>
 
         {calendly ? (
-          <div
-            className="mx-auto mt-12 max-w-[48ch] text-left"
-            style={{
-              borderTop: '1px solid var(--color-line-soft)',
-              paddingTop: 24,
-            }}
+          <p
+            className="mt-12 text-[color:var(--color-mute)]"
+            style={{ fontSize: 12, lineHeight: 1.55 }}
           >
-            <p className="eyebrow mb-3">Optional</p>
-            <p
-              className="text-[color:var(--color-ink-2)]"
-              style={{ fontSize: 14, lineHeight: 1.55 }}
-            >
-              If it&rsquo;s easier, book a 15-minute call to walk the team
-              through the store. Most people skip this — the URL is all we
-              need.
-            </p>
+            Prefer voice?{' '}
             <a
               href={calendly}
               target="_blank"
               rel="noreferrer"
-              className="btn mt-4 inline-flex"
+              className="text-[color:var(--color-ink)] underline"
             >
-              Book a 15-minute call →
+              Book a quick call →
             </a>
-          </div>
+          </p>
         ) : null}
 
         <p

@@ -1,7 +1,7 @@
 /**
  * Concierge delivery email — sent at audit completion with the letter
  * PDF + per-product CSV attached. Fired from the `audit:deliver` script
- * after John has finished writing.
+ * after the team has finished writing.
  *
  * Voice: same neutral-bold register as the confirmation email. "We" /
  * "the team" in body copy per BUSINESS.md:19; named-director sign-off
@@ -14,9 +14,10 @@
 
 import { bandBySlug, bandPriceLine, type AuditBandSlug } from './audit-pricing';
 import {
-  JOHN_SIGNATURE_NAME,
-  JOHN_SIGNATURE_REPLY_INVITE,
-  JOHN_SIGNATURE_TITLE,
+  FOUNDER_SIGNATURE_IMAGE_URL,
+  FOUNDER_SIGNATURE_NAME,
+  FOUNDER_SIGNATURE_REPLY_INVITE,
+  FOUNDER_SIGNATURE_TEAM_LINE,
 } from './copy';
 import { sendEmail, type SendEmailResult } from './resend';
 
@@ -81,9 +82,14 @@ export async function sendConciergeDeliveryEmail(
             </td>
           </tr>
           <tr>
-            <td style="padding:20px 32px 24px 32px;border-top:1px solid #D5D2C8;">
-              <p style="margin:0;font-size:15px;color:#141518;line-height:1.55;">— ${esc(JOHN_SIGNATURE_NAME)}, ${esc(JOHN_SIGNATURE_TITLE)}</p>
-              <p style="margin:6px 0 0 0;font-size:13px;color:#8B8D95;line-height:1.55;">${esc(JOHN_SIGNATURE_REPLY_INVITE)}</p>
+            <td style="padding:28px 32px 28px 32px;border-top:1px solid #D5D2C8;">
+              ${
+                FOUNDER_SIGNATURE_IMAGE_URL
+                  ? `<img src="${esc(FOUNDER_SIGNATURE_IMAGE_URL)}" alt="${esc(FOUNDER_SIGNATURE_NAME)}" width="200" height="60" style="display:block;height:auto;width:200px;max-width:200px;margin:0 0 6px 0;">`
+                  : `<div style="font-family:ui-monospace,Menlo,monospace;font-size:32px;font-weight:600;letter-spacing:-0.01em;color:#0A0A0B;margin:0 0 4px 0;">[&nbsp;${esc(FOUNDER_SIGNATURE_NAME)}&nbsp;]</div>`
+              }
+              <p style="margin:0;font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;">${esc(FOUNDER_SIGNATURE_TEAM_LINE)}</p>
+              <p style="margin:14px 0 0 0;font-size:13px;color:#8B8D95;line-height:1.55;">${esc(FOUNDER_SIGNATURE_REPLY_INVITE)}</p>
             </td>
           </tr>
           <tr>
@@ -111,8 +117,10 @@ ${safeNotesText}
 In thirty days the scanner re-runs against ${shopUrl} and emails you a
 progress report — what moved, what didn't. No further action from you.
 
-— ${JOHN_SIGNATURE_NAME}, ${JOHN_SIGNATURE_TITLE}
-${JOHN_SIGNATURE_REPLY_INVITE}
+[ ${FOUNDER_SIGNATURE_NAME} ]
+${FOUNDER_SIGNATURE_TEAM_LINE}
+
+${FOUNDER_SIGNATURE_REPLY_INVITE}
 
 —
 Flintmere is a trading name of Eazy Access Ltd · flintmere.com`;

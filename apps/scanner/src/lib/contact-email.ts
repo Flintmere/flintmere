@@ -7,8 +7,8 @@
  */
 
 import {
-  JOHN_SIGNATURE_NAME,
-  JOHN_SIGNATURE_TITLE,
+  FOUNDER_SIGNATURE_NAME,
+  FOUNDER_SIGNATURE_TEAM_LINE,
   REPLY_SLA,
 } from './copy';
 import { labelForTopic } from './contact-routing';
@@ -121,8 +121,8 @@ export async function sendContactConfirmationEmail(
   <p style="margin:0 0 16px 0;font-size:15px;line-height:1.6;color:${INK};">${esc(REPLY_SLA)}</p>
   <p style="margin:0 0 0 0;font-size:14px;line-height:1.6;color:${MUTE};">If your enquiry is urgent or you don&rsquo;t hear back, just reply to this email and we&rsquo;ll bump it.</p>
   <div style="margin-top:28px;padding-top:18px;border-top:1px solid ${LINE};">
-    <div style="font-size:14px;line-height:1.55;color:${INK};font-weight:500;">${esc(JOHN_SIGNATURE_NAME)}</div>
-    <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:${MUTE};margin-top:2px;">${esc(JOHN_SIGNATURE_TITLE)}</div>
+    <div style="font-size:14px;line-height:1.55;color:${INK};font-weight:500;">${esc(FOUNDER_SIGNATURE_NAME)}</div>
+    <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:${MUTE};margin-top:2px;">${esc(FOUNDER_SIGNATURE_TEAM_LINE)}</div>
     <div style="margin-top:14px;height:2px;width:48px;background:${AMBER};"></div>
   </div>
 </div>
@@ -134,7 +134,8 @@ We received your [ ${topicLabel} ] message. ${REPLY_SLA}
 
 If your enquiry is urgent or you don't hear back, just reply to this email and we'll bump it.
 
-— ${JOHN_SIGNATURE_NAME}, ${JOHN_SIGNATURE_TITLE}`;
+${FOUNDER_SIGNATURE_NAME}
+${FOUNDER_SIGNATURE_TEAM_LINE}`;
 
   return sendEmail({
     to: input.to,

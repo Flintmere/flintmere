@@ -1,9 +1,10 @@
 import type { CompositeScore, PillarId } from '@flintmere/scoring';
 import {
   AUTHORITY_LINE,
-  JOHN_SIGNATURE_NAME,
-  JOHN_SIGNATURE_REPLY_INVITE,
-  JOHN_SIGNATURE_TITLE,
+  FOUNDER_SIGNATURE_IMAGE_URL,
+  FOUNDER_SIGNATURE_NAME,
+  FOUNDER_SIGNATURE_REPLY_INVITE,
+  FOUNDER_SIGNATURE_TEAM_LINE,
   REPLY_SLA,
   gradeBadgeAnchor,
   issueCodeToFounderSpeak,
@@ -221,12 +222,17 @@ function renderHtml(input: ReportEmailInput): string {
 
           <!-- Founder sign-off -->
           <tr>
-            <td style="padding:28px 32px 24px 32px;">
-              <p style="margin:0;font-size:15px;color:#141518;line-height:1.55;">
-                — ${esc(JOHN_SIGNATURE_NAME)}, ${esc(JOHN_SIGNATURE_TITLE)}
+            <td style="padding:28px 32px 28px 32px;">
+              ${
+                FOUNDER_SIGNATURE_IMAGE_URL
+                  ? `<img src="${esc(FOUNDER_SIGNATURE_IMAGE_URL)}" alt="${esc(FOUNDER_SIGNATURE_NAME)}" width="200" height="60" style="display:block;height:auto;width:200px;max-width:200px;margin:0 0 6px 0;">`
+                  : `<div style="font-family:ui-monospace,Menlo,monospace;font-size:32px;font-weight:600;letter-spacing:-0.01em;color:#0A0A0B;margin:0 0 4px 0;">[&nbsp;${esc(FOUNDER_SIGNATURE_NAME)}&nbsp;]</div>`
+              }
+              <p style="margin:0;font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;">
+                ${esc(FOUNDER_SIGNATURE_TEAM_LINE)}
               </p>
-              <p style="margin:6px 0 0 0;font-size:13px;color:#8B8D95;line-height:1.55;">
-                ${esc(JOHN_SIGNATURE_REPLY_INVITE)}
+              <p style="margin:14px 0 0 0;font-size:13px;color:#8B8D95;line-height:1.55;">
+                ${esc(FOUNDER_SIGNATURE_REPLY_INVITE)}
               </p>
             </td>
           </tr>
@@ -332,8 +338,10 @@ What next — three ways to fix what we found
 3. Prefer to talk first?
    Just reply to this email. ${REPLY_SLA}
 
-— ${JOHN_SIGNATURE_NAME}, ${JOHN_SIGNATURE_TITLE}
-${JOHN_SIGNATURE_REPLY_INVITE}
+[ ${FOUNDER_SIGNATURE_NAME} ]
+${FOUNDER_SIGNATURE_TEAM_LINE}
+
+${FOUNDER_SIGNATURE_REPLY_INVITE}
 
 ---
 
