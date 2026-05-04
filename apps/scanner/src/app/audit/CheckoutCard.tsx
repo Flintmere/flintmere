@@ -38,6 +38,7 @@ import {
   useStripe,
 } from '@stripe/react-stripe-js';
 import { track } from '@/lib/plausible';
+import { readAndConsumeHandoff } from '@/lib/audit-handoff';
 import {
   bandBySlug,
   type AuditBand,
@@ -134,21 +135,20 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
 
   const selectedBand = useMemo(() => bandBySlug(bandSlug), [bandSlug]);
 
-  // Read ?email= and ?shop= URL params on mount and pre-fill the form.
-  // Bridges /scan-results → /audit deep-link path: scanner-results CTAs
-  // can pass `?band=…&shop=<myshop.myshopify.com>&email=<merchant@…>` so
-  // the merchant lands at a half-completed checkout. Server renders
-  // empty (SSR) and we hydrate via effect to avoid a hydration mismatch.
-  // Effect-based, not lazy useState initializer, for that reason.
+  // Bridge /scan → /audit. Shop URL via `?shop=` (non-PII, copy-paste
+  // shareable); email via sessionStorage handoff (PII out of URLs per
+  // Council #24, see lib/audit-handoff.ts). One-shot consume on mount —
+  // a refresh of /audit does not silently re-pre-fill.
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const params = new URLSearchParams(window.location.search);
-    const emailParam = params.get('email')?.trim() ?? '';
-    const shopParam = params.get('shop')?.trim() ?? '';
+    const shopParam = new URLSearchParams(window.location.search)
+      .get('shop')
+      ?.trim() ?? '';
+    const handoff = readAndConsumeHandoff();
     let prefilledEmail = false;
     let prefilledShop = false;
-    if (emailParam) {
-      setEmail(emailParam);
+    if (handoff?.email) {
+      setEmail(handoff.email);
       prefilledEmail = true;
     }
     if (shopParam) {
@@ -157,8 +157,8 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
     }
     if (prefilledEmail || prefilledShop) {
       track('audit_prefill_applied', {
-        from_email: prefilledEmail,
-        from_shop: prefilledShop,
+        from_handoff: prefilledEmail,
+        from_shop_url: prefilledShop,
       });
     }
   }, []);
