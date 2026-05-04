@@ -59,7 +59,10 @@ const NAV_ITEMS: NavItem[] = [
   // standards.flintmere.com/food/v1 as the eventual artefact home.
   { label: 'Standards', href: 'https://standards.flintmere.com', external: true },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'Sign in', href: 'https://app.flintmere.com', external: true },
+  // Sign in (→ app.flintmere.com) restores when the embedded Shopify app is
+  // bound at that subdomain. Withdrawn pre-launch because Coolify hasn't
+  // routed the subdomain yet — the link served Traefik's self-signed default
+  // cert + a 503, which is brand-killer on every nav.
 ];
 
 export function SiteHeader() {
