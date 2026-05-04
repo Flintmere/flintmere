@@ -162,7 +162,7 @@ export function Results({ result }: { result: ScanResult }) {
                           ? 'var(--color-alert)'
                           : issue.severity === 'high'
                             ? 'var(--color-ink)'
-                            : 'var(--color-mute-2)',
+                            : 'var(--color-mute)',
                       color: 'var(--color-paper)',
                       padding: '4px 8px',
                     }}

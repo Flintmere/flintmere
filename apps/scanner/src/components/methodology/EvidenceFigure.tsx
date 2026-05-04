@@ -88,7 +88,7 @@ export function EvidenceFigure() {
         }}
       >
         <p
-          className="font-mono uppercase text-[color:var(--color-mute-2)] mb-3"
+          className="font-mono uppercase text-[color:var(--color-mute)] mb-3"
           style={{ fontSize: 11, letterSpacing: '0.16em' }}
         >
           Evidence — same product, two records
@@ -197,7 +197,7 @@ function RecordCard({ kind, rows, scores }: RecordCardProps) {
             }}
           >
             <dt
-              className="font-mono uppercase text-[color:var(--color-mute-2)]"
+              className="font-mono uppercase text-[color:var(--color-mute)]"
               style={{ fontSize: 10, letterSpacing: '0.14em', alignSelf: 'start', paddingTop: 2 }}
             >
               {row.label}
@@ -252,7 +252,7 @@ function ScoreCell({ label, value, kind }: { label: string; value: string; kind:
   return (
     <div>
       <p
-        className="font-mono uppercase text-[color:var(--color-mute-2)]"
+        className="font-mono uppercase text-[color:var(--color-mute)]"
         style={{ fontSize: 10, letterSpacing: '0.14em', marginBottom: 4 }}
       >
         {label}

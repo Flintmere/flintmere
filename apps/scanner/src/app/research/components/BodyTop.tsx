@@ -201,7 +201,7 @@ export function BodyTop({ data }: { data: Published }) {
                   fontSize: 'clamp(11px, 1vw, 13px)',
                   letterSpacing: '0.18em',
                   fontWeight: 500,
-                  color: 'var(--color-mute-2)',
+                  color: 'var(--color-mute)',
                   ['--reveal-delay' as string]: '500ms',
                 }}
               >

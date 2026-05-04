@@ -74,7 +74,7 @@ export function PillarSpread({ pillar }: PillarSpreadProps) {
             {pillar.n}
           </p>
           <p
-            className="font-mono uppercase text-[color:var(--color-mute-2)]"
+            className="font-mono uppercase text-[color:var(--color-mute)]"
             style={{
               fontSize: 11,
               letterSpacing: '0.16em',
@@ -128,7 +128,7 @@ function Section({ label, body, small, mute }: SectionProps) {
   return (
     <div>
       <p
-        className="font-mono uppercase text-[color:var(--color-mute-2)]"
+        className="font-mono uppercase text-[color:var(--color-mute)]"
         style={{ fontSize: 11, letterSpacing: '0.16em', marginBottom: 8 }}
       >
         {label}

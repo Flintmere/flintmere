@@ -298,7 +298,7 @@ export default function About() {
               Food standard v1 publishes 2026 — see how we maintain it →
             </Link>
             <p
-              className="font-mono text-[color:var(--color-mute-2)]"
+              className="font-mono text-[color:var(--color-mute)]"
               style={{
                 marginTop: '0.5rem',
                 fontSize: '11px',
@@ -407,7 +407,7 @@ export default function About() {
             </ul>
 
             <p
-              className="font-mono text-[color:var(--color-mute-2)]"
+              className="font-mono text-[color:var(--color-mute)]"
               style={{
                 marginTop: 'clamp(40px, 5vw, 64px)',
                 fontSize: '11px',

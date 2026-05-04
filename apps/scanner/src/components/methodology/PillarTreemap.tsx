@@ -240,7 +240,7 @@ function TreemapTile({ pillar, isFirstInRow, isActive }: TreemapTileProps) {
           {pillar.name}
         </p>
         <p
-          className="font-mono text-[color:var(--color-mute-2)]"
+          className="font-mono text-[color:var(--color-mute)]"
           style={{ fontSize: 11, letterSpacing: '0.12em' }}
         >
           {pillar.weight}%

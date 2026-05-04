@@ -29,7 +29,7 @@ export function HeroStat({ label, value, suffix }: HeroStatProps) {
       }}
     >
       <dt
-        className="font-mono uppercase text-[color:var(--color-mute-2)]"
+        className="font-mono uppercase text-[color:var(--color-mute)]"
         style={{ fontSize: 11, letterSpacing: '0.16em', alignSelf: 'end' }}
       >
         {label}
@@ -60,7 +60,7 @@ export function StatusCell({ label, value, mono }: StatusCellProps) {
   return (
     <div>
       <p
-        className="font-mono uppercase text-[color:var(--color-mute-2)]"
+        className="font-mono uppercase text-[color:var(--color-mute)]"
         style={{ fontSize: 11, letterSpacing: '0.16em', marginBottom: 6 }}
       >
         {label}
@@ -84,7 +84,7 @@ export function CadenceRow({ label, body }: CadenceRowProps) {
   return (
     <>
       <dt
-        className="font-mono uppercase text-[color:var(--color-mute-2)]"
+        className="font-mono uppercase text-[color:var(--color-mute)]"
         style={{ fontSize: 11, letterSpacing: '0.16em', alignSelf: 'start' }}
       >
         {label}

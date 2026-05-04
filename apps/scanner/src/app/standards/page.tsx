@@ -56,7 +56,7 @@ export default function StandardsHolding() {
           }}
         >
           <p
-            className="font-mono uppercase text-[color:var(--color-mute-2)]"
+            className="font-mono uppercase text-[color:var(--color-mute)]"
             style={{
               fontSize: '11px',
               letterSpacing: '0.16em',
@@ -115,7 +115,7 @@ export default function StandardsHolding() {
           }}
         >
           <p
-            className="font-mono uppercase text-[color:var(--color-mute-2)]"
+            className="font-mono uppercase text-[color:var(--color-mute)]"
             style={{
               fontSize: '11px',
               letterSpacing: '0.16em',
@@ -183,7 +183,7 @@ export default function StandardsHolding() {
           }}
         >
           <p
-            className="font-mono uppercase text-[color:var(--color-mute-2)]"
+            className="font-mono uppercase text-[color:var(--color-mute)]"
             style={{
               fontSize: '11px',
               letterSpacing: '0.16em',

@@ -133,7 +133,7 @@ export function BodyBottom({ data }: { data: Published }) {
                     fontSize: 'clamp(11px, 1vw, 13px)',
                     letterSpacing: '0.18em',
                     fontWeight: 500,
-                    color: 'var(--color-mute-2)',
+                    color: 'var(--color-mute)',
                   }}
                 >
                   {v.label}
@@ -154,7 +154,7 @@ export function BodyBottom({ data }: { data: Published }) {
                     fontSize: 'clamp(10px, 0.85vw, 12px)',
                     letterSpacing: '0.18em',
                     fontWeight: 500,
-                    color: 'var(--color-mute-2)',
+                    color: 'var(--color-mute)',
                   }}
                 >
                   {v.median !== null
@@ -272,7 +272,7 @@ export function BodyBottom({ data }: { data: Published }) {
                       fontSize: 'clamp(10px, 0.85vw, 11px)',
                       letterSpacing: '0.18em',
                       fontWeight: 500,
-                      color: 'var(--color-mute-2)',
+                      color: 'var(--color-mute)',
                     }}
                   >
                     {v.label}
@@ -289,7 +289,7 @@ export function BodyBottom({ data }: { data: Published }) {
                       fontSize: '11px',
                       letterSpacing: '0.16em',
                       fontWeight: 500,
-                      color: 'var(--color-mute-2)',
+                      color: 'var(--color-mute)',
                     }}
                   >
                     n={v.n}
@@ -457,7 +457,7 @@ export function BodyBottom({ data }: { data: Published }) {
                 fontSize: 'clamp(11px, 1vw, 13px)',
                 letterSpacing: '0.18em',
                 fontWeight: 500,
-                color: 'var(--color-mute-2)',
+                color: 'var(--color-mute)',
                 marginBottom: '12px',
               }}
             >
