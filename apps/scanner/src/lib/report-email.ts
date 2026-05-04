@@ -225,7 +225,7 @@ function renderHtml(input: ReportEmailInput): string {
             <td style="padding:28px 32px 28px 32px;">
               ${
                 FOUNDER_SIGNATURE_IMAGE_URL
-                  ? `<img src="${esc(FOUNDER_SIGNATURE_IMAGE_URL)}" alt="${esc(FOUNDER_SIGNATURE_NAME)}" width="200" height="60" style="display:block;height:auto;width:200px;max-width:200px;margin:0 0 6px 0;">`
+                  ? `<img src="${esc(FOUNDER_SIGNATURE_IMAGE_URL)}" alt="${esc(FOUNDER_SIGNATURE_NAME)}" width="200" height="78" style="display:block;height:auto;width:200px;max-width:200px;margin:0 0 6px 0;">`
                   : `<div style="font-family:ui-monospace,Menlo,monospace;font-size:32px;font-weight:600;letter-spacing:-0.01em;color:#0A0A0B;margin:0 0 4px 0;">[&nbsp;${esc(FOUNDER_SIGNATURE_NAME)}&nbsp;]</div>`
               }
               <p style="margin:0;font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;">

@@ -33,13 +33,13 @@ export const REPLY_SLA = 'The team usually replies within two working days.'
 // preserves team-voice attribution beneath the signed name.
 //
 // Signature mark: when FOUNDER_SIGNATURE_IMAGE_URL is set, emails render
-// that image (transparent PNG / SVG, ~200×60). When unset, emails fall
+// that image (transparent PNG / SVG, ~200×78). When unset, emails fall
 // back to the heroic bracket-signature pattern — canon-aligned, plaintext-
 // safe, no asset dependency.
 export const FOUNDER_SIGNATURE_NAME = 'Abdur-Rahman Morris'
 export const FOUNDER_SIGNATURE_TEAM_LINE = 'For the Flintmere team'
 export const FOUNDER_SIGNATURE_REPLY_INVITE = 'Reply direct. We read every one.'
-export const FOUNDER_SIGNATURE_IMAGE_URL: string | null = 'https://flintmere.com/signature-arm.png'
+export const FOUNDER_SIGNATURE_IMAGE_URL: string | null = 'https://audit.flintmere.com/signature-arm.png'
 
 // The concierge deliverable. Written audit — no video, no call —
 // delivered by the Flintmere team. Every customer-facing surface that
