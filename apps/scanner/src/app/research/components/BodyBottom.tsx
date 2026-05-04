@@ -386,7 +386,7 @@ export function BodyBottom({ data }: { data: Published }) {
                   ['--reveal-delay' as string]: '320ms',
                 }}
               >
-                Aggregate-only. Refreshed monthly.
+                Aggregate-only. Refreshed periodically.
               </p>
 
               <div

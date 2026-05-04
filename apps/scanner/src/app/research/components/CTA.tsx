@@ -50,7 +50,7 @@ export function CTA() {
             ['--reveal-delay' as string]: '200ms',
           }}
         >
-          Run a free scan. Your score sits inside the next monthly refresh.
+          Run a free scan. Your score sits inside the next refresh.
         </h2>
 
         <div

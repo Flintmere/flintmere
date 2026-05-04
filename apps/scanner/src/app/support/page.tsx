@@ -158,8 +158,8 @@ export default function Support() {
 
       <Clause n="06" heading="Feature requests">
         <p>
-          We take feature requests seriously — many shipped features came
-          from a customer message. Send them via our{' '}
+          We take feature requests seriously — customer messages
+          shape the roadmap. Send them via our{' '}
           <a href="/contact?topic=general" className="underline">
             contact form
           </a>{' '}
@@ -173,7 +173,7 @@ export default function Support() {
         <p>
           If you aren&rsquo;t happy with the response you received, reply with
           the word <em>&ldquo;escalate&rdquo;</em> and the thread is routed
-          directly to the founder. Unresolved complaints about personal data can be
+          directly to the team lead. Unresolved complaints about personal data can be
           raised with the ICO:{' '}
           <a href="https://ico.org.uk/make-a-complaint/" className="underline">
             ico.org.uk/make-a-complaint

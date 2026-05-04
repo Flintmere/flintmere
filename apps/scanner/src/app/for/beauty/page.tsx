@@ -230,7 +230,7 @@ export default async function FlintmereForBeauty() {
             style={{ fontSize: 17, lineHeight: 1.5, letterSpacing: '-0.01em' }}
           >
             {bench.available && !bench.preview
-              ? 'The median beauty catalog scored by FlintmereBot. Updated monthly. Run your own scan to see where your store sits against it.'
+              ? 'The median beauty catalog scored by FlintmereBot. Updated periodically. Run your own scan to see where your store sits against it.'
               : bench.available
                 ? `Early sample — at ${bench.n.toLocaleString()} beauty store${bench.n === 1 ? '' : 's'}, this is the score so far, not “the median beauty catalog.” The median framing publishes at ${BENCHMARK_PUBLISH_FLOOR}. Scan your store and you shift the number.`
                 : 'Beauty scores appear here as soon as the first stores land in the dataset. Run yours to seed it.'}

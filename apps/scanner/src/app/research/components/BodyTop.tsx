@@ -115,7 +115,7 @@ export function BodyTop({ data }: { data: Published }) {
             distribution, per-vertical gaps) and nothing else. No
             individual store is ever named.
             {data.available && !data.preview
-              ? ` This is v1: ${data.n.toLocaleString()} stores in the cohort, refreshed monthly.`
+              ? ` This is v1: ${data.n.toLocaleString()} stores in the cohort, refreshed periodically.`
               : data.available && data.preview
                 ? ` Early sample — ${data.n.toLocaleString()} stores scanned so far. We don't frame these as "the median Shopify store" until the dataset clears ${data.publishFloor.toLocaleString()} per vertical.`
                 : ' The first bot scans are in flight; numbers appear here as soon as the first store lands in the dataset.'}

@@ -131,7 +131,7 @@ export const DATA_SOURCES = [
   {
     domain: 'Allergens',
     source: 'FSA Big-14 allergens list',
-    url: 'https://www.food.gov.uk/safety-hygiene/allergen-and-intolerance-information',
+    url: 'https://www.food.gov.uk/business-guidance/allergen-guidance-for-food-businesses',
     purpose: 'Canonical UK allergen schema; informs the Attributes pillar.',
   },
   {
@@ -143,7 +143,7 @@ export const DATA_SOURCES = [
   {
     domain: 'Geographic indications',
     source: 'DEFRA UK GI register',
-    url: 'https://www.gov.uk/guidance/protected-food-name-scheme-uk-gis',
+    url: 'https://www.gov.uk/guidance/protected-geographical-food-and-drink-names-uk-gi-schemes',
     purpose: 'Post-Brexit UK PDO/PGI/TSG register; informs provenance attributes.',
   },
   {

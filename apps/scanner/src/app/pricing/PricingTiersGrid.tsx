@@ -93,7 +93,7 @@ function FoodCohortInvitation() {
             aria-labelledby="food-cohort-free-name"
             aria-describedby={explainerId}
           >
-            <p className="eyebrow">Always free</p>
+            <p className="eyebrow">Free scan</p>
             <h3
               id="food-cohort-free-name"
               className="mt-3"
@@ -110,8 +110,8 @@ function FoodCohortInvitation() {
               className="mt-4 text-[color:var(--color-ink-2)]"
               style={{ fontSize: 14, lineHeight: 1.55 }}
             >
-              Four public-source pillars, no install, 60 seconds. Free
-              forever; the recurring tiers add daily monitoring,
+              Four public-source pillars, no install, 60 seconds. No
+              signup needed. The recurring tiers add daily monitoring,
               auto-fixes, and the seven-pillar score.
             </p>
             <Link
