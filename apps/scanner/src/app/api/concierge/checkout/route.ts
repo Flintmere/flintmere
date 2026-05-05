@@ -105,21 +105,58 @@ export async function POST(req: NextRequest) {
   // once at the account level via Settings → Public details → Statement
   // descriptors → Add custom descriptor. Max 22 chars total. The band
   // suffix gives the bookkeeper enough context to reconcile.
-  const intent = await stripe.paymentIntents.create({
-    amount: band.pricePence,
-    currency: 'gbp',
-    receipt_email: email,
-    description: `Flintmere concierge audit (${band.label}) — written deliverable in three working days`,
-    statement_descriptor: `FLINTMERE AUDIT B${bandSlug === 'band-1' ? '1' : '2'}`,
-    automatic_payment_methods: { enabled: true },
-    metadata: {
-      kind: 'concierge-audit',
-      email,
-      shop_url: shopUrl.slice(0, 250),
-      [STRIPE_BAND_METADATA_KEY]: bandSlug,
-      band_label: band.label,
-    },
-  });
+  let intent;
+  try {
+    intent = await stripe.paymentIntents.create({
+      amount: band.pricePence,
+      currency: 'gbp',
+      receipt_email: email,
+      description: `Flintmere concierge audit (${band.label}) — written deliverable in three working days`,
+      statement_descriptor: `FLINTMERE AUDIT B${bandSlug === 'band-1' ? '1' : '2'}`,
+      automatic_payment_methods: { enabled: true },
+      metadata: {
+        kind: 'concierge-audit',
+        email,
+        shop_url: shopUrl.slice(0, 250),
+        [STRIPE_BAND_METADATA_KEY]: bandSlug,
+        band_label: band.label,
+      },
+    });
+  } catch (err) {
+    // Stripe SDK throws on validation / auth / rate-limit / API errors.
+    // Without this catch the throw becomes a 500 HTML error page from
+    // Next.js, the UI maps the non-JSON body to "server is restarting"
+    // copy, and the actual cause stays hidden. Caught 2026-05-05 — the
+    // £197 test passed yesterday, today the same call started throwing
+    // post-Turnstile-fix and we couldn't tell whether it was the
+    // descriptor, the API key, an `automatic_payment_methods`
+    // constraint, or something else entirely. Surface the underlying
+    // `code` / `type` / `message` so the next failure self-explains.
+    const stripeErr = err as { code?: string; type?: string; message?: string; statusCode?: number };
+    // eslint-disable-next-line no-console
+    console.error(
+      JSON.stringify({
+        event: 'stripe-payment-intent-create-failed',
+        code: stripeErr.code,
+        type: stripeErr.type,
+        statusCode: stripeErr.statusCode,
+        message: stripeErr.message,
+        bandSlug,
+      }),
+    );
+    return NextResponse.json(
+      {
+        ok: false,
+        code: 'stripe-error',
+        stripeCode: stripeErr.code,
+        stripeType: stripeErr.type,
+        message:
+          stripeErr.message ??
+          'Payment provider rejected the request. Please refresh and try again.',
+      },
+      { status: 502 },
+    );
+  }
 
   if (!intent.client_secret) {
     return NextResponse.json(
