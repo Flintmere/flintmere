@@ -226,7 +226,17 @@
    bracket-spacing rule (0.16em em-margin between bracket character and
    bracketed content) but DON'T want the .bracket primitive's mono-700
    font override. Apply to a span wrapping the bracketed content; the
-   pseudo-elements add the brackets at the parent's font/weight. */
+   pseudo-elements add the brackets at the parent's font/weight.
+
+   white-space: nowrap mirrors `.bracket` — without it the pseudo
+   `[` / `]` characters can wrap to separate lines from the bracketed
+   content when the parent column is narrow (caught 2026-05-05 on
+   /for/plus MistakeRow's 80px ordinal column — the brackets stacked
+   above and below the numeral instead of flanking it inline). */
+.bracket-inline {
+  white-space: nowrap;
+}
+
 .bracket-inline::before,
 .bracket-inline::after {
   display: inline-block;
