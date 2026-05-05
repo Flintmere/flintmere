@@ -160,6 +160,11 @@ export function Results({ result }: { result: ScanResult }) {
               const speak = issueCodeToFounderSpeak[issue.code];
               const title = speak?.title ?? issue.title;
               const consequence = speak?.consequence ?? issue.description;
+              const examples = issue.affectedProductExamples ?? [];
+              const overflowCount = Math.max(
+                0,
+                issue.affectedCount - examples.length,
+              );
               return (
                 <li
                   key={issue.code}
@@ -185,6 +190,27 @@ export function Results({ result }: { result: ScanResult }) {
                     <p className="mt-1 text-[14px] text-[color:var(--color-mute)]">
                       {consequence}
                     </p>
+                    {examples.length > 0 ? (
+                      <p
+                        className="mt-2 text-[color:var(--color-ink-2)]"
+                        style={{
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: 12,
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        e.g.{' '}
+                        {examples.map((ex, i) => (
+                          <span key={ex.handle}>
+                            {ex.title}
+                            {i < examples.length - 1 ? ', ' : ''}
+                          </span>
+                        ))}
+                        {overflowCount > 0
+                          ? ` + ${overflowCount.toLocaleString()} more like ${overflowCount === 1 ? 'this' : 'these'}`
+                          : ''}
+                      </p>
+                    ) : null}
                   </div>
                   <p className="eyebrow text-right max-md:text-left">
                     {issue.affectedCount.toLocaleString()}{' '}

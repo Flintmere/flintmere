@@ -87,6 +87,17 @@ export interface Issue {
   affectedCount: number;
   affectedProductIds: string[];
   revenueImpactScore: number;
+  /**
+   * Up to N example products affected by this issue, populated by
+   * `enrichIssuesWithExamples()` after scoring runs. Optional because
+   * the scoring pillars themselves emit ids only — example titles +
+   * handles are looked up against the catalog by the post-processor.
+   * UI surfaces these as the per-issue mirror-recognition beat
+   * ("affecting Almond Butter, Coffee Grinder, Snack Bar").
+   * Empty array for site-level issues with no per-product attribution
+   * (e.g. robots.txt blocking).
+   */
+  affectedProductExamples?: Array<{ title: string; handle: string }>;
 }
 
 export interface PillarResult {

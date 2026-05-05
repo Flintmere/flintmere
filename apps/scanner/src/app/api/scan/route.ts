@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import {
+  enrichIssuesWithExamples,
   estimateAov,
   estimateSuppression,
   scoreCatalog,
@@ -121,6 +122,13 @@ export async function POST(req: NextRequest) {
     // loaded products. See packages/scoring/src/catalog-summary.ts.
     const catalogSummary = summarizeCatalog(catalog);
 
+    // Per-issue product citations — extends the catalog-level mirror
+    // mechanic to the issue level. Each issue picks up up to 3 example
+    // {title, handle} pairs from the catalog so the UI can render
+    // "affecting Almond Butter, Coffee Grinder, and 60 more like these".
+    // See packages/scoring/src/enrich-issues.ts.
+    const enrichedIssues = enrichIssuesWithExamples(score.issues, catalog);
+
     // Dead-inventory wedge — v2 strategic report §7. Computed from the
     // already-loaded catalog; no new fetches, no LLM, no OAuth.
     const suppressionEstimate = estimateSuppression(catalog);
@@ -175,6 +183,10 @@ export async function POST(req: NextRequest) {
     // queryable signals.
     const persistedScoreJson = {
       ...(score as unknown as Record<string, unknown>),
+      // Replace the bare issues with the enriched variant so the persisted
+      // record carries citations too — /score/[shop] and any future
+      // historical-scan replay surface them without recomputing.
+      issues: enrichedIssues,
       truncated,
       actualProductCount,
       catalogSummary,
@@ -233,7 +245,7 @@ export async function POST(req: NextRequest) {
           locked: p.locked,
           lockedReason: p.lockedReason,
         })),
-        issues: score.issues.slice(0, 10),
+        issues: enrichedIssues.slice(0, 10),
       },
       { status: 200 },
     );

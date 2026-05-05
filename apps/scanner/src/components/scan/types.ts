@@ -79,5 +79,12 @@ export interface ScanResult {
     title: string;
     description: string;
     affectedCount: number;
+    /**
+     * Up to 3 example products attached by `enrichIssuesWithExamples`.
+     * Optional for backwards compatibility with scans persisted before
+     * 2026-05-05; empty array for site-level issues with no per-product
+     * attribution (e.g. robots.txt blocking).
+     */
+    affectedProductExamples?: Array<{ title: string; handle: string }>;
   }>;
 }

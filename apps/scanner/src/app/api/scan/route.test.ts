@@ -158,4 +158,38 @@ describe('POST /api/scan — suppressionEstimate field', () => {
       { label: 'Coffee Grinder', count: 1 },
     ]);
   });
+
+  it('attaches affectedProductExamples to each issue', async () => {
+    const { POST } = await import('./route');
+    const req = new Request('http://localhost/api/scan', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ shopUrl: 'risky-food-store.myshopify.com' }),
+    }) as unknown as import('next/server').NextRequest;
+
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+
+    // Every issue carries the examples field — even when empty (site
+    // issues like robots-blocks-all). The triple-signal product (id=1)
+    // should appear under the missing-gtin issue with its title.
+    expect(Array.isArray(body.issues)).toBe(true);
+    for (const issue of body.issues) {
+      expect(Array.isArray(issue.affectedProductExamples)).toBe(true);
+      expect(issue.affectedProductExamples.length).toBeLessThanOrEqual(3);
+      for (const example of issue.affectedProductExamples) {
+        expect(typeof example.title).toBe('string');
+        expect(typeof example.handle).toBe('string');
+      }
+    }
+    const gtinIssue = body.issues.find(
+      (i: { code: string }) => i.code === 'missing-gtin',
+    );
+    expect(gtinIssue).toBeDefined();
+    expect(gtinIssue.affectedProductExamples).toContainEqual({
+      title: 'Organic Snack Bar',
+      handle: 'mystery-snack-1',
+    });
+  });
 });
