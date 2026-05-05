@@ -7,7 +7,16 @@
 
 import * as Sentry from "@sentry/nextjs";
 
-Sentry.init({
+// Defer Sentry init until after first paint — its setup work
+// (registering global handlers, hooking fetch/XHR, instrumenting the
+// router) blocks the main thread for 100–200ms on mobile CPUs and
+// adds directly to TBT. Errors that happen before init fires are
+// lost; for marketing surfaces that's acceptable since most user
+// errors hit checkout / API routes (server-side Sentry catches those)
+// and the first 2 seconds of pageload are typically render, not
+// user-error-prone interaction. requestIdleCallback runs when the
+// browser is genuinely idle; setTimeout fallback for Safari.
+const initSentry = () => Sentry.init({
   dsn: "https://79d1fef09f845649f00fe46fbb99b29e@o4511281229266944.ingest.de.sentry.io/4511281236344912",
 
   // Session replay deliberately NOT included as an integration. Our Cookie
@@ -40,5 +49,19 @@ Sentry.init({
     return event;
   },
 });
+
+if (typeof window !== "undefined") {
+  const w = window as Window & {
+    requestIdleCallback?: (
+      cb: () => void,
+      opts?: { timeout?: number },
+    ) => number;
+  };
+  if (typeof w.requestIdleCallback === "function") {
+    w.requestIdleCallback(() => initSentry(), { timeout: 4000 });
+  } else {
+    setTimeout(initSentry, 2000);
+  }
+}
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
