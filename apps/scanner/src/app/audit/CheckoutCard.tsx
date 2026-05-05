@@ -186,18 +186,43 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
           turnstileToken: turnstileInput?.value ?? '',
         }),
       });
-      const body = await res.json();
+
+      // Three-layer error parse. The earlier flow conflated all
+      // failures into one vague "Network error" message — a 502 from
+      // Coolify mid-deploy returning HTML, a 403 turnstile failure
+      // returning JSON, and an actual offline-fetch all read identical
+      // to the user. Caught 2026-05-05 (operator screenshot during the
+      // three-commit-in-five-minutes deploy wave): res.json() threw on
+      // the 502's HTML body, the catch fired, the user saw "Network
+      // error" while the actual cause was "the server is restarting,
+      // wait 30 seconds". Now we surface the specific cause.
+      let body: {
+        clientSecret?: string;
+        message?: string;
+        code?: string;
+      } | null = null;
+      try {
+        body = await res.json();
+      } catch {
+        body = null;
+      }
+
       if (!res.ok || !body?.clientSecret) {
         telemetry('concierge-checkout-intent-failed', {
           status: res.status,
           code: body?.code,
+          parseFailed: body === null,
           band: bandSlug,
         });
+        const fallback =
+          body === null && res.status >= 500
+            ? 'The server is restarting after a deploy. Refresh the page in 30 seconds and try again.'
+            : body === null
+              ? 'Could not read the server response. Refresh the page and try again, or contact us via /contact?topic=billing.'
+              : 'Could not start checkout. Try again, or contact us via /contact?topic=billing.';
         setState({
           kind: 'error',
-          message:
-            body?.message ??
-            'Could not start checkout. Try again, or contact us via /contact?topic=billing.',
+          message: body?.message ?? fallback,
         });
         return;
       }
@@ -209,11 +234,15 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
         email: email.trim(),
         shopUrl: shopUrl.trim(),
       });
-    } catch {
-      telemetry('concierge-checkout-intent-network-error', { band: bandSlug });
+    } catch (err) {
+      telemetry('concierge-checkout-intent-network-error', {
+        band: bandSlug,
+        error: err instanceof Error ? err.message : 'unknown',
+      });
       setState({
         kind: 'error',
-        message: 'Network error. Check your connection and try again.',
+        message:
+          'We could not reach the server. Check your connection and try again, or contact us via /contact?topic=billing.',
       });
     }
   }
