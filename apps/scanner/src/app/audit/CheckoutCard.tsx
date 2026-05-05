@@ -174,6 +174,26 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
     const turnstileInput = formRef.current?.querySelector<HTMLInputElement>(
       'input[name="cf-turnstile-response"]',
     );
+    const turnstileToken = turnstileInput?.value ?? '';
+
+    // Pre-flight refuse-to-submit. If the Turnstile widget didn't render
+    // (NEXT_PUBLIC_TURNSTILE_SITE_KEY missing at build, Invisible-mode
+    // timing miss, network failure loading challenges.cloudflare.com),
+    // the token is empty and the server will 403 with `missing-token`
+    // *after* we've already taken the user through card entry. Catching
+    // it client-side surfaces the failure before they invest the data.
+    // Caught 2026-05-05 — operator hit a misconfigured Turnstile
+    // (Invisible widget mode + no client-side render) and only saw the
+    // failure after typing card details.
+    if (process.env.NODE_ENV === 'production' && !turnstileToken) {
+      setState({
+        kind: 'error',
+        message:
+          'Verification is unavailable right now. Please refresh the page in a few seconds; if it persists, please use /contact.',
+      });
+      telemetry('concierge-checkout-turnstile-missing', { band: bandSlug });
+      return;
+    }
 
     try {
       const res = await fetch('/api/concierge/checkout', {
@@ -183,7 +203,7 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
           email: email.trim(),
           shopUrl: shopUrl.trim(),
           bandSlug,
-          turnstileToken: turnstileInput?.value ?? '',
+          turnstileToken,
         }),
       });
 
