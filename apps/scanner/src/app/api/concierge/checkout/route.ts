@@ -98,13 +98,21 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Full per-charge `statement_descriptor` overrides the account default
-  // (shared with Eazy Access Ltd's other businesses) so Flintmere customers
-  // see "FLINTMERE AUDIT B1" on their bank statement instead of the parent
-  // "EAZYACCESS LTD" line. Stripe requires this descriptor to be approved
-  // once at the account level via Settings → Public details → Statement
-  // descriptors → Add custom descriptor. Max 22 chars total. The band
-  // suffix gives the bookkeeper enough context to reconcile.
+  // Per-charge statement-descriptor suffix. Stripe deprecated the full
+  // `statement_descriptor` parameter for card payment methods 2026-05
+  // (per support.stripe.com/questions/use-of-the-statement-descriptor-parameter-on-paymentintents-for-card-charges).
+  // The replacement is `statement_descriptor_suffix` which Stripe
+  // prepends with the account-level descriptor; combined length must
+  // be ≤22 chars. Account-level default is "EAZYACCESS LTD" (parent
+  // co), so the customer's bank line reads e.g. "EAZYACCESS LTD*
+  // FLINT B1" — keeps the band code visible for bookkeeper
+  // reconciliation. Earlier "FLINTMERE AUDIT B1" full descriptor
+  // is no longer available via the API; achieving Flintmere-prefix
+  // on the statement now requires either a separate Stripe account
+  // for Flintmere or changing the parent's account-level descriptor
+  // (which propagates to all Eazy Access Ltd businesses on that
+  // account). Operator decision deferred — bookkeeper still has
+  // band code + metadata.audit_band for full attribution.
   let intent;
   try {
     intent = await stripe.paymentIntents.create({
@@ -112,7 +120,7 @@ export async function POST(req: NextRequest) {
       currency: 'gbp',
       receipt_email: email,
       description: `Flintmere concierge audit (${band.label}) — written deliverable in three working days`,
-      statement_descriptor: `FLINTMERE AUDIT B${bandSlug === 'band-1' ? '1' : '2'}`,
+      statement_descriptor_suffix: `FLINT B${bandSlug === 'band-1' ? '1' : '2'}`,
       automatic_payment_methods: { enabled: true },
       metadata: {
         kind: 'concierge-audit',
