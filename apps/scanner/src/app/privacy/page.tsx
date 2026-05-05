@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: 'Privacy Policy',
   description:
     'How Flintmere collects, uses, stores, and protects personal data. UK GDPR and UK DPA 2018 compliant.',
+  alternates: { canonical: '/privacy' },
 };
 
 export default function Privacy() {

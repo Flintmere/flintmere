@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   title: 'Flintmere for beauty brands — shades, INCI, claims, agent-ready',
   description:
     'The beauty-catalog mistakes that make AI shopping agents skip your store — shade names only a human could parse, INCI buried in images, claims taxonomy missing. Flintmere detects each one.',
+  alternates: { canonical: '/for/beauty' },
 };
 
 // Belt-and-braces: render per request so build never hits the DB.

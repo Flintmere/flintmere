@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: 'Security',
   description:
     'How Flintmere secures Shopify tokens, catalog data, and customer information. Encryption, HMAC, TLS, incident response.',
+  alternates: { canonical: '/security' },
 };
 
 export default function Security() {

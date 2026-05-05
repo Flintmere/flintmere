@@ -207,6 +207,7 @@ export function VerticalRadiogroup({
             type="button"
             role="radio"
             aria-checked={isSelected}
+            aria-label={v.label}
             tabIndex={i === selectedIndex ? 0 : -1}
             onClick={() => onChange(v.id)}
             onKeyDown={(event) => handleKeyDown(event, i)}

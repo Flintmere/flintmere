@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   title: 'Flintmere for food & drink — allergens, nutrition, provenance, agent-ready',
   description:
     'The food-and-drink catalog mistakes that make AI shopping agents skip your store — allergens in prose, nutrition panels as images, provenance claims without structured data. Flintmere detects each one.',
+  alternates: { canonical: '/for/food-and-drink' },
 };
 
 // Belt-and-braces: render per request so build never hits the DB.

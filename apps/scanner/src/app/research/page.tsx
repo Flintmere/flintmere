@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   title: 'Research — State of Shopify Catalogs 2026',
   description:
     "The v1 Flintmere benchmark: Shopify catalogs scored against AI shopping agent requirements. Median scores, grade distributions, and the single biggest catalog mistake by vertical — scanned by FlintmereBot, aggregate-only, refreshed periodically.",
+  alternates: { canonical: '/research' },
 };
 
 // Belt-and-braces: fully dynamic so the page never prerenders at build

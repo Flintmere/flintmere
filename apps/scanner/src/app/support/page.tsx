@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: 'Support',
   description:
     'How to get help with Flintmere — scanner, Shopify app, concierge audits. Response times by plan, security reporting, status page.',
+  alternates: { canonical: '/support' },
 };
 
 export default function Support() {

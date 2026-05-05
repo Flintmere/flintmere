@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   title: 'Flintmere for apparel brands — size, colour, material, agent-ready',
   description:
     'The apparel-catalog mistakes that make AI shopping agents skip your store — size charts buried in images, colour names only a human can parse, composition hidden in description prose. Flintmere detects each one.',
+  alternates: { canonical: '/for/apparel' },
 };
 
 // Belt-and-braces: render per request so build never hits the DB.

@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: 'Cookies',
   description:
     'Cookies and similar technologies used by Flintmere. One functional cookie on the scanner; no tracking, analytics, or advertising cookies on the marketing site.',
+  alternates: { canonical: '/cookies' },
 };
 
 export default function Cookies() {

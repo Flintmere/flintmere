@@ -15,6 +15,7 @@ export const metadata: Metadata = {
   title: 'Pricing',
   description:
     'Flintmere pricing — the vertical standard licensed × distribution mode. Forward pricing finalising May–June 2026. Existing customers grandfathered.',
+  alternates: { canonical: '/pricing' },
 };
 
 const FAQS = [
@@ -137,18 +138,20 @@ export default function Pricing() {
           <p className="eyebrow mb-6">
             <span aria-hidden="true">// </span>The audit, in practice
           </p>
-          <figure
-            className="relative w-full"
-            style={{ aspectRatio: '4 / 3', maxHeight: 'clamp(360px, 56vh, 640px)' }}
-          >
+          <figure className="relative w-full" style={{ maxWidth: 1216, margin: '0 auto' }}>
             <Image
               src="/marketing/pricing/ladder-still-life.webp"
-              alt="A still-life of a printed UK food label sheet on warm cream linen, with a brass magnifying loupe, a small ceramic bowl of dried thyme, and a folded barcode strip — the surface a Flintmere audit reviews."
-              fill
+              alt="A small brass apothecary balance scale on warm cream linen, with one pan holding loose dried thyme leaves and the other pan holding three smooth grey river stones — calibrating a catalog against a standard."
+              width={1024}
+              height={768}
               unoptimized
               sizes="(min-width: 1280px) 1216px, 92vw"
-              className="object-cover"
-              style={{ filter: 'var(--image-treatment-warm)' }}
+              className="w-full h-auto"
+              style={{
+                filter: 'var(--image-treatment-warm)',
+                maxHeight: 'clamp(360px, 56vh, 640px)',
+                objectFit: 'cover',
+              }}
             />
           </figure>
           <figcaption

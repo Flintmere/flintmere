@@ -9,6 +9,10 @@ import { Bracket, SiteFooter } from '@flintmere/ui';
 // for mobile Coolify-CPU-bound TTFB.
 export const dynamic = 'force-static';
 export const revalidate = 86400;
+
+export const metadata = {
+  alternates: { canonical: '/' },
+};
 import { ViewportReveal } from '@/components/ViewportReveal';
 import { HeroParallaxFigure } from '@/components/HeroParallaxFigure';
 import { MarketingStickyCta } from '@/components/MarketingStickyCta';

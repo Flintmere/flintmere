@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   title: 'Concierge audit — from £197',
   description:
     'We read your Shopify store product by product and send a written audit letter plus a per-product fix CSV within three working days. Three SKU bands — £197 / £397 / from £597. 30-day re-scan included.',
+  alternates: { canonical: '/audit' },
 };
 
 /**

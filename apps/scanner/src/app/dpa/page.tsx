@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: 'Data Processing Agreement',
   description:
     'Flintmere Data Processing Agreement for Shopify merchants and agency customers. Incorporates UK SCCs and International Data Transfer Addendum.',
+  alternates: { canonical: '/dpa' },
 };
 
 export default function DPA() {

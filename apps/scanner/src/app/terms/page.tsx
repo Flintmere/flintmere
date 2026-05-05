@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: 'Terms of Service',
   description:
     'The agreement between you and Flintmere (Eazy Access Ltd) for the scanner, Shopify app, and concierge audits.',
+  alternates: { canonical: '/terms' },
 };
 
 export default function Terms() {

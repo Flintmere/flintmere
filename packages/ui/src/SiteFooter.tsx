@@ -143,7 +143,6 @@ export function SiteFooter() {
             <Link
               href="/contact"
               className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
-              aria-label="Contact Flintmere — opens contact form"
             >
               hello@flintmere.com
             </Link>

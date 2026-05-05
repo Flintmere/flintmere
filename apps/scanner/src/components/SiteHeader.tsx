@@ -202,14 +202,24 @@ export function SiteHeader() {
         </div>
       </header>
 
-      {open ? (
-        <div
-          id="mobile-menu-sheet"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Site navigation"
-          className="fixed inset-0 z-50 bg-[color:var(--color-paper)] flex flex-col md:hidden"
-        >
+      {/* Mobile sheet — always present in the DOM (hidden when closed
+          via display:none) so the trigger's aria-controls pointer
+          always resolves. Conditional render breaks the
+          aria-controls→id contract: axe-core / Lighthouse flag it as
+          "ID referenced by aria-controls is not found" because at
+          page-load the controlled element doesn't exist. Caught
+          2026-05-05 in the squirrelscan a11y sweep. */}
+      <div
+        id="mobile-menu-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Site navigation"
+        aria-hidden={open ? undefined : true}
+        className="fixed inset-0 z-50 bg-[color:var(--color-paper)] flex-col md:hidden"
+        style={{ display: open ? 'flex' : 'none' }}
+      >
+        {open ? (
+          <div className="contents">
           <div
             className="flex items-center justify-between"
             style={{
@@ -335,8 +345,9 @@ export function SiteHeader() {
               Run a free scan &rarr;
             </Link>
           </div>
-        </div>
-      ) : null}
+          </div>
+        ) : null}
+      </div>
     </>
   );
 }
