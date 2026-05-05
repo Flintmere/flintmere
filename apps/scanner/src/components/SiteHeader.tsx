@@ -117,9 +117,11 @@ export function SiteHeader() {
           <Link
             href="/"
             aria-label="Flintmere home"
-            className="font-medium tracking-tight text-[color:var(--color-ink)] inline-flex items-center"
+            className="font-mono text-[color:var(--color-ink)] hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)] inline-flex items-center"
             style={{
               fontSize: 'clamp(18px, 1.4vw, 20px)',
+              fontWeight: 600,
+              letterSpacing: '-0.04em',
               minHeight: 44,
               minWidth: 44,
               marginLeft: -8,
@@ -127,10 +129,7 @@ export function SiteHeader() {
               paddingRight: 8,
             }}
           >
-            Flintmere
-            <span className="font-mono font-bold" aria-hidden="true">
-              ]
-            </span>
+            Flintmere<span aria-hidden="true">]</span>
           </Link>
 
           {/* Right-side cluster: comma-list nav (desktop) + always-visible
@@ -240,9 +239,11 @@ export function SiteHeader() {
               href="/"
               onClick={() => setOpen(false)}
               aria-label="Flintmere home"
-              className="font-medium tracking-tight text-[color:var(--color-ink)] inline-flex items-center"
+              className="font-mono text-[color:var(--color-ink)] hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)] inline-flex items-center"
               style={{
                 fontSize: 'clamp(18px, 1.4vw, 20px)',
+                fontWeight: 600,
+                letterSpacing: '-0.04em',
                 minHeight: 44,
                 minWidth: 44,
                 marginLeft: -8,
@@ -250,10 +251,7 @@ export function SiteHeader() {
                 paddingRight: 8,
               }}
             >
-              Flintmere
-              <span className="font-mono font-bold" aria-hidden="true">
-                ]
-              </span>
+              Flintmere<span aria-hidden="true">]</span>
             </Link>
             <button
               ref={closeRef}
