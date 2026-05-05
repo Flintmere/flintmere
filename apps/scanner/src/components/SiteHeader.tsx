@@ -126,53 +126,79 @@ export function SiteHeader() {
             </span>
           </Link>
 
-          {/* Desktop comma-list — unchanged Batch B register. */}
-          <nav
-            aria-label="Primary"
-            className="hidden md:flex items-baseline gap-x-1.5 text-[color:var(--color-ink)]"
-            style={{
-              fontSize: 'clamp(14px, 1.1vw, 16px)',
-              fontWeight: 600,
-              letterSpacing: 0,
-            }}
-          >
-            {NAV_ITEMS.map((item, i) => (
-              <span key={item.label} className="contents">
-                <Link
-                  href={item.href}
-                  className="site-nav-item hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
-                  {...(item.external
-                    ? { target: '_blank', rel: 'noopener noreferrer' }
-                    : {})}
-                >
-                  {item.label}
-                </Link>
-                {i < NAV_ITEMS.length - 1 ? (
-                  <span aria-hidden="true">,</span>
-                ) : null}
-              </span>
-            ))}
-          </nav>
+          {/* Right-side cluster: comma-list nav (desktop) + always-visible
+              "Run a free scan" CTA (every viewport) + Menu trigger (mobile).
+              The CTA addresses operator audit 2026-05-05 — no immediately
+              visible scan action existed on cold pageload at narrow viewports
+              (hero CTA below the photo zone fold; sticky reveal only after
+              scroll; mobile-sheet CTA behind a Menu tap). Locked nav memory
+              permits 3–5 destinations + 1–2 actions; this is the first
+              right-aligned action under that rule. */}
+          <div className="flex items-center" style={{ gap: 'clamp(16px, 2vw, 32px)' }}>
+            <nav
+              aria-label="Primary"
+              className="hidden md:flex items-baseline gap-x-1.5 text-[color:var(--color-ink)]"
+              style={{
+                fontSize: 'clamp(14px, 1.1vw, 16px)',
+                fontWeight: 600,
+                letterSpacing: 0,
+              }}
+            >
+              {NAV_ITEMS.map((item, i) => (
+                <span key={item.label} className="contents">
+                  <Link
+                    href={item.href}
+                    className="site-nav-item hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
+                    {...(item.external
+                      ? { target: '_blank', rel: 'noopener noreferrer' }
+                      : {})}
+                  >
+                    {item.label}
+                  </Link>
+                  {i < NAV_ITEMS.length - 1 ? (
+                    <span aria-hidden="true">,</span>
+                  ) : null}
+                </span>
+              ))}
+            </nav>
 
-          {/* Mobile trigger — mono caption. The Tempo-style restraint:
-              one word, no chrome, hover lifts to amber. */}
-          <button
-            ref={triggerRef}
-            type="button"
-            aria-expanded={open}
-            aria-controls="mobile-menu-sheet"
-            onClick={() => setOpen(true)}
-            className="md:hidden site-nav-item font-mono uppercase text-[color:var(--color-ink)] hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
-            style={{
-              fontSize: 12,
-              letterSpacing: '0.18em',
-              fontWeight: 500,
-              padding: '14px 8px',
+            <Link
+              href="/scan"
+              className="inline-flex items-center gap-2 bg-[color:var(--color-accent)] text-[color:var(--color-accent-ink)] font-mono uppercase whitespace-nowrap hover:bg-[color:var(--color-ink)] hover:text-[color:var(--color-paper)] transition-colors duration-[var(--duration-instant)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
+              style={{
+                fontSize: 'clamp(11px, 0.95vw, 13px)',
+                fontWeight: 500,
+                letterSpacing: '0.14em',
+                paddingLeft: 'clamp(14px, 1.6vw, 22px)',
+                paddingRight: 'clamp(14px, 1.6vw, 22px)',
+                minHeight: 44,
+              }}
+            >
+              <span className="sm:hidden">Free scan</span>
+              <span className="hidden sm:inline">Run a free scan</span>
+              <span aria-hidden="true">&rarr;</span>
+            </Link>
+
+            {/* Mobile trigger — mono caption. The Tempo-style restraint:
+                one word, no chrome, hover lifts to amber. */}
+            <button
+              ref={triggerRef}
+              type="button"
+              aria-expanded={open}
+              aria-controls="mobile-menu-sheet"
+              onClick={() => setOpen(true)}
+              className="md:hidden site-nav-item font-mono uppercase text-[color:var(--color-ink)] hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
+              style={{
+                fontSize: 12,
+                letterSpacing: '0.18em',
+                fontWeight: 500,
+                padding: '14px 8px',
               minHeight: 44,
             }}
           >
-            Menu
-          </button>
+              Menu
+            </button>
+          </div>
         </div>
       </header>
 
