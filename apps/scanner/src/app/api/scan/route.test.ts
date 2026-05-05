@@ -135,4 +135,27 @@ describe('POST /api/scan — suppressionEstimate field', () => {
     expect(body.suppressionEstimate.signals.ambiguousAllergen).toBe(1);
     expect(body.suppressionEstimate.signals.missingGmcCategory).toBe(1);
   });
+
+  it('includes catalogSummary in the response payload', async () => {
+    const { POST } = await import('./route');
+    const req = new Request('http://localhost/api/scan', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ shopUrl: 'risky-food-store.myshopify.com' }),
+    }) as unknown as import('next/server').NextRequest;
+
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+
+    // The fixture has 1 product with productType '' and 1 with
+    // 'Coffee Grinder', so summary falls onto the product-type rung
+    // (one rung-1 string is enough to commit).
+    expect(body.catalogSummary).toBeDefined();
+    expect(body.catalogSummary.totalProducts).toBe(2);
+    expect(body.catalogSummary.source).toBe('product-type');
+    expect(body.catalogSummary.topCategories).toEqual([
+      { label: 'Coffee Grinder', count: 1 },
+    ]);
+  });
 });

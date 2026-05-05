@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { estimateAov, estimateSuppression, scoreCatalog } from '@flintmere/scoring';
+import {
+  estimateAov,
+  estimateSuppression,
+  scoreCatalog,
+  summarizeCatalog,
+} from '@flintmere/scoring';
 import { prisma } from '@/lib/db';
 import { fetchCrawlability } from '@/lib/crawlability-fetcher';
 import { fetchCatalog, ShopifyFetchError } from '@/lib/shopify-fetcher';
@@ -110,6 +115,12 @@ export async function POST(req: NextRequest) {
       catalog,
       crawlability ? { crawlability } : {},
     );
+    // "What we read" preamble — verbatim merchant productType / vendor
+    // strings played back to prove we read THIS catalog, not a template.
+    // Vertical-correct by construction; pure projection over already-
+    // loaded products. See packages/scoring/src/catalog-summary.ts.
+    const catalogSummary = summarizeCatalog(catalog);
+
     // Dead-inventory wedge — v2 strategic report §7. Computed from the
     // already-loaded catalog; no new fetches, no LLM, no OAuth.
     const suppressionEstimate = estimateSuppression(catalog);
@@ -166,6 +177,7 @@ export async function POST(req: NextRequest) {
       ...(score as unknown as Record<string, unknown>),
       truncated,
       actualProductCount,
+      catalogSummary,
       suppressionEstimate,
       scaledSuppressionEstimate,
       aovEstimate: aovResult?.aovEstimate ?? null,
@@ -202,6 +214,10 @@ export async function POST(req: NextRequest) {
         // UI uses these to render "Sampled N of M products" not "N products".
         truncated,
         actualProductCount,
+        // Catalog summary preamble — top productType strings played back
+        // verbatim. Sits ahead of the lede in the UI as the "we read your
+        // store" trust anchor.
+        catalogSummary,
         suppressionEstimate,
         // When truncated, the scaled estimates project sample counts up to
         // the merchant's full catalog. UI displays scaled when present and

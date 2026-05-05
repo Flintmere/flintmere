@@ -8,6 +8,7 @@ export { scoreMapping } from './pillars/mapping.js';
 export { scoreCheckout } from './pillars/checkout.js';
 export { estimateSuppression } from './pillars/suppression-estimate.js';
 export { estimateAov } from './pillars/aov-estimate.js';
+export { summarizeCatalog } from './catalog-summary.js';
 export { isValidGtin, gtinLength } from './utils/gtin.js';
 export { detectFluff } from './utils/fluff.js';
 export {
@@ -40,4 +41,5 @@ export type {
   SuppressionEstimate,
   AovEstimate,
   RevenueEstimate,
+  CatalogSummary,
 } from './types.js';

@@ -10,6 +10,7 @@
 
 import type {
   AovEstimate,
+  CatalogSummary,
   RevenueEstimate,
   SuppressionEstimate,
 } from '@flintmere/scoring';
@@ -33,6 +34,12 @@ export interface ScanResult {
    */
   truncated?: boolean;
   actualProductCount?: number | null;
+  /**
+   * "What we read" preamble — verbatim merchant categories played back to
+   * prove vertical-correctness. Optional for backwards compatibility with
+   * scans persisted before 2026-05-05. See packages/scoring/src/catalog-summary.ts.
+   */
+  catalogSummary?: CatalogSummary;
   /**
    * Optional for backwards compatibility — older scans persisted before
    * the dead-inventory wedge shipped won't carry this field.

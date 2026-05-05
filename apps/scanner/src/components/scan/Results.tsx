@@ -27,6 +27,7 @@ import {
   verdictHeader,
 } from '@/lib/copy';
 import type { PillarId } from '@flintmere/scoring';
+import { CatalogSummary } from './CatalogSummary';
 import { ScanScopeLine } from './ScanScopeLine';
 import { SuppressionLede } from './SuppressionLede';
 import { useLiveSample } from './use-live-sample';
@@ -64,6 +65,16 @@ export function Results({ result }: { result: ScanResult }) {
         actualProductCount={result.actualProductCount ?? null}
         truncated={result.truncated ?? false}
       />
+
+      {/*
+        "What we read" preamble — vertical-correct trust anchor that
+        plays back verbatim merchant categories. Sits between the
+        sampling-honesty row and the wedge so the merchant reads
+        "Scanned N of M → here's WHAT they were → here's the IMPACT"
+        in honest top-down order. See packages/scoring/src/catalog-summary.ts
+        for the rationale arc and the vertical-blind-copy memory.
+      */}
+      <CatalogSummary summary={result.catalogSummary} />
 
       {/*
         Dead-inventory wedge — v2 strategic report §7. Surface the

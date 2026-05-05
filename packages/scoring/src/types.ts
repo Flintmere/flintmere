@@ -193,3 +193,26 @@ export interface RevenueEstimate {
   /** The AovEstimate that generated this band. */
   aovEstimate: AovEstimate;
 }
+
+// ---- Catalog summary ("What we read" preamble) ----
+// A vertical-correct projection over the catalog the scanner actually
+// observed. Surfaces verbatim merchant strings (productType first,
+// vendor fallback) so the disclosure copy can mirror the merchant's own
+// taxonomy back to them — proves we read the catalog without imposing
+// a taxonomy of our own. See `catalog-summary.ts` for the rationale arc.
+export interface CatalogSummary {
+  /** Total products observed in the public catalog. */
+  totalProducts: number;
+  /**
+   * Top categories by count, descending; capped at 4.
+   * Empty when the catalog has zero products.
+   */
+  topCategories: Array<{ label: string; count: number }>;
+  /**
+   * Which signal sourced the labels — drives copy framing in the UI.
+   *  - `product-type`: at least one product had a non-empty productType.
+   *  - `vendor`: no productType anywhere; vendor strings exist.
+   *  - `generic`: neither signal; falls back to "products".
+   */
+  source: 'product-type' | 'vendor' | 'generic';
+}
