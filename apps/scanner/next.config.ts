@@ -68,6 +68,23 @@ export default withSentryConfig(config, {
   // session shows we need the extra granularity.
   widenClientFileUpload: false,
 
+  // Bundle-size optimisations (2026-05-05). Mobile PageSpeed measured
+  // the @sentry/nextjs client SDK at 128 KB on the marketing surface.
+  // We don't use Session Replay, the client SDK has tracing disabled
+  // (instrumentation-client.ts dropped tracesSampleRate), and we ship
+  // production without debug statements. Tree-shaking these unused
+  // subsystems should drop the Sentry chunk substantially.
+  bundleSizeOptimizations: {
+    excludeTracing: true,
+    excludeReplayShadowDom: true,
+    excludeReplayIframe: true,
+    excludeReplayWorker: true,
+    excludeDebugStatements: true,
+  },
+
+  // Sentry's internal debug logger — production doesn't need it.
+  disableLogger: true,
+
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   // This can increase your server load as well as your hosting bill.
   // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
