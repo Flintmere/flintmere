@@ -4,40 +4,46 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 /**
- * MarketingStickyCta — slim persistent CTA bar for long-scroll marketing
- * surfaces (2026-05-03).
+ * MarketingStickyCta — bottom-right floating CTA pill (rev 2,
+ * 2026-05-05).
  *
  * Why it exists. The marketing chapters on the home and /audit run
- * several viewports of editorial scroll past the hero (pillar wheel pin,
- * manifesto cascade, deliverables, how-it-works). The hero CTA scrolls
- * away early and the SiteHeader is non-sticky, so a primary action isn't
- * reachable from most of the page. This bar is the smallest structural
- * fix — one CTA, always reachable past the hero, never inside the
- * editorial frames themselves.
+ * several viewports of editorial scroll past the hero. The header CTA
+ * scrolls away; without a follower, the primary action vanishes mid-
+ * page. This component is that follower.
  *
- * Reveal contract. Visible from the moment the hero scrolls past upward
- * until the SiteFooter enters the viewport. The footer carries the
- * locked closing `Flintmere]` wordmark chord — the bar must not cover
- * it. Anchored to elements (not vh constants) so it works on mobile
- * where the hero stacks taller than 100vh.
+ * Why bottom-right pill (not top bar). The original rev was a slim
+ * full-width top bar with wordmark + CTA. Operator caught it 2026-05-05
+ * as "intrusive" — the bar reads as corporate header chrome, covers
+ * content, and competes with the editorial frame above. The replacement
+ * is the canonical non-intrusive-but-visible pattern: a small amber
+ * pill anchored to the bottom-right corner, ~44px tall (touch target),
+ * appears after the hero scrolls past, fades out as the footer chord
+ * approaches. No wordmark — the header already carries the brand at
+ * the top of the page and the footer carries the locked closing chord
+ * at the bottom; the pill is purely the action.
  *
- * Same-page anchor hide. When `href` starts with `#`, the destination is
- * also observed — the bar hides while the destination is in view. A
- * "Book the audit ↑" pointer is noise when the user is already at the
- * bands.
+ * Reveal contract.
+ *  - Hidden initially (no flash on first paint, no LCP hit).
+ *  - Reveals once the hero scrolls past upward.
+ *  - Hides when the SiteFooter enters viewport — the closing
+ *    `Flintmere]` wordmark must own the bottom of the page.
+ *  - Hides when an in-page destination (href starting with `#`) is
+ *    already in view — pointing users at where they already are is
+ *    noise.
  *
- * Reduced motion. The reveal honours prefers-reduced-motion via
- * globals.css §Reduced motion soft contract — `transition: none`
- * cascades onto the bar. The bar still appears at threshold; only the
- * fade animation is suppressed.
+ * Accessibility.
+ *  - `inert={!revealed}` — removes the pill from the a11y tree AND the
+ *    tab order while collapsed. React 19 first-class.
+ *  - `aria-label` on the <nav> ("Persistent primary action").
  *
- * Accessibility. `inert` flips while collapsed — removes the bar from
- * the a11y tree (no SR announcement) and from the tab order (keyboard
- * users don't catch invisible anchors). Replaces an earlier
- * aria-hidden + tabIndex={-1} pair which tripped axe rule
- * a11y/aria-hidden-focus (focusable elements inside aria-hidden=true).
- * `inert` is React 19 first-class + universally supported in evergreen
- * browsers; no fallback needed.
+ * Reduced motion. The fade + slide honours
+ * `prefers-reduced-motion: reduce` via the global @media block in
+ * globals.css (transition-duration scales to 0.01ms). The pill still
+ * appears at threshold; only the animation is suppressed.
+ *
+ * Safe area. Mobile bottom uses `env(safe-area-inset-bottom)` so the
+ * pill sits above iPhone home-indicator gestures.
  */
 
 interface MarketingStickyCtaProps {
@@ -116,56 +122,29 @@ export function MarketingStickyCta({
       inert={!revealed}
       style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
+        right: 'clamp(16px, 2.5vw, 32px)',
+        bottom: 'max(clamp(16px, 2.5vw, 32px), env(safe-area-inset-bottom, 0px))',
         zIndex: 30,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: '16px',
-        background: 'var(--color-paper)',
-        borderBottom: '1px solid var(--color-line)',
-        paddingLeft: 'clamp(20px, 4vw, 48px)',
-        paddingRight: 'clamp(12px, 2vw, 24px)',
-        paddingTop: 'clamp(10px, 1vw, 14px)',
-        paddingBottom: 'clamp(10px, 1vw, 14px)',
         opacity: revealed ? 1 : 0,
-        transform: revealed ? 'translateY(0)' : 'translateY(-100%)',
+        transform: revealed ? 'translateY(0)' : 'translateY(12px)',
         transition:
           'opacity var(--duration-short) var(--ease-sharp), transform var(--duration-short) var(--ease-sharp)',
         pointerEvents: revealed ? 'auto' : 'none',
       }}
     >
       <Link
-        href="/"
-        aria-label="Flintmere home"
-        className="font-medium tracking-tight text-[color:var(--color-ink)] truncate inline-flex items-center"
-        style={{
-          fontSize: 'clamp(14px, 1.1vw, 16px)',
-          minHeight: 44,
-          minWidth: 44,
-          marginLeft: -8,
-          paddingLeft: 8,
-          paddingRight: 8,
-        }}
-      >
-        Flintmere
-        <span className="font-mono font-bold" aria-hidden="true">
-          ]
-        </span>
-      </Link>
-
-      <Link
         href={href}
-        className="inline-flex items-center gap-2 bg-[color:var(--color-accent)] text-[color:var(--color-accent-ink)] font-mono font-medium uppercase hover:bg-[color:var(--color-paper-on-ink)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)] ease-[cubic-bezier(0.4,0,0.2,1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)] whitespace-nowrap"
+        className="inline-flex items-center gap-2 bg-[color:var(--color-accent)] text-[color:var(--color-accent-ink)] font-mono font-medium uppercase hover:bg-[color:var(--color-ink)] hover:text-[color:var(--color-paper)] transition-colors duration-[var(--duration-instant)] ease-[cubic-bezier(0.4,0,0.2,1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)] whitespace-nowrap"
         style={{
-          fontSize: 'clamp(11px, 1vw, 12px)',
+          fontSize: 'clamp(12px, 1vw, 13px)',
           letterSpacing: '0.14em',
-          paddingLeft: 'clamp(14px, 1.6vw, 22px)',
-          paddingRight: 'clamp(14px, 1.6vw, 22px)',
-          paddingTop: 'clamp(8px, 0.9vw, 11px)',
-          paddingBottom: 'clamp(8px, 0.9vw, 11px)',
+          paddingLeft: 'clamp(16px, 1.8vw, 22px)',
+          paddingRight: 'clamp(16px, 1.8vw, 22px)',
+          paddingTop: 12,
+          paddingBottom: 12,
+          minHeight: 44,
+          // Subtle paper-1 elevation — restrained per ADR 0021 §1.
+          boxShadow: 'var(--shadow-paper-1)',
         }}
       >
         {label}
