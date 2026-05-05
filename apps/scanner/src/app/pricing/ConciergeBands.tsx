@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { AUDIT_BANDS, type AuditBand } from '@/lib/audit-pricing';
+import { ViewportReveal } from '@/components/ViewportReveal';
 
 /**
  * Concierge audit band ladder — primary pricing-comparison surface on
@@ -64,20 +65,22 @@ export function ConciergeBands() {
           .
         </p>
 
-        <div
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
-          style={{ marginTop: 'clamp(40px, 5vw, 64px)' }}
-        >
-          {AUDIT_BANDS.map((band) => (
-            <BandCard key={band.slug} band={band} />
-          ))}
-        </div>
+        <ViewportReveal>
+          <div
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            style={{ marginTop: 'clamp(40px, 5vw, 64px)' }}
+          >
+            {AUDIT_BANDS.map((band, i) => (
+              <BandCard key={band.slug} band={band} revealDelay={i * 120} />
+            ))}
+          </div>
+        </ViewportReveal>
       </div>
     </section>
   );
 }
 
-function BandCard({ band }: { band: AuditBand }) {
+function BandCard({ band, revealDelay }: { band: AuditBand; revealDelay: number }) {
   const priceId = `concierge-${band.slug}-price`;
   // All bands deep-link to the checkout section; the BandTriptych
   // reads ?band= on mount and pre-selects, so the user lands on the
@@ -89,9 +92,13 @@ function BandCard({ band }: { band: AuditBand }) {
 
   return (
     <article
+      data-reveal
       data-hover-lift
       className="border border-[color:var(--color-line)] bg-[color:var(--color-paper)] p-6 flex flex-col"
-      style={{ minHeight: 360 }}
+      style={{
+        minHeight: 360,
+        ['--reveal-delay' as string]: `${revealDelay}ms`,
+      }}
       aria-labelledby={`concierge-${band.slug}-name`}
     >
       <h3

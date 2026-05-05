@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { Bracket, SiteFooter } from '@flintmere/ui';
@@ -109,6 +110,56 @@ export default function Pricing() {
           2026-05-03). Real-priced surface; leads the page so the eye
           lands on £197 / £397 / £597+ before any calibrating slot. */}
       <ConciergeBands />
+
+      {/* Editorial divider — punctuates the transition from concierge
+          ladder to Plus anchor with a tactile still-life moment.
+          Generated via Runware Flux Dev per
+          memory/project_runware_image_workflow.md (per-surface operator
+          override 2026-05-05). Subject: printed food-label sheet, brass
+          loupe, dried thyme, barcode strip on warm cream linen — the
+          food-vertical canon. */}
+      <section
+        aria-label="Food audit in practice"
+        className="bg-[color:var(--color-paper)] border-b border-[color:var(--color-line)]"
+      >
+        <div
+          className="mx-auto max-w-[1280px]"
+          style={{
+            paddingLeft: 'clamp(24px, 4vw, 64px)',
+            paddingRight: 'clamp(24px, 4vw, 64px)',
+            paddingTop: 'clamp(48px, 6vw, 96px)',
+            paddingBottom: 'clamp(48px, 6vw, 96px)',
+          }}
+        >
+          <p className="eyebrow mb-6">
+            <span aria-hidden="true">// </span>The audit, in practice
+          </p>
+          <figure
+            className="relative w-full"
+            style={{ aspectRatio: '4 / 3', maxHeight: 'clamp(360px, 56vh, 640px)' }}
+          >
+            <Image
+              src="/marketing/pricing/ladder-still-life.webp"
+              alt="A still-life of a printed UK food label sheet on warm cream linen, with a brass magnifying loupe, a small ceramic bowl of dried thyme, and a folded barcode strip — the surface a Flintmere audit reviews."
+              fill
+              unoptimized
+              sizes="(min-width: 1280px) 1216px, 92vw"
+              className="object-cover"
+              style={{ filter: 'var(--image-treatment-warm)' }}
+            />
+          </figure>
+          <figcaption
+            className="text-[color:var(--color-mute)] font-mono uppercase mt-4"
+            style={{
+              fontSize: 'clamp(10px, 0.85vw, 11px)',
+              letterSpacing: '0.18em',
+              fontWeight: 500,
+            }}
+          >
+            Catalog readiness · Label, identifier, taxonomy
+          </figcaption>
+        </div>
+      </section>
 
       {/* Plus tier anchor — secondary heroic surface. Real-priced
           (£1,200/mo floor per ADR 0017). */}

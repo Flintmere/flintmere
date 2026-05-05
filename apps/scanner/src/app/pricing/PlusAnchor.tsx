@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Bracket } from '@flintmere/ui';
+import { CountUp } from '@/app/research/components/CountUp';
 
 /**
  * Plus tier anchor — secondary heroic surface on /pricing per the
@@ -96,7 +97,9 @@ export function PlusAnchor() {
               whiteSpace: 'nowrap',
             }}
           >
-            <Bracket>From £1,200</Bracket>
+            <Bracket>
+              From £<CountUp target={1200} trigger="viewport" />
+            </Bracket>
           </div>
           <p
             className="eyebrow"
