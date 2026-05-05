@@ -432,8 +432,19 @@ export function suppressionSignalLine(args: {
 // monthly turn source).
 export const REVENUE_LEDE_EYEBROW = 'Annual demand at risk'
 
+// Vertical-neutral phrasing. Earlier draft enumerated "barcodes, GMC
+// categories, and allergen statements" — operator caught this 2026-05-05
+// when self-testing the scanner against allbirds.com (apparel) and the
+// disclosure plastered allergen language across a non-food merchant's
+// public report. The scoring engine itself is vertical-aware (allergen
+// flags only fire on food products per packages/scoring/.../suppression-
+// estimate.ts) but the disclosure boilerplate was vertical-blind. Now
+// it lists the signal CATEGORIES (barcodes, GMC categories, product
+// attributes) rather than naming food-specific attributes; the actual
+// per-merchant findings still surface vertical-correctly via
+// suppressionSignalLine() below.
 export const REVENUE_LEDE_DISCLOSURE =
-  'Modelled from public catalog signals — missing barcodes, GMC categories, and allergen statements. Install Flintmere to verify against your Google Merchant Center account.'
+  'Modelled from public catalog signals — barcodes, Google Merchant Center categories, and product attributes. Install Flintmere to verify against your Google Merchant Center account.'
 
 /**
  * Disclosure variant when the scan was truncated and figures are projected
@@ -450,7 +461,7 @@ export function sampledRevenueDisclosure(args: {
     args.actualProductCount !== null
       ? args.actualProductCount.toLocaleString()
       : `${sampled}+`
-  return `Projected from a ${sampled}-product sample of your ${total}-product catalog. Modelled from public signals — missing barcodes, GMC categories, and allergen statements. Install Flintmere to verify against your full catalog and Google Merchant Center account.`
+  return `Projected from a ${sampled}-product sample of your ${total}-product catalog. Modelled from public catalog signals — barcodes, Google Merchant Center categories, and product attributes. Install Flintmere to verify against your full catalog and Google Merchant Center account.`
 }
 
 /**
