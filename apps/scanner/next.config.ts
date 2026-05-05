@@ -28,6 +28,19 @@ const config: NextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          // HSTS — declares HTTPS-only for a year. Coolify already 301s
+          // HTTP→HTTPS at the edge; this header tells browsers to skip
+          // the HTTP attempt entirely on subsequent visits. `preload`
+          // is omitted intentionally — operator must explicitly submit
+          // to the HSTS preload list before adding it.
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains',
+          },
+          // Cross-Origin-Opener-Policy — isolates the page's browsing
+          // context. Tightens the Spectre-class side-channel surface
+          // and unlocks performance.now() higher resolution.
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
         ],
       },
       // Static marketing assets — long-cache + immutable. The default

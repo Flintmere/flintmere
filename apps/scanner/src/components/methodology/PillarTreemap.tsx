@@ -213,9 +213,9 @@ function TreemapTile({ pillar, isFirstInRow, isActive }: TreemapTileProps) {
             aria-hidden="true"
             className="font-mono text-[color:var(--color-accent-ink)]"
             style={{
-              fontSize: 'clamp(9px, 0.7vw, 10px)',
+              fontSize: 'clamp(11px, 0.85vw, 12px)',
               letterSpacing: '0.18em',
-              padding: '2px 6px',
+              padding: '3px 7px',
               background: 'var(--color-accent)',
             }}
           >

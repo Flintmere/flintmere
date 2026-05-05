@@ -269,7 +269,12 @@
 
 .eyebrow-micro {
   font-family: var(--font-mono);
-  font-size: clamp(10px, 0.85vw, 11px);
+  /* Floor 12px — Lighthouse flags <12px on mobile as a readability
+     concern (squirrelscan audit 2026-05-05 reported 77 elements on
+     /methodology under 12px, dominated by .eyebrow-micro at 10px
+     floor). 12px keeps the mono caption legible without changing the
+     visual weight perceptibly at desktop sizes. */
+  font-size: clamp(12px, 0.85vw, 13px);
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
