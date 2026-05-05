@@ -12,7 +12,7 @@ export const dynamic = 'force-static';
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Pricing — Food single, agency, bundle, and one-off audit',
+  title: 'Pricing — Single, agency, bundle, audit',
   description:
     'Flintmere pricing — the vertical standard licensed × distribution mode. Forward pricing finalising May–June 2026. Existing customers grandfathered.',
   alternates: { canonical: '/pricing' },

@@ -11,9 +11,9 @@ import { BENCHMARK_FLOOR, BENCHMARK_PUBLISH_FLOOR } from '@/lib/copy';
 import { MistakeRow, type Mistake } from '@/components/sections/MistakeRow';
 
 export const metadata: Metadata = {
-  title: 'Flintmere for beauty brands — shades, INCI, claims, agent-ready',
+  title: 'Flintmere for beauty — shades, INCI, claims',
   description:
-    'The beauty-catalog mistakes that make AI shopping agents skip your store — shade names only a human could parse, INCI buried in images, claims taxonomy missing. Flintmere detects each one.',
+    'Beauty-catalog mistakes that make AI shopping agents skip your store — shade names only a human can parse, INCI buried in images, claims taxonomy missing.',
   alternates: { canonical: '/for/beauty' },
 };
 

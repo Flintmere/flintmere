@@ -62,9 +62,9 @@ export const dynamic = 'force-static';
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Methodology — How Flintmere scores Shopify catalogs for AI shopping agents',
+  title: 'Methodology — How we score AI-readiness',
   description:
-    'How Flintmere computes the seven-pillar catalog readiness score for UK food merchants pushing to Google Merchant Center, Amazon Fresh, Ocado, Deliveroo, and AI shopping agents — sources, cadence, public change log, conflicts of interest, and what we do not measure.',
+    'How Flintmere computes the seven-pillar catalog-readiness score — sources, cadence, public change log, conflicts of interest, and what we do not measure.',
   alternates: { canonical: 'https://flintmere.com/methodology' },
 };
 

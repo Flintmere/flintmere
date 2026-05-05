@@ -11,9 +11,9 @@ import { BENCHMARK_FLOOR, BENCHMARK_PUBLISH_FLOOR } from '@/lib/copy';
 import { MistakeRow, type Mistake } from '@/components/sections/MistakeRow';
 
 export const metadata: Metadata = {
-  title: 'Flintmere for food & drink — allergens, nutrition, provenance, agent-ready',
+  title: 'Flintmere for food & drink — allergens, nutrition',
   description:
-    'The food-and-drink catalog mistakes that make AI shopping agents skip your store — allergens in prose, nutrition panels as images, provenance claims without structured data. Flintmere detects each one.',
+    'Food-and-drink catalog mistakes that make AI shopping agents skip your store — allergens in prose, nutrition as images, provenance claims unstructured.',
   alternates: { canonical: '/for/food-and-drink' },
 };
 

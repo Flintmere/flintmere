@@ -112,6 +112,8 @@ export function VerticalRadiogroup({
   className,
 }: VerticalRadiogroupProps) {
   const refs = React.useRef<(HTMLButtonElement | null)[]>([]);
+  // Stable id prefix for aria-labelledby wiring on the visible spans.
+  const labelIdBase = React.useId();
 
   // The currently selected index drives where focus lands when the user
   // tabs into the group; falls back to 0 when the controlled `selected`
@@ -198,6 +200,15 @@ export function VerticalRadiogroup({
           .filter(Boolean)
           .join(' ');
 
+        // role="radio" is "name from author" per WAI-ARIA spec — content
+        // does not contribute to the accessible name. We wire
+        // aria-labelledby to the three visible spans so the accessible
+        // name IS the visible text by reference (no string drift, no
+        // axe `label-content-name-mismatch`, and `aria-input-field-name`
+        // gets the explicit name it requires).
+        const eyebrowId = `${labelIdBase}-${v.id}-eyebrow`;
+        const labelId = `${labelIdBase}-${v.id}-label`;
+        const sublineId = `${labelIdBase}-${v.id}-subline`;
         return (
           <button
             key={v.id}
@@ -207,26 +218,29 @@ export function VerticalRadiogroup({
             type="button"
             role="radio"
             aria-checked={isSelected}
-            // Accessible name = visible content (eyebrow + label + subline).
-            // Earlier we set aria-label={v.label} which truncated the SR
-            // experience and tripped axe's label-content-name-mismatch
-            // (visible text "FOOD + DRINK Food + drink. Spearhead..." vs
-            // accessible name "Food + drink."). Voice-control users now
-            // pronounce any visible word and reach the control; SR users
-            // hear the same context sighted users see.
+            aria-labelledby={`${eyebrowId} ${labelId} ${sublineId}`}
             tabIndex={i === selectedIndex ? 0 : -1}
             onClick={() => onChange(v.id)}
             onKeyDown={(event) => handleKeyDown(event, i)}
             className={cardClass}
             data-hover-lift
           >
-            <span className={cardEyebrowClassName({ surface, selected: isSelected })}>
+            <span
+              id={eyebrowId}
+              className={cardEyebrowClassName({ surface, selected: isSelected })}
+            >
               {v.eyebrow}
             </span>
-            <span className="mt-3 text-[28px] md:text-[32px] font-medium tracking-[-0.025em] leading-[1.05]">
+            <span
+              id={labelId}
+              className="mt-3 text-[28px] md:text-[32px] font-medium tracking-[-0.025em] leading-[1.05]"
+            >
               {v.label}
             </span>
-            <span className={cardSublineClassName({ surface, selected: isSelected })}>
+            <span
+              id={sublineId}
+              className={cardSublineClassName({ surface, selected: isSelected })}
+            >
               {v.subline}
             </span>
           </button>

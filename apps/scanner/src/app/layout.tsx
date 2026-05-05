@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     template: '%s · Flintmere',
   },
   description:
-    'Score your Shopify catalog for AI-agent readiness across seven pillars in 60 seconds. Free scan, no signup, no credit card. Find what suppresses you in Google Shopping.',
+    'Score your Shopify catalog for AI-agent readiness across seven pillars in 60 seconds. Free scan, no signup. Find what suppresses you on Google.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://flintmere.com'),
   openGraph: {
     title: 'Flintmere — Catalog readiness for AI agents',

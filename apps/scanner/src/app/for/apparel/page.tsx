@@ -11,9 +11,9 @@ import { BENCHMARK_FLOOR, BENCHMARK_PUBLISH_FLOOR } from '@/lib/copy';
 import { MistakeRow, type Mistake } from '@/components/sections/MistakeRow';
 
 export const metadata: Metadata = {
-  title: 'Flintmere for apparel brands — size, colour, material, agent-ready',
+  title: 'Flintmere for apparel — size, colour, material',
   description:
-    'The apparel-catalog mistakes that make AI shopping agents skip your store — size charts buried in images, colour names only a human can parse, composition hidden in description prose. Flintmere detects each one.',
+    'Apparel-catalog mistakes that make AI shopping agents skip your store — size charts as images, colour names only a human can parse, composition in prose.',
   alternates: { canonical: '/for/apparel' },
 };
 
