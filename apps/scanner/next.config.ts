@@ -75,11 +75,10 @@ export default withSentryConfig(config, {
   tunnelRoute: "/monitoring",
 
   webpack: {
-    // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-    // See the following for more information:
-    // https://docs.sentry.io/product/crons/
-    // https://vercel.com/docs/cron-jobs
-    automaticVercelMonitors: true,
+    // Vercel Cron Monitors instrumentation — irrelevant; we deploy on
+    // Coolify, not Vercel. Disabling drops ~5 KB of unused
+    // instrumentation code from the client bundle.
+    automaticVercelMonitors: false,
 
     // Tree-shaking options for reducing bundle size
     treeshake: {

@@ -1,7 +1,9 @@
 // Sentry client-side init. Wizard-generated; manually amended for Cookie
 // Policy compliance (clause 03 + 05 — explicit commitment to NO session
-// replay and NO advertising/tracking technology) and Privacy Policy
-// compliance (clause 04 — hashed IP only).
+// replay and NO advertising/tracking technology), Privacy Policy
+// compliance (clause 04 — hashed IP only), and bundle-weight discipline
+// (Lighthouse mobile audit 2026-05-05 surfaced Sentry as the dominant
+// chunk on the marketing surface — 124 KB, 47% of total JS payload).
 
 import * as Sentry from "@sentry/nextjs";
 
@@ -13,8 +15,16 @@ Sentry.init({
   // would penalise the marketing surface. Re-enable would require Cookie
   // Policy + Privacy Policy update + cookie-consent banner.
 
-  tracesSampleRate: 0.1,
-  enableLogs: true,
+  // Tracing disabled on the client. The BrowserTracing integration adds
+  // ~40 KB to the marketing bundle for performance telemetry we don't
+  // act on (Plausible covers Core Web Vitals; we don't have an SLA on
+  // home-page latency that needs Sentry). Server-side tracing in
+  // sentry.server.config.ts is unaffected — that's where checkout +
+  // webhook + concierge-flow visibility lives. Re-enable here only if
+  // a debugging session needs client-side spans for a specific bug.
+
+  // Console/log capture also disabled — same reasoning. Errors still
+  // capture via the default browser exception handlers.
 
   // PRIVACY: must stay false.
   sendDefaultPii: false,
