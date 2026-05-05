@@ -179,6 +179,7 @@ export default function MarketingHome() {
               alt="A wooden compartmented tray displaying unbranded artisan goods — small jars, brass mortar, dried herbs — in warm afternoon side-light."
               fill
               priority
+              unoptimized
               sizes="(min-width: 1024px) 58vw, 100vw"
               className="object-cover"
               style={{

@@ -30,6 +30,18 @@ const config: NextConfig = {
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         ],
       },
+      // Static marketing assets — long-cache + immutable. The default
+      // Next.js standalone server emits `cache-control: public, max-age=0`
+      // for /public files, forcing every revisit to revalidate. These
+      // assets ship with a commit hash in their path (or change identity
+      // when the bytes change), so a year-long immutable cache is safe
+      // and cuts repeat-visit image fetches to 0.
+      {
+        source: '/marketing/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
     ];
   },
 };

@@ -829,11 +829,19 @@
    opaque so the wordmark (z-index -1) only shows once content peels off-top.
    Without this default, sections that omit their own background let the
    wordmark bleed through mid-scroll (regression observed on /scan results
-   2026-05-02). :where() keeps specificity at 0 so any explicit background
-   utility class (e.g. bg-[color:var(--color-ink)] on the homepage ink
-   column) overrides without effort. */
-:where(.flintmere-main > *:not(.flintmere-footer-sticky)) {
-  background: var(--color-paper);
+   2026-05-02).
+
+   Wrapped in @layer base so Tailwind 4's utility classes (which live in
+   @layer utilities) can override. Without the layer wrap, this rule is
+   un-layered and ALWAYS beats layered Tailwind utilities regardless of
+   specificity — that's why bg-[color:var(--color-ink)] on the /pricing
+   "What we maintain" section was getting painted paper (regression caught
+   2026-05-05). :where() still pins specificity to 0 so within-layer
+   utility overrides remain effortless. */
+@layer base {
+  :where(.flintmere-main > *:not(.flintmere-footer-sticky)) {
+    background: var(--color-paper);
+  }
 }
 
 /* Chapter 3 (FounderStrip) uses mechanic #5 dual-column pin + scrollable

@@ -76,21 +76,24 @@ export function PlusAnchor() {
             </Link>
           </div>
         </div>
-        <div className="lg:justify-self-end lg:text-right">
-          {/* Solid heroic price chord — saks-scale outline-shimmer reads
-              airy at price-tag scale, undersells the £1,200 anchor.
-              Council 2026-05-03: solid Geist Mono 700 at clamp(56-128px)
-              creates the visual weight the price needs against the
-              left-column display headline. */}
+        <div
+          className="lg:justify-self-end lg:text-right"
+          style={{ containerType: 'inline-size', minWidth: 0 }}
+        >
+          {/* Solid heroic price chord — sized against container width
+              (cqw) not viewport width, so the bracket-and-price never
+              overshoots its column on narrow desktop or its viewport
+              on mobile. */}
           <div
             aria-label="From one thousand two hundred pounds per month"
             style={{
               fontFamily: 'var(--font-mono)',
               fontWeight: 700,
-              fontSize: 'clamp(56px, 8vw, 128px)',
+              fontSize: 'clamp(32px, 12cqw, 96px)',
               letterSpacing: '-0.04em',
               lineHeight: 0.95,
               color: 'var(--color-ink)',
+              whiteSpace: 'nowrap',
             }}
           >
             <Bracket>From £1,200</Bracket>
