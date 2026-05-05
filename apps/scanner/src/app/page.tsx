@@ -201,7 +201,17 @@ export default function MarketingHome() {
                 renders a bare <img>; squirrelscan's CLS rule (and Lighthouse)
                 want width/height attributes on it to reserve layout space.
                 Visual: w-full h-full + object-cover keeps full-bleed
-                behaviour identical to the prior fill mode. */}
+                behaviour identical to the prior fill mode.
+
+                fetchPriority + loading explicit. With `fill`, Next.js
+                Image auto-emits fetchpriority="high" + loading="eager"
+                on `priority` images. With explicit width/height +
+                `unoptimized`, that auto-emit doesn't fire — the
+                rendered <img> ships without LCP-priority hints. Caught
+                2026-05-05 (operator screenshot): mobile PageSpeed
+                regressed 99 → 95, LCP 2.0s → 2.6s, "fetchpriority/high
+                should be applied" surfaced as the primary diagnostic.
+                Setting both props explicitly restores the hints. */}
             <Image
               src="/marketing/hero/hero.avif"
               alt="A wooden compartmented tray displaying unbranded artisan goods — small jars, brass mortar, dried herbs — in warm afternoon side-light."
@@ -209,6 +219,8 @@ export default function MarketingHome() {
               height={768}
               priority
               unoptimized
+              fetchPriority="high"
+              loading="eager"
               sizes="(min-width: 1024px) 58vw, 100vw"
               className="object-cover w-full h-full"
               style={{
