@@ -58,6 +58,9 @@ import { methodologyStyles } from '@/components/methodology/styles';
  *     numeral IS the chapter anchor in this register.
  */
 
+export const dynamic = 'force-static';
+export const revalidate = 86400;
+
 export const metadata: Metadata = {
   title: 'Methodology — How Flintmere scores Shopify catalogs for AI shopping agents',
   description:

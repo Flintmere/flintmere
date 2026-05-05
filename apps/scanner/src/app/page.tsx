@@ -1,6 +1,14 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Bracket, SiteFooter } from '@flintmere/ui';
+
+// Mark the homepage statically renderable. The page has no dynamic data
+// — no cookies, no headers reads, no per-request DB calls. Force-static
+// + 24-hour revalidate caches the rendered HTML so every visit gets a
+// pre-built response instead of re-rendering the React tree. Critical
+// for mobile Coolify-CPU-bound TTFB.
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 import { ViewportReveal } from '@/components/ViewportReveal';
 import { HeroParallaxFigure } from '@/components/HeroParallaxFigure';
 import { MarketingStickyCta } from '@/components/MarketingStickyCta';

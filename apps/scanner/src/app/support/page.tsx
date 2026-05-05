@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import { LegalShell, Clause } from '@/components/LegalShell';
 
+export const dynamic = 'force-static';
+export const revalidate = 86400;
+
 export const metadata: Metadata = {
   title: 'Support',
   description:

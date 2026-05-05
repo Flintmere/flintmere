@@ -40,6 +40,9 @@ import { Bracket, SiteFooter } from '@flintmere/ui';
  * director, VAT status) ship now.
  */
 
+export const dynamic = 'force-static';
+export const revalidate = 86400;
+
 export const metadata: Metadata = {
   title: 'About — How Flintmere decides',
   description:

@@ -3,6 +3,9 @@ import type { Metadata } from 'next';
 import { Bracket, SiteFooter } from '@flintmere/ui';
 import { MistakeRow, type Mistake } from '@/components/sections/MistakeRow';
 
+export const dynamic = 'force-static';
+export const revalidate = 86400;
+
 export const metadata: Metadata = {
   title: 'Flintmere for Shopify Plus — seven-figure catalogs, agent-ready',
   description:

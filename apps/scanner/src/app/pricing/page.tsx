@@ -8,6 +8,9 @@ import { PricingTiersGrid } from './PricingTiersGrid';
 import { ConciergeBands } from './ConciergeBands';
 import { PlusAnchor } from './PlusAnchor';
 
+export const dynamic = 'force-static';
+export const revalidate = 86400;
+
 export const metadata: Metadata = {
   title: 'Pricing',
   description:
