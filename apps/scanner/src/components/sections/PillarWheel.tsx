@@ -477,7 +477,7 @@ export function PillarWheel({
                       fontSize: 'clamp(8px, 1.5cqi, 11px)',
                       letterSpacing: '0.18em',
                       fontWeight: 500,
-                      color: 'var(--color-mute-2)',
+                      color: 'var(--color-mute)',
                       marginTop: 'clamp(8px, 1.6cqi, 14px)',
                     }}
                   >
@@ -498,7 +498,7 @@ export function PillarWheel({
               fontSize: 'clamp(10px, 0.85vw, 12px)',
               letterSpacing: '0.18em',
               fontWeight: 500,
-              color: 'var(--color-mute-2)',
+              color: 'var(--color-mute)',
               lineHeight: 1.6,
             }}
           >
@@ -514,7 +514,7 @@ export function PillarWheel({
               fontSize: 'clamp(10px, 0.85vw, 12px)',
               letterSpacing: '0.18em',
               fontWeight: 500,
-              color: 'var(--color-mute-2)',
+              color: 'var(--color-mute)',
               lineHeight: 1.6,
               whiteSpace: 'nowrap',
             }}
@@ -544,7 +544,7 @@ export function PillarWheel({
                   fontSize: 'clamp(10px, 0.85vw, 12px)',
                   letterSpacing: '0.18em',
                   fontWeight: 500,
-                  color: 'var(--color-mute-2)',
+                  color: 'var(--color-mute)',
                 }}
               >
                 <span aria-hidden="true">// </span>pillar{' '}
@@ -595,7 +595,7 @@ export function PillarWheel({
                     fontSize: 'clamp(10px, 0.85vw, 11px)',
                     letterSpacing: '0.18em',
                     fontWeight: 500,
-                    color: 'var(--color-mute-2)',
+                    color: 'var(--color-mute)',
                   }}
                 >
                   <span aria-hidden="true">// </span>WHAT WE CHECK
@@ -619,7 +619,7 @@ export function PillarWheel({
                     fontSize: 'clamp(10px, 0.85vw, 11px)',
                     letterSpacing: '0.18em',
                     fontWeight: 500,
-                    color: 'var(--color-mute-2)',
+                    color: 'var(--color-mute)',
                   }}
                 >
                   <span
@@ -744,7 +744,7 @@ export function PillarWheel({
                     fontSize: 'clamp(11px, 1vw, 13px)',
                     letterSpacing: '0.18em',
                     fontWeight: 500,
-                    color: 'var(--color-mute-2)',
+                    color: 'var(--color-mute)',
                   }}
                 >
                   <span aria-hidden="true">// </span>pillar{' '}
@@ -817,7 +817,7 @@ export function PillarWheel({
                       fontSize: 'clamp(10px, 0.85vw, 11px)',
                       letterSpacing: '0.18em',
                       fontWeight: 500,
-                      color: 'var(--color-mute-2)',
+                      color: 'var(--color-mute)',
                     }}
                   >
                     <span aria-hidden="true">// </span>figure{' '}
@@ -839,7 +839,7 @@ export function PillarWheel({
                         fontSize: 'clamp(10px, 0.85vw, 11px)',
                         letterSpacing: '0.18em',
                         fontWeight: 500,
-                        color: 'var(--color-mute-2)',
+                        color: 'var(--color-mute)',
                       }}
                     >
                       <span aria-hidden="true">// </span>WHAT WE CHECK
@@ -861,7 +861,7 @@ export function PillarWheel({
                         fontSize: 'clamp(10px, 0.85vw, 11px)',
                         letterSpacing: '0.18em',
                         fontWeight: 500,
-                        color: 'var(--color-mute-2)',
+                        color: 'var(--color-mute)',
                       }}
                     >
                       <span
@@ -921,7 +921,7 @@ export function PillarWheel({
                         fontSize: 'clamp(10px, 0.85vw, 11px)',
                         letterSpacing: '0.18em',
                         fontWeight: 500,
-                        color: 'var(--color-mute-2)',
+                        color: 'var(--color-mute)',
                         lineHeight: 1.7,
                       }}
                     >

@@ -740,7 +740,14 @@
   position: absolute;
   top: 0;
   left: 0;
-  padding: 0.75rem 1rem;
+  /* WCAG 2.5.5 touch-target floor — Lighthouse flags links under 44×44.
+     Padding + line-height + min-height keeps the target compliant in
+     both the hidden-translated state (which Lighthouse measures
+     statically) and the focused-revealed state. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.75rem 1.25rem;
   background: var(--color-ink);
   color: var(--color-paper);
   font-family: var(--font-mono);

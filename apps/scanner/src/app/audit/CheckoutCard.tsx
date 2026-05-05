@@ -613,7 +613,7 @@ function PayStep({ returnUrl, band }: { returnUrl: string; band: AuditBand }) {
             alignItems: 'center',
             gap: 12,
             margin: '20px 0',
-            color: 'var(--color-mute-2)',
+            color: 'var(--color-mute)',
             fontFamily: 'var(--font-mono)',
             fontSize: 11,
             letterSpacing: '0.14em',

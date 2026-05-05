@@ -150,7 +150,7 @@ export function ChallengeManifesto() {
       >
         <p
           className="eyebrow"
-          style={{ color: 'var(--color-mute-2)', marginBottom: 'clamp(40px, 6vw, 80px)' }}
+          style={{ color: 'var(--color-mute)', marginBottom: 'clamp(40px, 6vw, 80px)' }}
         >
           How to challenge a score
         </p>

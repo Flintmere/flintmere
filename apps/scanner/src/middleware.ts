@@ -45,6 +45,30 @@ export function middleware(request: NextRequest): NextResponse {
   // to redirect away.
   const target = targetHostForRedirect(requestHost, request.nextUrl.pathname);
   if (target) {
+    // RSC prefetch carve-out — the App Router prefetches `<Link>` targets
+    // by issuing `fetch(href + '?_rsc=...', { headers: { RSC: '1' } })`
+    // on hover/visibility. On a cross-host link, that fetch hits THIS
+    // redirect, browser tries to follow cross-origin without CORS
+    // headers, fails preflight, console fills with errors, and Next.js
+    // falls back to full nav anyway. Return 204 No Content so the
+    // prefetch silently no-ops — the user-initiated click still gets
+    // the 301 (no RSC headers on real navigations) and lands on the
+    // correct host. Caught 2026-05-05 via Lighthouse mobile audit.
+    const isRscPrefetch =
+      request.headers.get('rsc') === '1' ||
+      request.headers.get('next-router-prefetch') === '1' ||
+      request.nextUrl.searchParams.has('_rsc');
+    if (isRscPrefetch) {
+      const noContent = new NextResponse(null, { status: 204 });
+      annotateHostDiagnostics(noContent, {
+        forwardedHost,
+        directHost,
+        urlHost,
+        detected: requestHost,
+        decision: `rsc-noop:${target}`,
+      });
+      return noContent;
+    }
     const redirectUrl = new URL(request.nextUrl.toString());
     redirectUrl.host = target;
     redirectUrl.protocol = 'https:';

@@ -145,7 +145,7 @@ export function Limits() {
                   fontSize: 'clamp(10px, 0.9vw, 12px)',
                   letterSpacing: '0.18em',
                   fontWeight: 500,
-                  color: 'var(--color-mute-2)',
+                  color: 'var(--color-mute)',
                 }}
               >
                 {cell.caption}

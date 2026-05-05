@@ -62,7 +62,7 @@ export function MistakeRow({ mistake }: { mistake: Mistake }) {
         className="eyebrow text-right max-md:text-left"
         style={{ textWrap: 'balance' }}
       >
-        <span className="block" style={{ color: 'var(--color-mute-2)' }}>
+        <span className="block" style={{ color: 'var(--color-mute)' }}>
           Check ·
         </span>
         <span className="block">{mistake.pillar}</span>

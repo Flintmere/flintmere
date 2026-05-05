@@ -333,7 +333,7 @@ export function LiveCascade() {
                   style={{
                     fontSize: 'clamp(11px, 1vw, 13px)',
                     letterSpacing: '0.18em',
-                    color: 'var(--color-mute-2)',
+                    color: 'var(--color-mute)',
                     fontWeight: 500,
                     marginBottom: 12,
                   }}
@@ -435,7 +435,7 @@ export function LiveCascade() {
                   fontSize: 'clamp(11px, 0.95vw, 13px)',
                   letterSpacing: '0.04em',
                   lineHeight: 1.7,
-                  color: 'var(--color-mute-2)',
+                  color: 'var(--color-mute)',
                 }}
                 aria-hidden="true"
               >

@@ -136,8 +136,15 @@ export function MarketingStickyCta({
       <Link
         href="/"
         aria-label="Flintmere home"
-        className="font-medium tracking-tight text-[color:var(--color-ink)] truncate"
-        style={{ fontSize: 'clamp(14px, 1.1vw, 16px)' }}
+        className="font-medium tracking-tight text-[color:var(--color-ink)] truncate inline-flex items-center"
+        style={{
+          fontSize: 'clamp(14px, 1.1vw, 16px)',
+          minHeight: 44,
+          minWidth: 44,
+          marginLeft: -8,
+          paddingLeft: 8,
+          paddingRight: 8,
+        }}
         tabIndex={revealed ? 0 : -1}
       >
         Flintmere

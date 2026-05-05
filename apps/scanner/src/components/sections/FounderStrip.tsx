@@ -136,7 +136,6 @@ export function FounderStrip() {
 
           <p
             className="font-sans"
-            aria-label="No outsourced support queue. No pitch. No sales call."
             style={{
               marginTop: 'clamp(32px, 4vw, 56px)',
               fontSize: 'clamp(28px, 3.5vw, 52px)',
@@ -146,25 +145,13 @@ export function FounderStrip() {
               color: 'var(--color-paper-on-ink)',
             }}
           >
-            <span
-              aria-hidden="true"
-              className="block"
-              style={{ whiteSpace: 'nowrap' }}
-            >
+            <span className="block" style={{ whiteSpace: 'nowrap' }}>
               No outsourced support queue.
             </span>
-            <span
-              aria-hidden="true"
-              className="block"
-              style={{ whiteSpace: 'nowrap' }}
-            >
+            <span className="block" style={{ whiteSpace: 'nowrap' }}>
               No pitch.
             </span>
-            <span
-              aria-hidden="true"
-              className="block"
-              style={{ whiteSpace: 'nowrap' }}
-            >
+            <span className="block" style={{ whiteSpace: 'nowrap' }}>
               No sales call.
             </span>
           </p>
