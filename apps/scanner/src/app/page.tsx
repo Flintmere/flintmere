@@ -5,9 +5,18 @@ import { ViewportReveal } from '@/components/ViewportReveal';
 import { HeroParallaxFigure } from '@/components/HeroParallaxFigure';
 import { MarketingStickyCta } from '@/components/MarketingStickyCta';
 import { type PillarSpec } from '@/components/sections/PillarWheel';
-import { PillarWheelScrollPin } from '@/components/sections/PillarWheelScrollPin';
-import { FounderStrip } from '@/components/sections/FounderStrip';
-import { ManifestoChord } from '@/components/sections/ManifestoChord';
+
+// Below-fold heavy client sections — lazy-mounted via next/dynamic to
+// keep the homepage initial JS bundle small. Mobile PageSpeed
+// (2026-05-05) showed TBT 1,570ms largely from PillarWheel +
+// ManifestoChord parse/execute cost; this defers their JS until after
+// first paint. SSR is disabled (Next.js 15 forbids ssr:false in Server
+// Components, so the dynamic call lives inside a 'use client' wrapper).
+// SEO is preserved because Googlebot executes JS. Each wrapper renders
+// a height placeholder to prevent CLS while the chunk loads.
+import { PillarWheelScrollPin } from '@/components/sections/LazyPillarWheelScrollPin';
+import { FounderStrip } from '@/components/sections/LazyFounderStrip';
+import { ManifestoChord } from '@/components/sections/LazyManifestoChord';
 
 /**
  * Marketing home — Batch B expand-to-five arc 2026-04-29.
