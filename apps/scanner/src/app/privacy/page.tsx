@@ -5,7 +5,7 @@ export const dynamic = 'force-static';
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — How Flintmere handles merchant and visitor data',
+  title: 'Privacy — data, retention, deletion',
   description:
     'How Flintmere collects, uses, stores, and protects personal data. UK GDPR and UK DPA 2018 compliant — UK/EU hosting, 60-second token deletion on uninstall, in-browser encryption for one-time secrets.',
   alternates: { canonical: '/privacy' },

@@ -5,7 +5,7 @@ export const dynamic = 'force-static';
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Cookies — Tracking, analytics, and storage on Flintmere',
+  title: 'Cookies — tracking, analytics, storage',
   description:
     'Cookies and similar technologies used by Flintmere. One functional cookie on the scanner; no tracking, analytics, or advertising cookies on the marketing site.',
   alternates: { canonical: '/cookies' },

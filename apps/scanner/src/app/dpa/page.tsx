@@ -5,7 +5,7 @@ export const dynamic = 'force-static';
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Data Processing Agreement — UK GDPR processor terms',
+  title: 'Data Processing Agreement — UK GDPR terms',
   description:
     'Flintmere Data Processing Agreement for Shopify merchants and agency customers. Incorporates UK SCCs and International Data Transfer Addendum.',
   alternates: { canonical: '/dpa' },
