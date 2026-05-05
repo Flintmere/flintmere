@@ -19,6 +19,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { Bracket } from '@flintmere/ui';
+import { SCAN_URL } from '@/lib/host-routing';
 
 /**
  * PillarWheel — Chapter 2 v8 (Apple-grade redesign, 2026-04-29).
@@ -955,7 +956,7 @@ export function PillarWheel({
                     See where you score on this pillar.
                   </p>
                   <Link
-                    href="/scan"
+                    href={SCAN_URL}
                     onClick={() => setModalOpen(false)}
                     className="inline-flex items-center gap-3 px-7 py-4 bg-[color:var(--color-accent)] text-[color:var(--color-accent-ink)] font-mono uppercase hover:bg-[color:var(--color-ink)] hover:text-[color:var(--color-paper)] transition-colors duration-[var(--duration-instant)]"
                     style={{

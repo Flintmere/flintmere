@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Bracket } from '@flintmere/ui';
+import { BOT_URL, SCAN_URL } from '@/lib/host-routing';
 import {
   STAGGER,
   belowCeilingPct,
@@ -127,10 +128,10 @@ export function Cover({ data }: { data: Published }) {
             ['--reveal-delay' as string]: `${lastWordDelay + 200}ms`,
           }}
         >
-          <Link href="/scan" className="btn btn-accent">
+          <Link href={SCAN_URL} className="btn btn-accent">
             Add my store to the next edition →
           </Link>
-          <Link href="/bot" className="btn">
+          <Link href={BOT_URL} className="btn">
             How FlintmereBot works
           </Link>
         </div>

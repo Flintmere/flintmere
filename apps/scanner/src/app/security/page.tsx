@@ -5,9 +5,9 @@ export const dynamic = 'force-static';
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Security',
+  title: 'Security — How we protect Shopify tokens and catalog data',
   description:
-    'How Flintmere secures Shopify tokens, catalog data, and customer information. Encryption, HMAC, TLS, incident response.',
+    'How Flintmere secures Shopify tokens, catalog data, and customer information — encryption at rest, HMAC-verified webhooks, TLS 1.2+, written incident-response runbook, automated dependency scanning.',
   alternates: { canonical: '/security' },
 };
 

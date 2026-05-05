@@ -85,12 +85,18 @@ export function PillarTreemap({ pillars }: PillarTreemapProps) {
   const total = topWeight + bottomWeight;
 
   return (
-    <div
-      role="img"
-      aria-label="Treemap of the seven pillars sized in proportion to their weight in the composite score. The active tile reflects which pillar spread is currently in view."
-    >
-      <div
-        aria-hidden="true"
+    <div>
+      {/* The treemap is a navigation surface — each tile is an in-page
+          anchor to its pillar spread below. Earlier we wrapped it as
+          role="img" + aria-hidden on the inner frame to treat the whole
+          treemap as one labelled image, but that hides interactive
+          anchors from the a11y tree (axe rule a11y/aria-hidden-focus).
+          Now: a real <nav> with a clear label; tiles are real anchors
+          discoverable by keyboard + screen reader. The sr-only table
+          below carries the weight summary for SR users who want the
+          numeric breakdown instead of the visual ratios. */}
+      <nav
+        aria-label="Pillar treemap — links to detailed spreads below, sized in proportion to weight"
         className="methodology-treemap-frame border border-[color:var(--color-line)] overflow-hidden flex flex-col"
         style={{
           // Wide ribbon, not a chapter-takeover. When pinned at the top of
@@ -113,7 +119,7 @@ export function PillarTreemap({ pillars }: PillarTreemapProps) {
           activeId={activeId}
           isTop={false}
         />
-      </div>
+      </nav>
 
       <table className="sr-only">
         <caption>The seven pillars and their weights.</caption>
@@ -177,6 +183,7 @@ function TreemapTile({ pillar, isFirstInRow, isActive }: TreemapTileProps) {
     <a
       href={`#pillar-${pillar.id}`}
       data-active={isActive ? 'true' : 'false'}
+      aria-current={isActive ? 'location' : undefined}
       className="group relative flex flex-col justify-between overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent)]"
       style={{
         flex: `${pillar.weight} 1 0`,

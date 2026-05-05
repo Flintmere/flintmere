@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Bracket, SiteFooter } from '@flintmere/ui';
+import { AUDIT_URL, SCAN_URL } from '@/lib/host-routing';
 import { prisma } from '@/lib/db';
 import {
   summariseBenchmark,
@@ -172,10 +173,10 @@ export default async function FlintmereForApparel() {
           real Shopify catalog, each one scored on every Flintmere scan.
         </p>
         <div className="mt-10 flex flex-wrap gap-3">
-          <Link href="/scan" className="btn btn-accent">
+          <Link href={SCAN_URL} className="btn btn-accent">
             Scan my apparel store →
           </Link>
-          <Link href="/audit#checkout" className="btn">
+          <Link href={`${AUDIT_URL}#checkout`} className="btn">
             Book a concierge audit (from £197)
           </Link>
         </div>
@@ -235,7 +236,7 @@ export default async function FlintmereForApparel() {
                 ? `Early sample — at ${bench.n.toLocaleString()} apparel store${bench.n === 1 ? '' : 's'}, this is the score so far, not “the median apparel catalog.” The median framing publishes at ${BENCHMARK_PUBLISH_FLOOR}. Scan your store and you shift the number.`
                 : 'Apparel scores appear here as soon as the first stores land in the dataset. Run yours to seed it.'}
           </p>
-          <Link href="/scan" className="btn btn-accent whitespace-nowrap self-end pb-4">
+          <Link href={SCAN_URL} className="btn btn-accent whitespace-nowrap self-end pb-4">
             {bench.available && !bench.preview
               ? 'See my score →'
               : bench.available
@@ -296,7 +297,7 @@ export default async function FlintmereForApparel() {
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
-              href="/audit#checkout"
+              href={`${AUDIT_URL}#checkout`}
               className="btn"
               style={{
                 background: 'var(--color-accent)',
@@ -307,7 +308,7 @@ export default async function FlintmereForApparel() {
               Book the audit →
             </Link>
             <Link
-              href="/scan"
+              href={SCAN_URL}
               className="btn"
               style={{
                 color: 'var(--color-paper)',

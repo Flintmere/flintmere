@@ -207,7 +207,13 @@ export function VerticalRadiogroup({
             type="button"
             role="radio"
             aria-checked={isSelected}
-            aria-label={v.label}
+            // Accessible name = visible content (eyebrow + label + subline).
+            // Earlier we set aria-label={v.label} which truncated the SR
+            // experience and tripped axe's label-content-name-mismatch
+            // (visible text "FOOD + DRINK Food + drink. Spearhead..." vs
+            // accessible name "Food + drink."). Voice-control users now
+            // pronounce any visible word and reach the control; SR users
+            // hear the same context sighted users see.
             tabIndex={i === selectedIndex ? 0 : -1}
             onClick={() => onChange(v.id)}
             onKeyDown={(event) => handleKeyDown(event, i)}

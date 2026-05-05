@@ -12,7 +12,7 @@ export const dynamic = 'force-static';
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Pricing',
+  title: 'Pricing — Food single, agency, bundle, and one-off audit',
   description:
     'Flintmere pricing — the vertical standard licensed × distribution mode. Forward pricing finalising May–June 2026. Existing customers grandfathered.',
   alternates: { canonical: '/pricing' },
@@ -145,6 +145,7 @@ export default function Pricing() {
               width={1024}
               height={768}
               unoptimized
+              priority
               sizes="(min-width: 1280px) 1216px, 92vw"
               className="w-full h-auto"
               style={{

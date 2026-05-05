@@ -257,14 +257,16 @@ export function ContactForm({
         />
       </Field>
 
-      {/* Honeypot — visually hidden, kept out of the tab order. Bots fill
-          it; humans don't see it. */}
-      <div aria-hidden="true" style={honeypotWrapStyle}>
+      {/* Honeypot — visually offscreen + inert (no a11y, no focus, no
+          click). Bots that scrape forms still see the input in the DOM
+          and fill it; humans never see or tab into it. `inert` replaces
+          the prior aria-hidden + tabIndex={-1} pair which tripped axe
+          rule a11y/aria-hidden-focus. */}
+      <div inert style={honeypotWrapStyle}>
         <label>
           Website
           <input
             type="text"
-            tabIndex={-1}
             autoComplete="off"
             value={website}
             onChange={(e) => setWebsite(e.target.value)}

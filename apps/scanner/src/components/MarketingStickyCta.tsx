@@ -31,9 +31,13 @@ import { useEffect, useState } from 'react';
  * cascades onto the bar. The bar still appears at threshold; only the
  * fade animation is suppressed.
  *
- * Accessibility. `aria-hidden` flips while collapsed so screen readers
- * don't announce a duplicate CTA before scroll. Tab order picks it up
- * only once revealed.
+ * Accessibility. `inert` flips while collapsed — removes the bar from
+ * the a11y tree (no SR announcement) and from the tab order (keyboard
+ * users don't catch invisible anchors). Replaces an earlier
+ * aria-hidden + tabIndex={-1} pair which tripped axe rule
+ * a11y/aria-hidden-focus (focusable elements inside aria-hidden=true).
+ * `inert` is React 19 first-class + universally supported in evergreen
+ * browsers; no fallback needed.
  */
 
 interface MarketingStickyCtaProps {
@@ -109,7 +113,7 @@ export function MarketingStickyCta({
   return (
     <nav
       aria-label="Persistent primary action"
-      aria-hidden={!revealed}
+      inert={!revealed}
       style={{
         position: 'fixed',
         top: 0,
@@ -145,7 +149,6 @@ export function MarketingStickyCta({
           paddingLeft: 8,
           paddingRight: 8,
         }}
-        tabIndex={revealed ? 0 : -1}
       >
         Flintmere
         <span className="font-mono font-bold" aria-hidden="true">
@@ -155,7 +158,6 @@ export function MarketingStickyCta({
 
       <Link
         href={href}
-        tabIndex={revealed ? 0 : -1}
         className="inline-flex items-center gap-2 bg-[color:var(--color-accent)] text-[color:var(--color-accent-ink)] font-mono font-medium uppercase hover:bg-[color:var(--color-paper-on-ink)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)] ease-[cubic-bezier(0.4,0,0.2,1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)] whitespace-nowrap"
         style={{
           fontSize: 'clamp(11px, 1vw, 12px)',

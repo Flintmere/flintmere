@@ -1,5 +1,13 @@
 import Link from 'next/link';
 
+// Cross-host link absolutes — `flintmere.com` (marketing) → `audit.flintmere.com`
+// (scanner) routes would otherwise emit a 301 hop. Inlined here rather
+// than imported from `@/lib/host-routing` to keep packages/ui consumer-
+// agnostic; if Flintmere ever splits hosts further, update both.
+const SCANNER_HOST_URL = 'https://audit.flintmere.com';
+const SCAN_URL = `${SCANNER_HOST_URL}/scan`;
+const AUDIT_URL = `${SCANNER_HOST_URL}/audit`;
+
 /**
  * SiteFooter — closing-chord footer (Batch B, 2026-04-29).
  *
@@ -56,7 +64,7 @@ export function SiteFooter() {
           }}
         >
           <Link
-            href="/scan"
+            href={SCAN_URL}
             className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >
             Free scan
@@ -70,7 +78,7 @@ export function SiteFooter() {
           </Link>
           <span aria-hidden="true" className="hidden sm:inline">,</span>
           <Link
-            href="/audit"
+            href={AUDIT_URL}
             className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >
             £197 audit

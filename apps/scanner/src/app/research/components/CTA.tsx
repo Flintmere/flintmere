@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AUDIT_URL, SCAN_URL } from '@/lib/host-routing';
 
 /**
  * Chapter 8 — Closing CTA on ink. Visual antecedent to the footer
@@ -90,14 +91,14 @@ export function CTA() {
           style={{ ['--reveal-delay' as string]: '900ms' }}
         >
           <Link
-            href="/scan"
+            href={SCAN_URL}
             className="inline-flex items-center gap-3 px-7 py-3.5 bg-[color:var(--color-accent)] text-[color:var(--color-accent-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)]"
           >
             Run the free scan
             <span aria-hidden="true">→</span>
           </Link>
           <Link
-            href="/audit#checkout"
+            href={`${AUDIT_URL}#checkout`}
             className="inline-flex items-center gap-3 px-7 py-3.5 border border-[color:var(--color-paper)] text-[color:var(--color-paper)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)]"
           >
             Or book the concierge audit (from £197)

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AUDIT_URL, SCAN_URL } from '@/lib/host-routing';
 import { DashLi } from './page-helpers';
 
 /**
@@ -262,12 +263,12 @@ export function BottomCta() {
           style={{ marginTop: 'clamp(28px, 3vw, 40px)' }}
         >
           <Link
-            href="/audit#checkout"
+            href={`${AUDIT_URL}#checkout`}
             className="btn btn-accent whitespace-nowrap"
           >
             Book the concierge audit &mdash; from &pound;197 &rarr;
           </Link>
-          <Link href="/scan" className="btn whitespace-nowrap">
+          <Link href={SCAN_URL} className="btn whitespace-nowrap">
             Run a free scan first &rarr;
           </Link>
         </div>

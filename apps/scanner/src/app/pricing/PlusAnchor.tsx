@@ -78,19 +78,36 @@ export function PlusAnchor() {
           </div>
         </div>
         <div
-          className="lg:justify-self-end lg:text-right"
+          className="lg:text-right w-full overflow-hidden"
           style={{ containerType: 'inline-size', minWidth: 0 }}
         >
           {/* Solid heroic price chord — sized against container width
-              (cqw) not viewport width, so the bracket-and-price never
-              overshoots its column on narrow desktop or its viewport
-              on mobile. */}
+              (cqw) not viewport width.
+
+              Earlier composition used `lg:justify-self-end` on this
+              column, which sized the grid item to its CONTENT (not the
+              declared 1.2fr track). Combined with `containerType:
+              inline-size` + the chord's `whiteSpace: nowrap`, the
+              container's inline-size resolved to the content width, the
+              cqw font-size resolved against that, the font-size grew
+              unbounded, and the chord overflowed past the viewport on
+              desktop. Caught 2026-05-05 (operator screenshot) — second
+              attempt at the same fix; first attempt (commit c29a1d1)
+              didn't drop the `justify-self-end` and so the cycle
+              survived.
+
+              Fix: drop `justify-self-end` so the column takes its
+              declared `1.2fr` track width. `lg:text-right` keeps the
+              chord aligned to the right edge of that track.
+              `overflow: hidden` is the belt-and-braces guard against
+              any future cqw drift — the column will clip rather than
+              push the layout. */}
           <div
             aria-label="From one thousand two hundred pounds per month"
             style={{
               fontFamily: 'var(--font-mono)',
               fontWeight: 700,
-              fontSize: 'clamp(32px, 12cqw, 96px)',
+              fontSize: 'clamp(32px, 11cqw, 88px)',
               letterSpacing: '-0.04em',
               lineHeight: 0.95,
               color: 'var(--color-ink)',

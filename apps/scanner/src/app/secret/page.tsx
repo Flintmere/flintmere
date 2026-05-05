@@ -3,7 +3,7 @@ import { Bracket, SiteFooter } from '@flintmere/ui';
 import { SecretForm } from './SecretForm';
 
 export const metadata: Metadata = {
-  title: 'One-time secret',
+  title: 'One-time secret — Send credentials safely, view-once link',
   description:
     'Share a sensitive value through a single-use URL. Encrypted in your browser before it leaves your device — we never see the key. Burns on first read or 24 hours, whichever comes first.',
   alternates: { canonical: '/secret' },

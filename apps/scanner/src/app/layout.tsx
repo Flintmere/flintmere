@@ -11,12 +11,12 @@ export const metadata: Metadata = {
     template: '%s · Flintmere',
   },
   description:
-    'Score your Shopify catalog for AI-agent readiness. Free scan, 60 seconds, no signup to start.',
+    'Score your Shopify catalog for AI-agent readiness across seven pillars in 60 seconds. Free scan, no signup, no credit card. Find what suppresses you in Google Shopping.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://flintmere.com'),
   openGraph: {
     title: 'Flintmere — Catalog readiness for AI agents',
     description:
-      'Score your Shopify catalog for AI-agent readiness. Free scan, 60 seconds.',
+      'Score your Shopify catalog for AI-agent readiness across seven pillars in 60 seconds. Free scan, no signup, no credit card.',
     url: '/',
     siteName: 'Flintmere',
     locale: 'en_GB',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Flintmere — Catalog readiness for AI agents',
     description:
-      'Score your Shopify catalog for AI-agent readiness. Free scan, 60 seconds.',
+      'Score your Shopify catalog for AI-agent readiness across seven pillars in 60 seconds. Free scan, no signup, no credit card.',
   },
   robots: {
     index: true,

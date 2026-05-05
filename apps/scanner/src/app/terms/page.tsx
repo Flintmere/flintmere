@@ -5,9 +5,9 @@ export const dynamic = 'force-static';
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Terms of Service',
+  title: 'Terms of Service — Your agreement with Flintmere',
   description:
-    'The agreement between you and Flintmere (Eazy Access Ltd) for the scanner, Shopify app, and concierge audits.',
+    'The agreement between you and Flintmere (Eazy Access Ltd) for the scanner, Shopify app, and concierge audits — 30-day refund window, English law, liability capped at 12 months of fees.',
   alternates: { canonical: '/terms' },
 };
 

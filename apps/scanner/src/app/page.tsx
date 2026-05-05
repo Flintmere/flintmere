@@ -17,6 +17,7 @@ import { ViewportReveal } from '@/components/ViewportReveal';
 import { HeroParallaxFigure } from '@/components/HeroParallaxFigure';
 import { MarketingStickyCta } from '@/components/MarketingStickyCta';
 import { type PillarSpec } from '@/components/sections/PillarWheel';
+import { SCAN_URL } from '@/lib/host-routing';
 
 // Below-fold heavy client sections — lazy-mounted via next/dynamic to
 // keep the homepage initial JS bundle small. Mobile PageSpeed
@@ -155,7 +156,7 @@ export default function MarketingHome() {
   return (
     <main id="main" className="flintmere-main flintmere-main--curtain">
       <a href="#hero" className="skip-link">Skip to content</a>
-      <MarketingStickyCta href="/scan" label="Run a free scan" glyph="→" />
+      <MarketingStickyCta href={SCAN_URL} label="Run a free scan" glyph="→" />
       <ViewportReveal>
       {/* Chapter 1 — Hero (Modern House split + Pentagram Saks logotype scale +
           A24 single-film credit). Second dispatch under design-extravagant
@@ -195,14 +196,21 @@ export default function MarketingHome() {
           className="relative overflow-hidden bg-[color:var(--color-ink)] max-lg:min-h-[56vh]"
         >
           <HeroParallaxFigure className="absolute inset-0 w-full h-full">
+            {/* Explicit intrinsic width/height (1344×768 — the source AVIF
+                dimensions) instead of `fill`. With `unoptimized` Next.js
+                renders a bare <img>; squirrelscan's CLS rule (and Lighthouse)
+                want width/height attributes on it to reserve layout space.
+                Visual: w-full h-full + object-cover keeps full-bleed
+                behaviour identical to the prior fill mode. */}
             <Image
               src="/marketing/hero/hero.avif"
               alt="A wooden compartmented tray displaying unbranded artisan goods — small jars, brass mortar, dried herbs — in warm afternoon side-light."
-              fill
+              width={1344}
+              height={768}
               priority
               unoptimized
               sizes="(min-width: 1024px) 58vw, 100vw"
-              className="object-cover"
+              className="object-cover w-full h-full"
               style={{
                 objectPosition: 'center',
                 filter: 'var(--image-treatment-warm)',
@@ -283,7 +291,7 @@ export default function MarketingHome() {
               — visual unchanged from prior hero. */}
           <div style={{ marginTop: 'clamp(40px, 5vw, 64px)' }}>
             <Link
-              href="/scan"
+              href={SCAN_URL}
               className="inline-flex items-center gap-3 px-7 py-3.5 bg-[color:var(--color-accent)] text-[color:var(--color-accent-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper-on-ink)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)] ease-[cubic-bezier(0.4,0,0.2,1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
             >
               Run the scan

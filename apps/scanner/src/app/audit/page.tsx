@@ -180,9 +180,10 @@ export default function Audit() {
                 <Image
                   src="/marketing/audit/deliverables.webp"
                   alt="A still-life: a single blank cream paper sheet (the audit letter) layered over a faintly grid-ruled cream paper (the per-product fix CSV), a black-barrelled fountain pen resting at the bottom-right, and a closed brown leather-bound pocket notebook (the 30-day plan) at the top-right, on a warm cream backdrop in soft afternoon daylight from the upper-left."
-                  fill
+                  width={1344}
+                  height={576}
                   sizes="(min-width: 1280px) 1216px, 100vw"
-                  className="object-cover"
+                  className="object-cover w-full h-full"
                   style={{ filter: 'var(--image-treatment-warm)' }}
                   priority={false}
                 />

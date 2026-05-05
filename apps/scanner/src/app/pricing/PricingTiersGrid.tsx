@@ -24,6 +24,7 @@
  */
 
 import Link from 'next/link';
+import { SCAN_URL } from '@/lib/host-routing';
 import { Bracket } from '@flintmere/ui';
 import { usePricingVertical } from '@/lib/use-vertical';
 import type { PricingVerticalId } from '@/lib/vertical';
@@ -115,7 +116,7 @@ function FoodCohortInvitation() {
               auto-fixes, and the seven-pillar score.
             </p>
             <Link
-              href="/scan"
+              href={SCAN_URL}
               className="btn btn-accent mt-auto"
               style={{ marginTop: 'auto' }}
             >

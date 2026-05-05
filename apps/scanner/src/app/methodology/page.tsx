@@ -303,7 +303,8 @@ export default function Methodology() {
                 alt="Editorial still life of British speciality foods on warm cream paper — a glass jar of golden honey, a wedge of aged cheddar partially wrapped in waxed paper, a sprig of fresh thyme, and a wooden spoon, lit by soft north window light."
                 width={1024}
                 height={768}
-                loading="lazy"
+                loading="eager"
+                fetchPriority="high"
                 decoding="async"
                 style={{
                   width: '100%',

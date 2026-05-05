@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Bracket, SiteFooter } from '@flintmere/ui';
+import { AUDIT_URL, SCAN_URL } from '@/lib/host-routing';
 import { MistakeRow, type Mistake } from '@/components/sections/MistakeRow';
 
 export const dynamic = 'force-static';
@@ -107,10 +108,10 @@ export default function FlintmereForPlus() {
           catches each.
         </p>
         <div className="mt-10 flex flex-wrap gap-3">
-          <Link href="/scan" className="btn btn-accent">
+          <Link href={SCAN_URL} className="btn btn-accent">
             Scan my Plus store →
           </Link>
-          <Link href="/audit#checkout" className="btn">
+          <Link href={`${AUDIT_URL}#checkout`} className="btn">
             Book a bespoke concierge audit
           </Link>
         </div>
@@ -217,7 +218,7 @@ export default function FlintmereForPlus() {
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
-              href="/audit#checkout"
+              href={`${AUDIT_URL}#checkout`}
               className="btn"
               style={{
                 background: 'var(--color-accent)',
@@ -228,7 +229,7 @@ export default function FlintmereForPlus() {
               Request a bespoke quote →
             </Link>
             <Link
-              href="/scan"
+              href={SCAN_URL}
               className="btn"
               style={{
                 color: 'var(--color-paper)',

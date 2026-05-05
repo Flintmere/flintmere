@@ -218,6 +218,52 @@ export function targetHostForRedirect(
 }
 
 /**
+ * Absolute URL on the canonical host for `pathname`. Use this when emitting
+ * cross-host links from a page that lives on a different host than the
+ * target — e.g. a `<Link href="/scan">` from the marketing homepage would
+ * 301 through `flintmere.com/scan` → `audit.flintmere.com/scan`. Calling
+ * `crossHostHref('/scan')` from a marketing page returns the absolute URL
+ * directly so there is no redirect hop. Pass-through for routes that live
+ * on the same host (or that classify as host-agnostic / unknown — falls
+ * back to a relative path so client-side nav still works).
+ *
+ * Pass `currentHost` from the caller — if you cannot determine the
+ * current host (server components without request context), pass null and
+ * the helper will always emit absolute URLs (safe and 301-free at the
+ * cost of disabled prefetch within the same host).
+ */
+export function crossHostHref(
+  pathname: string,
+  currentHost: string | null = null,
+): string {
+  const klass = classifyRoute(pathname);
+  if (klass === 'both' || klass === 'unknown') return pathname;
+  const targetHost =
+    klass === 'scanner'
+      ? SCANNER_HOST
+      : klass === 'standards'
+        ? STANDARDS_HOST
+        : MARKETING_HOST;
+  if (currentHost && currentHost.split(':')[0]?.toLowerCase() === targetHost) {
+    return pathname;
+  }
+  return `https://${targetHost}${pathname}`;
+}
+
+/**
+ * Convenience constants for the most common cross-host targets — emitted
+ * as absolute URLs always. Use these in shared components (header, footer,
+ * sticky CTA) where the component is rendered on multiple hosts and you
+ * cannot detect the current host at module load time. The cost is a
+ * disabled prefetch when the component happens to render on the target
+ * host (e.g. SCAN_URL from a page on audit.flintmere.com), but the saved
+ * 301 hop on the much more common cross-host case is the bigger win.
+ */
+export const SCAN_URL = `https://${SCANNER_HOST}/scan`;
+export const AUDIT_URL = `https://${SCANNER_HOST}/audit`;
+export const BOT_URL = `https://${SCANNER_HOST}/bot`;
+
+/**
  * Whether a request on `requestHost` for `pathname` should be rewritten
  * (internally re-routed without changing the URL the user sees) rather
  * than served directly. Returns the rewrite target path if so, null

@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Bracket } from '@flintmere/ui';
+import { BOT_URL } from '@/lib/host-routing';
 import { BENCHMARK_PUBLISH_FLOOR } from '@/lib/copy';
 import { type Published } from '../data';
 import { CountUp } from './CountUp';
@@ -116,12 +117,17 @@ export function BodyBottom({ data }: { data: Published }) {
                     className="relative overflow-hidden border border-[color:var(--color-line)] bg-[color:var(--color-paper-2)] mb-8"
                     style={{ aspectRatio: '4 / 3' }}
                   >
+                    {/* Explicit intrinsic width/height (1024×768 — source
+                        WebP dimensions) gives the rendered <img> width and
+                        height attributes that prevent CLS. The wrapping
+                        4:3 div + w-full h-full keeps responsive scaling. */}
                     <Image
                       src={thumb.src}
                       alt={thumb.alt}
-                      fill
+                      width={1024}
+                      height={768}
                       sizes="(min-width: 1024px) 380px, (min-width: 768px) 33vw, 100vw"
-                      className="object-cover"
+                      className="object-cover w-full h-full"
                       style={{ filter: 'var(--image-treatment-warm)' }}
                       priority={false}
                     />
@@ -489,7 +495,7 @@ export function BodyBottom({ data }: { data: Published }) {
                 className="mt-2 lg:mt-4"
                 style={{ ['--reveal-delay' as string]: '1200ms' }}
               >
-                <Link href="/bot" className="btn inline-flex">
+                <Link href={BOT_URL} className="btn inline-flex">
                   Full methodology notes →
                 </Link>
               </div>

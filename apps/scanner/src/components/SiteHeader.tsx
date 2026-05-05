@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { AUDIT_URL, SCAN_URL } from '@/lib/host-routing';
 
 /**
  * SiteHeader — Batch B navbar redo (2026-04-29) + mobile sheet (2026-05-02).
@@ -53,7 +54,13 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Audit', href: '/audit' },
+  // Audit is on the audit.flintmere.com host — emit absolute URL so the
+  // marketing-host link doesn't 301-hop through flintmere.com/audit.
+  // (audit.flintmere.com renderings of the header pay a disabled-prefetch
+  // cost in exchange — acceptable since the header sits at the top of
+  // every page and the nav-item destination is reached on click, not
+  // prefetched in 99% of cases.)
+  { label: 'Audit', href: AUDIT_URL },
   // Standards routes to the canonical subdomain — DNS provisioned 2026-05-02
   // (operator-confirmed). Methodology body still references
   // standards.flintmere.com/food/v1 as the eventual artefact home.
@@ -163,7 +170,7 @@ export function SiteHeader() {
             </nav>
 
             <Link
-              href="/scan"
+              href={SCAN_URL}
               className="inline-flex items-center gap-2 bg-[color:var(--color-accent)] text-[color:var(--color-accent-ink)] font-mono uppercase whitespace-nowrap hover:bg-[color:var(--color-ink)] hover:text-[color:var(--color-paper)] transition-colors duration-[var(--duration-instant)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
               style={{
                 fontSize: 'clamp(11px, 0.95vw, 13px)',
@@ -338,7 +345,7 @@ export function SiteHeader() {
             }}
           >
             <Link
-              href="/scan"
+              href={SCAN_URL}
               onClick={() => setOpen(false)}
               className="btn btn-accent w-full justify-center"
             >
