@@ -30,6 +30,7 @@ enum ScanStatus {
 enum ScanSource {
   user
   bot
+  rescan_30_day
 }
 
 model Scan {
