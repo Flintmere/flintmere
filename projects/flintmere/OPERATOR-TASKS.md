@@ -335,6 +335,49 @@ Miss 2+ gates → pause. Reposition before writing more code.
 - [ ] Triage support inbox via `support-triage`
 - [ ] Open-source PR triage (if we open any packages) — 5-day first-response SLA
 
+### Per concierge-audit booking — generate first audit draft
+
+The audit-assist v0 surface at `/admin/audit-draft` drafts the structured findings document for a paid concierge audit. **You always edit the draft before sending; the LLM is the assist, not the deliverable.** First five drafts route through `claim-review` before any merchant-facing copy ships — that's how we calibrate the voice + check for fabrication.
+
+**One-time setup (before the first run)**
+
+- [ ] Generate operator password: pick a memorable 12+ char passphrase. Hash it locally via:
+  ```sh
+  cd apps/scanner && pnpm exec node -e "import('./src/lib/admin-auth.ts').then(m => m.hashPassword(process.argv[1]).then(h => console.log(h)))" "your-password"
+  ```
+- [ ] Set Coolify env vars (Runtime-only, do NOT mark Buildtime):
+  - `ADMIN_EMAIL` — `info@eazyaccess.org`
+  - `ADMIN_LOGIN_PASSWORD_HASH` — paste the scrypt hash from above
+  - `ADMIN_SESSION_SECRET` — `openssl rand -hex 32`
+  - `FEATURE_AUDIT_ASSIST` — `true`
+  - Confirm `GOOGLE_CLOUD_PROJECT`, `LLM_HARDCASE_REGION` (`europe-west1`), and SA-key file mount are already wired (existing Vertex stack).
+- [ ] Redeploy Coolify so the env reaches the container.
+
+**Per-audit workflow** (paid concierge booking via Stripe → audit needed)
+
+- [ ] Confirm a recent public scan exists for the merchant. If not, paste the shop into `https://audit.flintmere.com/scan` and let it run. The audit-draft route 409s with `no-recent-scan` if no successful scan in the last 7 days.
+- [ ] Sign in at `https://audit.flintmere.com/admin/login`.
+- [ ] At `/admin/audit-draft`: enter shop URL, pick band, vertical (defaults to food). Click **Generate draft →**. Hold the tab — Gemini 2.5 Pro typically takes 15–25s.
+- [ ] Read the headline. **Two-beat lede check** — does it lead with a deterministic anchor (a number) and demote any range to the body? If not, edit it.
+- [ ] Read every pillar's observations. Quote-check any product titles cited — they must appear in the catalog.
+- [ ] Read every actionable fix. Effort + impact ratings reasonable? If a fix says "low effort" but is actually a 3-day Shopify metafield migration, edit it.
+- [ ] Read the Operator TBDs section. Each item is something the LLM declined to fabricate. Resolve every TBD before send: edit the draft to fill the gap, or remove the TBD if no longer applicable.
+- [ ] Click **Save edits**. The status moves `draft → edited`.
+- [ ] **First 5 drafts only**: paste the markdown export (Copy as markdown button) into a fresh `claim-review` skill dispatch. Address every finding before sending.
+- [ ] Send the deliverable to the merchant via your existing email + delivery flow.
+- [ ] Click **Mark as sent**. Status moves `edited → sent`.
+
+**After 20 drafts have shipped**
+
+- [ ] Run the edit-rate analysis from the repo root:
+  ```sh
+  DATABASE_URL="<prod>" node packages/llm/scripts/audit-draft-edit-analysis.mjs
+  ```
+- [ ] Inspect the top 25 most-edited fields. Heavy-edit + high-delta fields are prompt-tuning candidates — the system prompt is wrong about that field.
+- [ ] If a hot-path finding emerges: open a `claim-review` brief, propose a system-prompt edit in `apps/scanner/src/lib/audit-draft/prompt.ts`, and re-run the smoke against `bluetokyo.co.uk` before shipping.
+
+**Cost ceiling**: ~£0.04–0.06 per draft. Per-cookie rate limit caps at 5 generations/hour (~£0.30/hour worst case). If the limit fires unexpectedly, check `/api/admin/audit-draft/generate` console logs in Coolify for retry storms.
+
 ### Monthly
 
 - [ ] Finance snapshot via `finance-snapshot` skill

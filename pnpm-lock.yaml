@@ -17,6 +17,9 @@ importers:
 
   apps/scanner:
     dependencies:
+      '@flintmere/llm':
+        specifier: workspace:*
+        version: link:../../packages/llm
       '@flintmere/scoring':
         specifier: workspace:*
         version: link:../../packages/scoring

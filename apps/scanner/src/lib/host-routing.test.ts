@@ -38,6 +38,9 @@ describe('classifyRoute', () => {
     ['/score/example-shop', 'scanner'],
     ['/bot', 'scanner'],
     ['/unsubscribe', 'scanner'],
+    ['/admin', 'scanner'],
+    ['/admin/audit-draft', 'scanner'],
+    ['/admin/login', 'scanner'],
   ])('classifies %s as scanner', (path, expected) => {
     expect(classifyRoute(path)).toBe(expected);
   });
@@ -123,6 +126,8 @@ describe('targetHostForRedirect', () => {
   it('redirects scanner-route hits on marketing host to scanner host', () => {
     expect(targetHostForRedirect(MARKETING_HOST, '/scan')).toBe(SCANNER_HOST);
     expect(targetHostForRedirect(MARKETING_HOST, '/audit/success')).toBe(SCANNER_HOST);
+    expect(targetHostForRedirect(MARKETING_HOST, '/admin')).toBe(SCANNER_HOST);
+    expect(targetHostForRedirect(MARKETING_HOST, '/admin/audit-draft')).toBe(SCANNER_HOST);
   });
 
   it('redirects marketing-route hits on scanner host to marketing host', () => {

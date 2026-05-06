@@ -129,6 +129,10 @@ function maybeSweep(now: number) {
   for (const [k, b] of checkoutIpBuckets) {
     if (b.tokens >= CHECKOUT_IP_POLICY.capacity) checkoutIpBuckets.delete(k);
   }
+  for (const [k, b] of auditDraftGenerateBuckets) {
+    if (b.tokens >= AUDIT_DRAFT_GENERATE_POLICY.capacity)
+      auditDraftGenerateBuckets.delete(k);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -246,11 +250,88 @@ function consumeToken(
   return { consumed: true, retryAfterSec: 0 };
 }
 
+// ---------------------------------------------------------------------------
+// Admin-login rate limit (audit-assist v0).
+//
+// Per-IP only. The login route accepts a single password — there's no
+// email or shop key to scope by. 10 attempts per 10 minutes leaves ample
+// headroom for legitimate fat-fingering (operator types it wrong 5
+// times during a tired evening) while making any brute force attack
+// useless against a 12-char+ password.
+// ---------------------------------------------------------------------------
+
+const adminLoginIpBuckets = new Map<string, Bucket>();
+
+const ADMIN_LOGIN_IP_POLICY: BucketPolicy = {
+  capacity: 10,
+  refillRate: 10 / 600, // 10 per 10 minutes sustained
+};
+
+export function checkAdminLoginRateLimit(args: {
+  ip: string | null;
+  now?: number;
+}): RateLimitResult {
+  const now = args.now ?? Date.now();
+  const ipKey = (args.ip && hashIp(args.ip)) || 'anon';
+  maybeSweep(now);
+
+  const result = consumeToken(
+    adminLoginIpBuckets,
+    ipKey,
+    ADMIN_LOGIN_IP_POLICY,
+    now,
+    /* dryRun */ false,
+  );
+  if (!result.consumed) {
+    return { ok: false, reason: 'ip', retryAfterSec: result.retryAfterSec };
+  }
+  return { ok: true, retryAfterSec: 0 };
+}
+
+// ---------------------------------------------------------------------------
+// Audit-draft generate rate limit (audit-assist v0).
+//
+// Per-cookie (= per-operator at v0). 5 generations per hour caps cost
+// at ~£0.30/hour worst-case (5 × £0.06 per Gemini 2.5 Pro draft).
+// Loose enough for legitimate operator iteration; tight enough that a
+// stuck loop or accidental refresh storm can't burn the LLM budget.
+// ---------------------------------------------------------------------------
+
+const auditDraftGenerateBuckets = new Map<string, Bucket>();
+
+const AUDIT_DRAFT_GENERATE_POLICY: BucketPolicy = {
+  capacity: 5,
+  refillRate: 5 / 3600, // 5/hour sustained
+};
+
+export function checkAuditDraftGenerateRateLimit(args: {
+  cookieValue: string;
+  now?: number;
+}): RateLimitResult {
+  const now = args.now ?? Date.now();
+  const key = args.cookieValue || 'anon';
+  maybeSweep(now);
+
+  const result = consumeToken(
+    auditDraftGenerateBuckets,
+    key,
+    AUDIT_DRAFT_GENERATE_POLICY,
+    now,
+    /* dryRun */ false,
+  );
+  if (!result.consumed) {
+    return { ok: false, reason: 'ip', retryAfterSec: result.retryAfterSec };
+  }
+  return { ok: true, retryAfterSec: 0 };
+}
+
 /** Test helper — clears state between tests. Not for production use. */
 export function __resetRateLimitState() {
   ipBuckets.clear();
   domainSeenAt.clear();
   checkoutEmailBuckets.clear();
   checkoutIpBuckets.clear();
+  adminLoginIpBuckets.clear();
+  auditDraftGenerateBuckets.clear();
   lastSweep = 0;
 }

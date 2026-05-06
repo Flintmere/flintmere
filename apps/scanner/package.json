@@ -26,6 +26,7 @@
     "audit:sla-monitor": "tsx scripts/concierge-sla-monitor.ts"
   },
   "dependencies": {
+    "@flintmere/llm": "workspace:*",
     "@flintmere/scoring": "workspace:*",
     "@flintmere/ui": "workspace:*",
     "@googleapis/content": "^42.2.1",

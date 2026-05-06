@@ -69,9 +69,16 @@ export const MARKETING_ROUTES: readonly string[] = [
 /**
  * Routes that live on `audit.flintmere.com`. Hitting one of these on
  * `flintmere.com` or `standards.flintmere.com` → 301 to audit.flintmere.com.
+ *
+ * `/admin` is the operator-only surface (audit-assist v0). It binds to
+ * the scanner host so the cookie issued at /admin/login carries on the
+ * same origin as the surfaces it gates. The route is feature-flagged
+ * + admin-cookie gated; cross-host requests 301 cleanly rather than
+ * fall through unknown.
  */
 export const SCANNER_ROUTES: readonly string[] = [
   '/audit/success',
+  '/admin',
   '/score',
   '/scan',
   '/audit',
