@@ -34,6 +34,7 @@ import {
   type AuditBandSlug,
 } from '../src/lib/audit-pricing';
 import { sendConciergeDeliveryEmail } from '../src/lib/concierge-delivery-email';
+import { normaliseDomain } from '../src/lib/shopify-fetcher';
 import { getStripe } from '../src/lib/stripe';
 
 function arg(name: string): string | undefined {
@@ -121,11 +122,17 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
+  const deliveredAt = new Date();
+  const rescanCapture = await captureBaselineForRescan(audit.shopUrl, deliveredAt);
+
   await prisma.conciergeAudit.update({
     where: { stripePaymentIntentId: intent },
     data: {
       status: 'delivered',
-      deliveredAt: new Date(),
+      deliveredAt,
+      baselineScanId: rescanCapture?.baselineScanId ?? null,
+      baselineScoreJson: rescanCapture?.baselineScoreJson ?? undefined,
+      rescanDueAt: rescanCapture?.rescanDueAt ?? null,
     },
   });
 
@@ -135,7 +142,53 @@ async function main(): Promise<void> {
   console.log(`  Shop     : ${audit.shopUrl}`);
   console.log(`  Letter   : ${basename(letterAbs)} (${formatBytes(letterBuffer.length)})`);
   console.log(`  CSV      : ${basename(csvAbs)} (${formatBytes(csvBuffer.length)})`);
+  if (rescanCapture) {
+    console.log(`  Baseline : ${rescanCapture.baselineScanId} (score ${rescanCapture.baselineScore})`);
+    console.log(`  Re-scan  : due ${rescanCapture.rescanDueAt.toISOString()} (delivered + 30d)`);
+  } else {
+    console.warn(`  Re-scan  : no baseline scan found for ${audit.shopUrl} — Day-30 re-scan not scheduled.`);
+    console.warn(`             Run a fresh public scan + re-deliver with --force to schedule.`);
+  }
 }
+
+/**
+ * Day-30 re-scan baseline capture. Picks the most recent completed scan
+ * for the shop's normalised domain as the baseline. The merchant will
+ * compare against this snapshot in 30 days. If no completed scan exists,
+ * we skip baseline capture and warn — operator can re-run the scanner +
+ * re-deliver with --force to backfill, or wait for Slice B's cron to
+ * tolerate the missing baseline by running a fresh scan at re-scan time.
+ */
+async function captureBaselineForRescan(
+  shopUrl: string,
+  deliveredAt: Date,
+): Promise<{
+  baselineScanId: string;
+  baselineScoreJson: unknown;
+  baselineScore: number | null;
+  rescanDueAt: Date;
+} | null> {
+  const normalised = normaliseDomain(shopUrl);
+  const baseline = await prisma.scan.findFirst({
+    where: {
+      normalisedDomain: normalised,
+      status: 'complete',
+      scoreJson: { not: undefined },
+    },
+    orderBy: { createdAt: 'desc' },
+    select: { id: true, score: true, scoreJson: true },
+  });
+  if (!baseline) return null;
+  const rescanDueAt = new Date(deliveredAt.getTime() + RESCAN_INTERVAL_MS);
+  return {
+    baselineScanId: baseline.id,
+    baselineScoreJson: baseline.scoreJson ?? null,
+    baselineScore: baseline.score ?? null,
+    rescanDueAt,
+  };
+}
+
+const RESCAN_INTERVAL_MS = 30 * 24 * 60 * 60 * 1000;
 
 async function resolveBandSlug(paymentIntentId: string): Promise<AuditBandSlug> {
   const stripe = getStripe();

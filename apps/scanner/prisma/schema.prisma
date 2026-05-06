@@ -97,8 +97,27 @@ model ConciergeAudit {
   deliveredAt    DateTime? @map("delivered_at")
   createdAt      DateTime  @default(now()) @map("created_at")
 
+  // Day-30 re-scan tracking. Per the audit-delivery email, every paid
+  // audit gets a free re-scan 30 days after delivery so the merchant can
+  // see what shifted. Capture happens in `scripts/audit-deliver.ts` at
+  // delivery time; execution happens in the rescan-30-day cron.
+  // baselineScanId points at the scanner_scans row that was the merchant's
+  // pre-audit state (latest scan for shopUrl at delivery time).
+  // baselineScoreJson is a denormalised snapshot so the re-scan email
+  // can compare without a join.
+  baselineScanId      String?   @map("baseline_scan_id")
+  baselineScoreJson   Json?     @map("baseline_score_json")
+  rescanDueAt         DateTime? @map("rescan_due_at")
+  rescanScanId        String?   @map("rescan_scan_id")
+  rescanCompletedAt   DateTime? @map("rescan_completed_at")
+  rescanEmailSentAt   DateTime? @map("rescan_email_sent_at")
+
   @@index([email])
   @@index([status])
+  // Scoped index for the cron's "what's due" query — partial would be
+  // better but Prisma's Postgres provider doesn't surface partial-index
+  // syntax, so we index the column and filter at query time.
+  @@index([rescanDueAt])
   @@map("scanner_concierge_audits")
 }
 
