@@ -51,4 +51,5 @@ export type GmcErrorCode =
   | 'account_suspended'
   | 'timeout'
   | 'no_account'
+  | 'account_ambiguous'
   | 'unexpected';

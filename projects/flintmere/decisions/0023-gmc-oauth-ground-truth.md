@@ -97,3 +97,25 @@ No vetoes. Operator strategic ratification 2026-05-06 (*"we need track a or ever
 - When slice 5 closes, capture connect-rate, disapproval-density distribution, and merchant-side qualitative reception in `STATUS.md` §Validation. The £497 ADR depends on those numbers; do not pre-empt.
 - When Track B re-opens, the "additive + nullable splice" pattern this ADR ratifies is reusable — but the agent-eval invocation must NOT use the same `runScanForShop` inline splice point. Async / queued / gated by tier per §Council sign-off note.
 - If the embedded ingestion engine re-asserts as urgent before slice 2 ships, the unwind cost is bounded: ADR 0023 + schema + runbook are reversible; OAuth code does not yet exist. Re-sequencing is cheap until slice 2.
+
+## Amendment 2026-05-06 — verification timeline + scenario actuality
+
+The original plan (slice 1) named two scenarios for Google Trust & Safety verification of the `auth/content` sensitive scope:
+
+- **Scenario A** — Eazy Access Ltd's existing GCP project verified for sensitive scopes already → slices 2–5 ship in 5–7 days.
+- **Scenario A2 / B** — fresh verification round needed; Google's canonical 1–3 week window applies.
+
+Reality landed:
+
+- **Scenario A3** — fresh verification submitted, Google's response timeline now sits at **4–6 weeks**, materially longer than the 1–3 weeks the plan allowed. Source: Google's current public guidance + early submission triage.
+- **Slice 2b shipped** anyway (commit `bfc8176`) with State A (request-access waiting list) live and States B + C (Connect CTA + Connected card) DARK behind `FEATURE_GMC_OAUTH=false`. Single canonical route (`/audit/connect`), three states, dispatched at server-component render via `pickState`. The waiting list captures merchant interest in `scanner_gmc_access_requests` during the verification window so we don't lose post-audit purchasers between paid-audit delivery and OAuth go-live.
+- **Concierge-delivery email** gains an "Optional · ground-truth track" callout linking merchants to `/audit/connect?audit=<id>` — naturally bounded by paid-audit volume, no Turnstile required.
+
+Implications carried into the live plan:
+
+- The original "ship slices 2–5 in 5–7 days" framing under Scenario A is retired. New framing: slices 2–5 sequence behind verification clearance, target ship-on-clearance.
+- Legal Council sign-off on State B + State C copy is committed but was **not reviewed at commit-time** under deadline. A council pass post-refactor (commit-side gate per §Council sign-off) tightened the GMC scope claim language across `/privacy` clause 11 and the in-product `ScopeCredits` row — `auth/content` is no longer described as "a read-only scope" (Google's Content API has only one scope and it's write-capable; we restrict ourselves at the call-site, not at the scope). This is now disclosed accurately. Flag-flip remains the deploy-side gate.
+- Multi-account merchants — `pickAccount` in `lib/gmc/ground-truth.ts` previously fell through to `accounts[0]` when the merchant's website URL didn't match any returned account. Tightened 2026-05-06 to fail-closed with a new `account_ambiguous` `GmcErrorCode`: when there are multiple accounts and none match the website URL, the orchestrator records the error and returns null instead of silently picking the first. Merchant-side picker UI deferred to slice 2c (post-verification).
+- ICO data-controller registration **ZC137268** issued and disclosed on `/about` + `/privacy` (commit `b79c787`). Adds a UK regulatory data point not foreseen in the original ADR.
+
+The 16-0 ratification stands. This amendment captures schedule-actuality and one mechanical hardening (`pickAccount` fail-closed); no scope or strategy change.

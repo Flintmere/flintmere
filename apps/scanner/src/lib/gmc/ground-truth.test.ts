@@ -340,7 +340,7 @@ describe('IssueAggregator', () => {
 });
 
 describe('pickAccount', () => {
-  it('matches by website url first', () => {
+  it('multi-account: matches by website url first', () => {
     const result = __testing.pickAccount(
       [
         { accountId: 'a1', accountName: null, websiteUrl: 'https://other.com' },
@@ -348,18 +348,52 @@ describe('pickAccount', () => {
       ],
       'acme.com',
     );
-    expect(result?.accountId).toBe('a2');
+    expect(result.kind).toBe('matched');
+    if (result.kind === 'matched') {
+      expect(result.accountId).toBe('a2');
+    }
   });
 
-  it('falls through to first account when none match', () => {
+  it('single-account: unambiguous — picks the only one even without website match', () => {
     const result = __testing.pickAccount(
       [{ accountId: 'a1', accountName: null, websiteUrl: 'https://other.com' }],
       'acme.com',
     );
-    expect(result?.accountId).toBe('a1');
+    expect(result.kind).toBe('matched');
+    if (result.kind === 'matched') {
+      expect(result.accountId).toBe('a1');
+    }
   });
 
-  it('returns null on empty list', () => {
-    expect(__testing.pickAccount([], 'acme.com')).toBeNull();
+  it('multi-account, no website match: returns ambiguous instead of silently picking first', () => {
+    // The fail-closed change. Previously this silently returned a1 — wrong
+    // for agencies / parent-sub setups. Now operator gets account_ambiguous
+    // recorded on the connection and the read returns null.
+    const result = __testing.pickAccount(
+      [
+        { accountId: 'a1', accountName: null, websiteUrl: 'https://other.com' },
+        { accountId: 'a2', accountName: null, websiteUrl: 'https://different.com' },
+      ],
+      'acme.com',
+    );
+    expect(result.kind).toBe('ambiguous');
+    if (result.kind === 'ambiguous') {
+      expect(result.accountCount).toBe(2);
+    }
+  });
+
+  it('multi-account, no website urls at all: returns ambiguous', () => {
+    const result = __testing.pickAccount(
+      [
+        { accountId: 'a1', accountName: null, websiteUrl: null },
+        { accountId: 'a2', accountName: null, websiteUrl: null },
+      ],
+      'acme.com',
+    );
+    expect(result.kind).toBe('ambiguous');
+  });
+
+  it('empty list: returns none', () => {
+    expect(__testing.pickAccount([], 'acme.com').kind).toBe('none');
   });
 });

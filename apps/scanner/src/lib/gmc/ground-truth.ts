@@ -84,8 +84,16 @@ export async function fetchGmcGroundTruth(
     }
 
     const matched = pickAccount(accounts, normalisedDomain);
-    if (!matched) {
+    if (matched.kind === 'none') {
       await recordError(conn.id, 'no_account', 'accounts.list returned 0 accounts');
+      return null;
+    }
+    if (matched.kind === 'ambiguous') {
+      await recordError(
+        conn.id,
+        'account_ambiguous',
+        `accounts.list returned ${matched.accountCount} accounts, none matching ${normalisedDomain} — picker UI required`,
+      );
       return null;
     }
     merchantId = matched.accountId;
@@ -209,14 +217,29 @@ function makeController(
   };
 }
 
+type PickAccountResult =
+  | { kind: 'none' }
+  | { kind: 'ambiguous'; accountCount: number }
+  | { kind: 'matched'; accountId: string; accountName: string | null };
+
 function pickAccount(
   accounts: Array<{ accountId: string; accountName: string | null; websiteUrl: string | null }>,
   normalisedDomain: string,
-): { accountId: string; accountName: string | null } | null {
-  if (accounts.length === 0) return null;
-  // Prefer an account whose websiteUrl matches the merchant's domain.
-  // Falls through to first when none match (single-account case is the
-  // norm; the picker UI lands in slice 2b for multi-account merchants).
+): PickAccountResult {
+  if (accounts.length === 0) return { kind: 'none' };
+
+  // Single-account case is unambiguous — vast majority of merchants.
+  if (accounts.length === 1) {
+    const only = accounts[0]!;
+    return { kind: 'matched', accountId: only.accountId, accountName: only.accountName };
+  }
+
+  // Multi-account: only proceed when the merchant's website URL
+  // unambiguously matches one account. Previously this fell through to
+  // accounts[0] when no match — silently picking the wrong account when
+  // the merchant has multiple GMC accounts (agencies, parent / sub-brand
+  // setups). Fail-closed: surface account_ambiguous so the operator can
+  // intervene; the picker UI will land when slice 2b's State C ships.
   const matched = accounts.find((a) => {
     if (!a.websiteUrl) return false;
     return a.websiteUrl
@@ -225,8 +248,11 @@ function pickAccount(
       .replace(/\/.*$/, '')
       .replace(/^www\./, '') === normalisedDomain;
   });
-  const pick = matched ?? accounts[0]!;
-  return { accountId: pick.accountId, accountName: pick.accountName };
+  if (matched) {
+    return { kind: 'matched', accountId: matched.accountId, accountName: matched.accountName };
+  }
+
+  return { kind: 'ambiguous', accountCount: accounts.length };
 }
 
 class IssueAggregator {
