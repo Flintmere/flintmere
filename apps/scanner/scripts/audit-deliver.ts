@@ -114,6 +114,7 @@ async function main(): Promise<void> {
     letterBuffer,
     csvFilename: basename(csvAbs),
     csvBuffer,
+    auditId: audit.id,
   });
 
   if (!result.sent) {

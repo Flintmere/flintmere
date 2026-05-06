@@ -39,13 +39,31 @@ export interface ConciergeDeliveryInput {
   letterBuffer: Buffer;
   csvFilename: string;
   csvBuffer: Buffer;
+  /**
+   * ConciergeAudit row id. When present, the email includes the GMC
+   * connect link `${NEXT_PUBLIC_APP_URL}/audit/connect?audit=${auditId}`
+   * per ADR 0023 §slice 2b. The /audit/connect page renders either the
+   * pre-verification request-access form (FEATURE_GMC_OAUTH=false) or
+   * the live OAuth start (flag flipped post Google T&S verification);
+   * the email link is identical across both states.
+   */
+  auditId?: string;
 }
 
 export async function sendConciergeDeliveryEmail(
   input: ConciergeDeliveryInput,
 ): Promise<SendEmailResult> {
-  const { to, shopUrl, bandSlug, notes, letterFilename, letterBuffer, csvFilename, csvBuffer } =
-    input;
+  const {
+    to,
+    shopUrl,
+    bandSlug,
+    notes,
+    letterFilename,
+    letterBuffer,
+    csvFilename,
+    csvBuffer,
+    auditId,
+  } = input;
   const safeShop = esc(shopUrl);
   const band = bandBySlug(bandSlug);
   const priceLine = bandPriceLine(bandSlug);
@@ -54,6 +72,29 @@ export async function sendConciergeDeliveryEmail(
     ? `<p style="margin:16px 0 0 0;font-size:15px;line-height:1.6;color:#141518;">${esc(notes)}</p>`
     : '';
   const safeNotesText = notes ? `\n${notes}\n` : '';
+
+  const connectUrl = auditId
+    ? `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://audit.flintmere.com'}/audit/connect?audit=${encodeURIComponent(auditId)}`
+    : null;
+  const connectHtml = connectUrl
+    ? `
+          <tr>
+            <td style="padding:0 32px 24px 32px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #D5D2C8;border-left:3px solid #F8BF24;">
+                <tr>
+                  <td style="padding:18px 20px;">
+                    <p style="margin:0;font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;">Optional · ground-truth track</p>
+                    <p style="margin:8px 0 0 0;font-size:15px;line-height:1.55;color:#141518;">Connect Google Merchant Center and the next scan reads Google&rsquo;s real disapproval reasons direct from your account &mdash; not our model. Read-only. Disconnect anytime.</p>
+                    <p style="margin:12px 0 0 0;font-size:14px;line-height:1.55;"><a href="${esc(connectUrl)}" style="color:#0A0A0B;text-decoration:underline;">Connect Google Merchant Center &rarr;</a></p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>`
+    : '';
+  const connectText = connectUrl
+    ? `\nOptional — Connect Google Merchant Center so the next scan reads Google's real disapproval reasons direct from your account, not our model. Read-only, disconnect anytime:\n${connectUrl}\n`
+    : '';
 
   const html = `<!doctype html>
 <html>
@@ -80,7 +121,7 @@ export async function sendConciergeDeliveryEmail(
             <td style="padding:0 32px 24px 32px;">
               <p style="margin:0;font-size:14px;line-height:1.55;color:#5A5C64;">In thirty days the scanner re-runs against ${safeShop} and emails you a progress report — what moved, what didn&rsquo;t. No further action from you.</p>
             </td>
-          </tr>
+          </tr>${connectHtml}
           <tr>
             <td style="padding:28px 32px 28px 32px;border-top:1px solid #D5D2C8;">
               ${
@@ -116,7 +157,7 @@ that needs clarifying, reply direct.
 ${safeNotesText}
 In thirty days the scanner re-runs against ${shopUrl} and emails you a
 progress report — what moved, what didn't. No further action from you.
-
+${connectText}
 [ ${FOUNDER_SIGNATURE_NAME} ]
 ${FOUNDER_SIGNATURE_TEAM_LINE}
 

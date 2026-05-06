@@ -185,6 +185,29 @@ model OneTimeSecret {
   @@map("scanner_one_time_secrets")
 }
 
+/// Pre-verification waiting list for GMC OAuth. Captured during the
+/// Google T&S verification window (typical 4–6 weeks) by merchants
+/// who clicked the connect link from their audit delivery email while
+/// `FEATURE_GMC_OAUTH=false`. `notifiedAt` is set the day verification
+/// clears and we email the merchant. Per ADR 0023 §slice 2b. No FK to
+/// `ConciergeAudit` — `auditId` is a soft reference so the request
+/// retains shape even if the audit is later archived.
+model GmcAccessRequest {
+  id               String    @id @default(cuid())
+  auditId          String    @map("audit_id")
+  email            String
+  shopUrl          String    @map("shop_url")
+  normalisedDomain String    @map("normalised_domain")
+  reason           String?
+  notifiedAt       DateTime? @map("notified_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  @@index([auditId])
+  @@index([normalisedDomain])
+  @@index([notifiedAt])
+  @@map("scanner_gmc_access_requests")
+}
+
 /// Merchant's connected Google Merchant Center account. Per ADR 0023,
 /// the audit's ground-truth track. One row per merchant; @@unique on
 /// normalised_domain enforces single active connection. Reconnect after
