@@ -6,6 +6,10 @@ import {
   sendConciergeCustomerEmail,
   sendConciergeOpsEmail,
 } from '@/lib/concierge-email';
+import {
+  sendConciergeDisputeOpsEmail,
+  sendConciergeRefundOpsEmail,
+} from '@/lib/concierge-refund-email';
 import { createConciergeInvoice } from '@/lib/stripe-invoice';
 import {
   STRIPE_BAND_METADATA_KEY,
@@ -67,6 +71,12 @@ export async function POST(req: NextRequest) {
     } else if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
       await handleConciergeCheckout(stripe, session);
+    } else if (event.type === 'charge.refunded') {
+      const charge = event.data.object as Stripe.Charge;
+      await handleConciergeRefund(charge);
+    } else if (event.type === 'charge.dispute.created') {
+      const dispute = event.data.object as Stripe.Dispute;
+      await handleConciergeDispute(dispute);
     }
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -218,4 +228,112 @@ async function finaliseConciergeBooking(args: {
       }),
     );
   }
+}
+
+/**
+ * Refund handler — fires on every `charge.refunded` event Stripe sends,
+ * which includes both full and partial refunds. We only flip status when
+ * the refund is full AND the prior status was 'paid' (clean cancel
+ * path). Refunds against a 'delivered' row are accounting events, not
+ * status flips — the deliverable + 30-day re-scan promise is already
+ * spent, so the row stays 'delivered' and ops gets a high-severity
+ * "investigate" alert.
+ *
+ * Idempotency: re-firing on an already-'refunded' row is a no-op (no
+ * second email, no re-update). Stripe occasionally retries webhooks; the
+ * `wasAlreadyRefunded` guard keeps us safe.
+ */
+async function handleConciergeRefund(charge: Stripe.Charge): Promise<void> {
+  const paymentIntentId =
+    typeof charge.payment_intent === 'string' ? charge.payment_intent : null;
+  if (!paymentIntentId) return;
+
+  const row = await prisma.conciergeAudit.findUnique({
+    where: { stripePaymentIntentId: paymentIntentId },
+  });
+  if (!row) return;
+
+  const wasAlreadyRefunded = row.status === 'refunded';
+  if (wasAlreadyRefunded) return;
+
+  const wasDelivered = row.status === 'delivered';
+  const fullyRefunded = charge.refunded === true;
+  const bandSlug = readBandSlug(charge.metadata);
+  const opsEmail =
+    process.env.CONCIERGE_OPS_EMAIL ||
+    process.env.RESEND_REPLY_TO ||
+    'hello@flintmere.com';
+
+  // Status policy:
+  //   - 'paid'     + full refund    → flip to 'refunded'
+  //   - 'paid'     + partial refund → stay 'paid' (operator decides), email ops
+  //   - 'delivered' + any refund    → stay 'delivered' (accounting flow), high-severity email
+  //   - any other state             → don't touch status, just alert
+  if (!wasDelivered && fullyRefunded && row.status === 'paid') {
+    await prisma.conciergeAudit.update({
+      where: { stripePaymentIntentId: paymentIntentId },
+      data: { status: 'refunded' },
+    });
+  }
+
+  await sendConciergeRefundOpsEmail({
+    to: opsEmail,
+    shopUrl: row.shopUrl,
+    customerEmail: row.email,
+    paymentIntentId,
+    bandSlug,
+    amountRefundedPence: charge.amount_refunded ?? 0,
+    amountPence: charge.amount,
+    currency: charge.currency,
+    fullyRefunded,
+    wasDelivered,
+  });
+}
+
+/**
+ * Dispute handler — fires on `charge.dispute.created`. Always
+ * high-severity: chargebacks have a 7–21 day evidence window, missing
+ * the deadline forfeits the dispute by default. Status flips to
+ * 'disputed' regardless of prior state so the SLA monitor + delivery
+ * scripts can branch on it (e.g., don't auto-deliver an audit for a
+ * disputed booking).
+ */
+async function handleConciergeDispute(dispute: Stripe.Dispute): Promise<void> {
+  const paymentIntentId =
+    typeof dispute.payment_intent === 'string' ? dispute.payment_intent : null;
+  if (!paymentIntentId) return;
+
+  const row = await prisma.conciergeAudit.findUnique({
+    where: { stripePaymentIntentId: paymentIntentId },
+  });
+  if (!row) return;
+
+  if (row.status !== 'disputed') {
+    await prisma.conciergeAudit.update({
+      where: { stripePaymentIntentId: paymentIntentId },
+      data: { status: 'disputed' },
+    });
+  }
+
+  const bandSlug = readBandSlug(dispute.metadata);
+  const opsEmail =
+    process.env.CONCIERGE_OPS_EMAIL ||
+    process.env.RESEND_REPLY_TO ||
+    'hello@flintmere.com';
+  const evidenceDueBy =
+    typeof dispute.evidence_details?.due_by === 'number'
+      ? new Date(dispute.evidence_details.due_by * 1000)
+      : null;
+
+  await sendConciergeDisputeOpsEmail({
+    to: opsEmail,
+    shopUrl: row.shopUrl,
+    customerEmail: row.email,
+    paymentIntentId,
+    bandSlug,
+    amountPence: dispute.amount,
+    currency: dispute.currency,
+    reason: dispute.reason,
+    evidenceDueBy,
+  });
 }
