@@ -250,8 +250,13 @@ export default function Privacy() {
           (Privacy topic). We respond within 30 days and usually within three working days.
         </p>
         <p className="mt-4">
+          Eazy Access Ltd is registered with the Information
+          Commissioner&rsquo;s Office (ICO) as a data controller — registration
+          number <strong>ZC137268</strong>.
+        </p>
+        <p className="mt-4">
           If you&rsquo;re not satisfied with our response you can complain to
-          the Information Commissioner&rsquo;s Office (ICO):{' '}
+          the ICO:{' '}
           <a href="https://ico.org.uk/make-a-complaint/" className="underline">
             ico.org.uk/make-a-complaint
           </a>.

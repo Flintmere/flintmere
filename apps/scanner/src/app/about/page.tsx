@@ -31,13 +31,12 @@ import { Bracket, SiteFooter } from '@flintmere/ui';
  * type-led restraint. When `image-direction` lands an Adobe-Stock asset, the
  * right-hand slot can ship in a follow-up.
  *
- * Procurement-section facts that NEED operator confirmation before publication:
- *   - Companies House number
- *   - Registered office address
- *   - ICO registration number
- * Until confirmed, the page renders an "available on request" line for those
- * three rows. The verified rows (entity name, jurisdiction, accountable
- * director, VAT status) ship now.
+ * Procurement-section facts (all confirmed and disclosed as of 2026-05-06):
+ *   - Companies House number: 13205428
+ *   - Registered office: 71–75 Shelton Street, Covent Garden, London, WC2H 9JQ
+ *   - ICO registration: ZC137268
+ * The verified rows (entity name, jurisdiction, accountable director, VAT
+ * status) shipped earlier; the ICO row landed when ICO confirmation issued.
  */
 
 export const dynamic = 'force-static';
@@ -318,8 +317,7 @@ export default function About() {
             legal-page-draft co-authored. Definition list pattern.
             Companies House number wired (13205428). Registered office
             wired (71–75 Shelton Street, Covent Garden, London, WC2H 9JQ).
-            ICO registration in progress — value updates to the ICO number
-            when confirmation lands.
+            ICO registration wired (ZC137268, issued 2026-05-06).
             ────────────────────────────────────────────────────────────── */}
         <section
           id="procurement"
@@ -383,10 +381,7 @@ export default function About() {
                 label="VAT registration"
                 value="Not VAT-registered (Eazy Access Ltd is below the UK threshold)"
               />
-              <ProcurementRow
-                label="ICO registration"
-                value="Registration in progress — confirmation pending"
-              />
+              <ProcurementRow label="ICO registration" value="ZC137268" />
               <ProcurementRow
                 label="Accountable director"
                 value="Abdur-Rahman Morris"
