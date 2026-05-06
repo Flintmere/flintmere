@@ -122,6 +122,20 @@ export async function POST(req: NextRequest) {
       description: `Flintmere concierge audit (${band.label}) — written deliverable in three working days`,
       statement_descriptor_suffix: `FLINT B${bandSlug === 'band-1' ? '1' : '2'}`,
       automatic_payment_methods: { enabled: true },
+      // Force 3D Secure where the issuer supports it. Stripe's default
+      // `automatic` decisioning fires 3DS for PSD2-mandated EEA cards
+      // (UK + EU) and Radar-flagged risky transactions, but skips it on
+      // most non-EEA cards. `any` requests 3DS for every supported card,
+      // shifting chargeback liability to the issuer on every accepted
+      // payment. Friction cost (~3–7% conversion on non-EEA cards per
+      // Stripe data) is a worthwhile trade for one-shot £197+ audits
+      // with no recurring relationship — no second-purchase opportunity
+      // to make up a fraudulent one.
+      payment_method_options: {
+        card: {
+          request_three_d_secure: 'any',
+        },
+      },
       metadata: {
         kind: 'concierge-audit',
         email,

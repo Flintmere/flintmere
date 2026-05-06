@@ -153,6 +153,14 @@ describe('concierge checkout route', () => {
     expect(args.statement_descriptor_suffix).toBe('FLINT B1');
     expect(args.statement_descriptor).toBeUndefined();
 
+    // 3DS liability-shift floor — forces 3D Secure on every supported
+    // card, regardless of region or Radar score. Closes the non-EEA
+    // gap left by Stripe's `automatic` default.
+    const pmo = args.payment_method_options as
+      | { card?: { request_three_d_secure?: string } }
+      | undefined;
+    expect(pmo?.card?.request_three_d_secure).toBe('any');
+
     vi.doUnmock('@/lib/stripe');
   });
 
