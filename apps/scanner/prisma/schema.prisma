@@ -184,3 +184,32 @@ model OneTimeSecret {
   @@index([expiresAt])
   @@map("scanner_one_time_secrets")
 }
+
+/// Merchant's connected Google Merchant Center account. Per ADR 0023,
+/// the audit's ground-truth track. One row per merchant; @@unique on
+/// normalised_domain enforces single active connection. Reconnect after
+/// revoke updates the row in place (revokedAt cleared, ciphertext
+/// rewritten). Refresh token encrypted at rest with AES-256-GCM
+/// (key from GMC_TOKEN_KEY, 32 bytes hex). Access tokens never
+/// persisted — rotated on demand from refresh token, held in memory +
+/// short-TTL cache only. Disconnect zeros the ciphertext + sets
+/// revokedAt; row remains for audit trail.
+model MerchantGmcConnection {
+  id                    String    @id @default(cuid())
+  normalisedDomain      String    @unique @map("normalised_domain")
+  gmcAccountId          String?   @map("gmc_account_id")
+  gmcAccountName        String?   @map("gmc_account_name")
+  refreshTokenCipher    Bytes     @map("refresh_token_cipher")
+  refreshTokenIv        Bytes     @map("refresh_token_iv")
+  refreshTokenAuthTag   Bytes     @map("refresh_token_auth_tag")
+  scopes                String[]
+  connectedAt           DateTime  @default(now()) @map("connected_at")
+  lastSyncedAt          DateTime? @map("last_synced_at")
+  lastErrorCode         String?   @map("last_error_code")
+  lastErrorAt           DateTime? @map("last_error_at")
+  revokedAt             DateTime? @map("revoked_at")
+
+  @@index([gmcAccountId])
+  @@index([revokedAt])
+  @@map("scanner_merchant_gmc_connections")
+}
