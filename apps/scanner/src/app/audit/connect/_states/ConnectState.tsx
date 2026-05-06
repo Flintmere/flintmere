@@ -75,9 +75,8 @@ export function ConnectBody({ auditId }: { auditId: string }) {
           color: 'var(--color-mute)',
         }}
       >
-        You&rsquo;ll be redirected to Google to grant read-only access to
-        your Merchant Center. We never see your password and we never
-        write to your account.
+        You&rsquo;ll be redirected to Google. We never see your password,
+        and we never call any method that writes to your account.
       </p>
     </div>
   );

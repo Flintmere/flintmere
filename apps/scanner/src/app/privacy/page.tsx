@@ -76,8 +76,18 @@ export default function Privacy() {
             account-level and product-level diagnostic data: your GMC account
             ID, per-product disapproval status, the disapproval reasons
             Google has recorded, and aggregate destination counts. We do
-            not request, receive, or store customer-level GMC data, financial
-            reports, or any write scope. Full treatment in clause 11.
+            not request, receive, or store customer-level GMC data or
+            financial reports, and we do not call any GMC method that writes
+            to your account. Full treatment in clause 11.
+          </li>
+          <li>
+            <strong>GMC pre-verification waiting list (only if you ask).</strong>{' '}
+            While Google&rsquo;s Trust &amp; Safety review of our integration
+            is still in flight, the connect surface offers a request-access
+            form instead of starting the OAuth flow. If you submit, we store
+            your email, the audit ID that brought you to the page, your shop
+            URL, and any optional message you leave. We use this only to
+            email you when access opens. Full treatment in clause 11.
           </li>
         </ul>
         <p className="mt-4">
@@ -160,6 +170,14 @@ export default function Privacy() {
             <strong>Google Merchant Center diagnostic data:</strong> joins
             your scan record under the same 90-day retention as scanner
             results; deleted on the same schedule.
+          </li>
+          <li>
+            <strong>GMC pre-verification waiting-list entries:</strong> kept
+            until we send the access-opens notification, then deleted within
+            30 days. Maximum lifetime 12 months from creation regardless of
+            notification status. Right to erasure (clause 09) applies — ask
+            via the contact form (Privacy topic) and we honour within 30
+            days.
           </li>
           <li>
             <strong>Stripe concierge audit records:</strong> kept for 7 years
@@ -338,10 +356,28 @@ export default function Privacy() {
           revocable at any time.
         </p>
         <p className="mt-4">
+          <strong>Pre-verification waiting list.</strong> While Google&rsquo;s
+          Trust &amp; Safety review of our integration is still in flight,
+          the connect surface captures expressions of interest instead of
+          starting the OAuth flow. If you submit your details there, we
+          store your email, the audit ID that brought you to the page, your
+          shop URL, and any optional message you leave. We use this only to
+          write to you the day access opens — at most a single email, after
+          which the row&rsquo;s purpose is fulfilled. You can ask us to
+          delete your row at any time via the contact form (Privacy topic);
+          retention details in clause 04.
+        </p>
+        <p className="mt-4">
           <strong>Scope.</strong> We request a single OAuth scope:{' '}
-          <code>https://www.googleapis.com/auth/content</code>. This is a
-          read-only scope. We never request a write scope and cannot modify
-          your GMC account, products, settings, or feeds.
+          <code>https://www.googleapis.com/auth/content</code> — Google&rsquo;s
+          Content API for Shopping scope. We restrict our use to read-only
+          API methods: <code>accounts.list</code>,{' '}
+          <code>accountstatuses.get</code>, <code>productstatuses.list</code>,
+          and <code>accounts.reports.search</code>. We do not call any
+          method that writes to your GMC account, products, settings, or
+          feeds. Google does not currently publish a separate read-only
+          variant of this scope; the read-only commitment is enforced at
+          our call-site.
         </p>
         <p className="mt-4">
           <strong>Data we receive.</strong> Your GMC account ID, per-product

@@ -3,11 +3,11 @@ type Variant = 'pre-connect' | 'connected';
 const ITEMS: Record<Variant, ReadonlyArray<{ k: string; v: string }>> = {
   connected: [
     { k: 'What we read', v: 'Account state · disapproval reasons · per-product status' },
-    { k: 'What we don’t', v: 'Customer data · order data · ad spend · write access' },
+    { k: 'What we don’t', v: 'Customer data · order data · ad spend · writes to your account' },
     { k: 'Refresh token', v: 'AES-256-GCM at rest · zeroed on disconnect' },
   ],
   'pre-connect': [
-    { k: 'OAuth scope', v: 'auth/content · read-only' },
+    { k: 'OAuth scope', v: 'auth/content · read methods only' },
     { k: 'Refresh token', v: 'AES-256-GCM at rest · isolated key' },
     { k: 'Revoke', v: 'Disconnect zeros the token here and at Google' },
   ],
