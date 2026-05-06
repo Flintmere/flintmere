@@ -1,7 +1,12 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import { __resetRateLimitState } from '@/lib/rate-limit';
 
 describe('concierge checkout route', () => {
   const ORIGINAL_KEY = process.env.STRIPE_SECRET_KEY;
+
+  beforeEach(() => {
+    __resetRateLimitState();
+  });
 
   afterEach(() => {
     if (ORIGINAL_KEY !== undefined) {
@@ -160,6 +165,56 @@ describe('concierge checkout route', () => {
       | { card?: { request_three_d_secure?: string } }
       | undefined;
     expect(pmo?.card?.request_three_d_secure).toBe('any');
+
+    vi.doUnmock('@/lib/stripe');
+  });
+
+  it('returns 429 with Retry-After once the per-email burst is exhausted', async () => {
+    vi.resetModules();
+    process.env.STRIPE_SECRET_KEY = 'sk_test_dummy';
+
+    const create = vi.fn().mockResolvedValue({
+      id: 'pi_test_rl',
+      client_secret: 'pi_test_rl_secret',
+    });
+    vi.doMock('@/lib/stripe', () => ({
+      getStripe: () => ({
+        paymentIntents: { create },
+      }),
+    }));
+
+    const { POST } = await import('./route');
+
+    const makeReq = (ip: string) =>
+      new Request('http://localhost/api/concierge/checkout', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-forwarded-for': ip,
+        },
+        body: JSON.stringify({
+          email: 'rate-limit@store.com',
+          shopUrl: 'meridian-coffee.myshopify.com',
+          bandSlug: 'band-1',
+        }),
+      }) as unknown as import('next/server').NextRequest;
+
+    // Five legitimate attempts from rotating IPs (so per-IP doesn't fire
+    // first) consume the per-email burst.
+    for (let i = 0; i < 5; i++) {
+      const r = await POST(makeReq(`198.51.100.${i + 1}`));
+      expect(r.status).toBe(200);
+    }
+
+    // Sixth attempt — same email — must be blocked with 429.
+    const blocked = await POST(makeReq('198.51.100.99'));
+    expect(blocked.status).toBe(429);
+    expect(blocked.headers.get('Retry-After')).toMatch(/^\d+$/);
+    const body = await blocked.json();
+    expect(body.code).toBe('rate-limited');
+    expect(body.reason).toBe('email');
+    // Stripe was not called for the blocked attempt.
+    expect(create).toHaveBeenCalledTimes(5);
 
     vi.doUnmock('@/lib/stripe');
   });

@@ -7,6 +7,7 @@ import {
   type AuditBandSlug,
 } from '@/lib/audit-pricing';
 import { verifyTurnstile } from '@/lib/turnstile';
+import { checkCheckoutRateLimit } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -62,6 +63,29 @@ export async function POST(req: NextRequest) {
 
   const ip =
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null;
+
+  // Rate limit before Turnstile + Stripe to cap scripted card-testing
+  // that solves Turnstile at scale. Per-email catches "one merchant
+  // identity + many cards"; per-IP catches single-source flood. Both
+  // are belt-and-braces — distributed botnets rotating identity bypass
+  // both, but Radar at the Stripe level catches the velocity tail.
+  const rl = checkCheckoutRateLimit({ email, ip });
+  if (!rl.ok) {
+    return NextResponse.json(
+      {
+        ok: false,
+        code: 'rate-limited',
+        reason: rl.reason,
+        retryAfterSec: rl.retryAfterSec,
+        message: 'Too many attempts. Please wait a few minutes and try again.',
+      },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(rl.retryAfterSec) },
+      },
+    );
+  }
+
   const turnstile = await verifyTurnstile(turnstileToken, ip);
   if (!turnstile.ok) {
     return NextResponse.json(

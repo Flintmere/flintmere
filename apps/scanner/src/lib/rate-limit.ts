@@ -1,20 +1,29 @@
 import { hashIp } from './hash';
 
 /**
- * In-memory rate limiter for the public scanner.
+ * In-memory rate limiter.
  *
  * Single-droplet deployment per `decisions/0002-coolify-on-do.md` — a Map
  * is sufficient. If the scanner ever runs more than one node, swap the
  * store for Redis (or move to Upstash @upstash/ratelimit) without changing
  * the call sites.
  *
- * Two policies layered on /api/scan:
- *   • per-IP token bucket — protects against single-source flood
- *   • per-domain dedupe TTL — protects merchants' Shopify CDNs from
- *     being repeatedly scanned by different IPs in a tight window.
+ * Two distinct call sites, each with its own state maps + policies:
  *
- * Identity for per-IP is the SHA-256 hash already used for ipHash, not the
- * raw IP — keeps PII off the in-memory map and matches what we persist.
+ *   `checkScanRateLimit` — public scanner:
+ *     • per-IP token bucket — single-source flood protection
+ *     • per-domain dedupe TTL — protects merchants' Shopify CDNs from
+ *       being repeatedly scanned by different IPs in a tight window.
+ *
+ *   `checkCheckoutRateLimit` — concierge audit checkout:
+ *     • per-email token bucket — catches scripted card-testing on a
+ *       single merchant identity + many stolen cards.
+ *     • per-IP token bucket — single-source flood protection.
+ *     Layered after Turnstile, before Stripe API.
+ *
+ * Identity for per-IP is the SHA-256 hash already used for ipHash, not
+ * the raw IP — keeps PII off the in-memory map and matches what we
+ * persist. Email is normalised lowercase + trimmed before keying.
  */
 
 interface Bucket {
@@ -114,11 +123,134 @@ function maybeSweep(now: number) {
   for (const [d, t] of domainSeenAt) {
     if (now - t > DOMAIN_DEDUPE_MS * 4) domainSeenAt.delete(d);
   }
+  for (const [k, b] of checkoutEmailBuckets) {
+    if (b.tokens >= CHECKOUT_EMAIL_POLICY.capacity) checkoutEmailBuckets.delete(k);
+  }
+  for (const [k, b] of checkoutIpBuckets) {
+    if (b.tokens >= CHECKOUT_IP_POLICY.capacity) checkoutIpBuckets.delete(k);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Concierge-audit checkout rate limit.
+//
+// Layered after Turnstile (which catches naive bots) and before the Stripe
+// PaymentIntent create call. Defends against scripted card-testing — the
+// pattern where an attacker scripts ONE email + many stolen card numbers
+// to validate which work, exploiting Stripe's per-PI authentication for
+// free card-validity probing.
+//
+// Per-email policy: 5 attempts per hour. Generous for legitimate retries
+// (declined card → fix details → retry); tight enough that a scripted
+// attack on one identity caps fast.
+//
+// Per-IP policy: 20 attempts per hour. Generous for shared NAT (corporate
+// / mobile / student / VPN); tight enough to flag scripted abuse from a
+// single source. Distributed botnets bypass per-IP — defence in depth.
+// ---------------------------------------------------------------------------
+
+const checkoutEmailBuckets = new Map<string, Bucket>();
+const checkoutIpBuckets = new Map<string, Bucket>();
+
+const CHECKOUT_EMAIL_POLICY: BucketPolicy = {
+  capacity: 5,
+  refillRate: 5 / 3600, // 5/hour sustained
+};
+
+const CHECKOUT_IP_POLICY: BucketPolicy = {
+  capacity: 20,
+  refillRate: 20 / 3600, // 20/hour sustained
+};
+
+export interface CheckoutRateLimitResult {
+  ok: boolean;
+  reason?: 'email' | 'ip';
+  retryAfterSec: number;
+}
+
+export function checkCheckoutRateLimit(args: {
+  email: string;
+  ip: string | null;
+  now?: number;
+}): CheckoutRateLimitResult {
+  const now = args.now ?? Date.now();
+  const emailKey = args.email.trim().toLowerCase();
+  const ipKey = (args.ip && hashIp(args.ip)) || 'anon';
+
+  maybeSweep(now);
+
+  // Email check first — narrower defence, more specific signal. We don't
+  // consume the email token if the IP check would block; otherwise a
+  // distributed attack would burn a legitimate user's email budget.
+  const ipBucket = consumeToken(checkoutIpBuckets, ipKey, CHECKOUT_IP_POLICY, now, /* dryRun */ true);
+  if (!ipBucket.consumed) {
+    return { ok: false, reason: 'ip', retryAfterSec: ipBucket.retryAfterSec };
+  }
+
+  const emailBucket = consumeToken(
+    checkoutEmailBuckets,
+    emailKey,
+    CHECKOUT_EMAIL_POLICY,
+    now,
+    /* dryRun */ true,
+  );
+  if (!emailBucket.consumed) {
+    return { ok: false, reason: 'email', retryAfterSec: emailBucket.retryAfterSec };
+  }
+
+  // Both checks pass — actually consume both tokens.
+  consumeToken(checkoutIpBuckets, ipKey, CHECKOUT_IP_POLICY, now, /* dryRun */ false);
+  consumeToken(checkoutEmailBuckets, emailKey, CHECKOUT_EMAIL_POLICY, now, /* dryRun */ false);
+
+  return { ok: true, retryAfterSec: 0 };
+}
+
+interface ConsumeResult {
+  consumed: boolean;
+  retryAfterSec: number;
+}
+
+function consumeToken(
+  map: Map<string, Bucket>,
+  key: string,
+  policy: BucketPolicy,
+  now: number,
+  dryRun: boolean,
+): ConsumeResult {
+  const bucket = map.get(key) ?? {
+    tokens: policy.capacity,
+    updatedAt: now,
+  };
+  const elapsedSec = Math.max(0, (now - bucket.updatedAt) / 1000);
+  const refilled = Math.min(
+    policy.capacity,
+    bucket.tokens + elapsedSec * policy.refillRate,
+  );
+
+  if (refilled < 1) {
+    const need = 1 - refilled;
+    const retryAfterSec = Math.max(1, Math.ceil(need / policy.refillRate));
+    if (!dryRun) {
+      bucket.tokens = refilled;
+      bucket.updatedAt = now;
+      map.set(key, bucket);
+    }
+    return { consumed: false, retryAfterSec };
+  }
+
+  if (!dryRun) {
+    bucket.tokens = refilled - 1;
+    bucket.updatedAt = now;
+    map.set(key, bucket);
+  }
+  return { consumed: true, retryAfterSec: 0 };
 }
 
 /** Test helper — clears state between tests. Not for production use. */
 export function __resetRateLimitState() {
   ipBuckets.clear();
   domainSeenAt.clear();
+  checkoutEmailBuckets.clear();
+  checkoutIpBuckets.clear();
   lastSweep = 0;
 }
