@@ -236,3 +236,19 @@ model MerchantGmcConnection {
   @@index([revokedAt])
   @@map("scanner_merchant_gmc_connections")
 }
+
+/// Stripe webhook event-ID idempotency. PK on event_id is the lock —
+/// a unique-violation race resolves cleanly: loser returns 200 (replay),
+/// winner proceeds to dispatch. Failed dispatches leave the row in
+/// place and Sentry alert is the manual-recovery signal. Retention
+/// ~30 days (Stripe's max retry window); processedAt index supports
+/// the prune query. See ADR 0023 + apps/scanner/src/app/api/webhooks/
+/// stripe/route.ts.
+model StripeProcessedEvent {
+  eventId     String   @id @map("event_id")
+  eventType   String   @map("event_type")
+  processedAt DateTime @default(now()) @map("processed_at")
+
+  @@index([processedAt])
+  @@map("scanner_stripe_processed_events")
+}

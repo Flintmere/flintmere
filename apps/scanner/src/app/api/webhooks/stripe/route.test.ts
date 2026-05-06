@@ -126,7 +126,10 @@ describe('POST /api/webhooks/stripe', () => {
       getStripe: () => ({ webhooks: { constructEvent } }),
     }));
     vi.doMock('@/lib/db', () => ({
-      prisma: { conciergeAudit: { upsert, update } },
+      prisma: {
+        conciergeAudit: { upsert, update },
+        stripeProcessedEvent: { create: vi.fn() },
+      },
     }));
     vi.doMock('@/lib/concierge-email', () => ({
       sendConciergeCustomerEmail: sendCustomer,
@@ -204,7 +207,10 @@ describe('POST /api/webhooks/stripe', () => {
       getStripe: () => ({ webhooks: { constructEvent } }),
     }));
     vi.doMock('@/lib/db', () => ({
-      prisma: { conciergeAudit: { upsert, update } },
+      prisma: {
+        conciergeAudit: { upsert, update },
+        stripeProcessedEvent: { create: vi.fn() },
+      },
     }));
     vi.doMock('@/lib/concierge-email', () => ({
       sendConciergeCustomerEmail: sendCustomer,
@@ -272,7 +278,10 @@ describe('POST /api/webhooks/stripe', () => {
       getStripe: () => ({ webhooks: { constructEvent } }),
     }));
     vi.doMock('@/lib/db', () => ({
-      prisma: { conciergeAudit: { upsert, update } },
+      prisma: {
+        conciergeAudit: { upsert, update },
+        stripeProcessedEvent: { create: vi.fn() },
+      },
     }));
     vi.doMock('@/lib/concierge-email', () => ({
       sendConciergeCustomerEmail: sendCustomer,
@@ -331,7 +340,10 @@ describe('POST /api/webhooks/stripe', () => {
       getStripe: () => ({ webhooks: { constructEvent } }),
     }));
     vi.doMock('@/lib/db', () => ({
-      prisma: { conciergeAudit: { upsert, update } },
+      prisma: {
+        conciergeAudit: { upsert, update },
+        stripeProcessedEvent: { create: vi.fn() },
+      },
     }));
     vi.doMock('@/lib/concierge-email', () => ({
       sendConciergeCustomerEmail: sendCustomer,
@@ -385,7 +397,10 @@ describe('POST /api/webhooks/stripe', () => {
       getStripe: () => ({ webhooks: { constructEvent } }),
     }));
     vi.doMock('@/lib/db', () => ({
-      prisma: { conciergeAudit: { upsert, update } },
+      prisma: {
+        conciergeAudit: { upsert, update },
+        stripeProcessedEvent: { create: vi.fn() },
+      },
     }));
     vi.doMock('@/lib/concierge-email', () => ({
       sendConciergeCustomerEmail: sendCustomer,
@@ -430,7 +445,10 @@ describe('POST /api/webhooks/stripe', () => {
       getStripe: () => ({ webhooks: { constructEvent } }),
     }));
     vi.doMock('@/lib/db', () => ({
-      prisma: { conciergeAudit: { upsert, update: vi.fn() } },
+      prisma: {
+        conciergeAudit: { upsert, update: vi.fn() },
+        stripeProcessedEvent: { create: vi.fn() },
+      },
     }));
     vi.doMock('@/lib/concierge-email', () => ({
       sendConciergeCustomerEmail: sendCustomer,
@@ -475,7 +493,10 @@ describe('POST /api/webhooks/stripe', () => {
       getStripe: () => ({ webhooks: { constructEvent } }),
     }));
     vi.doMock('@/lib/db', () => ({
-      prisma: { conciergeAudit: { upsert, update: vi.fn() } },
+      prisma: {
+        conciergeAudit: { upsert, update: vi.fn() },
+        stripeProcessedEvent: { create: vi.fn() },
+      },
     }));
     vi.doMock('@/lib/concierge-email', () => ({
       sendConciergeCustomerEmail: vi.fn(),
@@ -553,7 +574,10 @@ describe('POST /api/webhooks/stripe', () => {
       getStripe: () => ({ webhooks: { constructEvent } }),
     }));
     vi.doMock('@/lib/db', () => ({
-      prisma: { conciergeAudit: { findUnique, update } },
+      prisma: {
+        conciergeAudit: { findUnique, update },
+        stripeProcessedEvent: { create: vi.fn() },
+      },
     }));
     vi.doMock('@/lib/concierge-refund-email', () => ({
       sendConciergeRefundOpsEmail: sendRefundOps,
@@ -618,7 +642,10 @@ describe('POST /api/webhooks/stripe', () => {
       getStripe: () => ({ webhooks: { constructEvent } }),
     }));
     vi.doMock('@/lib/db', () => ({
-      prisma: { conciergeAudit: { findUnique, update } },
+      prisma: {
+        conciergeAudit: { findUnique, update },
+        stripeProcessedEvent: { create: vi.fn() },
+      },
     }));
     vi.doMock('@/lib/concierge-refund-email', () => ({
       sendConciergeRefundOpsEmail: sendRefundOps,
@@ -672,7 +699,10 @@ describe('POST /api/webhooks/stripe', () => {
       getStripe: () => ({ webhooks: { constructEvent } }),
     }));
     vi.doMock('@/lib/db', () => ({
-      prisma: { conciergeAudit: { findUnique, update } },
+      prisma: {
+        conciergeAudit: { findUnique, update },
+        stripeProcessedEvent: { create: vi.fn() },
+      },
     }));
     vi.doMock('@/lib/concierge-refund-email', () => ({
       sendConciergeRefundOpsEmail: sendRefundOps,
@@ -711,7 +741,10 @@ describe('POST /api/webhooks/stripe', () => {
       getStripe: () => ({ webhooks: { constructEvent } }),
     }));
     vi.doMock('@/lib/db', () => ({
-      prisma: { conciergeAudit: { findUnique, update } },
+      prisma: {
+        conciergeAudit: { findUnique, update },
+        stripeProcessedEvent: { create: vi.fn() },
+      },
     }));
     vi.doMock('@/lib/concierge-refund-email', () => ({
       sendConciergeRefundOpsEmail: sendRefundOps,
@@ -759,7 +792,10 @@ describe('POST /api/webhooks/stripe', () => {
       getStripe: () => ({ webhooks: { constructEvent } }),
     }));
     vi.doMock('@/lib/db', () => ({
-      prisma: { conciergeAudit: { findUnique, update } },
+      prisma: {
+        conciergeAudit: { findUnique, update },
+        stripeProcessedEvent: { create: vi.fn() },
+      },
     }));
     vi.doMock('@/lib/concierge-refund-email', () => ({
       sendConciergeRefundOpsEmail: sendRefundOps,
@@ -780,6 +816,206 @@ describe('POST /api/webhooks/stripe', () => {
     vi.doUnmock('@/lib/stripe');
     vi.doUnmock('@/lib/db');
     vi.doUnmock('@/lib/concierge-refund-email');
+  });
+
+  // ----------------------------------------------------------------------
+  // Event-ID idempotency gate. Stripe at-least-once delivery means the
+  // SAME event_id can arrive twice. The PK on scanner_stripe_processed_
+  // events.event_id is the lock — second arrival hits P2002, replay-200,
+  // dispatch is not re-run.
+  // ----------------------------------------------------------------------
+
+  it('event-ID replay — duplicate event_id returns 200 replay and skips dispatch', async () => {
+    setupEnv();
+    vi.resetModules();
+
+    // Idempotency insert fails with P2002 (Prisma unique violation).
+    // This is what Stripe's retry of an already-processed event looks like.
+    const idempotencyCreate = vi.fn().mockRejectedValue({
+      code: 'P2002',
+      message: 'Unique constraint failed on the fields: (`event_id`)',
+    });
+    const upsert = vi.fn();
+    const update = vi.fn();
+    const sendCustomer = vi.fn();
+    const sendOps = vi.fn();
+
+    const event = {
+      id: 'evt_replay_target',
+      type: 'payment_intent.succeeded',
+      data: {
+        object: {
+          id: 'pi_replay',
+          metadata: {
+            kind: 'concierge-audit',
+            email: 'merchant@store.com',
+            shop_url: 'meridian-coffee.myshopify.com',
+            audit_band: 'band-1',
+          },
+        },
+      },
+    };
+    const constructEvent = vi.fn().mockReturnValue(event);
+
+    vi.doMock('@/lib/stripe', () => ({
+      getStripe: () => ({ webhooks: { constructEvent } }),
+    }));
+    vi.doMock('@/lib/db', () => ({
+      prisma: {
+        conciergeAudit: { upsert, update },
+        stripeProcessedEvent: { create: idempotencyCreate },
+      },
+    }));
+    vi.doMock('@/lib/concierge-email', () => ({
+      sendConciergeCustomerEmail: sendCustomer,
+      sendConciergeOpsEmail: sendOps,
+    }));
+
+    const { POST } = await import('./route');
+    const res = await POST(makeRequest());
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.ok).toBe(true);
+    expect(body.replay).toBe(true);
+    expect(body.received).toBe('evt_replay_target');
+
+    // Critical: NO dispatch — upsert / update / email sends never called.
+    expect(upsert).not.toHaveBeenCalled();
+    expect(update).not.toHaveBeenCalled();
+    expect(sendCustomer).not.toHaveBeenCalled();
+    expect(sendOps).not.toHaveBeenCalled();
+
+    vi.doUnmock('@/lib/stripe');
+    vi.doUnmock('@/lib/db');
+    vi.doUnmock('@/lib/concierge-email');
+  });
+
+  it('idempotency write failure (non-P2002) returns 500 so Stripe retries', async () => {
+    setupEnv();
+    vi.resetModules();
+
+    // Simulates DB outage — connection refused, schema mismatch, etc.
+    const idempotencyCreate = vi
+      .fn()
+      .mockRejectedValue(new Error('connection refused'));
+    const upsert = vi.fn();
+
+    const event = {
+      id: 'evt_db_outage',
+      type: 'payment_intent.succeeded',
+      data: {
+        object: {
+          id: 'pi_outage',
+          metadata: {
+            kind: 'concierge-audit',
+            email: 'm@store.com',
+            shop_url: 'shop.example.com',
+            audit_band: 'band-1',
+          },
+        },
+      },
+    };
+    const constructEvent = vi.fn().mockReturnValue(event);
+
+    vi.doMock('@/lib/stripe', () => ({
+      getStripe: () => ({ webhooks: { constructEvent } }),
+    }));
+    vi.doMock('@/lib/db', () => ({
+      prisma: {
+        conciergeAudit: { upsert, update: vi.fn() },
+        stripeProcessedEvent: { create: idempotencyCreate },
+      },
+    }));
+    vi.doMock('@/lib/concierge-email', () => ({
+      sendConciergeCustomerEmail: vi.fn(),
+      sendConciergeOpsEmail: vi.fn(),
+    }));
+
+    const { POST } = await import('./route');
+    const res = await POST(makeRequest());
+
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body.code).toBe('idempotency-write-failed');
+
+    // Dispatch never reached.
+    expect(upsert).not.toHaveBeenCalled();
+
+    vi.doUnmock('@/lib/stripe');
+    vi.doUnmock('@/lib/db');
+    vi.doUnmock('@/lib/concierge-email');
+  });
+
+  it('first-time event records its event_id before dispatching', async () => {
+    setupEnv();
+    vi.resetModules();
+
+    const idempotencyCreate = vi.fn().mockResolvedValue({
+      eventId: 'evt_fresh_1',
+      eventType: 'payment_intent.succeeded',
+      processedAt: new Date(),
+    });
+    const upsert = vi.fn().mockResolvedValue({
+      id: 'ca_fresh',
+      notificationSentAt: null,
+    });
+    const update = vi.fn().mockResolvedValue({});
+    const sendCustomer = vi.fn().mockResolvedValue({ sent: true });
+    const sendOps = vi.fn().mockResolvedValue({ sent: true });
+
+    const event = {
+      id: 'evt_fresh_1',
+      type: 'payment_intent.succeeded',
+      data: {
+        object: {
+          id: 'pi_fresh',
+          metadata: {
+            kind: 'concierge-audit',
+            email: 'm@store.com',
+            shop_url: 'shop.example.com',
+            audit_band: 'band-1',
+          },
+        },
+      },
+    };
+    const constructEvent = vi.fn().mockReturnValue(event);
+
+    vi.doMock('@/lib/stripe', () => ({
+      getStripe: () => ({ webhooks: { constructEvent } }),
+    }));
+    vi.doMock('@/lib/db', () => ({
+      prisma: {
+        conciergeAudit: { upsert, update },
+        stripeProcessedEvent: { create: idempotencyCreate },
+      },
+    }));
+    vi.doMock('@/lib/concierge-email', () => ({
+      sendConciergeCustomerEmail: sendCustomer,
+      sendConciergeOpsEmail: sendOps,
+    }));
+    vi.doMock('@/lib/stripe-invoice', () => ({
+      createConciergeInvoice: vi.fn().mockResolvedValue(null),
+    }));
+
+    const { POST } = await import('./route');
+    const res = await POST(makeRequest());
+
+    expect(res.status).toBe(200);
+    expect(idempotencyCreate).toHaveBeenCalledWith({
+      data: {
+        eventId: 'evt_fresh_1',
+        eventType: 'payment_intent.succeeded',
+      },
+    });
+    // Dispatch did run on the first-time event.
+    expect(upsert).toHaveBeenCalledTimes(1);
+    expect(sendCustomer).toHaveBeenCalledTimes(1);
+
+    vi.doUnmock('@/lib/stripe');
+    vi.doUnmock('@/lib/db');
+    vi.doUnmock('@/lib/concierge-email');
+    vi.doUnmock('@/lib/stripe-invoice');
   });
 
   it('charge.dispute.created — flips status to disputed and alerts ops with evidence due-by', async () => {
@@ -812,7 +1048,10 @@ describe('POST /api/webhooks/stripe', () => {
       getStripe: () => ({ webhooks: { constructEvent } }),
     }));
     vi.doMock('@/lib/db', () => ({
-      prisma: { conciergeAudit: { findUnique, update } },
+      prisma: {
+        conciergeAudit: { findUnique, update },
+        stripeProcessedEvent: { create: vi.fn() },
+      },
     }));
     vi.doMock('@/lib/concierge-refund-email', () => ({
       sendConciergeRefundOpsEmail: vi.fn(),

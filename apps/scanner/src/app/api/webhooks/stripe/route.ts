@@ -64,6 +64,46 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Event-ID idempotency gate. Stripe guarantees at-least-once delivery
+  // — if our handler takes >20s or fails mid-flight, Stripe retries the
+  // SAME event_id. The PK race on scanner_stripe_processed_events.event_id
+  // serialises concurrent attempts: the loser's INSERT raises a unique
+  // violation, we treat that as a replay and ACK 200 without re-dispatch.
+  // Failed first-attempts leave the row in place so subsequent Stripe
+  // retries are no-ops; Sentry alert (via the handler-error log below)
+  // is the manual-recovery signal.
+  try {
+    await prisma.stripeProcessedEvent.create({
+      data: {
+        eventId: event.id,
+        eventType: event.type,
+      },
+    });
+  } catch (err) {
+    if (isUniqueViolation(err)) {
+      return NextResponse.json({
+        ok: true,
+        received: event.id,
+        replay: true,
+      });
+    }
+    // Any other error — DB down, schema mismatch — surfaces as 500 so
+    // Stripe retries.
+    // eslint-disable-next-line no-console
+    console.error(
+      JSON.stringify({
+        event: 'stripe-webhook-idempotency-write-failed',
+        type: event.type,
+        id: event.id,
+        error: err instanceof Error ? err.message : String(err),
+      }),
+    );
+    return NextResponse.json(
+      { ok: false, code: 'idempotency-write-failed' },
+      { status: 500 },
+    );
+  }
+
   try {
     if (event.type === 'payment_intent.succeeded') {
       const intent = event.data.object as Stripe.PaymentIntent;
@@ -92,6 +132,17 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ ok: true, received: event.id });
+}
+
+/**
+ * Prisma raises a `PrismaClientKnownRequestError` with code 'P2002' on
+ * unique-constraint violations. We don't import the error type directly
+ * to keep this route runtime-light; structural check is sufficient.
+ */
+function isUniqueViolation(err: unknown): boolean {
+  if (!err || typeof err !== 'object') return false;
+  const e = err as { code?: unknown };
+  return e.code === 'P2002';
 }
 
 async function handleConciergePaymentIntent(
