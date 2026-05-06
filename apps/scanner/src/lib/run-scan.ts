@@ -32,6 +32,8 @@ import {
 import { fetchCrawlability } from './crawlability-fetcher';
 import { fetchCatalog, ShopifyFetchError } from './shopify-fetcher';
 import { prisma } from './db';
+import { fetchGmcGroundTruth } from './gmc/ground-truth';
+import type { GmcGroundTruth } from './gmc/types';
 
 // Mirrors the Prisma `ScanSource` enum. The underscore-form value
 // (`rescan_30_day`) is constrained by Postgres enum naming rules — the
@@ -65,6 +67,7 @@ interface RunScanCompleteResult {
   aovEstimate: AovEstimate | null;
   revenueEstimate: RevenueEstimate | null;
   scaledRevenueEstimate: RevenueEstimate | null;
+  gmcGroundTruth: GmcGroundTruth | null;
   pillars: Array<{
     pillar: string;
     score: number;
@@ -108,6 +111,17 @@ export async function runScanForShop(input: RunScanInput): Promise<RunScanResult
   try {
     const fetched = await fetchCatalog(input.shopUrl, { maxPages: 4 });
     const { catalog, truncated, actualProductCount } = fetched;
+    // Per ADR 0023: GMC ground-truth fetch runs in parallel with the
+    // remaining catalog work so its 30s budget overlaps scoring rather
+    // than stacking onto user-facing scan latency. Returns null when no
+    // active MerchantGmcConnection exists (current state pre-flag-flip).
+    const gmcPromise = fetchGmcGroundTruth(catalog.shopDomain).catch((err) => {
+      console.warn(
+        'gmc-ground-truth: orchestrator-throw',
+        err instanceof Error ? err.message : String(err),
+      );
+      return null;
+    });
     const crawlability = await fetchCrawlability(catalog.shopDomain).catch(() => null);
     const score = scoreCatalog(catalog, crawlability ? { crawlability } : {});
     const catalogSummary = summarizeCatalog(catalog);
@@ -153,6 +167,8 @@ export async function runScanForShop(input: RunScanInput): Promise<RunScanResult
           }
         : null;
 
+    const gmcGroundTruth = await gmcPromise;
+
     const persistedScoreJson = {
       ...(score as unknown as Record<string, unknown>),
       issues: enrichedIssues,
@@ -164,6 +180,7 @@ export async function runScanForShop(input: RunScanInput): Promise<RunScanResult
       aovEstimate: aovResult?.aovEstimate ?? null,
       revenueEstimate: aovResult?.revenueEstimate ?? null,
       scaledRevenueEstimate,
+      gmcGroundTruth,
     };
 
     await prisma.scan.update({
@@ -197,6 +214,7 @@ export async function runScanForShop(input: RunScanInput): Promise<RunScanResult
       aovEstimate: aovResult?.aovEstimate ?? null,
       revenueEstimate: aovResult?.revenueEstimate ?? null,
       scaledRevenueEstimate,
+      gmcGroundTruth,
       pillars: score.pillars.map((p) => ({
         pillar: p.pillar,
         score: p.score,

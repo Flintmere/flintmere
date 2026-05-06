@@ -3,6 +3,8 @@ import type { CatalogInput } from '@flintmere/scoring';
 
 // ---- Mocks ----
 // Mock prisma — both the create + the update branch are no-ops.
+// merchantGmcConnection.findUnique returns null so the GMC ground-truth
+// splice in runScanForShop short-circuits without warnings.
 vi.mock('@/lib/db', () => ({
   prisma: {
     scan: {
@@ -11,6 +13,9 @@ vi.mock('@/lib/db', () => ({
         ...data,
       })),
       update: vi.fn(async () => ({})),
+    },
+    merchantGmcConnection: {
+      findUnique: vi.fn(async () => null),
     },
   },
 }));
