@@ -67,6 +67,7 @@ describe('estimateSuppression', () => {
     const result = estimateSuppression(makeCatalog([]));
     expect(result.low).toBe(0);
     expect(result.high).toBe(0);
+    expect(result.productsWithAnySignal).toBe(0);
     expect(result.signals.missingGtin).toBe(0);
     expect(result.signals.ambiguousAllergen).toBe(0);
     expect(result.signals.missingGmcCategory).toBe(0);
@@ -78,6 +79,7 @@ describe('estimateSuppression', () => {
     const result = estimateSuppression(makeCatalog([cleanProduct]));
     expect(result.low).toBe(0);
     expect(result.high).toBe(0);
+    expect(result.productsWithAnySignal).toBe(0);
     expect(result.signals.missingGtin).toBe(0);
     expect(result.signals.ambiguousAllergen).toBe(0);
     expect(result.signals.missingGmcCategory).toBe(0);
@@ -86,7 +88,7 @@ describe('estimateSuppression', () => {
   it('returns a non-trivial range for a high-signal catalog', () => {
     // Ten copies of the triple-signal food product. Per the bands,
     // each contributes [0.85, 1.0] → sum [8.5, 10.0]. After floor/ceil,
-    // low = 8, high = 10.
+    // low = 8, high = 10. All 10 carry ≥1 signal.
     const products = Array.from({ length: 10 }, (_, i) => ({
       ...tripleSignalFoodProduct,
       id: `gid://shopify/Product/${200 + i}`,
@@ -96,9 +98,27 @@ describe('estimateSuppression', () => {
     expect(result.high).toBeGreaterThan(result.low);
     expect(result.low).toBeGreaterThan(0);
     expect(result.high).toBeGreaterThan(0);
+    expect(result.productsWithAnySignal).toBe(10);
     expect(result.signals.missingGtin).toBe(10);
     expect(result.signals.ambiguousAllergen).toBe(10);
     expect(result.signals.missingGmcCategory).toBe(10);
+  });
+
+  it('productsWithAnySignal counts the union, not the sum of per-signal counts', () => {
+    // Mixed catalog: triple-signal (3 signals on one product) + two-signal
+    // (2 on one product) + one-signal (1 on one product) + clean (0).
+    // Sum of per-signal counts is 3+1+2 = 6 (missingGtin + ambiguousAllergen +
+    // missingGmcCategory). The union — distinct products carrying ≥1 signal —
+    // is 3, because each of the three non-clean products contributes one row
+    // to the union regardless of how many signals fire on it.
+    const products = [
+      tripleSignalFoodProduct,
+      twoSignalFoodProduct,
+      oneSignalFoodProduct,
+      cleanProduct,
+    ];
+    const result = estimateSuppression(makeCatalog(products));
+    expect(result.productsWithAnySignal).toBe(3);
   });
 
   it('range is monotonic — high is always >= low', () => {

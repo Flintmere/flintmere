@@ -344,43 +344,71 @@ export function verdictHeader(args: {
 
 export const SUPPRESSION_LEDE_EYEBROW = 'Likely suppressed in Google Shopping'
 
-// Disclosure tone softened 2026-04-28 per #37 Consumer psychologist lens.
-// Old subhead read as accusatory + demand-led ("Install Flintmere to confirm
-// exact figures..."). New subhead frames as honest projection + path-forward
-// ("verify and prioritise the biggest wins"). Same substance, less anxiety.
 export const SUPPRESSION_LEDE_SUBHEAD =
-  'Modelled from your public catalog signals — the actual count depends on your Google Merchant Center account. Install Flintmere to verify, then prioritise the fixes that move the most products.'
+  'Modelled from your public catalog signals — the actual count depends on your Google Merchant Center account.'
 
 /**
- * The lede headline for the scan results page.
+ * The lede for the scan results page — returns a deterministic-anchor
+ * headline plus an optional probabilistic subline.
  *
- * Returns a single sentence stating the modelled range. Wrapping
- * component handles the Bracket signature on key nouns.
+ * The headline anchors on the count of products carrying ≥1 signal —
+ * a number reproducible from the merchant's own admin (count of products
+ * with a missing barcode, a missing GMC category, or unstructured allergen
+ * data). The subline reports the probability-banded suppression range,
+ * which used to be the whole headline and read as a guess because the
+ * 1-signal probability band (15–35%) puts a ~2.3× spread on the dominant
+ * cohort. Anchor first, refine second.
  *
- * Tone (softened 2026-04-28 per #37):
- *   - "aren't appearing" instead of "are likely suppressed" — matter-of-fact,
- *     less accusatory. "Suppressed" is the canonical GMC dashboard term and
- *     stays in the eyebrow; the body uses everyday English.
- *   - "Roughly" prefix signals modelled-not-measured and matches "we estimate".
- *   - Drop "today" tail — present-tense urgency without it.
+ * Backward compat: when `productsWithAnySignal` is undefined (older scans
+ * persisted before this field shipped), fall back to the original single-
+ * sentence framing so /score/[shop] re-renders don't crash.
  */
 export function suppressionLede(args: {
   low: number
   high: number
   productCount: number
-}): string {
-  const { low, high, productCount } = args
+  productsWithAnySignal?: number
+}): { headline: string; subline: string | null } {
+  const { low, high, productCount, productsWithAnySignal } = args
 
   if (productCount === 0) {
-    return 'No public products found, so we have nothing to estimate against.'
+    return {
+      headline: 'No public products found, so we have nothing to estimate against.',
+      subline: null,
+    }
   }
-  if (high === 0) {
-    return 'We see no clear suppression signals on this catalog. Every product carries a barcode, a category, and (for food items) an allergen statement.'
+  if (high === 0 || productsWithAnySignal === 0) {
+    return {
+      headline:
+        'We see no clear suppression signals on this catalog. Every product carries the data Google Shopping looks for.',
+      subline: null,
+    }
   }
+
+  // Backward-compat path — old persisted scans without the deterministic anchor.
+  if (productsWithAnySignal === undefined) {
+    if (low === high) {
+      return {
+        headline: `We estimate ${low.toLocaleString()} of your ${productCount.toLocaleString()} products may not be appearing in Google Shopping right now.`,
+        subline: null,
+      }
+    }
+    return {
+      headline: `We estimate roughly ${low.toLocaleString()}–${high.toLocaleString()} of your ${productCount.toLocaleString()} products may not be appearing in Google Shopping right now.`,
+      subline: null,
+    }
+  }
+
+  const headline = `${productsWithAnySignal.toLocaleString()} of your ${productCount.toLocaleString()} products are missing data Google Shopping looks for.`
+  let subline: string
   if (low === high) {
-    return `We estimate ${low.toLocaleString()} of your ${productCount.toLocaleString()} products may not be appearing in Google Shopping right now.`
+    subline = `Roughly ${low.toLocaleString()} are likely already suppressed today.`
+  } else if (low === 0) {
+    subline = `Up to ${high.toLocaleString()} are likely already suppressed today.`
+  } else {
+    subline = `Roughly ${low.toLocaleString()}–${high.toLocaleString()} are likely already suppressed today.`
   }
-  return `We estimate roughly ${low.toLocaleString()}–${high.toLocaleString()} of your ${productCount.toLocaleString()} products may not be appearing in Google Shopping right now.`
+  return { headline, subline }
 }
 
 /**
@@ -444,7 +472,7 @@ export const REVENUE_LEDE_EYEBROW = 'Annual demand at risk'
 // per-merchant findings still surface vertical-correctly via
 // suppressionSignalLine() below.
 export const REVENUE_LEDE_DISCLOSURE =
-  'Modelled from public catalog signals — barcodes, Google Merchant Center categories, and product attributes. Install Flintmere to verify against your Google Merchant Center account.'
+  'Modelled from public catalog signals — barcodes, Google Merchant Center categories, and product attributes.'
 
 /**
  * Disclosure variant when the scan was truncated and figures are projected
@@ -461,7 +489,7 @@ export function sampledRevenueDisclosure(args: {
     args.actualProductCount !== null
       ? args.actualProductCount.toLocaleString()
       : `${sampled}+`
-  return `Projected from a ${sampled}-product sample of your ${total}-product catalog. Modelled from public catalog signals — barcodes, Google Merchant Center categories, and product attributes. Install Flintmere to verify against your full catalog and Google Merchant Center account.`
+  return `Projected from a ${sampled}-product sample of your ${total}-product catalog. Modelled from public catalog signals — barcodes, Google Merchant Center categories, and product attributes.`
 }
 
 /**

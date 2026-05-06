@@ -275,6 +275,7 @@ export function estimateSuppression(input: CatalogInput): SuppressionEstimate {
     return {
       low: 0,
       high: 0,
+      productsWithAnySignal: 0,
       signals: {
         missingGtin: 0,
         ambiguousAllergen: 0,
@@ -293,6 +294,7 @@ export function estimateSuppression(input: CatalogInput): SuppressionEstimate {
   let missingGtinCount = 0;
   let ambiguousAllergenCount = 0;
   let missingGmcCategoryCount = 0;
+  let productsWithAnySignal = 0;
 
   for (const product of input.products) {
     const signals = extractSignals(product, catalogIsNonFood);
@@ -300,7 +302,10 @@ export function estimateSuppression(input: CatalogInput): SuppressionEstimate {
     if (signals.ambiguousAllergen) ambiguousAllergenCount++;
     if (signals.missingGmcCategory) missingGmcCategoryCount++;
 
-    const band = PROBABILITY_BANDS[signalCount(signals)];
+    const n = signalCount(signals);
+    if (n > 0) productsWithAnySignal++;
+
+    const band = PROBABILITY_BANDS[n];
     lowSum += band.low;
     highSum += band.high;
   }
@@ -314,6 +319,7 @@ export function estimateSuppression(input: CatalogInput): SuppressionEstimate {
   return {
     low,
     high,
+    productsWithAnySignal,
     signals: {
       missingGtin: missingGtinCount,
       ambiguousAllergen: ambiguousAllergenCount,

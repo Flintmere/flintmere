@@ -119,10 +119,11 @@ export function SuppressionLede({
     truncated && scaledEstimate
       ? actualProductCount ?? productCount
       : productCount;
-  const headline = suppressionLede({
+  const { headline, subline } = suppressionLede({
     low: effectiveSuppression.low,
     high: effectiveSuppression.high,
     productCount: ledeProductCount,
+    productsWithAnySignal: effectiveSuppression.productsWithAnySignal,
   });
   return (
     <div className="mb-12 pb-12 border-b border-[color:var(--color-line)]">
@@ -130,6 +131,14 @@ export function SuppressionLede({
         <Bracket>{SUPPRESSION_LEDE_EYEBROW}</Bracket>
       </p>
       <h2 className="max-w-[34ch]">{headline}</h2>
+      {subline ? (
+        <p
+          className="mt-4 max-w-[48ch] text-[color:var(--color-ink-2)]"
+          style={{ fontSize: 18, lineHeight: 1.4 }}
+        >
+          {subline}
+        </p>
+      ) : null}
       {signalLine ? (
         <p
           className="mt-6 max-w-[58ch] text-[color:var(--color-ink-2)]"

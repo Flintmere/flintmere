@@ -176,6 +176,14 @@ export interface SuppressionEstimate {
   low: number;
   /** Upper bound of likely-suppressed product count (looser probabilities). */
   high: number;
+  /**
+   * Deterministic count of products carrying ≥1 suppression signal — the
+   * union over the three per-signal counts. Anchors the lede with a
+   * reproducible number ahead of the probability-banded `low/high` range,
+   * so the headline reads as data not as a guess. Optional for backward
+   * compatibility with scoreJson rows persisted before this field shipped.
+   */
+  productsWithAnySignal?: number;
   /** Per-signal counts driving the estimate (transparency, not aggregation maths). */
   signals: {
     missingGtin: number;
