@@ -21,6 +21,22 @@ export const CompletionOptsSchema = z.object({
   tag: z.string().optional(),
   /** A stable correlation id that propagates through logs. */
   requestId: z.string().optional(),
+  /**
+   * Structured-output mode. When set to 'application/json', Gemini
+   * returns strict JSON; when combined with `responseSchema`, output is
+   * constrained to that schema. Vertex maps these to `generationConfig`.
+   * The OpenAI provider currently ignores them — fallback path is
+   * unstructured text. Audit-assist v0 uses structured mode on Vertex
+   * only and fails loud on the fallback path (RejectingProvider).
+   */
+  responseMimeType: z.enum(['text/plain', 'application/json']).optional(),
+  /**
+   * Provider-shape JSON schema for structured output. Vertex accepts a
+   * Gemini-flavoured JSON schema (subset of OpenAPI). Held as `unknown`
+   * here because the schema document is owned by the caller and
+   * provider-shape varies. Do not validate cross-provider — pass through.
+   */
+  responseSchema: z.unknown().optional(),
 });
 export type CompletionOpts = z.infer<typeof CompletionOptsSchema>;
 

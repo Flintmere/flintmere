@@ -55,18 +55,52 @@ export class VertexProvider implements LLMProvider {
   ): Promise<CompletionResult> {
     const started = Date.now();
     try {
+      // Structured-output passthrough — when caller sets
+      // `responseMimeType: 'application/json'` (and optionally
+      // `responseSchema`), Vertex constrains output to that shape. The
+      // SDK's GenerationConfig type may or may not surface these fields
+      // depending on @google-cloud/vertexai version; we cast through
+      // `unknown` to avoid pinning the SDK type. Verified against
+      // @google-cloud/vertexai ^1.9 (the project's pinned version).
+      const generationConfig: Record<string, unknown> = {
+        maxOutputTokens: opts.maxOutputTokens,
+        temperature: opts.temperature,
+        topP: opts.topP,
+        stopSequences: opts.stopSequences,
+      };
+      if (opts.responseMimeType) {
+        generationConfig.responseMimeType = opts.responseMimeType;
+      }
+      if (opts.responseSchema !== undefined) {
+        generationConfig.responseSchema = opts.responseSchema;
+      }
+      // Gemini surface system prompts via `systemInstruction` on the
+      // model config — NOT via a `system` role in `contents`. The
+      // OpenAI-shaped `Message[]` we accept allows `system` for
+      // cross-provider portability; we extract system messages here
+      // and concatenate (rare but possible) before passing through.
+      // Caught 2026-05-06 — the audit-draft route was the first caller
+      // to send a system message; Vertex 400'd "Content with system
+      // role is not supported" until this split landed.
+      const systemMessages = opts.messages.filter((m) => m.role === 'system');
+      const nonSystemMessages = opts.messages.filter(
+        (m) => m.role !== 'system',
+      );
+      const systemInstructionText = systemMessages
+        .map((m) => m.content)
+        .join('\n\n');
+
       const generativeModel = this.client.getGenerativeModel({
         model: this.model,
-        generationConfig: {
-          maxOutputTokens: opts.maxOutputTokens,
-          temperature: opts.temperature,
-          topP: opts.topP,
-          stopSequences: opts.stopSequences,
-        },
+        generationConfig:
+          generationConfig as unknown as GenerateContentRequest['generationConfig'],
+        ...(systemInstructionText && {
+          systemInstruction: systemInstructionText,
+        }),
       });
 
-      const contents: Content[] = opts.messages.map((m) => ({
-        role: m.role === 'assistant' ? 'model' : m.role,
+      const contents: Content[] = nonSystemMessages.map((m) => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
         parts: [{ text: m.content }] as Part[],
       }));
 

@@ -36,3 +36,6 @@ export type { SanitizeResult, SanitizeMessagesResult } from './sanitize.js';
 
 export { createRouter, createRouterFromProviders } from './factory.js';
 export type { FactoryEnv } from './factory.js';
+
+export { draftAudit, RejectingProvider } from './customer/index.js';
+export type { DraftAuditOpts, DraftAuditResult } from './customer/index.js';
