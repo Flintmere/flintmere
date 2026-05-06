@@ -17,7 +17,7 @@ export default function Terms() {
       eyebrow="Terms"
       title="The rules of the road."
       summary="Plain terms: you pay, we score and fix your catalog. 30-day full refund if you change your mind. You own your data, we own our software. We can&rsquo;t be responsible for more than you paid us in the last 12 months. If we disagree, English law applies."
-      lastUpdated="2026-05-03"
+      lastUpdated="2026-05-06"
       anchorNumeral="02"
     >
       <Clause n="01" heading="Who these terms are with">
@@ -55,6 +55,15 @@ export default function Terms() {
             (1,501&ndash;5,000), or bespoke from £597 (5,001+, contracted by
             email). Eazy Access Ltd is not VAT-registered, so the band price
             you select is the full price &mdash; no VAT is added.
+          </li>
+          <li>
+            <strong>Optional Google Merchant Center connection</strong>: where
+            you have a GMC account, you can grant us read-only access via
+            Google&rsquo;s OAuth flow so the audit reads ground-truth
+            disapproval data alongside our public-catalog signals. The
+            integration is optional, never a precondition of any tier, and
+            revocable at any time. Clause 06 covers the scope of what we
+            read and how you revoke.
           </li>
         </ul>
       </Clause>
@@ -172,6 +181,27 @@ export default function Terms() {
           so only with the actions you approve. Every write is logged. You can
           roll back the last 30 days of changes from the app.
         </p>
+        <p className="mt-4">
+          <strong>Google Merchant Center connection (optional).</strong> If
+          you grant us OAuth access to your GMC, you authorise us to read
+          (read-only, scope <code>auth/content</code>) the account-level and
+          per-product diagnostic data Google maintains for your feed. You
+          warrant that you have authority to grant access to the GMC account
+          you connect. We never request a write scope, never modify your
+          GMC, never write back, never share GMC data with third parties
+          beyond the sub-processors listed in the Privacy Policy, and never
+          use GMC data for advertising or resale. You may revoke at any time
+          from your audit dashboard or directly at{' '}
+          <a
+            href="https://myaccount.google.com/permissions"
+            className="underline"
+          >
+            myaccount.google.com/permissions
+          </a>
+          ; the revoke takes effect immediately. Full data-scope, retention,
+          and Limited Use treatment lives at{' '}
+          <a href="/privacy" className="underline">privacy clause 11</a>.
+        </p>
       </Clause>
 
       <Clause n="07" heading="Our intellectual property">
@@ -206,6 +236,15 @@ export default function Terms() {
           any marketplace (Google, Amazon, Shopify Catalog) will accept your
           feed. Scores reflect current best-practice heuristics and will shift
           as specs evolve.
+        </p>
+        <p className="mt-4">
+          Where we surface third-party data — Google Merchant Center
+          disapproval reasons, marketplace feed status, search-platform
+          signals — we display the upstream system&rsquo;s own language and
+          values verbatim and make no warranty about the data&rsquo;s
+          accuracy, completeness, or timeliness. What we show is what the
+          upstream system has chosen to surface to your account at the
+          moment we read it.
         </p>
         <p className="mt-4">
           Nothing in these terms limits liability for death or personal injury

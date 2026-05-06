@@ -16,8 +16,8 @@ export default function Privacy() {
     <LegalShell
       eyebrow="Privacy"
       title="How we handle your data."
-      summary="We collect only what we need to score and fix your product catalog. We do not sell data, ever. We host in the UK/EU, we delete tokens within 60 seconds of uninstall, our free one-time-secret tool at /secret encrypts in your browser so we never hold the key, and you can ask us to delete everything else at any time by sending a message via our contact form (Privacy topic)."
-      lastUpdated="2026-05-03"
+      summary="We collect only what we need to score and fix your product catalog. We do not sell data, ever. We host in the UK/EU, we delete tokens within 60 seconds of uninstall, our free one-time-secret tool at /secret encrypts in your browser so we never hold the key, and if you connect your Google Merchant Center we hold a single read-only refresh token encrypted at rest until you disconnect — full Limited Use attestation in clause 11. You can ask us to delete everything else at any time by sending a message via our contact form (Privacy topic)."
+      lastUpdated="2026-05-06"
       anchorNumeral="01"
     >
       <Clause n="01" heading="Who we are">
@@ -39,7 +39,7 @@ export default function Privacy() {
       </Clause>
 
       <Clause n="02" heading="What data we collect">
-        <p>We collect four categories of data:</p>
+        <p>We collect five categories of data:</p>
         <ul className="mt-4 list-disc pl-6 space-y-2">
           <li>
             <strong>Scanner input.</strong> The Shopify store URL you submit,
@@ -68,6 +68,16 @@ export default function Privacy() {
             <code>write_products</code> — your product catalog, variants, and
             metafields. We do not request customer, order, or financial
             scopes.
+          </li>
+          <li>
+            <strong>Google Merchant Center data (only if you connect).</strong>{' '}
+            If you grant us read-only access to your Google Merchant Center
+            via Google&rsquo;s OAuth flow, we receive a refresh token plus
+            account-level and product-level diagnostic data: your GMC account
+            ID, per-product disapproval status, the disapproval reasons
+            Google has recorded, and aggregate destination counts. We do
+            not request, receive, or store customer-level GMC data, financial
+            reports, or any write scope. Full treatment in clause 11.
           </li>
         </ul>
         <p className="mt-4">
@@ -98,6 +108,12 @@ export default function Privacy() {
             <strong>Shopify app:</strong> contract performance — we cannot
             deliver the service you installed without processing the catalog
             data.
+          </li>
+          <li>
+            <strong>Google Merchant Center integration:</strong> consent —
+            your OAuth grant via Google&rsquo;s consent screen is the lawful
+            basis. You can revoke at any time and we honour the revoke
+            within seconds (clause 11).
           </li>
           <li>
             <strong>Sub-processor sharing:</strong> necessary for performance
@@ -133,6 +149,17 @@ export default function Privacy() {
             <strong>Shopify catalog snapshot + scores:</strong> 30-day grace
             window after uninstall (so a reinstall is seamless), then fully
             purged.
+          </li>
+          <li>
+            <strong>Google Merchant Center refresh token:</strong> kept until
+            you disconnect (or Google revokes access on your behalf), then
+            zeroed at rest within seconds and the row purged within 30 days
+            for audit-trail purposes.
+          </li>
+          <li>
+            <strong>Google Merchant Center diagnostic data:</strong> joins
+            your scan record under the same 90-day retention as scanner
+            results; deleted on the same schedule.
           </li>
           <li>
             <strong>Stripe concierge audit records:</strong> kept for 7 years
@@ -233,10 +260,13 @@ export default function Privacy() {
 
       <Clause n="08" heading="Security">
         <p>
-          Shopify access tokens are encrypted at rest with AES-256-GCM using a
-          key stored outside the database. All webhooks are HMAC-verified. All
-          traffic uses TLS 1.2 or higher. We run regular dependency scans and
-          follow a documented incident-response procedure. Full details:{' '}
+          Shopify access tokens and Google Merchant Center refresh tokens
+          are encrypted at rest with AES-256-GCM, each under a separate
+          environment-held key isolated from the other (a compromise of one
+          key does not expose the other). All webhooks are HMAC-verified.
+          All traffic uses TLS 1.2 or higher. We run regular dependency
+          scans and follow a documented incident-response procedure. Full
+          details:{' '}
           <a href="/security" className="underline">flintmere.com/security</a>.
         </p>
       </Clause>
@@ -294,7 +324,95 @@ export default function Privacy() {
         </p>
       </Clause>
 
-      <Clause n="11" heading="Changes to this policy">
+      <Clause n="11" heading="Google Merchant Center integration">
+        <p>
+          If you choose to connect your Google Merchant Center (GMC) account
+          to us, we receive read-only diagnostic data about your product
+          feed directly from Google. This integration is optional, granted
+          by you through Google&rsquo;s standard OAuth consent screen, and
+          revocable at any time.
+        </p>
+        <p className="mt-4">
+          <strong>Scope.</strong> We request a single OAuth scope:{' '}
+          <code>https://www.googleapis.com/auth/content</code>. This is a
+          read-only scope. We never request a write scope and cannot modify
+          your GMC account, products, settings, or feeds.
+        </p>
+        <p className="mt-4">
+          <strong>Data we receive.</strong> Your GMC account ID, per-product
+          status (approved / disapproved / pending), the human-readable
+          disapproval reasons Google records against each product, and
+          aggregate counts. We do not receive customer data, order data,
+          financial reports, or any data Google holds about your buyers.
+        </p>
+        <p className="mt-4">
+          <strong>How we use it.</strong> Strictly to produce your audit
+          deliverable — the report we hand back to you with the issues we
+          found and the fixes we recommend. Google&rsquo;s ground-truth
+          replaces our modelled estimates where we have it, so you get a
+          sharper diagnostic.
+        </p>
+        <p className="mt-4">
+          <strong>Storage.</strong> Your refresh token is encrypted at rest
+          using AES-256-GCM with a key held outside the database. Access
+          tokens are never written to disk — they are rotated on demand
+          from the refresh token and held only in process memory. The
+          diagnostic data Google returns joins your scan record under the
+          same retention as your other scan results.
+        </p>
+        <p className="mt-4">
+          <strong>Limited Use compliance.</strong> Our use of information
+          received from Google APIs adheres to Google API Services User
+          Data Policy, including the Limited Use requirements:
+        </p>
+        <ul className="mt-4 list-disc pl-6 space-y-2">
+          <li>
+            We do not allow humans to read GMC data except (a) with your
+            specific consent, (b) for security purposes such as
+            investigating abuse, (c) when required by law, or (d) when
+            the data has been aggregated and anonymised for product
+            improvement.
+          </li>
+          <li>
+            We do not transfer GMC data to others except as necessary to
+            provide or improve the audit, and only under written contract
+            with the same Limited Use commitments.
+          </li>
+          <li>
+            We do not use GMC data for advertising, including retargeting,
+            personalised advertising, or interest-based advertising.
+          </li>
+          <li>
+            We do not sell GMC data to anyone, ever, under any
+            circumstance.
+          </li>
+        </ul>
+        <p className="mt-4">
+          <strong>Your control.</strong> You can disconnect at any time —
+          either from your Flintmere audit dashboard or directly from your
+          Google Account at{' '}
+          <a
+            href="https://myaccount.google.com/permissions"
+            className="underline"
+          >
+            myaccount.google.com/permissions
+          </a>
+          . When you disconnect, we revoke the token at Google, zero the
+          stored ciphertext within seconds, and purge the row within 30
+          days. The diagnostic data Google previously returned to us
+          continues under its existing 90-day scan retention, or earlier
+          if you exercise your right to erasure (clause 07).
+        </p>
+        <p className="mt-4">
+          <strong>Sub-processing.</strong> Google is the upstream source of
+          this data, not our sub-processor — you authorise the data flow
+          directly via OAuth. The diagnostic data we receive flows through
+          the same UK/EU infrastructure listed in clause 05; no additional
+          third party sees it.
+        </p>
+      </Clause>
+
+      <Clause n="12" heading="Changes to this policy">
         <p>
           If we make material changes, we&rsquo;ll email Shopify app users 30
           days in advance and update the &ldquo;Last updated&rdquo; date at
