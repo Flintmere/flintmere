@@ -98,3 +98,4 @@ data/recruitment/*
 
 # Concierge audit working data (per-merchant CSV + summary outputs)
 data/audits/*
+.local-secrets

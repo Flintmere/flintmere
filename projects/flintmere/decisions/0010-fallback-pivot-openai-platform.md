@@ -4,6 +4,10 @@
 - **Date:** 2026-04-25
 - **Supersedes:** ADR 0005 §Decision/Fallback ("GPT-4o-mini via Azure OpenAI EU")
 
+> ## Amendment 2026-05-06 — Vertex AI rebrand
+>
+> The primary path this ADR complements (Vertex AI Gemini 2.5 Flash + Pro) was rebranded to the **Gemini Enterprise Agent Platform** at Cloud Next '26 (2026-04-22). The fallback decision is unaffected — OpenAI Platform `gpt-4o-mini` remains the fallback, the privacy-by-minimisation posture (`store: false`, project-scoped key, PII sanitiser, vision fallback disabled) stands, and the re-open conditions still bind. References to "Vertex AI primary" in the body should be read as "Gemini Enterprise Agent Platform primary (formerly Vertex AI)" going forward.
+
 ## Context
 
 ADR 0005 named **Azure OpenAI EU** as the fallback when Vertex AI Gemini errors out, on the basis that the `swedencentral` / `francecentral` regions deliver hard EU data residency and a multi-cloud decorrelation story for enterprise sales.

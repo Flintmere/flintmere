@@ -5,6 +5,20 @@
 - **Supersedes:** Nothing (first ADR on LLM choice)
 - **Supersedes memory note:** Previous SPEC.md §6.1 line naming Claude Haiku/Sonnet as default is superseded by this ADR.
 
+> ## Amendment 2026-05-06 — Vertex AI rebrand
+>
+> Vertex AI was rebranded to the **Gemini Enterprise Agent Platform** at Google Cloud Next '26 (announced 2026-04-22). Per Google's own framing — "Gemini Enterprise Agent Platform (formerly Vertex AI)" — this is a rebrand and consolidation (Vertex AI + Agentspace + Gemini Code Assist enterprise tiers into one product), not a retirement. Existing workloads run unchanged.
+>
+> Nothing in this ADR's decision changes:
+>
+> - Model IDs (`gemini-2.5-flash`, `gemini-2.5-pro`) unchanged.
+> - Region pinning (`europe-west1` primary, `europe-west4` failover) unchanged.
+> - SDK (`@google-cloud/vertexai` and successors), billing, and API surface migrated under the new namespace with no breaking changes.
+> - EU data-residency posture (data at rest in customer-selected region; processing within the request region) unchanged. GDPR / DPA story stands.
+> - Per-token pricing on Gemini 2.5 models unchanged ($1.25 / $10 per 1M for Pro; ~$0.30 / $2.50 for Flash).
+>
+> Future ADRs and runbooks prefer the new name. Body references to "Vertex AI" in this ADR remain accurate during the transition.
+
 ## Context
 
 Flintmere makes heavy use of LLMs across three workloads:

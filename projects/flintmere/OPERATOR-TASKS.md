@@ -74,12 +74,17 @@ Sections are ordered roughly by **when you need them**. Do Stage 1 first; Stage 
   cd apps/shopify-app && shopify app config link
   ```
 
-### Google Cloud (Vertex AI)
+### Google Cloud (Gemini Enterprise Agent Platform — formerly Vertex AI)
 
-- [ ] Create a **Google Cloud account** at [cloud.google.com](https://cloud.google.com)
-- [ ] Add billing (required even for Vertex AI trial credits)
-- [ ] Create a project: `flintmere-production`
-- [ ] Enable **Vertex AI API** in the project
+> **Naming.** Vertex AI was rebranded at Cloud Next '26 (2026-04-22) to the **Gemini Enterprise Agent Platform**. SDK, model IDs, regions, IAM roles, and the API enablement step are unchanged — the API itself is still labelled "Vertex AI API" in the console during transition. See ADR 0005 amendment.
+>
+> **Org-level identity.** Eazy Access Ltd (Companies House 13205428) is the data controller of record on the Flintmere Privacy Policy and DPA. The GCP organization, billing account, and DPA signatory must therefore be **Eazy Access Ltd**, with `flintmere-production` as a project inside that org. Same pattern as Stripe (`EAZYACCESS LTD* FLINT B1` descriptor) and OpenAI (`flintmere-fallback` project under Eazy Access Ltd org).
+
+- [ ] Sign in to [console.cloud.google.com](https://console.cloud.google.com) using `info@eazyaccess.org`
+  - Org name: **Eazy Access Ltd** (parent co. of Flintmere; create the org if it doesn't exist yet)
+- [ ] Add billing on the Eazy Access Ltd payment method (required even for trial credits)
+- [ ] Create a project inside the Eazy Access Ltd org: `flintmere-production`
+- [ ] Enable **Vertex AI API** in the project (console step still labelled "Vertex AI API" during the Gemini Enterprise transition)
 - [ ] Set region pinning to `europe-west1` (Belgium)
 - [ ] Create a **service account**: IAM & Admin → Service Accounts → Create
   - [ ] Grant role: `Vertex AI User`

@@ -33,18 +33,27 @@ Populated from `vendor-register.md`.
 - Owning skill: `vendor-review`
 - Notes: upgrade trigger at ~30 paying merchants (Basic → Premium 4 vCPU)
 
-### Google Vertex AI (Gemini)
+### Google Cloud — Gemini Enterprise Agent Platform (formerly Vertex AI)
 - Type: vendor renewal
 - Cadence: per-use (no renewal date)
 - Owner: operator + #36
 - Owning skill: `vendor-review` (annual cost + quality review)
-- Notes: monitor usage via `finance-snapshot`; re-evaluate model selection annually
+- Notes: monitor usage via `finance-snapshot`; re-evaluate model selection annually. Rebranded from Vertex AI at Cloud Next '26 (2026-04-22); Customer Agreement / DPA covers Google LLC + Google Ireland sub-processors regardless of product naming.
 
-### Azure OpenAI (fallback)
+### Google Cloud — service-account key rotation (`flintmere-llm`)
+- Type: security hygiene
+- Cadence: every 90 days
+- Next occurrence: **2026-08-04**
+- Lead time: 1 day (gen new key → swap in Coolify → delete old key)
+- Owner: operator + #4
+- Source of truth: GCP Console → IAM & Admin → Service Accounts → `flintmere-llm@flintmere-production.iam.gserviceaccount.com` → Keys
+- Notes: Mitigation for the JSON-key auth posture per ADR 0005 amendment 2026-05-06. Steps each rotation: (1) **Add Key** → **Create new key** → **JSON** → download. (2) Move new key to `~/Projects/Flintmere/.local-secrets/vertex-sa.json` (overwrite the old one locally — there is one canonical local copy). (3) Update Coolify scanner Storages file mount at `/secrets/vertex-sa.json` with new contents → redeploy. (4) Smoke-test from a Vertex-touching route (or run `packages/llm/scripts/smoke-vertex.mjs` once it exists). (5) After confirmation, return to GCP Console Keys tab and **delete the old key** (don't leave more than one active). (6) Append a one-line entry to STATUS.md Changelog. If rotation slips past the due date, do not panic-rotate during high-traffic hours; pick a maintenance window. **Re-evaluate** the JSON-key posture at: first horizontal-scale event (multi-droplet), first enterprise EU prospect asking about Workload Identity Federation, or 4 successful rotations (then graduate to a quarterly cadence with a calendar-rule script).
+
+### OpenAI Platform (fallback per ADR 0010)
 - Type: vendor renewal
 - Cadence: per-use
 - Owner: operator + #36
-- Notes: negligible spend until primary outage; review on `vendor-review` cadence
+- Notes: negligible spend until primary outage; review on `vendor-review` cadence. Project-scoped key (`sk-proj-…`); rotation cadence inherits the same 90-day rhythm if/when fallback traffic exceeds 5% sustained — see ADR 0010 §Re-open conditions.
 
 ### Stripe (direct invoicing for Agency + Enterprise)
 - Type: vendor renewal

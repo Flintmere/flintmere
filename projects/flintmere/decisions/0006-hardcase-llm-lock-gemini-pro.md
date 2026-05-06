@@ -4,6 +4,10 @@
 - **Date:** 2026-04-19
 - **Supersedes:** ADR 0005 §Decision — "Hard cases: benchmark Gemini 2.5 Pro vs Claude Sonnet 4.6, lock in follow-up ADR"
 
+> ## Amendment 2026-05-06 — Vertex AI rebrand
+>
+> Vertex AI rebranded to **Gemini Enterprise Agent Platform** at Cloud Next '26 (2026-04-22). Model ID `gemini-2.5-pro`, region `europe-west1`, SDK, env contract (`LLM_HARDCASE_PROVIDER=vertex` / `LLM_HARDCASE_MODEL=gemini-2.5-pro`), and per-token pricing are unchanged. The deferred benchmark trigger (50 concierge audits or month 3 post-launch) is unaffected. See ADR 0005 amendment for the full naming-hygiene rationale.
+
 ## Context
 
 ADR 0005 selected Google Gemini 2.5 Flash as the primary bulk LLM and left the hard-case model (title rewrites, ambiguous category classification, vertical-template matching) open, pending a 50-product benchmark against the candidate pair Gemini 2.5 Pro vs Claude Sonnet 4.6.
