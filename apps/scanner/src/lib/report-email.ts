@@ -24,7 +24,11 @@ import {
  * Copy rules (Copy Council #20 #21 #22 #37):
  *   - No banned jargon (see BANNED_JARGON in lib/copy).
  *   - Every issue translated via issueCodeToFounderSpeak.
- *   - Three-door close: concierge audit / install app / reply to John.
+ *   - Two-door close: concierge audit / reply. The earlier "install app"
+ *     door pitched a Shopify embedded app that is post-launch per the
+ *     2026-05-05 launch decision — selling it from the inbox set up a
+ *     dead link to /for/plus. Audit + reply are the only paths that
+ *     resolve to a shipped product right now.
  */
 
 export interface ReportEmailInput {
@@ -178,19 +182,19 @@ function renderHtml(input: ReportEmailInput): string {
                 lockedPillars.length > 0
                   ? `<p style="margin:16px 0 0 0;font-size:13px;color:#8B8D95;line-height:1.5;">
                       <span style="font-family:ui-monospace,Menlo,monospace;font-weight:700;">[&nbsp;${lockedPillars.length}&nbsp;]</span>
-                      more checks — ${lockedListText} — need a one-click Shopify connection. The free scan only reads what is publicly visible.
+                      more checks — ${lockedListText} — read merchant-side data the free scan can&rsquo;t see. The £197 audit covers them.
                     </p>`
                   : ''
               }
             </td>
           </tr>
 
-          <!-- Three-door close -->
+          <!-- Two-door close -->
           <tr>
             <td style="padding:32px;background:#0A0A0B;color:#F7F7F4;">
               <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#A8AAB2;">What next</div>
               <div style="margin-top:12px;font-size:20px;font-weight:500;letter-spacing:-0.015em;line-height:1.25;">
-                Three ways to fix what we found.
+                Two ways to fix what we found.
               </div>
 
               <!-- Door 1: concierge -->
@@ -203,17 +207,7 @@ function renderHtml(input: ReportEmailInput): string {
                 <a href="${esc(auditUrl)}" style="display:inline-block;margin-top:14px;background:#F8BF24;color:#0A0A0B;padding:12px 20px;font-family:ui-monospace,Menlo,monospace;font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;text-decoration:none;">Book the audit →</a>
               </div>
 
-              <!-- Door 2: install app -->
-              <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(250,247,242,0.15);">
-                <div style="font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#A8AAB2;">Or · self-serve · £29 first month</div>
-                <div style="margin-top:6px;font-size:16px;font-weight:500;color:#F7F7F4;line-height:1.3;">Install Flintmere and apply fixes yourself.</div>
-                <p style="margin:8px 0 0 0;font-size:13px;color:#A8AAB2;line-height:1.5;">
-                  Unlocks the remaining checks and applies safe, reversible fixes. First month £29 for scanner users (Growth tier, normally £49).
-                </p>
-                <a href="${esc(appUrl)}" style="display:inline-block;margin-top:12px;color:#F7F7F4;font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:0.04em;text-transform:uppercase;text-decoration:underline;">Install Flintmere →</a>
-              </div>
-
-              <!-- Door 3: reply -->
+              <!-- Door 2: reply -->
               <p style="margin:24px 0 0 0;font-size:13px;color:#A8AAB2;line-height:1.55;">
                 Prefer to talk first? Just reply to this email. ${esc(REPLY_SLA)}
               </p>
@@ -299,7 +293,7 @@ function renderText(input: ReportEmailInput): string {
           .map((p) => pillarLabelFor(p.pillar))
           .join(
             ', ',
-          )} — need a one-click Shopify connection. The free scan only reads what is publicly visible.`
+          )} — read merchant-side data the free scan can't see. The £197 audit covers them.`
       : '';
 
   return `Flintmere Report — ${score.shopDomain}
@@ -319,7 +313,7 @@ ${top}
 What we checked
 ${unlocked}${lockedNote}
 
-What next — three ways to fix what we found
+What next — two ways to fix what we found
 
 1. Recommended · from £197 one-off · three working days
    Have us read your store for you. We read every product, write a
@@ -330,12 +324,7 @@ What next — three ways to fix what we found
    bespoke from £597.
    ${auditUrl}
 
-2. Self-serve · £29 first month
-   Install Flintmere and apply fixes yourself. Unlocks the remaining
-   checks and applies safe, reversible fixes.
-   ${appUrl}
-
-3. Prefer to talk first?
+2. Prefer to talk first?
    Just reply to this email. ${REPLY_SLA}
 
 [ ${FOUNDER_SIGNATURE_NAME} ]

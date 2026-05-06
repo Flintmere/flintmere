@@ -280,8 +280,8 @@ export function Results({ result }: { result: ScanResult }) {
                 pillarLabelCustomerFacing[p.pillar as PillarId] ?? p.pillar,
             )
             .join(', ')}{' '}
-          — need a one-click Shopify connection to run. The free scan only
-          reads what is publicly visible.
+          — read merchant-side data the free scan can&rsquo;t see. The £197
+          audit covers them.
         </p>
       ) : null}
     </section>

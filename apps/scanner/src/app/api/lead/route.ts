@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
   const mail = buildReportEmail({
     score: scan.scoreJson as unknown as CompositeScore,
     unsubscribeUrl,
-    appUrl: `${marketingUrl}/for/plus`,
+    appUrl: marketingUrl,
     auditUrl: `${scannerUrl}/audit`,
     recipientEmail: email,
   });

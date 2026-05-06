@@ -45,7 +45,7 @@ const MISTAKES: Mistake[] = [
     symptom:
       'Apparel products have `material`, `care_instructions`, `fit`. Electronics products have `model_number`, `compatibility`, `warranty`. The overlap between the two templates is 12% and no one owns it.',
     pillar: 'Attribute completeness',
-    fix: 'Install Flintmere to unlock attribute scoring. We check each product against a vertical-specific template and flag metafields that agents expect but your theme is not populating.',
+    fix: 'Flintmere checks each product against a vertical-specific template and flags metafields that agents expect but your theme is not populating.',
   },
   {
     n: '05',
@@ -53,7 +53,7 @@ const MISTAKES: Mistake[] = [
     symptom:
       'Your team built beautiful custom metafields for `shoe-width-us`, `shoe-width-uk`. Shopify Catalog has `size.width` as a standard field. The mapping UI sits empty. Agents see raw custom fields as noise.',
     pillar: 'Catalog mapping',
-    fix: 'The embedded app scores your mapping coverage and surfaces high-value mappings to commit — the ones that move the needle most on agent discoverability.',
+    fix: 'Flintmere scores your mapping coverage and surfaces the high-value mappings to commit — the ones that move the needle most on agent discoverability.',
   },
   {
     n: '06',
@@ -77,7 +77,7 @@ const MISTAKES: Mistake[] = [
     symptom:
       'Shopify agentic storefronts require a populated external product URL metafield. Your theme writes product handles but not the fully-qualified URL, so AI checkout eligibility fails silently on 100% of the catalog.',
     pillar: 'AI checkout eligibility',
-    fix: 'The embedded app inspects each product for the required metafield and offers a one-click bulk-fix that writes canonical URLs across the catalog.',
+    fix: 'Flintmere inspects each product for the required metafield and surfaces every product that lacks a canonical URL — ready for a bulk fix.',
   },
 ];
 

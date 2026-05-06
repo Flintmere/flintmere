@@ -38,7 +38,7 @@ function makeScore(overrides: Partial<CompositeScore> = {}): CompositeScore {
 
 const baseInput = {
   unsubscribeUrl: 'https://audit.flintmere.com/api/unsubscribe/abc',
-  appUrl: 'https://flintmere.com/for/plus',
+  appUrl: 'https://flintmere.com',
   auditUrl: 'https://audit.flintmere.com/audit',
   recipientEmail: 'founder@meridian-coffee.com',
 };
@@ -73,10 +73,20 @@ describe('buildReportEmail', () => {
     expect(email.text).toContain('not affiliated with GS1');
   });
 
-  it('shows the 3 locked checks with a bracketed count', () => {
+  it('shows the locked-check count and routes the merchant to the audit', () => {
     const email = buildReportEmail({ score: makeScore(), ...baseInput });
     expect(email.html).toContain('[&nbsp;3&nbsp;]');
-    expect(email.html).toContain('Install Flintmere');
+    expect(email.html).toContain('£197 audit covers them');
+  });
+
+  it('does not pitch the embedded app — it is post-launch', () => {
+    // 2026-05-06: removed the "Install Flintmere" door from the email
+    // close. The Shopify embedded app is post-launch per the launch
+    // decision; the audit + reply are the only paths that resolve to a
+    // shipped product right now.
+    const email = buildReportEmail({ score: makeScore(), ...baseInput });
+    expect(email.html).not.toContain('Install Flintmere');
+    expect(email.text).not.toContain('Install Flintmere');
   });
 
   it('links Door 1 to the concierge audit page', () => {
