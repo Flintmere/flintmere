@@ -515,8 +515,27 @@ export function scanScopeLine(args: {
   return `Scanned ${sampled} of ${total} products · 60 seconds`
 }
 
-export function revenueLede(args: { low: number; high: number }): string {
-  const { low, high } = args
+/**
+ * Revenue-band lede — two-beat with deterministic count-anchor.
+ *
+ * Headline anchors on a number the merchant can re-derive from their own
+ * admin (count of products carrying ≥1 suppression signal). The subline
+ * carries the £-band — the wedge pulse, demoted from headline so the
+ * 2.3× spread on the band can't read as a guess in isolation. Same
+ * pattern as `suppressionLede()`, applied here to the State 1 surface.
+ *
+ * Backward compat: when `productCount` or `productsWithAnySignal` is
+ * undefined (older persisted scans, or callers that haven't been upgraded
+ * yet), fall back to the original single-sentence framing so the
+ * /score/[shop] re-render path doesn't crash.
+ */
+export function revenueLede(args: {
+  low: number
+  high: number
+  productCount?: number
+  productsWithAnySignal?: number
+}): { headline: string; subline: string | null } {
+  const { low, high, productCount, productsWithAnySignal } = args
   // £-formatter polish per operator + #21 Tech copywriter 2026-04-27.
   // For ≥£100k, drop the decimal — "£210k" reads cleaner than "£210.1k".
   // For ≥£10m, round to whole millions. For £1k–£99k and £1m–£9m, keep
@@ -528,7 +547,23 @@ export function revenueLede(args: { low: number; high: number }): string {
     if (n >= 1_000) return `£${(n / 1_000).toFixed(n % 1_000 === 0 ? 0 : 1)}k`
     return `£${n.toLocaleString()}`
   }
-  return `Roughly ${fmt(low)}–${fmt(high)} of annual demand may be going to competitors while these products stay suppressed.`
+
+  const revenueSentence = (() => {
+    if (low === high) {
+      return `${fmt(low)} of annual demand is at risk while these stay suppressed.`
+    }
+    if (low === 0) {
+      return `Up to ${fmt(high)} of annual demand is at risk while these stay suppressed.`
+    }
+    return `Roughly ${fmt(low)}–${fmt(high)} of annual demand is at risk while these stay suppressed.`
+  })()
+
+  if (productCount === undefined || productsWithAnySignal === undefined) {
+    return { headline: revenueSentence, subline: null }
+  }
+
+  const headline = `${productsWithAnySignal.toLocaleString()} of your ${productCount.toLocaleString()} products are missing data Google Shopping looks for.`
+  return { headline, subline: revenueSentence }
 }
 
 // Grade badge anchor. Live median from scanner_scans table when n≥50;
