@@ -343,8 +343,9 @@ The audit-assist v0 surface at `/admin/audit-draft` drafts the structured findin
 
 - [ ] Generate operator password: pick a memorable 12+ char passphrase. Hash it locally via:
   ```sh
-  cd apps/scanner && pnpm exec node -e "import('./src/lib/admin-auth.ts').then(m => m.hashPassword(process.argv[1]).then(h => console.log(h)))" "your-password"
+  cd apps/scanner && pnpm exec tsx -e "import('./src/lib/admin-auth.ts').then(m => m.hashPassword(process.argv[1]).then(h => console.log(h)))" 'your-password'
   ```
+  Output looks like `scrypt$16384$8$1$<salt>$<hash>`. Single-quote the password so shells don't interpolate `$` / `!` / spaces. Clear shell history after (`history -d $(history 1 | awk '{print $1}')` in zsh).
 - [ ] Set Coolify env vars (Runtime-only, do NOT mark Buildtime):
   - `ADMIN_EMAIL` — `info@eazyaccess.org`
   - `ADMIN_LOGIN_PASSWORD_HASH` — paste the scrypt hash from above

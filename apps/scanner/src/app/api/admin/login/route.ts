@@ -25,7 +25,12 @@ export const dynamic = 'force-dynamic'
  * a strong password. SameSite=Strict cookie gives CSRF immunity.
  */
 export async function POST(req: NextRequest) {
-  const baseUrl = req.nextUrl.origin
+  // Behind Traefik (Coolify), `req.nextUrl.origin` resolves to the
+  // container bind address (e.g. https://0.0.0.0:3001) because Next does
+  // not trust X-Forwarded-Host by default. Use the project-canonical
+  // public-origin env var (matches unsubscribe/lead/email routes).
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ?? req.nextUrl.origin
 
   // Form posts → x-www-form-urlencoded; tolerate JSON too for callers that
   // post programmatically (operator scripts, etc.).
