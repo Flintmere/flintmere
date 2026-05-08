@@ -74,6 +74,9 @@ export class VertexProvider implements LLMProvider {
       if (opts.responseSchema !== undefined) {
         generationConfig.responseSchema = opts.responseSchema;
       }
+      if (opts.thinkingConfig) {
+        generationConfig.thinkingConfig = opts.thinkingConfig;
+      }
       // Gemini surface system prompts via `systemInstruction` on the
       // model config — NOT via a `system` role in `contents`. The
       // OpenAI-shaped `Message[]` we accept allows `system` for

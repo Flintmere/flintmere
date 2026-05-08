@@ -37,6 +37,20 @@ export const CompletionOptsSchema = z.object({
    * provider-shape varies. Do not validate cross-provider — pass through.
    */
   responseSchema: z.unknown().optional(),
+  /**
+   * Gemini 2.5 thinking-token control. Thinking tokens count against
+   * `maxOutputTokens` — left unbounded on Pro, the model's dynamic
+   * thinking can consume the entire budget and emit empty text. Bound
+   * thinking explicitly here when the structured-output budget matters.
+   * `includeThoughts: false` keeps the visible response clean. Vertex-only;
+   * the OpenAI provider ignores it.
+   */
+  thinkingConfig: z
+    .object({
+      thinkingBudget: z.number().int().nonnegative().optional(),
+      includeThoughts: z.boolean().optional(),
+    })
+    .optional(),
 });
 export type CompletionOpts = z.infer<typeof CompletionOptsSchema>;
 

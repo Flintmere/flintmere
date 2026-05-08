@@ -10,8 +10,6 @@
 
 import {
   draftAudit,
-  LLMRouter,
-  RejectingProvider,
   VertexProvider,
   type CompletionOpts,
 } from '@flintmere/llm'
@@ -117,11 +115,14 @@ export async function generateAuditDraftForShop(
     )
   }
 
-  // 3. LLM call. Vertex hardcase + RejectingProvider as fallback. The
-  // router's auto-failover means a Vertex `provider-error` lands on the
-  // RejectingProvider, which throws — that throw surfaces as
-  // `llm-unavailable` (mapped to 503 by the route).
-  const router = buildAuditDraftRouter(env)
+  // 3. LLM call. Vertex direct — no router. The earlier router-with-
+  // RejectingProvider topology masked Vertex errors: any Vertex
+  // `provider-error` triggered the router's auto-failover into
+  // RejectingProvider, whose generic "fallback intentionally disabled"
+  // throw replaced the real cause. With direct Vertex we surface the
+  // actual finish-reason / status / message in mapLLMError, and there is
+  // by-construction no fallback path to OpenAI on this route.
+  const vertex = buildAuditDraftVertex(env)
   const sampleText = summariseProductsForLLM(sample.products)
   const systemPrompt = buildSystemPrompt()
   const userPrompt = buildUserPrompt({
@@ -137,11 +138,15 @@ export async function generateAuditDraftForShop(
   let result
   try {
     result = await draftAudit<AuditDraft>({
-      complete: (opts: CompletionOpts) => router.completeHardCase(opts),
+      complete: (opts: CompletionOpts) => vertex.complete(opts),
       systemPrompt,
       userPrompt,
       schema: AuditDraftSchema,
       responseSchema: AUDIT_DRAFT_RESPONSE_SCHEMA,
+      // Bound Pro's dynamic thinking so the 32768 maxOutputTokens budget
+      // leaves room for the structured JSON body. 4096 is enough thinking
+      // for an audit-draft synthesis without starving output.
+      thinkingConfig: { thinkingBudget: 4096, includeThoughts: false },
       tag: 'audit-draft',
     })
   } catch (err) {
@@ -162,13 +167,16 @@ export async function generateAuditDraftForShop(
 }
 
 /**
- * Builds the LLMRouter audit-assist uses. Vertex as primary AND
- * hardcase (single-provider; we don't double-cost on calls). Rejecting
- * in the fallback slot — fail-loud rather than silently routing to
- * OpenAI for catalog-text drafting (per the plan: "no silent fallback
- * to OpenAI on this route").
+ * Builds the VertexProvider audit-assist uses. Direct Vertex — no
+ * router, no fallback. The audit-draft route has always been
+ * fail-loud-only ("no silent fallback to OpenAI on this route"); the
+ * router/RejectingProvider topology that previously expressed that
+ * intent also swallowed Vertex's real error message. Direct provider
+ * achieves the same fail-loud guarantee without the error masking.
  */
-export function buildAuditDraftRouter(env: AuditDraftRouterEnv): LLMRouter {
+export function buildAuditDraftVertex(
+  env: AuditDraftRouterEnv,
+): VertexProvider {
   const project = env.GOOGLE_CLOUD_PROJECT
   if (!project) {
     throw new AuditDraftGenerationError(
@@ -176,17 +184,12 @@ export function buildAuditDraftRouter(env: AuditDraftRouterEnv): LLMRouter {
       'GOOGLE_CLOUD_PROJECT env var unset',
     )
   }
-  const vertex = new VertexProvider({
+  return new VertexProvider({
     project,
     location: env.LLM_HARDCASE_REGION ?? 'europe-west1',
     model: env.LLM_HARDCASE_MODEL ?? MODEL_ID,
     inputPriceTenthPencePerMillion: 1000, // £0.0010 / 1K in
     outputPriceTenthPencePerMillion: 4000, // £0.0040 / 1K out
-  })
-  return new LLMRouter({
-    primary: vertex,
-    hardcase: vertex,
-    fallback: new RejectingProvider(),
   })
 }
 

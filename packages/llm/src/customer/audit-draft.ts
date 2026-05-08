@@ -46,6 +46,7 @@ export interface DraftAuditOpts<T> {
   responseSchema: object;
   maxOutputTokens?: number;
   temperature?: number;
+  thinkingConfig?: CompletionOpts['thinkingConfig'];
   /** Correlation id propagated through logs + cost telemetry. */
   requestId?: string;
   /** Cost-telemetry tag. */
@@ -69,12 +70,18 @@ export async function draftAudit<T>(
     { role: 'user', content: opts.userPrompt },
   ];
 
+  // 32768 default leaves headroom for Gemini 2.5 Pro thinking tokens
+  // (which count against maxOutputTokens) AND the structured JSON body.
+  // Pro's dynamic thinking can consume 10–20k on a complex prompt; an
+  // 8192 budget left zero for visible output, so the candidate text was
+  // empty and Vertex returned finishReason=MAX_TOKENS.
   const baseCallOpts: CompletionOpts = {
     messages,
-    maxOutputTokens: opts.maxOutputTokens ?? 8192,
+    maxOutputTokens: opts.maxOutputTokens ?? 32768,
     temperature: opts.temperature ?? 0.2,
     responseMimeType: 'application/json',
     responseSchema: opts.responseSchema,
+    thinkingConfig: opts.thinkingConfig,
     requestId: opts.requestId,
     tag: opts.tag ?? 'audit-draft',
   };
