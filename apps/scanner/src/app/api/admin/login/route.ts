@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { NextResponse, type NextRequest } from 'next/server'
 import {
   ADMIN_COOKIE_NAME,
@@ -9,6 +10,27 @@ import { checkAdminLoginRateLimit } from '@/lib/rate-limit'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+
+/**
+ * Resolve a secret from either an env var or a file path env var.
+ * Coolify v4 shell-expands `$<letter>` patterns inside env-var values,
+ * which corrupts the scrypt hash whenever the salt or hash bytes
+ * happen to base64-encode to a letter after a `$`. File-secret mount
+ * bypasses the substitution layer entirely. Pattern: if
+ * `<NAME>_FILE` points at a readable path, use the file contents
+ * (trimmed). Otherwise fall back to `<NAME>` env var.
+ */
+function readSecret(name: string): string {
+  const filePath = process.env[`${name}_FILE`]
+  if (filePath) {
+    try {
+      return readFileSync(filePath, 'utf8').trim()
+    } catch {
+      return ''
+    }
+  }
+  return process.env[name] ?? ''
+}
 
 /**
  * POST /api/admin/login — single-admin auth for audit-assist v0.
@@ -56,10 +78,9 @@ export async function POST(req: NextRequest) {
     return redirect(baseUrl, '/admin/login?error=rate-limited')
   }
 
-  const env = process.env
-  const storedHash = env.ADMIN_LOGIN_PASSWORD_HASH ?? ''
-  const secret = env.ADMIN_SESSION_SECRET ?? ''
-  const adminEmail = env.ADMIN_EMAIL ?? ''
+  const storedHash = readSecret('ADMIN_LOGIN_PASSWORD_HASH')
+  const secret = readSecret('ADMIN_SESSION_SECRET')
+  const adminEmail = readSecret('ADMIN_EMAIL')
 
   if (!storedHash || !secret || !adminEmail) {
     // Misconfigured — log structured but show the operator the same
