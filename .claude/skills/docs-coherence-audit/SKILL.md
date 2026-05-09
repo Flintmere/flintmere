@@ -1,7 +1,7 @@
 ---
 name: docs-coherence-audit
-description: Audit Flintmere's user-facing and internal documentation for staleness, contradictions, broken links, and drift from current product behaviour. Use quarterly, before a major release, or when support trends signal docs confusion. Reads `docs-map.md` to know what to audit. Produces a P0–P3 findings report with per-doc handoff to `writer`, `legal-page-draft`, or engineering. Read-only.
-allowed-tools: Read, Grep, Glob, Write, Edit
+description: Audit Flintmere's user-facing and internal documentation for staleness, contradictions, broken links, and drift from current product behaviour. Use quarterly, before a major release, or when support trends signal docs confusion. Reads `docs-map.md` to know what to audit. Also runs a canon-drift check (per the 2026-05-09 binding) — fetches key flintmere.com pages and diffs against internal canon claims (pillar names + weights, pricing values, voice register). Produces a P0–P3 findings report with per-doc handoff to `writer`, `legal-page-draft`, or engineering. Read-only.
+allowed-tools: Read, Grep, Glob, Write, Edit, WebFetch
 ---
 
 # docs-coherence-audit
@@ -31,8 +31,29 @@ You are Flintmere's docs auditor. #36 Operations manager leads; #1 Editor-in-chi
 5. **Spot un-mapped docs.** Anything in `src/app/` that's documentation-shaped and not on the map → P1 + map update proposal.
 6. **IA ↔ code drift check.** For every `context/design/ia/*.md` + `context/design/architecture/*.md` + `context/design/specs/*.md` + `context/design/components/*.md` in scope: extract every absolute path it cites under `apps/` or `packages/` (paths in code-fence `\`apps/...\`` form, in narrative text, in routes tables). For each, verify (a) the path exists today, (b) two specs that name the same artefact agree on its location. Flag every gap as P0 (the spec drifted from code) or P1 (two specs disagree on where the artefact lives). Canonical example: 2026-04-26 — `context/design/ia/2026-04-26-standards-flintmere-com.md` colocated `CiteAffordance.tsx` under `apps/standards/src/components/`, while `context/design/components/2026-04-26-cite-affordance.md` promoted it to `packages/ui/src/CiteAffordance.tsx` for 9 callsites — exactly the contradiction this check exists to catch. The check is grep-shaped, not full-architectural-audit-shaped: it answers "does the spec match what's on disk?" not "is the architecture right?"
 7. **Cross-check support-triage.** Recent `docs` category trend in support-triage briefs? Cite as corroborating evidence.
-8. **Council gates.**
-9. **Emit** to `context/admin-ops/docs/audits/<YYYY-MM-DD>-<scope>.md`.
+8. **Canon-drift check (per CLAUDE.md §Binding 2026-05-09).** Fetch the live published canonical sources and diff against internal canon claims. The 2026-05-09 binding makes the published flintmere.com pages the canon; internal docs and code that contradict them are drift.
+   - WebFetch `https://flintmere.com/methodology` → extract pillar names + weights + public/install-gated split + voice examples. Diff against:
+     - `apps/scanner/src/lib/audit-draft/prompt.ts` (pillar names + weights in `PILLAR_DISPLAY`)
+     - `apps/scanner/src/components/scan/Results.tsx` + sibling pillar-render components (canonical pillar names in UI)
+     - `memory/canon-source-register.md` §A9 (the register's own pillar block)
+     - `projects/flintmere/plans/2026-05-09-audit-edit-pass-schema.md` §A items 13-15 (canonical reference data)
+     - Any P0 mismatch → drift finding; the published page wins; internal must update.
+   - WebFetch `https://flintmere.com/pricing` and `https://flintmere.com/audit` → extract tier prices + band ladder. Diff against:
+     - `apps/scanner/src/lib/pricing.ts` (subscription tier values)
+     - `apps/scanner/src/lib/audit-pricing.ts` (audit band ladder)
+     - `projects/flintmere/BUSINESS.md` §pricing
+     - Any divergence → P0 (the published page is what merchants pay; code that says otherwise mis-charges).
+   - WebFetch `https://flintmere.com/methodology` → extract reference-voice examples (declarative + load-bearing-claim-per-paragraph + occasionally aphoristic). Diff against:
+     - `memory/VOICE.md` voice rules
+     - `apps/scanner/src/lib/audit-draft/prompt.ts` voice block
+     - Any conceptual drift (e.g. internal canon says "calm authority" when methodology demonstrates declarative + aphoristic) → P1 finding.
+   - WebFetch `https://flintmere.com/audit` → extract what's promised to the buyer (turnaround, scope, format, deliverable shape). Diff against:
+     - `projects/flintmere/plans/2026-05-09-revenue-sprint-197-deliverable-spec.md`
+     - `projects/flintmere/plans/2026-05-09-audit-edit-pass-schema.md`
+     - Any divergence between promised and delivered → P0 (refund / breach risk).
+   - For each canon source on the register (`memory/canon-source-register.md` Section A) without a recent fetch in the audit, flag as a P3 coverage gap.
+9. **Council gates.**
+10. **Emit** to `context/admin-ops/docs/audits/<YYYY-MM-DD>-<scope>.md`.
 
 ## Output format
 

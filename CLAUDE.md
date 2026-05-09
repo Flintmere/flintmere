@@ -90,9 +90,33 @@ Index: `memory/README.md`.
 | Canonical design flow + stage gates | `process.md` |
 | Performance budget for design choices | `performance-budget.md` |
 
-**Binding 2026-04-28.** Every design-skill dispatch (`frontend-design`, `design-marketing-surface`, `design-component`, `design-critique`, `design-motion`) opens with a council pre-flight: name 3 references from `reference-register.md` by URL with one-sentence annotations on what to borrow. The skill brief carries the named references; output is traced to them. If the council can't name 3, the surface isn't ready for design — return to `grill-requirement` or `design-information-architecture`. **Decoration earns its keep when beautiful** — the earlier "every element earns its keep, no decoration" framing was retired in favour of the explicit "beauty is a load-bearing function" reading per `tokens.md` §Decoration.
+**Binding 2026-04-28 (design canon).** Every design-skill dispatch (`frontend-design`, `design-marketing-surface`, `design-component`, `design-critique`, `design-motion`) opens with a council pre-flight: name 3 references from `reference-register.md` by URL with one-sentence annotations on what to borrow. The skill brief carries the named references; output is traced to them. If the council can't name 3, the surface isn't ready for design — return to `grill-requirement` or `design-information-architecture`. **Decoration earns its keep when beautiful** — the earlier "every element earns its keep, no decoration" framing was retired in favour of the explicit "beauty is a load-bearing function" reading per `tokens.md` §Decoration.
 
-Skills: `grill-requirement` (stage 1 — interrogate the requirement), `design-information-architecture` (stage 3 — multi-page IA), `design-marketing-surface`, `design-app-surface`, `design-component`, `design-token`, `design-motion`, `design-scroll-choreography` (pick scroll mechanic from the canonical seven), `design-system-audit`, `design-critique`.
+**Binding 2026-05-09 (canon protection).** Every dispatch that produces a customer-facing artifact — audit-engine prompt, deliverable spec, marketing copy, outreach email, email template, pricing claim, positioning statement, ADR, customer-facing route / error message / metadata, or any artifact that ships to a paying merchant or appears on a public surface — opens with a council pre-flight: name 3 sources from `memory/canon-source-register.md` by URL or path with a one-sentence annotation on what to align to. The skill brief carries the named references; output is traced to them. If the council can't name 3 relevant sources, the artifact isn't ready for drafting — return to `grill-requirement` or run `canon-audit` on the surface to surface the gaps.
+
+**Why this binding exists**: the 2026-04-28 design binding catches visual drift but didn't reach the deliverable / prompt / copy / engine layer. The 2026-05-09 audit-edit-pass-schema was written from generic LLM-deliverable instinct without first reading `flintmere.com/methodology` — and an external review (audit-engine v2.1 delta) caught four corrections that would have been obvious if the canonical source had been read first. This binding closes that gap.
+
+**The binding fires for these dispatch types** (non-exhaustive — when in doubt, run `canon-audit`):
+- audit-engine prompts (anything in `apps/scanner/src/lib/audit-draft/`)
+- deliverable specs in `projects/flintmere/plans/*` that shape buyer-facing artifacts
+- copy / voice / positioning work
+- outreach / cold-email / marketing-email templates
+- email templates (Resend HTML + text bodies)
+- pricing / billing copy + claims
+- public API response strings, error messages, metadata
+- new ADRs
+- legal / compliance / regulatory copy (also goes through `claim-review`)
+- any customer-facing copy in `apps/scanner/src/app/` or `apps/shopify-app/app/`
+- operator console copy (`apps/scanner/src/app/admin/audit-draft/`) — flows into deliverables
+- PR descriptions for customer-facing changes
+
+**Skip the binding for**:
+- Pure plumbing (config, migrations, infra)
+- Internal-only tests / fixtures / dev scripts with no customer-facing strings
+
+**Skill**: `canon-audit` is the structured critique skill that surfaces drift on any artifact. Operator can invoke directly (`/canon-audit <artifact>`); it can also run as a pre-ship pass when called by `claim-review` or other gating skills. Read-only; never edits source.
+
+Skills: `grill-requirement` (stage 1 — interrogate the requirement), `design-information-architecture` (stage 3 — multi-page IA), `design-marketing-surface`, `design-app-surface`, `design-component`, `design-token`, `design-motion`, `design-scroll-choreography` (pick scroll mechanic from the canonical seven), `design-system-audit`, `design-critique`, `canon-audit` (pre-ship critique against published canonical sources — fires per the 2026-05-09 binding above).
 
 ### Product & Engineering department — `memory/product-engineering/`
 

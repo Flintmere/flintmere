@@ -81,6 +81,12 @@ apps/shopify-app/.shopify/
 context/
 .agents/
 .continue/
+.claude/scheduled_tasks.lock
+.claude/*.orphan-backup-*
+
+# Design source files (Photoshop, Sketch, etc.) — never ship to clients
+*.psd
+apps/shopify-app/design-sources/
 
 # Temporary
 tmp/
