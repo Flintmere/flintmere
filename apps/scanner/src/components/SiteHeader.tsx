@@ -239,7 +239,7 @@ export function SiteHeader() {
               href="/"
               onClick={() => setOpen(false)}
               aria-label="Flintmere home"
-              className="font-mono text-[color:var(--color-ink)] hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)] inline-flex items-center"
+              className="brand-wordmark font-mono text-[color:var(--color-ink)] inline-flex items-center"
               style={{
                 fontSize: 'clamp(18px, 1.4vw, 20px)',
                 fontWeight: 600,

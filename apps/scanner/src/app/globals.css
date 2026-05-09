@@ -608,6 +608,41 @@
   }
 }
 
+/* --- Brand wordmark hover (operator pref 2026-05-09) ---
+   Navbar wordmark "Flintmere]" expands in size on hover/focus instead of
+   shifting ink → amber. Amber is the diagnostic-warning + heroic-anchor
+   accent (score-ring, severity-high, footer wordmark shimmer); using it
+   on the small navbar mark conflated the brand mark with the diagnostic
+   register. The scale move keeps the brand mark in its own colour
+   register and expresses interactivity through motion (within ADR 0021
+   axis 8 — hover-lift expanded vocabulary).
+
+   Mechanism: transform: scale(1.06) with transform-origin: left center.
+   Not font-size — that would reflow the header on every hover frame and
+   shove the right-cluster nav leftward. Transform is GPU-composited and
+   leaves layout untouched; left-anchored origin lets the mark grow into
+   header whitespace without crossing the page edge.
+
+   Pattern matches [data-hover-lift] above — same easing, same duration,
+   same reduced-motion override. */
+.brand-wordmark {
+  transform: translate3d(0, 0, 0);
+  transform-origin: left center;
+  transition: transform var(--duration-short) var(--ease-sharp);
+}
+
+.brand-wordmark:hover,
+.brand-wordmark:focus-visible {
+  transform: scale(1.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-wordmark:hover,
+  .brand-wordmark:focus-visible {
+    transform: none;
+  }
+}
+
 /* --- Scan-form slab — focus-within signal (2026-05-01 design-extravagant pass).
    The form sits as the page's primary affordance; on focus-within the elevation
    deepens and a sage border-edge confirms intent (matches the [data-hover-lift]
