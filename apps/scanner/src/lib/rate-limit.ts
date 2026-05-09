@@ -133,6 +133,9 @@ function maybeSweep(now: number) {
     if (b.tokens >= AUDIT_DRAFT_GENERATE_POLICY.capacity)
       auditDraftGenerateBuckets.delete(k);
   }
+  for (const [k, b] of leadIpBuckets) {
+    if (b.tokens >= LEAD_IP_POLICY.capacity) leadIpBuckets.delete(k);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -325,6 +328,49 @@ export function checkAuditDraftGenerateRateLimit(args: {
   return { ok: true, retryAfterSec: 0 };
 }
 
+// ---------------------------------------------------------------------------
+// Lead-capture rate limit (scanner /api/lead).
+//
+// /api/lead accepts (email, scanId) and triggers a Resend email send.
+// Without a rate limit, anyone holding a valid scanId UUID can spray
+// arbitrary email addresses — burning Resend quota and salting the lead
+// list with addresses the merchant didn't enter. The DB unique
+// (email, scanId) index prevents row duplication but not address-spray.
+//
+// Per-IP only — the email is the variable being attacked, so keying by
+// email would be self-defeating. 10 attempts per hour covers legitimate
+// retries (typo → fix → resend) with margin; tight enough that a
+// scripted spray caps fast. Added 2026-05-09 pre-launch audit (P1-5).
+// ---------------------------------------------------------------------------
+
+const leadIpBuckets = new Map<string, Bucket>();
+
+const LEAD_IP_POLICY: BucketPolicy = {
+  capacity: 10,
+  refillRate: 10 / 3600, // 10/hour sustained
+};
+
+export function checkLeadRateLimit(args: {
+  ip: string | null;
+  now?: number;
+}): RateLimitResult {
+  const now = args.now ?? Date.now();
+  const ipKey = (args.ip && hashIp(args.ip)) || 'anon';
+  maybeSweep(now);
+
+  const result = consumeToken(
+    leadIpBuckets,
+    ipKey,
+    LEAD_IP_POLICY,
+    now,
+    /* dryRun */ false,
+  );
+  if (!result.consumed) {
+    return { ok: false, reason: 'ip', retryAfterSec: result.retryAfterSec };
+  }
+  return { ok: true, retryAfterSec: 0 };
+}
+
 /** Test helper — clears state between tests. Not for production use. */
 export function __resetRateLimitState() {
   ipBuckets.clear();
@@ -333,5 +379,6 @@ export function __resetRateLimitState() {
   checkoutIpBuckets.clear();
   adminLoginIpBuckets.clear();
   auditDraftGenerateBuckets.clear();
+  leadIpBuckets.clear();
   lastSweep = 0;
 }

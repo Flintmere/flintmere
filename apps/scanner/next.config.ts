@@ -27,7 +27,11 @@ const config: NextConfig = {
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          // payment=() — non-checkout surfaces deny the Payment Request API.
+          // Stripe Payment Element on /audit/checkout uses Stripe's iframe
+          // which has its own Permissions-Policy delegation; explicit deny
+          // here doesn't break that flow. Added 2026-05-09 pre-launch audit.
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=()' },
           // HSTS — declares HTTPS-only for a year. Coolify already 301s
           // HTTP→HTTPS at the edge; this header tells browsers to skip
           // the HTTP attempt entirely on subsequent visits. `preload`

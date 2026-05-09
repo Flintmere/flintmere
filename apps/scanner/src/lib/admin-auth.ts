@@ -52,7 +52,19 @@ function readSecret(env: AdminAuthEnv, name: string): string {
   if (filePath) {
     try {
       return readFileSync(filePath, 'utf8').trim()
-    } catch {
+    } catch (err) {
+      // Surface the failure so an operator debugging a silent admin
+      // lockout sees why. Without this, requireAdmin returns null and
+      // the route 401s with no log trail — caught 2026-05-09 audit.
+      // eslint-disable-next-line no-console
+      console.error(
+        JSON.stringify({
+          event: 'admin-auth.secret-file-read-failed',
+          name,
+          filePath,
+          message: err instanceof Error ? err.message : String(err),
+        }),
+      )
       return ''
     }
   }
@@ -159,7 +171,12 @@ export function buildCookieAttributes(
     'HttpOnly',
     'SameSite=Strict',
   ]
-  if (process.env.NODE_ENV === 'production') {
+  // Secure on every HTTPS context — production AND Coolify previews/staging.
+  // Gating on NODE_ENV='production' alone leaked cookies on Coolify staging
+  // where NODE_ENV is unset but the deploy serves HTTPS (caught 2026-05-09
+  // pre-launch audit). NEXT_PUBLIC_APP_URL declares the deployment scheme,
+  // so it is the right signal here.
+  if ((process.env.NEXT_PUBLIC_APP_URL ?? '').startsWith('https:')) {
     attrs.push('Secure')
   }
   return attrs.join('; ')
