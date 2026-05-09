@@ -19,11 +19,14 @@
 //     cookie with the wrong email is forbidden, not unauthenticated.
 //   - All comparisons use crypto.timingSafeEqual.
 //   - Smoke-token side-channel: `X-Admin-Smoke-Token` header carrying
-//     hex(HMAC-SHA256(secret, "smoke-v1")) authenticates laptop-side
-//     scripts (operator's smoke-audit-draft-direct.mjs) without going
-//     through the password flow. Same blast radius as the existing
-//     ADMIN_SESSION_SECRET — leak it and an attacker forges sessions
-//     either way.
+//     hex(HMAC-SHA256(secret, "smoke-v2:<hour-bucket>")) authenticates
+//     laptop-side scripts (operator's smoke-audit-draft-direct.mjs +
+//     dump-audit-markdown.ts) without going through the password flow.
+//     The hourly bucket rotation means a leaked token expires within
+//     ~1-2h (verifier accepts current OR previous bucket), reducing
+//     the leak-window vs the ADMIN_SESSION_SECRET itself. Operators
+//     who hold the secret can mint fresh tokens any time; cleartext
+//     leak of a single token has bounded blast radius.
 //
 // Extraction-clean: when a multi-admin auth provider lands (NextAuth /
 // Lucia / WorkOS), the public surface (`requireAdmin`, `signSession`)
@@ -36,7 +39,16 @@ import type { cookies as cookiesFn } from 'next/headers'
 const COOKIE_NAME = 'flintmere_admin'
 const SESSION_VERSION = 1
 const DEFAULT_TTL_SECONDS = 60 * 60 * 24 // 24h per plan D1 / OQ3
-const SMOKE_TOKEN_TAG = 'smoke-v1'
+
+// Smoke-token rotates with a 1-hour bucket so a leaked token expires
+// within ~1-2 hours without rotating ADMIN_SESSION_SECRET. v1 was a
+// static HMAC over the literal 'smoke-v1' — token never expired. v2
+// HMACs over `smoke-v2:<hour-bucket>` so the token rotates hourly.
+// Verifier accepts current OR previous bucket → 1-2h validity (depends
+// on phase), giving the operator headroom on long-running scripts.
+// Tightened 2026-05-09 pre-launch audit P0-1.
+const SMOKE_TOKEN_TAG_PREFIX = 'smoke-v2'
+const SMOKE_TOKEN_WINDOW_MS = 60 * 60 * 1000 // 1h
 
 /**
  * Read a secret from the env, with a `_FILE` mount fallback. Coolify
@@ -251,56 +263,84 @@ export async function requireAdmin(
 // ---- Smoke-token side-channel --------------------------------------
 
 /**
- * Compute the X-Admin-Smoke-Token value for a given secret. Operator
- * laptop scripts call this with their local copy of ADMIN_SESSION_SECRET
- * to derive the header value before hitting the API.
- *
- * Design: HMAC-SHA256 over the literal "smoke-v1" tag, hex-encoded. The
- * domain-separation tag prevents this token from being mistaken for a
- * session-cookie HMAC (which signs base64url payloads). The token is
- * static for the lifetime of the secret — leak it and any caller can
- * authenticate as admin until the secret rotates. Same blast radius as
- * the existing session HMAC.
+ * Compute the canonical token value for a given (secret, hour-bucket).
+ * Bucket = floor(unix-ms / SMOKE_TOKEN_WINDOW_MS). Internal helper used
+ * by both compute (current bucket) + verify (current ± previous bucket).
  */
-export function computeSmokeToken(secret: string): string {
+function computeSmokeTokenForBucket(secret: string, bucket: number): string {
+  return createHmac('sha256', secret)
+    .update(`${SMOKE_TOKEN_TAG_PREFIX}:${bucket}`)
+    .digest('hex')
+}
+
+/**
+ * Compute the X-Admin-Smoke-Token value for a given secret + clock.
+ * Operator laptop scripts call this with their local copy of
+ * ADMIN_SESSION_SECRET (and the system clock) to derive the header
+ * value at request time.
+ *
+ * Design: HMAC-SHA256 over `smoke-v2:<hour-bucket>`, hex-encoded. The
+ * domain-separation prefix prevents this token from being mistaken for
+ * a session-cookie HMAC (which signs base64url payloads). The token
+ * rotates hourly automatically — a leaked token expires within ~1-2h
+ * (verifier window) without an explicit ADMIN_SESSION_SECRET rotation.
+ *
+ * `now` is overridable for testability; production callers omit it.
+ */
+export function computeSmokeToken(secret: string, now: number = Date.now()): string {
   if (!secret || secret.length < 32) {
     throw new Error('ADMIN_SESSION_SECRET must be at least 32 characters')
   }
-  return createHmac('sha256', secret).update(SMOKE_TOKEN_TAG).digest('hex')
+  const bucket = Math.floor(now / SMOKE_TOKEN_WINDOW_MS)
+  return computeSmokeTokenForBucket(secret, bucket)
 }
 
 /**
  * Verify an `X-Admin-Smoke-Token` header against the configured secret +
- * ADMIN_EMAIL allowlist. Returns the admin email on success, null on any
- * failure. Used by audit-draft route handlers as the side-channel that
- * lets laptop-side smoke scripts skip the password flow.
+ * ADMIN_EMAIL allowlist + current/previous hour bucket. Returns the
+ * admin email on success, null on any failure.
  *
- * Pass `req.headers` (or any `Headers`-shaped object); the function pulls
- * the header itself.
+ * Accepting current OR previous bucket gives the operator a 1-2h
+ * validity window (depends on phase — token computed at minute-58 of
+ * hour H is valid through hour H+1). Long-running smoke scripts that
+ * compute the token once at start and run for tens of minutes don't
+ * race the rotation boundary.
+ *
+ * Pass `req.headers` (or any `Headers`-shaped object).
+ * `now` is overridable for testability.
  */
 export function verifyAdminSmokeToken(
   headers: Headers,
   env: AdminAuthEnv = process.env,
+  now: number = Date.now(),
 ): { email: string } | null {
   const secret = readSecret(env, 'ADMIN_SESSION_SECRET')
   const adminEmail = readSecret(env, 'ADMIN_EMAIL')
   if (!secret || !adminEmail) return null
+  if (secret.length < 32) return null
 
   const provided = headers.get('x-admin-smoke-token')
   if (!provided) return null
 
-  let expected: string
-  try {
-    expected = computeSmokeToken(secret)
-  } catch {
-    return null
-  }
-  if (provided.length !== expected.length) return null
-  const a = Buffer.from(provided, 'utf8')
-  const b = Buffer.from(expected, 'utf8')
-  if (!timingSafeEqual(a, b)) return null
+  // SHA-256 hex = 64 chars. Reject other lengths early so we don't pass
+  // mismatched-length buffers into timingSafeEqual (which throws).
+  if (provided.length !== 64) return null
 
-  return { email: adminEmail }
+  const currentBucket = Math.floor(now / SMOKE_TOKEN_WINDOW_MS)
+  const providedBuf = Buffer.from(provided, 'utf8')
+
+  // Loop both buckets to keep timing similar across "match-current"
+  // and "match-previous" paths. Don't early-return on first match.
+  let matched = false
+  for (const bucket of [currentBucket, currentBucket - 1]) {
+    const expected = computeSmokeTokenForBucket(secret, bucket)
+    const expectedBuf = Buffer.from(expected, 'utf8')
+    if (timingSafeEqual(providedBuf, expectedBuf)) {
+      matched = true
+    }
+  }
+
+  return matched ? { email: adminEmail } : null
 }
 
 // ---- base64url helpers ---------------------------------------------
