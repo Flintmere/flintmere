@@ -1,16 +1,22 @@
 #!/usr/bin/env node
 // Smoke-test audit-assist by hitting the API endpoint directly with a
 // freshly-forged session cookie. Bypasses the browser, login form, and
-// password gate entirely. Intended to run INSIDE the scanner container
-// (uses the container's ADMIN_SESSION_SECRET to forge the cookie and
-// localhost:3000 to reach the route handler).
+// password gate entirely.
 //
-// Run:
+// Run from laptop against prod (preferred — login UI is currently broken):
+//   SMOKE_HOST=https://audit.flintmere.com \
+//   ADMIN_SESSION_SECRET=<copy from Coolify env> \
+//   ADMIN_EMAIL=<copy from Coolify env> \
+//   SMOKE_SHOP=matersandco.com \
+//   node apps/scanner/scripts/smoke-audit-draft-direct.mjs
+//
+// Or inside the scanner container (legacy — defaults to localhost:3000):
 //   docker cp apps/scanner/scripts/smoke-audit-draft-direct.mjs <container>:/tmp/
 //   docker exec <container> node /tmp/smoke-audit-draft-direct.mjs
 
 import { createHmac } from 'node:crypto'
 
+const host = (process.env.SMOKE_HOST ?? 'http://localhost:3000').replace(/\/$/, '')
 const secret = process.env.ADMIN_SESSION_SECRET
 const email = process.env.ADMIN_EMAIL
 if (!secret || secret.length < 32) {
@@ -34,11 +40,12 @@ const payload = b64url(
 const hmac = createHmac('sha256', secret).update(payload).digest()
 const cookie = `${payload}.${b64url(hmac)}`
 
+console.log('--- target host:', host, '---')
 console.log('--- forged cookie len:', cookie.length, '---')
 console.log('--- POSTing /api/admin/audit-draft/generate ---')
 
 const t0 = Date.now()
-const res = await fetch('http://localhost:3000/api/admin/audit-draft/generate', {
+const res = await fetch(`${host}/api/admin/audit-draft/generate`, {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -69,6 +76,7 @@ try {
     console.log('--- FAILURE ---')
     console.log('code:', json.code)
     console.log('message:', json.message)
+    if (json.detail) console.log('detail:', json.detail)
     console.log('full body:', JSON.stringify(json, null, 2))
   }
 } catch {

@@ -143,6 +143,7 @@ export async function POST(req: NextRequest) {
         ok: false,
         code: 'internal-error',
         message: 'Audit-assist failed. Try again.',
+        detail: err instanceof Error ? err.message : String(err),
       },
       { status: 500 },
     )
@@ -158,6 +159,11 @@ function mapGenerationError(err: AuditDraftGenerationError): NextResponse {
       message: err.message,
     }),
   )
+  // Admin-only route — include the underlying error message in `detail`
+  // so smoke / curl callers can diagnose without docker-logs round-trips.
+  // The friendly `message` stays user-facing-safe; `detail` carries the
+  // raw cause (Vertex error text, prompt-violation reason, etc.).
+  const detail = err.message
   switch (err.code) {
     case 'config-missing':
       return NextResponse.json(
@@ -166,6 +172,7 @@ function mapGenerationError(err: AuditDraftGenerationError): NextResponse {
           code: 'config-missing',
           message:
             'Audit-assist is misconfigured. The operator has been alerted.',
+          detail,
         },
         { status: 503 },
       )
@@ -176,6 +183,7 @@ function mapGenerationError(err: AuditDraftGenerationError): NextResponse {
           code: 'no-recent-scan',
           message:
             'No recent public scan for this shop. Run /scan first, then retry.',
+          detail,
         },
         { status: 409 },
       )
@@ -185,6 +193,7 @@ function mapGenerationError(err: AuditDraftGenerationError): NextResponse {
           ok: false,
           code: 'scan-incomplete',
           message: 'The latest scan for this shop is missing pillar data.',
+          detail,
         },
         { status: 409 },
       )
@@ -194,6 +203,7 @@ function mapGenerationError(err: AuditDraftGenerationError): NextResponse {
           ok: false,
           code: 'catalog-unfetchable',
           message: 'Could not fetch catalog from this shop.',
+          detail,
         },
         { status: 503 },
       )
@@ -203,6 +213,7 @@ function mapGenerationError(err: AuditDraftGenerationError): NextResponse {
           ok: false,
           code: 'vertex-error',
           message: 'LLM provider rejected the request.',
+          detail,
         },
         { status: 502 },
       )
@@ -212,6 +223,7 @@ function mapGenerationError(err: AuditDraftGenerationError): NextResponse {
           ok: false,
           code: 'llm-schema-fail',
           message: 'LLM produced malformed output twice. Check the prompt.',
+          detail,
         },
         { status: 502 },
       )
@@ -222,6 +234,7 @@ function mapGenerationError(err: AuditDraftGenerationError): NextResponse {
           ok: false,
           code: 'llm-unavailable',
           message: 'Audit-assist LLM is temporarily unavailable.',
+          detail,
         },
         { status: 503 },
       )
