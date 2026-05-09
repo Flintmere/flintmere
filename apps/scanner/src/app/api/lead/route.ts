@@ -3,6 +3,7 @@ import type { CompositeScore } from '@flintmere/scoring';
 import { z } from 'zod';
 import { Prisma } from '@/generated/prisma';
 import { prisma } from '@/lib/db';
+import { checkLeadRateLimit } from '@/lib/rate-limit';
 import { buildReportEmail } from '@/lib/report-email';
 import { sendEmail } from '@/lib/resend';
 import { signUnsubToken } from '@/lib/unsub-token';
@@ -18,6 +19,27 @@ const BodySchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  // Per-IP rate limit (added 2026-05-09 pre-launch audit P1-5). Without
+  // this, anyone with a valid scanId UUID can spray emails — burning
+  // Resend quota + salting the lead list with addresses the merchant
+  // didn't enter. The DB (email, scanId) unique index prevents row
+  // duplication but not the spray.
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null;
+  const rl = checkLeadRateLimit({ ip });
+  if (!rl.ok) {
+    return NextResponse.json(
+      {
+        ok: false,
+        code: 'rate-limited',
+        message: `Too many requests. Try again in ${rl.retryAfterSec} seconds.`,
+      },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(rl.retryAfterSec) },
+      },
+    );
+  }
+
   let body: z.infer<typeof BodySchema>;
   try {
     body = BodySchema.parse(await req.json());
