@@ -14,7 +14,7 @@
       `info@eazyaccess.org`, click magic link in inbox within 10 min,
       confirm landing on `/admin/audit-draft`** — only path the test suite
       can't prove
-- [x] £197 deliverable spec frozen → `2026-05-09-revenue-sprint-197-deliverable-spec.md`
+- [x] Concierge audit deliverable spec frozen (all bands) → `2026-05-09-concierge-audit-deliverable-spec.md` (replaces v1 `2026-05-09-revenue-sprint-197-deliverable-spec.md` which was Band-1-only and under-specced)
 - [x] UK food candidate seed CSV written → `data/benchmark/candidates-uk-food-2026-05-09.csv` (69 brands)
 - [x] Cold-email template + follow-up drafted → `data/recruitment/cold-email-template-2026-05-09.md`
 - [x] Outreach cohort CSV (US + UK food, Band-1 fit) → `data/recruitment/cohort-food-outreach-2026-05-09.csv` (117 merchants)

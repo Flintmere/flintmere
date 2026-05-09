@@ -17,6 +17,7 @@
  */
 
 import { bandBySlug, bandPriceLine, type AuditBandSlug } from './audit-pricing';
+import { conciergeEmailDeliverableLine } from './concierge-deliverable';
 import {
   FOUNDER_SIGNATURE_IMAGE_URL,
   FOUNDER_SIGNATURE_NAME,
@@ -38,15 +39,14 @@ function esc(s: string): string {
 /**
  * Branches the audit-step wording on band scope. Used inside both the
  * HTML and plaintext customer email so the two stay in lockstep.
+ *
+ * Renders from `concierge-deliverable.ts` — single source of truth for
+ * what the operator delivers. Drift between the email line and the
+ * /audit deliverables list was the failure mode caught 2026-05-09;
+ * this indirection enforces parity.
  */
 function deliverableLineForBand(slug: AuditBandSlug): string {
-  const band = bandBySlug(slug);
-  const worstN = band?.deliverable.fullyDraftedFixCount ?? 10;
-  const isSample = band?.deliverable.auditScope === 'representative-sample';
-  if (isSample) {
-    return `you get a written audit letter, a per-product fix CSV (with the worst ${worstN} products drafted for you), a 30-day fix sequence, and the right GS1 UK barcode path. The audit reads a representative sample across your catalog patterns plus the structural data model. No video, no call — just the data.`;
-  }
-  return `you get a written audit letter, a per-product fix CSV (with the worst ${worstN} products drafted for you), a 30-day fix sequence, and the right GS1 UK barcode path. No video, no call — just the data.`;
+  return conciergeEmailDeliverableLine(slug);
 }
 
 export interface ConciergeInvoiceLink {

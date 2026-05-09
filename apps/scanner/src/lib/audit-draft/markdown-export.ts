@@ -16,6 +16,7 @@ import type {
   TopPriority,
 } from './schema'
 import { bandBySlug } from '../audit-pricing'
+import { gs1UkBarcodePathSection } from '../concierge-deliverable'
 
 export interface MarkdownExportInput {
   draft: AuditDraft
@@ -84,6 +85,19 @@ export function auditDraftToMarkdown(input: MarkdownExportInput): string {
     lines.push(...renderPillar(finding))
   }
 
+  // 30-day fix sequence — phases the top priorities into actionable
+  // calendar windows. Renders from the same topPriorities the audit
+  // letter already lists; this surface formats them as a plan, not a
+  // ranked list. Derivation is deterministic; operator may edit ordering
+  // during the calibration pass if a structural fix should lead.
+  lines.push(...renderThirtyDayPlan(input.draft))
+
+  // GS1 UK barcode path — templated section per
+  // concierge-deliverable.ts. UK default for the launch cohort; the
+  // operator pivots manually for non-UK merchants (placeholder rendered).
+  lines.push(gs1UkBarcodePathSection({ jurisdiction: 'GB' }))
+  lines.push('')
+
   // Operator TBDs.
   if (input.draft.operatorTodos.length > 0) {
     lines.push('## Operator TBDs')
@@ -95,6 +109,85 @@ export function auditDraftToMarkdown(input: MarkdownExportInput): string {
   }
 
   return lines.join('\n').trimEnd() + '\n'
+}
+
+/**
+ * 30-day fix sequence — phases the ranked topPriorities into Day 1 /
+ * Week 1 / Week 2 / Week 3-4 windows. The mapping is deterministic
+ * but the operator may re-order during the calibration pass if a
+ * structural fix should lead — schema §A item 16 of the audit-edit-pass
+ * schema already permits this.
+ *
+ * Phase mapping:
+ *   - Day 1   — priority rank 1 (highest impact, most fixes unblocked)
+ *   - Week 1  — priority ranks 2–3
+ *   - Week 2  — priority ranks 4–5
+ *   - Week 3-4 — operator-todos / structural cleanup
+ */
+function renderThirtyDayPlan(draft: AuditDraft): string[] {
+  const lines: string[] = []
+  lines.push('## 30-day fix sequence')
+  lines.push('')
+  lines.push(
+    'Phased calendar for the top priorities above. Sequenced by impact,',
+  )
+  lines.push('not by ease — fix the priorities that unblock the most products')
+  lines.push('first; let the rest cascade.')
+  lines.push('')
+
+  const ranked = [...draft.topPriorities].sort((a, b) => a.rank - b.rank)
+  const day1 = ranked.find((p) => p.rank === 1)
+  const week1 = ranked.filter((p) => p.rank === 2 || p.rank === 3)
+  const week2 = ranked.filter((p) => p.rank === 4 || p.rank === 5)
+
+  lines.push('### Day 1')
+  lines.push('')
+  if (day1) {
+    lines.push(`- **${day1.title}** — ${day1.rationale}`)
+  } else {
+    lines.push('- _No rank-1 priority surfaced — operator review._')
+  }
+  lines.push('')
+
+  lines.push('### Week 1')
+  lines.push('')
+  if (week1.length > 0) {
+    for (const p of week1) {
+      lines.push(`- **${p.title}** — ${p.rationale}`)
+    }
+  } else {
+    lines.push('- _No rank 2–3 priorities — operator review._')
+  }
+  lines.push('')
+
+  lines.push('### Week 2')
+  lines.push('')
+  if (week2.length > 0) {
+    for (const p of week2) {
+      lines.push(`- **${p.title}** — ${p.rationale}`)
+    }
+  } else {
+    lines.push('- _No rank 4–5 priorities — operator review._')
+  }
+  lines.push('')
+
+  lines.push('### Week 3-4')
+  lines.push('')
+  if (draft.operatorTodos.length > 0) {
+    lines.push(
+      'Structural cleanup and the operator-flagged TBDs above. Re-run the',
+    )
+    lines.push('free scan at the end of week 4 to verify score movement before')
+    lines.push('the included day-30 re-scan.')
+  } else {
+    lines.push(
+      'Re-run the free scan at the end of week 4 to verify score movement',
+    )
+    lines.push('before the included day-30 re-scan.')
+  }
+  lines.push('')
+
+  return lines
 }
 
 function renderPriority(p: TopPriority): string[] {
