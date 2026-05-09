@@ -197,47 +197,73 @@ describe('computeSmokeToken + verifyAdminSmokeToken', () => {
     return h
   }
 
+  // Pinned clock so bucket arithmetic is deterministic. Bucket =
+  // floor(now / 3_600_000). Pick a `now` that's mid-bucket so neither
+  // current nor previous is on a boundary.
+  const NOW = 1_715_270_400_000 // 2024-05-09 18:00:00 UTC + offset → mid-hour
+  const HOUR_MS = 60 * 60 * 1000
+
   it('round-trips: token from computeSmokeToken verifies under same secret', () => {
-    const token = computeSmokeToken(SECRET)
+    const token = computeSmokeToken(SECRET, NOW)
     expect(token).toMatch(/^[0-9a-f]{64}$/) // hex-encoded sha256
-    const result = verifyAdminSmokeToken(headersWith(token), env)
+    const result = verifyAdminSmokeToken(headersWith(token), env, NOW)
     expect(result).toEqual({ email: 'info@eazyaccess.org' })
   })
 
+  it('accepts a token from the previous hour-bucket (rollover headroom)', () => {
+    const previous = computeSmokeToken(SECRET, NOW - HOUR_MS)
+    const result = verifyAdminSmokeToken(headersWith(previous), env, NOW)
+    expect(result).toEqual({ email: 'info@eazyaccess.org' })
+  })
+
+  it('rejects a token older than the previous bucket', () => {
+    const stale = computeSmokeToken(SECRET, NOW - 2 * HOUR_MS)
+    expect(verifyAdminSmokeToken(headersWith(stale), env, NOW)).toBeNull()
+  })
+
+  it('rejects a token from a future hour-bucket', () => {
+    const future = computeSmokeToken(SECRET, NOW + 2 * HOUR_MS)
+    expect(verifyAdminSmokeToken(headersWith(future), env, NOW)).toBeNull()
+  })
+
   it('returns null when header missing', () => {
-    expect(verifyAdminSmokeToken(headersWith(null), env)).toBeNull()
+    expect(verifyAdminSmokeToken(headersWith(null), env, NOW)).toBeNull()
   })
 
   it('returns null when token signed under a different secret', () => {
-    const wrong = computeSmokeToken('b'.repeat(48))
-    expect(verifyAdminSmokeToken(headersWith(wrong), env)).toBeNull()
+    const wrong = computeSmokeToken('b'.repeat(48), NOW)
+    expect(verifyAdminSmokeToken(headersWith(wrong), env, NOW)).toBeNull()
   })
 
   it('returns null when token is gibberish', () => {
-    expect(verifyAdminSmokeToken(headersWith('not-hex'), env)).toBeNull()
-    expect(verifyAdminSmokeToken(headersWith(''), env)).toBeNull()
+    expect(verifyAdminSmokeToken(headersWith('not-hex'), env, NOW)).toBeNull()
+    expect(verifyAdminSmokeToken(headersWith(''), env, NOW)).toBeNull()
   })
 
   it('returns null when ADMIN_SESSION_SECRET is unset', () => {
-    const token = computeSmokeToken(SECRET)
+    const token = computeSmokeToken(SECRET, NOW)
     expect(
-      verifyAdminSmokeToken(headersWith(token), {
-        ADMIN_EMAIL: 'info@eazyaccess.org',
-      }),
+      verifyAdminSmokeToken(
+        headersWith(token),
+        { ADMIN_EMAIL: 'info@eazyaccess.org' },
+        NOW,
+      ),
     ).toBeNull()
   })
 
   it('returns null when ADMIN_EMAIL is unset', () => {
-    const token = computeSmokeToken(SECRET)
+    const token = computeSmokeToken(SECRET, NOW)
     expect(
-      verifyAdminSmokeToken(headersWith(token), {
-        ADMIN_SESSION_SECRET: SECRET,
-      }),
+      verifyAdminSmokeToken(
+        headersWith(token),
+        { ADMIN_SESSION_SECRET: SECRET },
+        NOW,
+      ),
     ).toBeNull()
   })
 
   it('throws on a too-short secret at compute time (config error)', () => {
-    expect(() => computeSmokeToken('short')).toThrow(/32 characters/)
+    expect(() => computeSmokeToken('short', NOW)).toThrow(/32 characters/)
   })
 })
 

@@ -22,8 +22,15 @@ if (!secret || secret.length < 32) {
   process.exit(1)
 }
 
-// Domain-separation tag must match SMOKE_TOKEN_TAG in lib/admin-auth.ts.
-const smokeToken = createHmac('sha256', secret).update('smoke-v1').digest('hex')
+// Smoke-token rotates hourly per smoke-v2 design (lib/admin-auth.ts
+// §SMOKE_TOKEN_TAG_PREFIX). HMAC over `smoke-v2:<hour-bucket>`. Server
+// accepts current OR previous bucket → 1-2h validity. Compute at script
+// start; if the run straddles >2 boundaries, re-run.
+const SMOKE_TOKEN_WINDOW_MS = 60 * 60 * 1000
+const bucket = Math.floor(Date.now() / SMOKE_TOKEN_WINDOW_MS)
+const smokeToken = createHmac('sha256', secret)
+  .update(`smoke-v2:${bucket}`)
+  .digest('hex')
 
 const headers = {
   'Content-Type': 'application/json',
