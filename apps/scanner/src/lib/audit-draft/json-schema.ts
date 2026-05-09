@@ -7,24 +7,37 @@ import { PILLARS, VERTICALS } from './schema'
  * shape Gemini accepts is a subset of OpenAPI 3 (no `oneOf` / `anyOf`,
  * limited `pattern` support, no zod-specific features) so a one-shot
  * conversion would either bring extras Gemini rejects or strip the
- * cardinality / range constraints that drive structured-output quality.
- * And — keeping the JSON schema visible alongside the zod schema lets
- * us tune the prompt-side cardinality discipline (`length(7)` etc.) by
- * reading both files side by side.
+ * cardinality / range constraints. And — keeping the JSON schema visible
+ * alongside the zod schema lets us tune the prompt-side cardinality
+ * discipline (`length(7)` etc.) by reading both files side by side.
  *
  * Drift hazard: when `AuditDraftSchema` changes, this file MUST change
  * with it. The schema unit test (`schema.test.ts`) catches drift on the
- * zod side; an integration test in step 4 catches drift on the Vertex
- * side. Until then, hand-discipline.
+ * zod side; the live audit-draft smoke catches drift on the Vertex side.
+ *
+ * State-explosion discipline (caught 2026-05-09): Vertex compiles
+ * `responseSchema` into a finite-state automaton and rejects schemas
+ * that exceed an internal state budget. With 7 fixed pillarFindings ×
+ * 5 fixed actionableFixes per pillar × multiple `maxLength` strings
+ * and `minimum/maximum` numbers per item, ours blew the budget and
+ * Vertex 400'd with INVALID_ARGUMENT "too many states for serving".
+ *
+ * What's safe to keep: `type`, `enum`, `required`, `properties`, `items`.
+ * What we strip: `maxLength`, `minimum`, `maximum`, `minItems`, `maxItems`.
+ *
+ * Quality enforcement after the strip:
+ *   - Prompt enforces cardinality verbally ("exactly 7 pillarFindings",
+ *     "exactly 5 topPriorities", per-string length guidance).
+ *   - zod schema in `schema.ts` validates Vertex's output AFTER receipt
+ *     and rejects out-of-bound values; `draftAudit` then runs a one-shot
+ *     repair attempt with the failure path inlined into the prompt.
+ *
+ * Net: same final guarantees, smaller FSA.
  */
 
-const confidence = {
-  type: 'number',
-  minimum: 0,
-  maximum: 1,
-}
+const confidence = { type: 'number' }
 
-const stringMax = (max: number) => ({ type: 'string', maxLength: max })
+const stringNoMax = { type: 'string' }
 
 const pillarEnum = { type: 'string', enum: [...PILLARS] }
 
@@ -38,8 +51,8 @@ const effortImpactEnum = {
 const actionableFix = {
   type: 'object',
   properties: {
-    title: stringMax(120),
-    detail: stringMax(600),
+    title: stringNoMax,
+    detail: stringNoMax,
     effort: effortImpactEnum,
     impact: effortImpactEnum,
     confidence,
@@ -51,14 +64,12 @@ const pillarFinding = {
   type: 'object',
   properties: {
     pillar: pillarEnum,
-    score: { type: 'number', minimum: 0, maximum: 100 },
+    score: { type: 'number' },
     rating: ratingEnum,
-    observations: stringMax(1500),
+    observations: stringNoMax,
     actionableFixes: {
       type: 'array',
       items: actionableFix,
-      minItems: 0,
-      maxItems: 5,
     },
     confidence,
   },
@@ -75,9 +86,9 @@ const pillarFinding = {
 const topPriority = {
   type: 'object',
   properties: {
-    rank: { type: 'integer', minimum: 1, maximum: 5 },
-    title: stringMax(120),
-    rationale: stringMax(400),
+    rank: { type: 'integer' },
+    title: stringNoMax,
+    rationale: stringNoMax,
     pillarRef: pillarEnum,
     confidence,
   },
@@ -87,8 +98,8 @@ const topPriority = {
 const executiveSummary = {
   type: 'object',
   properties: {
-    headline: stringMax(180),
-    body: stringMax(900),
+    headline: stringNoMax,
+    body: stringNoMax,
     confidence,
   },
   required: ['headline', 'body', 'confidence'],
@@ -98,7 +109,7 @@ const estimatedRevenueImpact = {
   type: 'object',
   properties: {
     available: { type: 'boolean' },
-    summary: stringMax(600),
+    summary: stringNoMax,
     confidence,
   },
   required: ['available', 'summary'],
@@ -112,7 +123,7 @@ const meta = {
     bandSlug: { type: 'string', enum: ['band-1', 'band-2', 'band-3'] },
     generatedAt: { type: 'string' },
     model: { type: 'string', enum: ['gemini-2.5-pro'] },
-    latencyMs: { type: 'integer', minimum: 0 },
+    latencyMs: { type: 'integer' },
   },
   required: [
     'shop',
@@ -132,19 +143,15 @@ export const AUDIT_DRAFT_RESPONSE_SCHEMA = {
     pillarFindings: {
       type: 'array',
       items: pillarFinding,
-      minItems: 7,
-      maxItems: 7,
     },
     topPriorities: {
       type: 'array',
       items: topPriority,
-      minItems: 5,
-      maxItems: 5,
     },
     estimatedRevenueImpact,
     operatorTodos: {
       type: 'array',
-      items: stringMax(280),
+      items: stringNoMax,
     },
   },
   required: [
