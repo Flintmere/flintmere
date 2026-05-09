@@ -341,18 +341,13 @@ The audit-assist v0 surface at `/admin/audit-draft` drafts the structured findin
 
 **One-time setup (before the first run)**
 
-- [ ] Generate operator password: pick a memorable 12+ char passphrase. Hash it locally via:
-  ```sh
-  cd apps/scanner && pnpm exec tsx -e "import('./src/lib/admin-auth.ts').then(m => m.hashPassword(process.argv[1]).then(h => console.log(h)))" 'your-password'
-  ```
-  Output looks like `scrypt$16384$8$1$<salt>$<hash>`. Single-quote the password so shells don't interpolate `$` / `!` / spaces. Clear shell history after (`history -d $(history 1 | awk '{print $1}')` in zsh).
 - [ ] Set Coolify env vars (Runtime-only, do NOT mark Buildtime):
   - `ADMIN_EMAIL` — `info@eazyaccess.org`
-  - `ADMIN_LOGIN_PASSWORD_HASH` — paste the scrypt hash from above
   - `ADMIN_SESSION_SECRET` — `openssl rand -hex 32`
   - `FEATURE_AUDIT_ASSIST` — `true`
+  - Confirm `RESEND_API_KEY` + `RESEND_FROM_ADDRESS` are wired (already used by lead-magnet + concierge-delivery emails).
   - Confirm `GOOGLE_CLOUD_PROJECT`, `LLM_HARDCASE_REGION` (`europe-west1`), and SA-key file mount are already wired (existing Vertex stack).
-- [ ] Redeploy Coolify so the env reaches the container.
+- [ ] Redeploy Coolify so the env reaches the container. Sign-in is magic-link only (the scrypt-password flow was retired 2026-05-09); request a link from `/admin/login` and click it within 10 minutes.
 
 **Per-audit workflow** (paid concierge booking via Stripe → audit needed)
 

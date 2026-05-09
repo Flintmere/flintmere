@@ -1,7 +1,11 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { cookies } from 'next/headers'
 import { z } from 'zod'
-import { ADMIN_COOKIE_NAME, requireAdmin } from '@/lib/admin-auth'
+import {
+  ADMIN_COOKIE_NAME,
+  requireAdmin,
+  verifyAdminSmokeToken,
+} from '@/lib/admin-auth'
 import {
   AuditDraftGenerationError,
   generateAuditDraftForShop,
@@ -48,7 +52,9 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const admin = await requireAdmin(cookies, process.env)
+  const admin =
+    verifyAdminSmokeToken(req.headers, process.env) ??
+    (await requireAdmin(cookies, process.env))
   if (!admin) {
     return NextResponse.json(
       { ok: false, code: 'unauth', message: 'Sign in to continue.' },
@@ -58,7 +64,7 @@ export async function POST(req: NextRequest) {
 
   // Rate limit by cookie value — single-admin-cookie at v0, but the key
   // is right when multi-admin auth lands (each operator gets their own
-  // bucket).
+  // bucket). Smoke-token callers fall back to the admin email as the key.
   const cookieStore = await cookies()
   const cookieValue = cookieStore.get(ADMIN_COOKIE_NAME)?.value ?? admin.email
   const rl = checkAuditDraftGenerateRateLimit({ cookieValue })

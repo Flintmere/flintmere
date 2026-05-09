@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { cookies } from 'next/headers'
 import { z } from 'zod'
-import { requireAdmin } from '@/lib/admin-auth'
+import { requireAdmin, verifyAdminSmokeToken } from '@/lib/admin-auth'
 import {
   AUDIT_DRAFT_STATUSES,
   getAuditDraft,
@@ -26,11 +26,13 @@ interface RouteParams {
   params: Promise<{ id: string }>
 }
 
-export async function GET(_req: NextRequest, ctx: RouteParams) {
+export async function GET(req: NextRequest, ctx: RouteParams) {
   if (process.env.FEATURE_AUDIT_ASSIST !== 'true') {
     return notFound()
   }
-  const admin = await requireAdmin(cookies, process.env)
+  const admin =
+    verifyAdminSmokeToken(req.headers, process.env) ??
+    (await requireAdmin(cookies, process.env))
   if (!admin) return unauth()
 
   const { id } = await ctx.params
@@ -54,7 +56,9 @@ export async function PATCH(req: NextRequest, ctx: RouteParams) {
   if (process.env.FEATURE_AUDIT_ASSIST !== 'true') {
     return notFound()
   }
-  const admin = await requireAdmin(cookies, process.env)
+  const admin =
+    verifyAdminSmokeToken(req.headers, process.env) ??
+    (await requireAdmin(cookies, process.env))
   if (!admin) return unauth()
 
   const { id } = await ctx.params
