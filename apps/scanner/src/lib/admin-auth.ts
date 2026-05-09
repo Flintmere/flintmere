@@ -23,6 +23,7 @@
 // Lucia / WorkOS), the public surface (`requireAdmin`, `signSession`)
 // stays the same — the implementation behind `requireAdmin` swaps.
 
+import { readFileSync } from 'node:fs'
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import type { cookies as cookiesFn } from 'next/headers'
 
@@ -30,6 +31,27 @@ const COOKIE_NAME = 'flintmere_admin'
 const SESSION_VERSION = 1
 const DEFAULT_TTL_SECONDS = 60 * 60 * 24 // 24h per plan D1 / OQ3
 const SMOKE_TOKEN_TAG = 'smoke-v1'
+
+/**
+ * Read a secret from the env, with a `_FILE` mount fallback. Coolify
+ * mounts file-secrets at a path stored in `${NAME}_FILE`; raw env-var
+ * shell-expansion was broken in the deploy that introduced this path
+ * (matches the pattern in /api/admin/magic-link/{request,verify}).
+ *
+ * `env` defaults to `process.env`; tests can pass synthetic envs that
+ * use the direct key form, the _FILE form, or both.
+ */
+function readSecret(env: AdminAuthEnv, name: string): string {
+  const filePath = env[`${name}_FILE`]
+  if (filePath) {
+    try {
+      return readFileSync(filePath, 'utf8').trim()
+    } catch {
+      return ''
+    }
+  }
+  return env[name] ?? ''
+}
 
 // ---- Session cookie (HMAC) -----------------------------------------
 
@@ -180,8 +202,8 @@ export async function requireAdmin(
   cookieGetter: typeof cookiesFn,
   env: AdminAuthEnv = process.env,
 ): Promise<{ email: string } | null> {
-  const secret = env.ADMIN_SESSION_SECRET
-  const allowlistedEmail = env.ADMIN_EMAIL
+  const secret = readSecret(env, 'ADMIN_SESSION_SECRET')
+  const allowlistedEmail = readSecret(env, 'ADMIN_EMAIL')
   if (!secret || !allowlistedEmail) return null
 
   const store = await cookieGetter()
@@ -237,8 +259,8 @@ export function verifyAdminSmokeToken(
   headers: Headers,
   env: AdminAuthEnv = process.env,
 ): { email: string } | null {
-  const secret = env.ADMIN_SESSION_SECRET
-  const adminEmail = env.ADMIN_EMAIL
+  const secret = readSecret(env, 'ADMIN_SESSION_SECRET')
+  const adminEmail = readSecret(env, 'ADMIN_EMAIL')
   if (!secret || !adminEmail) return null
 
   const provided = headers.get('x-admin-smoke-token')
