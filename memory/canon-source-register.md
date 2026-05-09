@@ -77,19 +77,46 @@ Files in scope: `projects/flintmere/plans/*deliverable*`,
 `projects/flintmere/plans/*spec*`, `projects/flintmere/plans/*audit*`,
 audit-edit-pass schemas.
 
-Read first:
-- **`https://flintmere.com/audit`** — what's promised, scope, format.
+**Three in-code truth surfaces** — every deliverable spec MUST
+reconcile against these (added 2026-05-09 after the deliverable-canon-
+alignment review):
+
+- **`apps/scanner/src/app/audit/page.tsx`** — the live `/audit`
+  conversion page; renders `CONCIERGE_DELIVERABLE_LIST` (5 items the
+  merchant is promised before they pay).
+- **`apps/scanner/src/app/audit/success/page.tsx`** — post-purchase
+  confirmation; promises "audit letter, per-product CSV, and 30-day fix
+  sequence within three working days."
+- **`apps/scanner/src/lib/concierge-email.ts`** — Resend body fired
+  on `payment_intent.succeeded`; renders
+  `conciergeEmailDeliverableLine` (the 5-item promise repeated to the
+  merchant via email).
+- **`apps/scanner/src/lib/concierge-deliverable.ts`** — single source
+  of truth for the deliverable copy (the three surfaces above all
+  render from this module).
+
+Read also:
+
+- **`https://flintmere.com/audit`** — the rendered live page.
 - **`https://flintmere.com/methodology`** — voice register + structural
   reference.
-- `projects/flintmere/plans/2026-05-09-revenue-sprint-197-deliverable-spec.md`
-  — current frozen v1 spec.
+- `projects/flintmere/plans/2026-05-09-concierge-audit-deliverable-spec.md`
+  — current frozen spec (covers all 3 bands; replaces the
+  Band-1-only `revenue-sprint-197-deliverable-spec.md`).
 - `projects/flintmere/plans/2026-05-09-audit-edit-pass-schema.md` —
   operator-edit schema (with v2.1 corrections folded).
+- `projects/flintmere/plans/2026-05-09-day2-calibration-checklist.md`
+  — operator's per-audit send-check.
 - `BUSINESS.md` §audits + §retainer.
 - `feedback_trust_load_bearing_surfaces_type_only.md` — audit
   deliverables are trust-load-bearing.
 - `feedback_disclosure_tier_vs_signal_tier_copy.md` — what may go in
   the deliverable vs what stays out.
+
+**Deliverable-parity rule**: every item promised in the spec MUST appear
+in all three in-code truth surfaces, and vice versa. Mismatch is an
+automatic P0 in canon-audit. Specs in `projects/flintmere/plans/*-spec.md`
+carry frontmatter listing `canon_sources` + `canon_audit_run` date.
 
 ### A3. Marketing copy / landing pages / blog
 Files in scope: `apps/scanner/src/app/page.tsx`,

@@ -54,7 +54,7 @@ function buildDraft(): AuditDraft {
 }
 
 describe('auditDraftToMarkdown', () => {
-  it('renders all six sections in order', () => {
+  it('renders all seven canonical sections in order', () => {
     const md = auditDraftToMarkdown({
       draft: buildDraft(),
       shop: 'bluetokyo.co.uk',
@@ -62,9 +62,25 @@ describe('auditDraftToMarkdown', () => {
       generatedAt: new Date('2026-05-06T20:00:00.000Z'),
     })
     expect(md).toMatch(/^# bluetokyo.co.uk — Audit draft/)
-    const sections = ['Executive summary', 'Estimated revenue impact', 'Top priorities', 'Pillar findings', 'Operator TBDs']
+    // Seven sections per the 2026-05-09 deliverable spec — exec summary
+    // → revenue impact → top priorities → pillar findings → 30-day plan
+    // → GS1 UK barcode path → operator TBDs. Order is enforced (the
+    // 30-day plan must follow pillar findings; GS1 section closes
+    // before the operator TBDs).
+    const sections = [
+      'Executive summary',
+      'Estimated revenue impact',
+      'Top priorities',
+      'Pillar findings',
+      '30-day fix sequence',
+      'GS1 UK barcode path',
+      'Operator TBDs',
+    ]
+    let lastIdx = -1
     for (const s of sections) {
-      expect(md).toContain(`## ${s}`)
+      const idx = md.indexOf(`## ${s}`)
+      expect(idx, `section "${s}" missing or out of order`).toBeGreaterThan(lastIdx)
+      lastIdx = idx
     }
   })
 
@@ -140,6 +156,46 @@ describe('auditDraftToMarkdown', () => {
       expect(idx).toBeGreaterThan(lastIdx)
       lastIdx = idx
     }
+  })
+
+  it('phases priorities into the canonical 30-day plan windows', () => {
+    const md = auditDraftToMarkdown({
+      draft: buildDraft(),
+      shop: 'bluetokyo.co.uk',
+      bandSlug: 'band-1',
+      generatedAt: new Date(),
+    })
+    // Day 1 → priority 1; Week 1 → priorities 2-3; Week 2 → priorities
+    // 4-5; Week 3-4 → operator-todos / structural cleanup. Matches the
+    // spec's phase mapping.
+    const day1Idx = md.indexOf('### Day 1')
+    const week1Idx = md.indexOf('### Week 1')
+    const week2Idx = md.indexOf('### Week 2')
+    const week34Idx = md.indexOf('### Week 3-4')
+    expect(day1Idx).toBeGreaterThan(0)
+    expect(week1Idx).toBeGreaterThan(day1Idx)
+    expect(week2Idx).toBeGreaterThan(week1Idx)
+    expect(week34Idx).toBeGreaterThan(week2Idx)
+
+    // Day 1 carries priority 1; Week 1 carries priorities 2 + 3.
+    const day1Block = md.slice(day1Idx, week1Idx)
+    const week1Block = md.slice(week1Idx, week2Idx)
+    expect(day1Block).toContain('Priority 1')
+    expect(week1Block).toContain('Priority 2')
+    expect(week1Block).toContain('Priority 3')
+  })
+
+  it('includes the GS1 UK barcode path section with non-affiliation note', () => {
+    const md = auditDraftToMarkdown({
+      draft: buildDraft(),
+      shop: 'bluetokyo.co.uk',
+      bandSlug: 'band-1',
+      generatedAt: new Date(),
+    })
+    expect(md).toContain('## GS1 UK barcode path')
+    expect(md).toContain('GS1 UK Ltd')
+    // Non-affiliation disclaimer is canon per ADR 0022 + concierge-deliverable.ts.
+    expect(md).toContain('Flintmere is not affiliated with GS1.')
   })
 })
 

@@ -114,6 +114,8 @@ Index: `memory/README.md`.
 - Pure plumbing (config, migrations, infra)
 - Internal-only tests / fixtures / dev scripts with no customer-facing strings
 
+**Deliverable-parity check** (added 2026-05-09 after the deliverable-canon-alignment review caught a v1 spec contradicting three customer-facing surfaces): every deliverable spec under `projects/flintmere/plans/*-spec.md` MUST reconcile bidirectionally with the in-code truth surfaces — `apps/scanner/src/app/audit/page.tsx` (deliverable list), `apps/scanner/src/app/audit/success/page.tsx` (post-purchase confirmation), and `apps/scanner/src/lib/concierge-email.ts` (Resend body). Single source of truth for deliverable copy is `apps/scanner/src/lib/concierge-deliverable.ts`. Specs carry `canon_sources` + `canon_audit_run` frontmatter. Mismatch is automatic P0 in canon-audit.
+
 **Skill**: `canon-audit` is the structured critique skill that surfaces drift on any artifact. Operator can invoke directly (`/canon-audit <artifact>`); it can also run as a pre-ship pass when called by `claim-review` or other gating skills. Read-only; never edits source.
 
 Skills: `grill-requirement` (stage 1 — interrogate the requirement), `design-information-architecture` (stage 3 — multi-page IA), `design-marketing-surface`, `design-app-surface`, `design-component`, `design-token`, `design-motion`, `design-scroll-choreography` (pick scroll mechanic from the canonical seven), `design-system-audit`, `design-critique`, `canon-audit` (pre-ship critique against published canonical sources — fires per the 2026-05-09 binding above).

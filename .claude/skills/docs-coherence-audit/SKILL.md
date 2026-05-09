@@ -48,8 +48,10 @@ You are Flintmere's docs auditor. #36 Operations manager leads; #1 Editor-in-chi
      - `apps/scanner/src/lib/audit-draft/prompt.ts` voice block
      - Any conceptual drift (e.g. internal canon says "calm authority" when methodology demonstrates declarative + aphoristic) → P1 finding.
    - WebFetch `https://flintmere.com/audit` → extract what's promised to the buyer (turnaround, scope, format, deliverable shape). Diff against:
-     - `projects/flintmere/plans/2026-05-09-revenue-sprint-197-deliverable-spec.md`
+     - `projects/flintmere/plans/2026-05-09-concierge-audit-deliverable-spec.md` (all 3 bands; replaces v1 `revenue-sprint-197-deliverable-spec.md`)
      - `projects/flintmere/plans/2026-05-09-audit-edit-pass-schema.md`
+     - `apps/scanner/src/lib/concierge-deliverable.ts` (SSOT for deliverable copy)
+     - `apps/scanner/src/lib/concierge-email.ts` (post-purchase Resend body)
      - Any divergence between promised and delivered → P0 (refund / breach risk).
    - For each canon source on the register (`memory/canon-source-register.md` Section A) without a recent fetch in the audit, flag as a P3 coverage gap.
 9. **Council gates.**

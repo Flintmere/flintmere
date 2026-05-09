@@ -75,6 +75,59 @@ Claims in the artifact that contradict canonical sources.
 
 For each drift hit: cite the artifact line + the canonical source URL/path + the recommended fix (declarative, not equivocating).
 
+### 1a. Deliverable-parity check (P0) — for deliverable specs only
+
+Required check when the artifact is a deliverable spec (lives under
+`projects/flintmere/plans/*-spec.md` or describes what merchants
+receive in exchange for a paid audit).
+
+The five-item canonical deliverable lives in
+`apps/scanner/src/lib/concierge-deliverable.ts` and is rendered by
+three customer-facing surfaces:
+
+1. `apps/scanner/src/app/audit/page.tsx` — `CONCIERGE_DELIVERABLE_LIST`
+   on the conversion page.
+2. `apps/scanner/src/app/audit/success/page.tsx` — post-purchase
+   confirmation page.
+3. `apps/scanner/src/lib/concierge-email.ts` — Resend body fired on
+   `payment_intent.succeeded`.
+
+For every spec, run a bidirectional parity check:
+
+- **Spec → surfaces**: every deliverable item named in the spec MUST
+  appear in all three surfaces. Missing from any → P0.
+- **Surfaces → spec**: every deliverable item named in any of the
+  three surfaces MUST appear in the spec. Missing from spec → P0.
+- **Worst-N counts**: per-band drafted-fix counts (10 / 25 / 25)
+  must match `audit-pricing.ts` `fullyDraftedFixCount`.
+- **Operator hours**: per-band `hoursEstimate` in
+  `audit-pricing.ts` must match the spec's per-band time budget.
+
+The 2026-05-09 deliverable-canon-alignment review surfaced exactly
+this failure mode: the v1 £197 spec promised one item; the three
+surfaces had promised five since 2026-05-04. This check exists to
+prevent that contradiction recurring.
+
+### 1b. Spec frontmatter requirement (P1) — for plans/*-spec.md only
+
+Specs under `projects/flintmere/plans/*-spec.md` MUST carry frontmatter
+naming the canonical sources read during drafting:
+
+```yaml
+---
+canon_sources:
+  - <path or URL>
+  - <path or URL>
+  - <minimum 3 sources>
+canon_audit_run: <YYYY-MM-DD>
+binding: CLAUDE.md §Binding 2026-05-09 (canon protection)
+---
+```
+
+A spec without this frontmatter has not had a council pre-flight in
+the load-bearing form the binding requires; flag P1 and require the
+frontmatter before approving the artifact.
+
 ### 2. Hallucination holes (P0)
 
 Input contracts or prompt design that allow the LLM to fabricate findings.

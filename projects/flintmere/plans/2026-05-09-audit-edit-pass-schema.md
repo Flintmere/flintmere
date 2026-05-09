@@ -1,6 +1,7 @@
 # Audit-draft edit pass — operator schema (v1.1)
 
-> 2026-05-09 — frozen with the £197 deliverable spec. Run this against
+> 2026-05-09 — frozen with the concierge audit deliverable spec
+> (`2026-05-09-concierge-audit-deliverable-spec.md`, all bands). Run this against
 > every paid audit before send. The Gemini draft is the raw material;
 > this schema is what makes it shippable as a Flintmere deliverable.
 >
