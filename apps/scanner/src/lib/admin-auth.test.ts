@@ -137,7 +137,11 @@ describe('requireAdmin', () => {
 
   it('returns null when the cookie is tampered', async () => {
     const cookie = issueSession('info@eazyaccess.org', SECRET, 600)
-    const tampered = cookie.slice(0, -1) + 'A'
+    // Tamper the first char of the payload (full 6 bits, no base64
+    // padding ambiguity — flipping it always changes the decoded
+    // bytes, so the HMAC mismatch is deterministic).
+    const replacement = cookie[0] === 'X' ? 'Y' : 'X'
+    const tampered = replacement + cookie.slice(1)
     const result = await requireAdmin(buildCookieStub(tampered), env)
     expect(result).toBeNull()
   })
@@ -236,3 +240,4 @@ describe('computeSmokeToken + verifyAdminSmokeToken', () => {
     expect(() => computeSmokeToken('short')).toThrow(/32 characters/)
   })
 })
+
