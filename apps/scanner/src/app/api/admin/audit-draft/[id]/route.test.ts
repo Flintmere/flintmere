@@ -1,6 +1,6 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { NextRequest } from 'next/server'
-import { hashPassword, issueSession, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
+import { issueSession, ADMIN_COOKIE_NAME } from '@/lib/admin-auth'
 
 const mockCookieStore = new Map<string, string>()
 vi.mock('next/headers', () => ({
@@ -32,12 +32,10 @@ import { GET, PATCH } from './route'
 
 const SECRET = 's'.repeat(48)
 const ADMIN_EMAIL = 'info@eazyaccess.org'
-let passwordHash: string
 
 const ENV_KEYS = [
   'FEATURE_AUDIT_ASSIST',
   'ADMIN_EMAIL',
-  'ADMIN_LOGIN_PASSWORD_HASH',
   'ADMIN_SESSION_SECRET',
 ] as const
 const ORIGINAL_ENV: Record<string, string | undefined> = {}
@@ -102,8 +100,7 @@ const VALID_DRAFT_BODY = {
 }
 
 describe('GET /api/admin/audit-draft/[id]', () => {
-  beforeAll(async () => {
-    passwordHash = await hashPassword('correct horse battery staple')
+  beforeAll(() => {
     for (const k of ENV_KEYS) ORIGINAL_ENV[k] = process.env[k]
   })
 
@@ -112,7 +109,6 @@ describe('GET /api/admin/audit-draft/[id]', () => {
     vi.clearAllMocks()
     process.env.FEATURE_AUDIT_ASSIST = 'true'
     process.env.ADMIN_EMAIL = ADMIN_EMAIL
-    process.env.ADMIN_LOGIN_PASSWORD_HASH = passwordHash
     process.env.ADMIN_SESSION_SECRET = SECRET
     vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
@@ -181,7 +177,6 @@ describe('PATCH /api/admin/audit-draft/[id]', () => {
     vi.clearAllMocks()
     process.env.FEATURE_AUDIT_ASSIST = 'true'
     process.env.ADMIN_EMAIL = ADMIN_EMAIL
-    process.env.ADMIN_LOGIN_PASSWORD_HASH = passwordHash
     process.env.ADMIN_SESSION_SECRET = SECRET
     vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})

@@ -1,12 +1,11 @@
 #!/usr/bin/env node
-// Smoke-test audit-assist by hitting the API endpoint directly with a
-// freshly-forged session cookie. Bypasses the browser, login form, and
-// password gate entirely.
+// Smoke-test audit-assist by hitting the API endpoint directly with the
+// X-Admin-Smoke-Token header. Bypasses the magic-link sign-in flow so
+// laptop-side smokes don't depend on the email round-trip.
 //
-// Run from laptop against prod (preferred — login UI is currently broken):
+// Run from laptop against prod:
 //   SMOKE_HOST=https://audit.flintmere.com \
 //   ADMIN_SESSION_SECRET=<copy from Coolify env> \
-//   ADMIN_EMAIL=<copy from Coolify env> \
 //   SMOKE_SHOP=matersandco.com \
 //   node apps/scanner/scripts/smoke-audit-draft-direct.mjs
 //
@@ -18,39 +17,27 @@ import { createHmac } from 'node:crypto'
 
 const host = (process.env.SMOKE_HOST ?? 'http://localhost:3000').replace(/\/$/, '')
 const secret = process.env.ADMIN_SESSION_SECRET
-const email = process.env.ADMIN_EMAIL
 if (!secret || secret.length < 32) {
   console.error('error: ADMIN_SESSION_SECRET missing or too short')
   process.exit(1)
 }
-if (!email) {
-  console.error('error: ADMIN_EMAIL missing')
-  process.exit(1)
+
+// Domain-separation tag must match SMOKE_TOKEN_TAG in lib/admin-auth.ts.
+const smokeToken = createHmac('sha256', secret).update('smoke-v1').digest('hex')
+
+const headers = {
+  'Content-Type': 'application/json',
+  'X-Admin-Smoke-Token': smokeToken,
 }
 
-const b64url = (buf) =>
-  buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-
-const payload = b64url(
-  Buffer.from(
-    JSON.stringify({ email, exp: Date.now() + 60 * 60 * 1000, v: 1 }),
-    'utf8',
-  ),
-)
-const hmac = createHmac('sha256', secret).update(payload).digest()
-const cookie = `${payload}.${b64url(hmac)}`
-
 console.log('--- target host:', host, '---')
-console.log('--- forged cookie len:', cookie.length, '---')
+console.log('--- smoke token len:', smokeToken.length, '---')
 console.log('--- POSTing /api/admin/audit-draft/generate ---')
 
 const t0 = Date.now()
 const res = await fetch(`${host}/api/admin/audit-draft/generate`, {
   method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    Cookie: `flintmere_admin=${cookie}`,
-  },
+  headers,
   body: JSON.stringify({
     shopUrl: process.env.SMOKE_SHOP || 'matersandco.com',
     bandSlug: process.env.SMOKE_BAND || 'band-1',
@@ -72,13 +59,11 @@ try {
     console.log('latency_ms (orchestrator total):', json.telemetry?.latencyMs)
     console.log('pillar count:', json.telemetry?.pillarCount)
     console.log('confidence avg:', json.telemetry?.confidenceAvg)
-    // Follow-up GET — pull the full draft body so we can read it
-    // without going through the (currently broken) admin UI.
     console.log('--- GETting /api/admin/audit-draft/' + json.draftId + ' ---')
     const draftRes = await fetch(
       `${host}/api/admin/audit-draft/${json.draftId}`,
       {
-        headers: { Cookie: `flintmere_admin=${cookie}` },
+        headers: { 'X-Admin-Smoke-Token': smokeToken },
         signal: AbortSignal.timeout(30_000),
       },
     )

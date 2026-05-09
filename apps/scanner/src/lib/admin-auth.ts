@@ -1,6 +1,7 @@
 // Admin auth — single-admin v0 for audit-assist. Session-cookie HMAC
-// against ADMIN_EMAIL + ADMIN_SESSION_SECRET. Password verification via
-// stdlib scrypt (no new dep — OWASP-recommended N=2^14, r=8, p=1).
+// against ADMIN_EMAIL + ADMIN_SESSION_SECRET. Sign-in front door is the
+// magic-link flow at /api/admin/magic-link/{request,verify} (replaced the
+// scrypt-password flow on 2026-05-09).
 //
 // Posture (plan §Council self-review #4):
 //   - HttpOnly + Secure (prod) + SameSite=Strict cookie. SameSite-Strict
@@ -11,99 +12,24 @@
 //   - Allowlist email check after HMAC + expiry pass. A valid signed
 //     cookie with the wrong email is forbidden, not unauthenticated.
 //   - All comparisons use crypto.timingSafeEqual.
+//   - Smoke-token side-channel: `X-Admin-Smoke-Token` header carrying
+//     hex(HMAC-SHA256(secret, "smoke-v1")) authenticates laptop-side
+//     scripts (operator's smoke-audit-draft-direct.mjs) without going
+//     through the magic-link flow. Same blast radius as the existing
+//     ADMIN_SESSION_SECRET — leak it and an attacker forges sessions
+//     either way.
 //
 // Extraction-clean: when a multi-admin auth provider lands (NextAuth /
 // Lucia / WorkOS), the public surface (`requireAdmin`, `signSession`)
 // stays the same — the implementation behind `requireAdmin` swaps.
 
-import { createHmac, randomBytes, scrypt, timingSafeEqual } from 'node:crypto'
-import { promisify } from 'node:util'
+import { createHmac, timingSafeEqual } from 'node:crypto'
 import type { cookies as cookiesFn } from 'next/headers'
-
-const SCRYPT_PARAMS = {
-  // OWASP password storage cheat sheet (2024). Tunable upward as
-  // hardware moves; 64MiB cost is enough to make GPU brute force
-  // expensive without slowing legitimate login appreciably (~150ms).
-  N: 16384, // 2^14
-  r: 8,
-  p: 1,
-  keyLen: 64,
-}
 
 const COOKIE_NAME = 'flintmere_admin'
 const SESSION_VERSION = 1
 const DEFAULT_TTL_SECONDS = 60 * 60 * 24 // 24h per plan D1 / OQ3
-
-const scryptAsync = promisify<string, Buffer, number, Buffer>(scrypt)
-
-// ---- Password hashing (scrypt) -------------------------------------
-
-/**
- * Hashes a password for storage. Format:
- *   `scrypt$<N>$<r>$<p>$<salt-base64>$<hash-base64>`
- *
- * Generate once locally; store the result in Coolify as
- * ADMIN_LOGIN_PASSWORD_HASH. Never commit a hash; never log it.
- *
- * Helper script for operator convenience:
- *   node -e "const {hashPassword} = await import('./apps/scanner/src/lib/admin-auth.ts'); console.log(await hashPassword(process.argv[1]))" "your-password"
- */
-export async function hashPassword(password: string): Promise<string> {
-  if (!password || password.length < 12) {
-    throw new Error('password must be at least 12 characters')
-  }
-  const salt = randomBytes(16)
-  const hash = (await scryptAsync(
-    password,
-    salt,
-    SCRYPT_PARAMS.keyLen,
-  )) as unknown as Buffer
-  return [
-    'scrypt',
-    SCRYPT_PARAMS.N,
-    SCRYPT_PARAMS.r,
-    SCRYPT_PARAMS.p,
-    salt.toString('base64'),
-    hash.toString('base64'),
-  ].join('$')
-}
-
-/**
- * Verifies a password against a stored hash. Timing-safe.
- * Returns false on any malformed / mismatched input — never throws on
- * bad input (request handlers map false → 401, no diagnostic leak).
- */
-export async function verifyPassword(
-  password: string,
-  storedHash: string,
-): Promise<boolean> {
-  if (!password || !storedHash) return false
-  const parts = storedHash.split('$')
-  if (parts.length !== 6 || parts[0] !== 'scrypt') return false
-  const [, nStr, , , saltB64, hashB64] = parts
-  const N = Number(nStr)
-  if (!Number.isInteger(N) || N <= 0) return false
-  let salt: Buffer
-  let stored: Buffer
-  try {
-    salt = Buffer.from(saltB64!, 'base64')
-    stored = Buffer.from(hashB64!, 'base64')
-  } catch {
-    return false
-  }
-  if (stored.length !== SCRYPT_PARAMS.keyLen) return false
-  let computed: Buffer
-  try {
-    computed = (await scryptAsync(
-      password,
-      salt,
-      SCRYPT_PARAMS.keyLen,
-    )) as unknown as Buffer
-  } catch {
-    return false
-  }
-  return timingSafeEqual(computed, stored)
-}
+const SMOKE_TOKEN_TAG = 'smoke-v1'
 
 // ---- Session cookie (HMAC) -----------------------------------------
 
@@ -194,7 +120,6 @@ function isSessionPayload(x: unknown): x is SessionPayload {
 export type AdminAuthEnv = Record<string, string | undefined> & {
   ADMIN_SESSION_SECRET?: string
   ADMIN_EMAIL?: string
-  ADMIN_LOGIN_PASSWORD_HASH?: string
 }
 
 export function buildCookieAttributes(
@@ -276,6 +201,61 @@ export async function requireAdmin(
   if (!timingSafeEqual(a, b)) return null
 
   return { email: payload.email }
+}
+
+// ---- Smoke-token side-channel --------------------------------------
+
+/**
+ * Compute the X-Admin-Smoke-Token value for a given secret. Operator
+ * laptop scripts call this with their local copy of ADMIN_SESSION_SECRET
+ * to derive the header value before hitting the API.
+ *
+ * Design: HMAC-SHA256 over the literal "smoke-v1" tag, hex-encoded. The
+ * domain-separation tag prevents this token from being mistaken for a
+ * session-cookie HMAC (which signs base64url payloads). The token is
+ * static for the lifetime of the secret — leak it and any caller can
+ * authenticate as admin until the secret rotates. Same blast radius as
+ * the existing session HMAC.
+ */
+export function computeSmokeToken(secret: string): string {
+  if (!secret || secret.length < 32) {
+    throw new Error('ADMIN_SESSION_SECRET must be at least 32 characters')
+  }
+  return createHmac('sha256', secret).update(SMOKE_TOKEN_TAG).digest('hex')
+}
+
+/**
+ * Verify an `X-Admin-Smoke-Token` header against the configured secret +
+ * ADMIN_EMAIL allowlist. Returns the admin email on success, null on any
+ * failure. Used by audit-draft route handlers as the side-channel that
+ * lets laptop-side smoke scripts skip the magic-link flow.
+ *
+ * Pass `req.headers` (or any `Headers`-shaped object); the function pulls
+ * the header itself.
+ */
+export function verifyAdminSmokeToken(
+  headers: Headers,
+  env: AdminAuthEnv = process.env,
+): { email: string } | null {
+  const secret = env.ADMIN_SESSION_SECRET
+  const adminEmail = env.ADMIN_EMAIL
+  if (!secret || !adminEmail) return null
+
+  const provided = headers.get('x-admin-smoke-token')
+  if (!provided) return null
+
+  let expected: string
+  try {
+    expected = computeSmokeToken(secret)
+  } catch {
+    return null
+  }
+  if (provided.length !== expected.length) return null
+  const a = Buffer.from(provided, 'utf8')
+  const b = Buffer.from(expected, 'utf8')
+  if (!timingSafeEqual(a, b)) return null
+
+  return { email: adminEmail }
 }
 
 // ---- base64url helpers ---------------------------------------------

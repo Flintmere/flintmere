@@ -185,6 +185,29 @@ model OneTimeSecret {
   @@map("scanner_one_time_secrets")
 }
 
+/// Magic-link sign-in tokens for the operator console at /admin/login.
+/// Replaces the scrypt-password flow (deleted 2026-05-09). The raw token
+/// is only ever in the email body and the URL the operator clicks; the
+/// DB stores sha256(rawToken). A DB dump cannot forge sessions.
+///
+/// Lifecycle: created on POST /api/admin/magic-link/request → consumed on
+/// GET /api/admin/magic-link/verify. `consumed_at` flips on first verify;
+/// second click 401s. `email` is persisted so the verify route can confirm
+/// allowlist match without re-derivation; allowlist also enforced at
+/// request-time (defence in depth — no link emitted to non-allowlisted).
+/// Default TTL 10 minutes (per OWASP magic-link guidance).
+model MagicLinkToken {
+  id         String    @id @default(cuid())
+  tokenHash  Bytes     @unique @map("token_hash")
+  email      String
+  expiresAt  DateTime  @map("expires_at")
+  consumedAt DateTime? @map("consumed_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  @@index([expiresAt])
+  @@map("scanner_magic_link_tokens")
+}
+
 /// Pre-verification waiting list for GMC OAuth. Captured during the
 /// Google T&S verification window (typical 4–6 weeks) by merchants
 /// who clicked the connect link from their audit delivery email while

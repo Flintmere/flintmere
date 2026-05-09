@@ -3,11 +3,11 @@ import {
   ADMIN_COOKIE_NAME,
   ADMIN_SESSION_VERSION,
   buildCookieAttributes,
-  hashPassword,
+  computeSmokeToken,
   issueSession,
   requireAdmin,
   signSession,
-  verifyPassword,
+  verifyAdminSmokeToken,
   verifySession,
   type SessionPayload,
 } from './admin-auth'
@@ -33,42 +33,6 @@ function buildCookieStub(value?: string) {
         : undefined,
   })
 }
-
-describe('hashPassword + verifyPassword', () => {
-  it('round-trips a strong password', async () => {
-    const hash = await hashPassword('correct horse battery staple')
-    expect(await verifyPassword('correct horse battery staple', hash)).toBe(true)
-  })
-
-  it('rejects an incorrect password', async () => {
-    const hash = await hashPassword('correct horse battery staple')
-    expect(await verifyPassword('wrong password sequence', hash)).toBe(false)
-  })
-
-  it('rejects passwords shorter than 12 chars at hash time', async () => {
-    await expect(hashPassword('short')).rejects.toThrow(/12 characters/)
-  })
-
-  it('returns false (not throws) on malformed stored hash', async () => {
-    expect(await verifyPassword('any-password-12345', 'not-a-hash')).toBe(false)
-    expect(await verifyPassword('any-password-12345', 'scrypt$bad')).toBe(false)
-    expect(await verifyPassword('any-password-12345', '')).toBe(false)
-  })
-
-  it('returns false on empty password', async () => {
-    const hash = await hashPassword('correct horse battery staple')
-    expect(await verifyPassword('', hash)).toBe(false)
-  })
-
-  it('produces different hashes for the same password (salted)', async () => {
-    const a = await hashPassword('correct horse battery staple')
-    const b = await hashPassword('correct horse battery staple')
-    expect(a).not.toBe(b)
-    // Both still verify.
-    expect(await verifyPassword('correct horse battery staple', a)).toBe(true)
-    expect(await verifyPassword('correct horse battery staple', b)).toBe(true)
-  })
-})
 
 describe('signSession + verifySession', () => {
   it('round-trips a payload', () => {
@@ -214,5 +178,61 @@ describe('requireAdmin', () => {
     )
     const result = await requireAdmin(buildCookieStub(expired), env)
     expect(result).toBeNull()
+  })
+})
+
+describe('computeSmokeToken + verifyAdminSmokeToken', () => {
+  const env = {
+    ADMIN_SESSION_SECRET: SECRET,
+    ADMIN_EMAIL: 'info@eazyaccess.org',
+  }
+
+  function headersWith(token: string | null): Headers {
+    const h = new Headers()
+    if (token !== null) h.set('x-admin-smoke-token', token)
+    return h
+  }
+
+  it('round-trips: token from computeSmokeToken verifies under same secret', () => {
+    const token = computeSmokeToken(SECRET)
+    expect(token).toMatch(/^[0-9a-f]{64}$/) // hex-encoded sha256
+    const result = verifyAdminSmokeToken(headersWith(token), env)
+    expect(result).toEqual({ email: 'info@eazyaccess.org' })
+  })
+
+  it('returns null when header missing', () => {
+    expect(verifyAdminSmokeToken(headersWith(null), env)).toBeNull()
+  })
+
+  it('returns null when token signed under a different secret', () => {
+    const wrong = computeSmokeToken('b'.repeat(48))
+    expect(verifyAdminSmokeToken(headersWith(wrong), env)).toBeNull()
+  })
+
+  it('returns null when token is gibberish', () => {
+    expect(verifyAdminSmokeToken(headersWith('not-hex'), env)).toBeNull()
+    expect(verifyAdminSmokeToken(headersWith(''), env)).toBeNull()
+  })
+
+  it('returns null when ADMIN_SESSION_SECRET is unset', () => {
+    const token = computeSmokeToken(SECRET)
+    expect(
+      verifyAdminSmokeToken(headersWith(token), {
+        ADMIN_EMAIL: 'info@eazyaccess.org',
+      }),
+    ).toBeNull()
+  })
+
+  it('returns null when ADMIN_EMAIL is unset', () => {
+    const token = computeSmokeToken(SECRET)
+    expect(
+      verifyAdminSmokeToken(headersWith(token), {
+        ADMIN_SESSION_SECRET: SECRET,
+      }),
+    ).toBeNull()
+  })
+
+  it('throws on a too-short secret at compute time (config error)', () => {
+    expect(() => computeSmokeToken('short')).toThrow(/32 characters/)
   })
 })
