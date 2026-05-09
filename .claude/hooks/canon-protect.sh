@@ -104,6 +104,96 @@ if [[ -z "$REGISTER_SECTION" ]]; then
   exit 0
 fi
 
+# ---- Diff-aware canon-content detection ----------------------------
+# The path-only matcher above is necessary but not sufficient: many
+# files in canon-protected paths also contain auth/CSP/cookie/rate-limit
+# plumbing with zero customer-facing content. Firing the hook on a
+# pure cookie-Secure conditional change (no copy touched) is noise.
+#
+# Heuristic: extract the changed text and look for canon-indicative
+# tokens — sentence-shaped string literals, multi-word backtick
+# templates, copy-keyword property keys, JSX text content. If NONE
+# are present, this is plumbing — suppress. If any are present, fire
+# the warning.
+#
+# Conservative posture: Write tool always fires (no diff to inspect;
+# treat full-file overwrites on canon paths as canon work).
+#
+# Bypass: set CANON_PROTECT_DEBUG=1 to log decisions to stderr;
+# set CANON_PROTECT_FORCE=1 to fire regardless of diff inspection
+# (useful when an audit agent wants the binding to bind hard).
+
+CHANGED=""
+if [[ "${CANON_PROTECT_FORCE:-}" != "1" ]]; then
+  case "$TOOL" in
+    Edit)
+      CHANGED="$(printf '%s' "$INPUT" | jq -r '
+        ((.tool_input.old_string // "") + "\n" + (.tool_input.new_string // ""))
+      ' 2>/dev/null)"
+      ;;
+    MultiEdit)
+      CHANGED="$(printf '%s' "$INPUT" | jq -r '
+        [.tool_input.edits[]? | (.old_string // "") + "\n" + (.new_string // "")]
+        | join("\n")
+      ' 2>/dev/null)"
+      ;;
+    Write)
+      # Full-file overwrite — always treat as canon work on a
+      # canon-protected path. Skip diff inspection.
+      CHANGED="__WRITE_NO_DIFF__"
+      ;;
+  esac
+fi
+
+CANON_CONTENT=0
+if [[ "${CANON_PROTECT_FORCE:-}" == "1" ]]; then
+  CANON_CONTENT=1
+elif [[ "$CHANGED" == "__WRITE_NO_DIFF__" ]]; then
+  CANON_CONTENT=1
+elif [[ -n "$CHANGED" ]]; then
+  # Pattern 1 — multi-word string literal in single/double quotes.
+  # 3+ english words signals sentence-shaped copy. Excludes kebab-
+  # cased identifiers ('rate-limited') and snake-cased ('NEXT_PUBLIC_X').
+  if printf '%s' "$CHANGED" | grep -qE "[\"'][A-Za-z]+ [A-Za-z]+ [A-Za-z]+"; then
+    CANON_CONTENT=1
+  fi
+
+  # Pattern 2 — backtick template with multi-word english.
+  # Catches `Hi {name}, your audit…`, `Welcome to Flintmere`, etc.
+  if [[ "$CANON_CONTENT" -eq 0 ]] && \
+     printf '%s' "$CHANGED" | grep -qE '`[A-Za-z]+ [A-Za-z]+ [A-Za-z]+'; then
+    CANON_CONTENT=1
+  fi
+
+  # Pattern 3 — copy-keyword property keys with quoted/template values.
+  # subject:, html:, text:, body:, headline:, title:, description:,
+  # label:, placeholder:, tooltip:, from:, replyTo:, message:, prompt:,
+  # systemPrompt:, userPrompt:.
+  if [[ "$CANON_CONTENT" -eq 0 ]] && \
+     printf '%s' "$CHANGED" | grep -qE "\\b(subject|html|text|body|headline|title|description|label|placeholder|tooltip|from|replyTo|message|prompt|systemPrompt|userPrompt)\\s*[:=]\\s*[\"'\\\`]"; then
+    CANON_CONTENT=1
+  fi
+
+  # Pattern 4 — JSX text content between tags. >Welcome to your audit<
+  if [[ "$CANON_CONTENT" -eq 0 ]] && \
+     printf '%s' "$CHANGED" | grep -qE '>[A-Za-z]+ [A-Za-z]+'; then
+    CANON_CONTENT=1
+  fi
+fi
+
+if [[ "${CANON_PROTECT_DEBUG:-}" == "1" ]]; then
+  printf 'canon-protect: tool=%s path=%s register=%s canon_content=%s\n' \
+    "$TOOL" "$REL_PATH" "$REGISTER_SECTION" "$CANON_CONTENT" >&2
+fi
+
+# Plumbing-only edit on a canon-protected path → suppress.
+# The path matcher kept us in scope; the diff-aware check confirmed
+# no customer-facing copy was touched (cookie flag, rate-limit guard,
+# import statement, type definition, etc.).
+if [[ "$CANON_CONTENT" -eq 0 ]]; then
+  exit 0
+fi
+
 # ---- Build the permission-prompt payload ---------------------------
 
 REASON="CANON-PROTECTED ARTIFACT — $ARTIFACT_TYPE.
