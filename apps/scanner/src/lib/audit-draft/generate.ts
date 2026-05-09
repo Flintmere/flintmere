@@ -124,7 +124,13 @@ export async function generateAuditDraftForShop(
   // by-construction no fallback path to OpenAI on this route.
   const vertex = buildAuditDraftVertex(env)
   const sampleText = summariseProductsForLLM(sample.products)
-  const systemPrompt = buildSystemPrompt()
+  // v1.1: free-scan audits are 'public' coverage by default. When the
+  // Shopify embedded app lands and the install_full path opens, the
+  // caller passes scanType: 'install_full'. The system prompt branches
+  // on scanType to enforce partial-coverage handling on the four
+  // install-gated pillars (Attributes, Mapping, Checkout eligibility).
+  const scanType: 'public' | 'install_full' = 'public'
+  const systemPrompt = buildSystemPrompt(vertical, scanType)
   const userPrompt = buildUserPrompt({
     shop: sample.shop,
     vertical,
@@ -133,6 +139,7 @@ export async function generateAuditDraftForShop(
     catalogSampleText: sampleText,
     sampleSize: sample.products.length,
     truncated: sample.truncated,
+    scanType,
   })
 
   let result
