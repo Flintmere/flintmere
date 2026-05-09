@@ -66,12 +66,44 @@ try {
   if (json.ok) {
     console.log('--- SUCCESS ---')
     console.log('draftId:', json.draftId)
-    console.log('model:', json.draft?.meta?.model)
-    console.log('latency_ms (LLM):', json.draft?.meta?.latencyMs)
-    console.log('headline:', json.draft?.executiveSummary?.headline)
-    console.log('pillar count:', json.draft?.pillarFindings?.length)
-    console.log('top priorities count:', json.draft?.topPriorities?.length)
-    console.log('--- (full draft truncated; persisted to Postgres) ---')
+    console.log('shop:', json.telemetry?.shop)
+    console.log('band:', json.telemetry?.bandSlug)
+    console.log('model:', json.telemetry?.model)
+    console.log('latency_ms (orchestrator total):', json.telemetry?.latencyMs)
+    console.log('pillar count:', json.telemetry?.pillarCount)
+    console.log('confidence avg:', json.telemetry?.confidenceAvg)
+    // Follow-up GET — pull the full draft body so we can read it
+    // without going through the (currently broken) admin UI.
+    console.log('--- GETting /api/admin/audit-draft/' + json.draftId + ' ---')
+    const draftRes = await fetch(
+      `${host}/api/admin/audit-draft/${json.draftId}`,
+      {
+        headers: { Cookie: `flintmere_admin=${cookie}` },
+        signal: AbortSignal.timeout(30_000),
+      },
+    )
+    const draftJson = await draftRes.json().catch(() => null)
+    const draft = draftJson?.draft?.rawDraft
+    if (draft) {
+      console.log('headline:', draft.executiveSummary?.headline)
+      console.log('exec body:', draft.executiveSummary?.body)
+      console.log('top priorities:')
+      for (const p of draft.topPriorities ?? []) {
+        console.log(`  ${p.rank}. [${p.pillarRef}] ${p.title}`)
+      }
+      console.log('pillar findings (', draft.pillarFindings?.length, '):')
+      for (const f of draft.pillarFindings ?? []) {
+        console.log(
+          `  ${f.pillar} — score ${f.score} (${f.rating}) — ${f.actionableFixes?.length ?? 0} fixes`,
+        )
+      }
+      console.log('estimated revenue impact:')
+      console.log(' ', draft.estimatedRevenueImpact?.summary)
+      console.log('operator todos:', draft.operatorTodos?.length, 'items')
+    } else {
+      console.log('(failed to fetch full draft)')
+      console.log(JSON.stringify(draftJson, null, 2).slice(0, 800))
+    }
   } else {
     console.log('--- FAILURE ---')
     console.log('code:', json.code)
