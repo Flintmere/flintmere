@@ -254,6 +254,99 @@
   margin-left: 0.16em;
 }
 
+/* --- Stage Ledger — Flintmere's wait-state primitive (2026-05-09) ---
+   Replaces every generic spinner across the product. Three slots:
+   bracket-wrapped status label, prose descriptor, tabular-numeral
+   elapsed counter.
+
+   One degree of freedom: the bracket pseudo-elements on the label
+   modulate their em-margin from the canon 0.16em out to 0.24em and
+   back over 1.5s. Reads as breathing rather than spinning — the
+   bracket signature applied to time.
+
+   Reduced-motion: handled by the global block at line 181
+   (animation-duration → 0.01ms, iteration-count → 1). Brackets snap
+   to canon rest width; the elapsed counter keeps ticking because it
+   is content, not motion. Spec:
+   context/design/specs/2026-05-09-stage-ledger.md */
+.flintmere-stage-ledger {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(12px, 2vw, 32px);
+  width: 100%;
+  font-family: var(--font-sans);
+}
+
+.flintmere-stage-ledger__label {
+  font-size: 14px;
+  color: var(--color-ink);
+  text-transform: lowercase;
+  flex: 0 0 auto;
+}
+
+.flintmere-stage-ledger__label::before {
+  animation: flintmere-stage-ledger-breathe-left 1500ms ease-in-out infinite;
+}
+
+.flintmere-stage-ledger__label::after {
+  animation: flintmere-stage-ledger-breathe-right 1500ms ease-in-out infinite;
+}
+
+@keyframes flintmere-stage-ledger-breathe-left {
+  0%, 100% { margin-right: 0.16em; }
+  50% { margin-right: 0.24em; }
+}
+
+@keyframes flintmere-stage-ledger-breathe-right {
+  0%, 100% { margin-left: 0.16em; }
+  50% { margin-left: 0.24em; }
+}
+
+.flintmere-stage-ledger__description {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 14px;
+  color: var(--color-ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flintmere-stage-ledger__elapsed {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-ink-2);
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+}
+
+.flintmere-stage-ledger__cancel {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.flintmere-stage-ledger__cancel:hover,
+.flintmere-stage-ledger__cancel:focus-visible {
+  color: var(--color-ink);
+}
+
+@media (max-width: 640px) {
+  .flintmere-stage-ledger {
+    flex-wrap: wrap;
+  }
+  .flintmere-stage-ledger__description {
+    flex-basis: 100%;
+    order: 3;
+  }
+}
+
 /* --- Eyebrow registers (micro uppercase mono) ---
    Three sizes for the three roles encountered across the codebase:
      .eyebrow         11px / 0.14em / mute-2 — the default; section eyebrows.

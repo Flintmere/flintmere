@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { track } from '@/lib/plausible'
 import type { Vertical } from '@/lib/audit-draft/schema'
+import { StageLedger } from '@/components/StageLedger'
 
 const VERTICALS: Vertical[] = [
   'food',
@@ -31,12 +32,14 @@ export function DraftForm({ defaultShopUrl }: DraftFormProps) {
   const [bandSlug, setBandSlug] = useState<'band-1' | 'band-2'>('band-1')
   const [vertical, setVertical] = useState<Vertical>('food')
   const [pending, setPending] = useState(false)
+  const [pendingStartedAt, setPendingStartedAt] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (pending) return
     setPending(true)
+    setPendingStartedAt(Date.now())
     setError(null)
     try {
       const res = await fetch('/api/admin/audit-draft/generate', {
@@ -299,19 +302,19 @@ export function DraftForm({ defaultShopUrl }: DraftFormProps) {
         {pending ? 'Drafting…' : 'Generate draft →'}
       </button>
 
-      {pending && (
-        <p
-          aria-live="polite"
-          style={{
-            margin: 0,
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.75rem',
-            color: 'var(--color-mute)',
-          }}
-        >
-          Gemini 2.5 Pro typically takes 15–25 seconds for a 50-product
-          context. Hold this tab.
-        </p>
+      {pending && pendingStartedAt !== null && (
+        <StageLedger
+          stages={[
+            {
+              id: 'all',
+              label: 'drafting',
+              description:
+                'resolving scan, fetching catalog, calling model',
+            },
+          ]}
+          currentId="all"
+          startedAt={pendingStartedAt}
+        />
       )}
     </form>
   )
