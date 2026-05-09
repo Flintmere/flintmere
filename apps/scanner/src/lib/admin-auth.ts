@@ -1,7 +1,13 @@
 // Admin auth — single-admin v0 for audit-assist. Session-cookie HMAC
-// against ADMIN_EMAIL + ADMIN_SESSION_SECRET. Sign-in front door is the
-// magic-link flow at /api/admin/magic-link/{request,verify} (replaced the
-// scrypt-password flow on 2026-05-09).
+// against ADMIN_EMAIL + ADMIN_SESSION_SECRET. Sign-in front door is a
+// long-random password at /api/admin/login (replaced the magic-link flow
+// on 2026-05-09 — operator preference + Coolify env-mount fragility).
+//
+// Password posture: ADMIN_PASSWORD is a 32-char openssl-random string,
+// stored in Coolify alongside ADMIN_SESSION_SECRET (same trust level —
+// either leaking is game-over). Compared timing-safe against the
+// submitted value; no hashing because hashing adds zero security when
+// the cookie-signing secret is at the same blast radius.
 //
 // Posture (plan §Council self-review #4):
 //   - HttpOnly + Secure (prod) + SameSite=Strict cookie. SameSite-Strict
@@ -15,7 +21,7 @@
 //   - Smoke-token side-channel: `X-Admin-Smoke-Token` header carrying
 //     hex(HMAC-SHA256(secret, "smoke-v1")) authenticates laptop-side
 //     scripts (operator's smoke-audit-draft-direct.mjs) without going
-//     through the magic-link flow. Same blast radius as the existing
+//     through the password flow. Same blast radius as the existing
 //     ADMIN_SESSION_SECRET — leak it and an attacker forges sessions
 //     either way.
 //
@@ -35,8 +41,8 @@ const SMOKE_TOKEN_TAG = 'smoke-v1'
 /**
  * Read a secret from the env, with a `_FILE` mount fallback. Coolify
  * mounts file-secrets at a path stored in `${NAME}_FILE`; raw env-var
- * shell-expansion was broken in the deploy that introduced this path
- * (matches the pattern in /api/admin/magic-link/{request,verify}).
+ * shell-expansion was broken in the deploy that introduced this path.
+ * Same pattern as /api/admin/login route helper.
  *
  * `env` defaults to `process.env`; tests can pass synthetic envs that
  * use the direct key form, the _FILE form, or both.
@@ -250,7 +256,7 @@ export function computeSmokeToken(secret: string): string {
  * Verify an `X-Admin-Smoke-Token` header against the configured secret +
  * ADMIN_EMAIL allowlist. Returns the admin email on success, null on any
  * failure. Used by audit-draft route handlers as the side-channel that
- * lets laptop-side smoke scripts skip the magic-link flow.
+ * lets laptop-side smoke scripts skip the password flow.
  *
  * Pass `req.headers` (or any `Headers`-shaped object); the function pulls
  * the header itself.
