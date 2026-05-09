@@ -57,7 +57,11 @@ function pendingEmailCookieAttributes(): string {
     'HttpOnly',
     'SameSite=Strict',
   ]
-  if (process.env.NODE_ENV === 'production') attrs.push('Secure')
+  // Mirror admin-auth.ts buildCookieAttributes — Secure on any HTTPS deploy,
+  // not just production. Coolify staging/preview is HTTPS but NODE_ENV may
+  // be unset (caught 2026-05-09 pre-launch audit).
+  if ((process.env.NEXT_PUBLIC_APP_URL ?? '').startsWith('https:'))
+    attrs.push('Secure')
   return attrs.join('; ')
 }
 

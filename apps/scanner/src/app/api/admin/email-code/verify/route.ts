@@ -44,7 +44,9 @@ function clearPendingEmailCookie(response: NextResponse): void {
     'HttpOnly',
     'SameSite=Strict',
   ]
-  if (process.env.NODE_ENV === 'production') attrs.push('Secure')
+  // Mirror admin-auth.ts buildCookieAttributes — Secure on any HTTPS deploy.
+  if ((process.env.NEXT_PUBLIC_APP_URL ?? '').startsWith('https:'))
+    attrs.push('Secure')
   response.headers.append(
     'Set-Cookie',
     `${PENDING_EMAIL_COOKIE}=; ${attrs.join('; ')}`,
