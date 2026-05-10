@@ -1,150 +1,95 @@
 /* eslint-disable no-console */
 /**
- * Batch sender for the cold-email outreach pipeline.
- *
- * Picks up to today's daily-cap-budget targets (per lib/outreach/cap.ts)
- * that match the requested kind ('initial' or 'followup') and dispatches
- * them through lib/outreach/send.ts with PACE_MS spacing between sends.
+ * Laptop-side batch sender. Thin wrapper around `lib/outreach/batch.ts`
+ * so the CLI and the Coolify cron routes share one execution path.
  *
  * Env vars (all optional):
- *   KIND               'initial' | 'followup'   default: 'initial'
- *   DRY_RUN            'true' to render without sending; default: false
- *   PACE_MS            ms between sends (rate-limit Resend API);
- *                      default 60_000 (60s — kindness contract + Resend politeness)
- *   LIMIT              hard limit on this run; default = today's daily cap
- *                      remaining (cap minus what's already been sent today)
+ *   KIND     'initial' | 'followup'   default: 'initial'
+ *   DRY_RUN  'true' to render without sending; default: false
+ *   PACE_MS  ms between sends. Default 60_000 (60s — kindness-contract
+ *            cadence for laptop-side use; the cron routes use 2000).
+ *   LIMIT    hard limit on this run; default = today's daily-cap remaining.
  *
  * Usage:
  *   pnpm tsx scripts/send-outreach-batch.ts                      # initial sends
  *   KIND=followup pnpm tsx scripts/send-outreach-batch.ts        # follow-ups
  *   DRY_RUN=true pnpm tsx scripts/send-outreach-batch.ts         # preview
- *   LIMIT=1 DRY_RUN=true pnpm tsx scripts/send-outreach-batch.ts # smoke
+ *   LIMIT=1 DRY_RUN=true pnpm tsx scripts/send-outreach-batch.ts # one-shot smoke
  */
 
-import { prisma } from '../src/lib/db'
-import { sendOutreach } from '../src/lib/outreach/send'
-import { dailyCap } from '../src/lib/outreach/cap'
-import { findEligibleTargets, countSentSince } from '../src/lib/outreach/db'
+import { prisma } from '../src/lib/db';
+import { runSendBatch } from '../src/lib/outreach/batch';
 
-const KIND = (process.env.KIND ?? 'initial') as 'initial' | 'followup'
-const DRY_RUN = process.env.DRY_RUN === 'true'
-const PACE_MS = Number.parseInt(process.env.PACE_MS ?? '60000', 10)
-const LIMIT_OVERRIDE = process.env.LIMIT ? Number.parseInt(process.env.LIMIT, 10) : null
+const rawKind = process.env.KIND ?? 'initial';
+const DRY_RUN = process.env.DRY_RUN === 'true';
+const PACE_MS = Number.parseInt(process.env.PACE_MS ?? '60000', 10);
+const LIMIT_OVERRIDE = process.env.LIMIT ? Number.parseInt(process.env.LIMIT, 10) : null;
 
 async function main(): Promise<void> {
-  if (KIND !== 'initial' && KIND !== 'followup') {
-    console.error(`KIND must be 'initial' or 'followup'; got '${KIND}'`)
-    process.exit(2)
+  if (rawKind !== 'initial' && rawKind !== 'followup') {
+    console.error(`KIND must be 'initial' or 'followup'; got '${rawKind}'`);
+    process.exit(2);
   }
   if (!Number.isFinite(PACE_MS) || PACE_MS < 0) {
-    console.error(`PACE_MS must be a non-negative integer; got '${process.env.PACE_MS}'`)
-    process.exit(2)
+    console.error(`PACE_MS must be a non-negative integer; got '${process.env.PACE_MS}'`);
+    process.exit(2);
   }
-
-  const startOfDay = new Date()
-  startOfDay.setUTCHours(0, 0, 0, 0)
-  const sentToday = await countSentSince(startOfDay)
-  const cap = dailyCap()
-  const remaining = Math.max(0, cap - sentToday)
-  const limit = LIMIT_OVERRIDE !== null ? Math.min(LIMIT_OVERRIDE, remaining) : remaining
 
   console.log(
     JSON.stringify({
       event: 'outreach-batch.start',
-      kind: KIND,
+      kind: rawKind,
       dryRun: DRY_RUN,
       paceMs: PACE_MS,
-      cap,
-      sentToday,
-      remaining,
-      limit,
+      limitOverride: LIMIT_OVERRIDE,
     }),
-  )
+  );
 
-  if (limit === 0) {
-    console.log(JSON.stringify({ event: 'outreach-batch.no-budget', cap, sentToday }))
-    await prisma.$disconnect()
-    return
-  }
+  const result = await runSendBatch({
+    kind: rawKind,
+    dryRun: DRY_RUN,
+    paceMs: PACE_MS,
+    ...(LIMIT_OVERRIDE !== null ? { limit: LIMIT_OVERRIDE } : {}),
+  });
 
-  const targets = await findEligibleTargets(KIND, limit)
-  if (targets.length === 0) {
-    console.log(JSON.stringify({ event: 'outreach-batch.no-eligible-targets', kind: KIND }))
-    await prisma.$disconnect()
-    return
-  }
-
-  let okCount = 0
-  let failCount = 0
-  let replayCount = 0
-
-  for (let i = 0; i < targets.length; i += 1) {
-    const target = targets[i]
-    try {
-      const result = await sendOutreach({
-        targetId: target.id,
-        kind: KIND,
-        dryRun: DRY_RUN,
-      })
-      if (result.ok) {
-        okCount += 1
-        if (result.idempotentReplay) replayCount += 1
-        console.log(
-          JSON.stringify({
-            event: 'outreach-batch.sent',
-            targetId: target.id,
-            shopDomain: target.shopDomain,
-            recipientEmail: target.recipientEmail,
-            resendMessageId: result.resendMessageId,
-            replay: result.idempotentReplay,
-            dryRun: DRY_RUN,
-          }),
-        )
-      } else {
-        failCount += 1
-        console.error(
-          JSON.stringify({
-            event: 'outreach-batch.failed',
-            targetId: target.id,
-            shopDomain: target.shopDomain,
-            recipientEmail: target.recipientEmail,
-            reason: result.reason,
-          }),
-        )
-      }
-    } catch (err) {
-      failCount += 1
-      console.error(
-        JSON.stringify({
-          event: 'outreach-batch.exception',
-          targetId: target.id,
-          shopDomain: target.shopDomain,
-          message: err instanceof Error ? err.message : String(err),
-        }),
-      )
-    }
-    if (i < targets.length - 1 && PACE_MS > 0) {
-      await new Promise((r) => setTimeout(r, PACE_MS))
-    }
+  for (const r of result.sends) {
+    console.log(
+      JSON.stringify({
+        event: r.ok ? 'outreach-batch.sent' : 'outreach-batch.failed',
+        targetId: r.targetId,
+        shopDomain: r.shopDomain,
+        recipientEmail: r.recipientEmail,
+        ...(r.resendMessageId !== undefined ? { resendMessageId: r.resendMessageId } : {}),
+        ...(r.replay !== undefined ? { replay: r.replay } : {}),
+        ...(r.reason !== undefined ? { reason: r.reason } : {}),
+      }),
+    );
   }
 
   console.log(
     JSON.stringify({
       event: 'outreach-batch.done',
-      kind: KIND,
-      attempted: targets.length,
-      ok: okCount,
-      replay: replayCount,
-      failed: failCount,
-      dryRun: DRY_RUN,
+      kind: result.kind,
+      attempted: result.attempted,
+      ok: result.ok,
+      replay: result.replay,
+      failed: result.failed,
+      cap: result.cap,
+      sentToday: result.sentToday,
+      remaining: result.remaining,
+      dryRun: result.dryRun,
     }),
-  )
-  await prisma.$disconnect()
+  );
+
+  await prisma.$disconnect();
 }
 
 main().catch((err) => {
   console.error(
-    JSON.stringify({ event: 'outreach-batch.fatal', message: err instanceof Error ? err.message : String(err) }),
-  )
-  process.exit(1)
-})
+    JSON.stringify({
+      event: 'outreach-batch.fatal',
+      message: err instanceof Error ? err.message : String(err),
+    }),
+  );
+  process.exit(1);
+});
