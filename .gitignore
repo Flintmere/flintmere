@@ -104,4 +104,9 @@ data/recruitment/*
 
 # Concierge audit working data (per-merchant CSV + summary outputs)
 data/audits/*
+
+# Cohort discovery working data (Wikipedia output, candidate validation,
+# in-flight scan results) — same operational-data class as data/benchmark
+data/discovery/*
+
 .local-secrets
