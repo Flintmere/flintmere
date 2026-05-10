@@ -54,6 +54,7 @@ function readBaseUrl(): string {
 
 function templateInputFromTarget(
   target: OutreachTarget,
+  kind: SendKind,
   senderName: string,
   baseUrl: string,
 ): TemplateInput {
@@ -66,9 +67,9 @@ function templateInputFromTarget(
     );
   }
   // rescanUrl: use the persisted column if set, else build from the canonical /scan path.
-  const rescanUrl =
+  const baseRescan =
     target.rescanUrl ?? `${baseUrl.replace(/\/+$/, '')}/scan?url=${encodeURIComponent(target.shopDomain)}`;
-  const auditUrl = `${baseUrl.replace(/\/+$/, '')}/audit`;
+  const baseAudit = `${baseUrl.replace(/\/+$/, '')}/audit`;
   return {
     shopDomain: target.shopDomain,
     shopName: target.shopDomain,
@@ -78,10 +79,28 @@ function templateInputFromTarget(
     productCount: target.productCount,
     senderName,
     variant: (target.subjectVariant as 'A' | 'B') ?? 'A',
-    rescanUrl,
-    auditUrl,
+    rescanUrl: appendOutreachUtm(baseRescan, target, kind),
+    auditUrl: appendOutreachUtm(baseAudit, target, kind),
     unsubscribeUrl: buildUnsubscribeUrl(target.id, baseUrl),
   };
+}
+
+/**
+ * Append cohort attribution to an outbound link. Captured client-side by
+ * Plausible on landing; the `t` param is the OutreachTarget id so we can
+ * also attribute server-side from request headers when needed.
+ *
+ * Per `feedback_no_pii_in_url_params` the cuid `t` is not PII (no email,
+ * no name) so it's safe to ride in the query string.
+ */
+function appendOutreachUtm(url: string, target: OutreachTarget, kind: SendKind): string {
+  const u = new URL(url);
+  u.searchParams.set('utm_source', 'outreach');
+  u.searchParams.set('utm_medium', 'email');
+  u.searchParams.set('utm_campaign', target.source);
+  u.searchParams.set('utm_content', kind);
+  u.searchParams.set('t', target.id);
+  return u.toString();
 }
 
 export async function sendOutreach(input: SendOutreachInput): Promise<SendOutcome> {
@@ -120,7 +139,7 @@ export async function sendOutreach(input: SendOutreachInput): Promise<SendOutcom
 
   const senderName = readSenderName(input);
   const baseUrl = readBaseUrl();
-  const tplInput = templateInputFromTarget(target, senderName, baseUrl);
+  const tplInput = templateInputFromTarget(target, input.kind, senderName, baseUrl);
   const rendered = renderEmail(input.kind, tplInput);
 
   if (input.dryRun) {
@@ -137,8 +156,12 @@ export async function sendOutreach(input: SendOutreachInput): Promise<SendOutcom
   // "unsubscribe" affordance — the cleanest opt-out path. The mailto
   // is internal only (the `feedback_no_mailto_links_anywhere` memory
   // applies to public surfaces; this is a header-only spec compliance).
+  // The mailto target lives on the SAME domain as the From — operator's
+  // M365 tenant routes `unsubscribe@team.flintmere.com` to the shared
+  // hello@team.flintmere.com mailbox via alias. Domain mismatch here
+  // would downrank deliverability with strict mailbox providers.
   const headers = {
-    'List-Unsubscribe': `<${tplInput.unsubscribeUrl}>, <mailto:unsubscribe+${target.id}@flintmere.com>`,
+    'List-Unsubscribe': `<${tplInput.unsubscribeUrl}>, <mailto:unsubscribe@team.flintmere.com>`,
     'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
   };
 
