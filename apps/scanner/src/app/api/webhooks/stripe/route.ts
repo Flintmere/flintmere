@@ -58,9 +58,12 @@ export async function POST(req: NextRequest) {
         error: err instanceof Error ? err.message : String(err),
       }),
     );
+    // 401 (not 400) per security-posture.md §Stripe webhooks — a forged
+    // signature is an auth failure, not a malformed request. The missing-
+    // signature branch above stays 400 (that IS a malformed request).
     return NextResponse.json(
       { ok: false, code: 'bad-signature' },
-      { status: 400 },
+      { status: 401 },
     );
   }
 
