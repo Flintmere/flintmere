@@ -379,7 +379,7 @@ export default function About() {
               />
               <ProcurementRow
                 label="VAT registration"
-                value="Not VAT-registered (Eazy Access Ltd is below the UK threshold)"
+                value="Not VAT-registered as of 2026-05-10 (Eazy Access Ltd is below the £90,000 UK threshold). If turnover exceeds the threshold we will register, add VAT to subsequent renewals, and notify existing customers at least 30 days before any price-inclusive change."
               />
               <ProcurementRow
                 label="ICO registration"

@@ -17,7 +17,7 @@ export default function Privacy() {
       eyebrow="Privacy"
       title="How we handle your data."
       summary="We collect only what we need to score and fix your product catalog. We do not sell data, ever. We host in the UK/EU, we delete tokens within 60 seconds of uninstall, our free one-time-secret tool at /secret encrypts in your browser so we never hold the key, and if you connect your Google Merchant Center we hold a single read-only refresh token encrypted at rest until you disconnect — full Limited Use attestation in clause 11. You can ask us to delete everything else at any time by sending a message via our contact form (Privacy topic)."
-      lastUpdated="2026-05-06"
+      lastUpdated="2026-05-10"
       anchorNumeral="01"
     >
       <Clause n="01" heading="Who we are">
@@ -188,6 +188,13 @@ export default function Privacy() {
             storage for up to 13 months for fraud and abuse investigations.
           </li>
         </ul>
+        <p className="mt-6">
+          The retention windows above are enforced automatically. A scheduled
+          job runs daily at <code>/api/cron/retention-sweep</code> and deletes
+          any rows past their retention window. Deletion is hard delete, not
+          soft delete — once a row is past its window, it is gone from the
+          database in the next sweep.
+        </p>
       </Clause>
 
       <Clause n="05" heading="Who we share it with (sub-processors)">
@@ -215,7 +222,12 @@ export default function Privacy() {
           </li>
           <li>
             <strong>Stripe</strong> (UK/Ireland) — payment processing for
-            concierge audits, Agency, and Plus tiers.
+            concierge audits, Agency, and Plus tiers. Stripe receives the
+            billing email, the shop URL (so it appears on the invoice), the
+            audit band purchased, and an internal payment-intent reference.
+            We do not pass Shopify access tokens, GMC tokens, catalog data,
+            or scan results to Stripe. Card data is collected in the Stripe
+            Payment Element iframe and never touches our servers.
           </li>
           <li>
             <strong>Sentry</strong> (EU) — error tracking. PII scrubbed at

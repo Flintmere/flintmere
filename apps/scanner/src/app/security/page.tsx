@@ -17,7 +17,7 @@ export default function Security() {
       eyebrow="Security"
       title="What we do to protect your store."
       summary="Shopify access tokens are encrypted at rest with a key stored outside the database. Every webhook is HMAC-verified. Everything on the wire uses TLS 1.2 or better. We scan dependencies automatically and have a written incident-response runbook. If you find a vulnerability, email security@flintmere.com and we&rsquo;ll respond within 24 hours."
-      lastUpdated="2026-05-03"
+      lastUpdated="2026-05-10"
       anchorNumeral="03"
     >
       <Clause n="01" heading="Encryption at rest">
@@ -44,7 +44,26 @@ export default function Security() {
         </p>
       </Clause>
 
-      <Clause n="03" heading="Webhook verification">
+      <Clause n="03" heading="Script-injection defence (CSP)">
+        <p>
+          Every page served from <code>flintmere.com</code> and{' '}
+          <code>audit.flintmere.com</code> carries a Content Security Policy
+          header with a per-request cryptographic nonce. Inline scripts run
+          only if they carry the matching nonce; scripts loaded by the
+          framework propagate trust via <code>&lsquo;strict-dynamic&rsquo;</code>.
+          This blocks injected third-party scripts, including XSS attempts that
+          bypass HTML sanitisation.
+        </p>
+        <p className="mt-4">
+          The policy is currently shipped as <strong>Report-Only</strong> while
+          we observe real-world reports. Violations are logged. We will flip
+          to enforcement once the report-only window shows a clean baseline —
+          at that point any non-allowlisted script will be hard-blocked by
+          the browser.
+        </p>
+      </Clause>
+
+      <Clause n="04" heading="Webhook verification">
         <p>
           Every incoming Shopify webhook is verified by HMAC-SHA256 against
           the shared secret before we process it. Unverified webhooks are
@@ -59,7 +78,7 @@ export default function Security() {
         </p>
       </Clause>
 
-      <Clause n="04" heading="Scope minimisation">
+      <Clause n="05" heading="Scope minimisation">
         <p>
           The Shopify app requests only <code>read_products</code> and{' '}
           <code>write_products</code>. We do not request customer, order,
@@ -69,7 +88,7 @@ export default function Security() {
         </p>
       </Clause>
 
-      <Clause n="05" heading="Access control">
+      <Clause n="06" heading="Access control">
         <p>
           Production access is limited to two people by default. All
           production access is logged. We use short-lived tokens and hardware
@@ -78,7 +97,7 @@ export default function Security() {
         </p>
       </Clause>
 
-      <Clause n="06" heading="Dependency and vulnerability management">
+      <Clause n="07" heading="Dependency and vulnerability management">
         <p>
           We run automated dependency scans on every commit. Critical and high
           CVEs are patched within 7 days; medium within 30; low within 90. We
@@ -87,7 +106,7 @@ export default function Security() {
         </p>
       </Clause>
 
-      <Clause n="07" heading="Infrastructure and backups">
+      <Clause n="08" heading="Infrastructure and backups">
         <p>
           Flintmere runs on <strong>DigitalOcean</strong> (UK region) managed
           via <strong>Coolify</strong>. Postgres is backed up nightly with
@@ -96,7 +115,7 @@ export default function Security() {
         </p>
       </Clause>
 
-      <Clause n="08" heading="Logging and monitoring">
+      <Clause n="09" heading="Logging and monitoring">
         <p>
           Application errors are captured in <strong>Sentry (EU)</strong> with
           PII scrubbing at source. Uptime is monitored by{' '}
@@ -106,7 +125,7 @@ export default function Security() {
         </p>
       </Clause>
 
-      <Clause n="09" heading="Incident response">
+      <Clause n="10" heading="Incident response">
         <p>
           We maintain a written incident-response runbook. Where Flintmere is
           the controller, we notify the ICO within 72 hours of a confirmed
@@ -125,7 +144,7 @@ export default function Security() {
         </p>
       </Clause>
 
-      <Clause n="10" heading="Responsible disclosure">
+      <Clause n="11" heading="Responsible disclosure">
         <p>
           We welcome security research. Send findings via our{' '}
           <a href="/contact?topic=security" className="underline">
@@ -149,7 +168,7 @@ export default function Security() {
         </p>
       </Clause>
 
-      <Clause n="11" heading="What we don't claim">
+      <Clause n="12" heading="What we don't claim">
         <p>
           We&rsquo;re a small team. We are not currently ISO 27001 certified
           or SOC 2 audited. We do not claim PCI-DSS compliance because Stripe
