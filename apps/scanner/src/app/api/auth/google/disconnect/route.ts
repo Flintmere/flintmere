@@ -44,8 +44,15 @@ export async function POST(request: NextRequest) {
     });
     await revokeAtGoogle(refreshToken);
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.warn('gmc-disconnect: google-revoke-failed', message);
+    // Structured log — Google's revoke errors can contain user-controlled
+    // strings; JSON.stringify normalises any newlines / control chars
+    // before they hit the log aggregator.
+    console.warn(
+      JSON.stringify({
+        event: 'gmc-disconnect.google-revoke-failed',
+        message: err instanceof Error ? err.message : String(err),
+      }),
+    );
   }
 
   await prisma.merchantGmcConnection.update({
