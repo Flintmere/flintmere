@@ -270,7 +270,7 @@ export default function Privacy() {
         <p className="mt-4">
           Eazy Access Ltd is registered with the Information
           Commissioner&rsquo;s Office (ICO) as a data controller — registration
-          number <strong>ZC137268</strong>.
+          number <strong>ZC137268</strong> (issued 2026-05-06).
         </p>
         <p className="mt-4">
           If you&rsquo;re not satisfied with our response you can complain to

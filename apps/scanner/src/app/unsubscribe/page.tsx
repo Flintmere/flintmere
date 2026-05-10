@@ -1,5 +1,10 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Bracket, SiteFooter } from '@flintmere/ui';
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 interface Props {
   searchParams: Promise<{ status?: string }>;

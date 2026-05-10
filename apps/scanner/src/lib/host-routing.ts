@@ -54,6 +54,7 @@ export const MARKETING_ROUTES: readonly string[] = [
   '/methodology',
   '/research',
   '/security',
+  '/sitemap',
   '/contact',
   '/support',
   '/cookies',

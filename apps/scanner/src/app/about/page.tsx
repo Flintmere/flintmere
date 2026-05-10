@@ -381,7 +381,10 @@ export default function About() {
                 label="VAT registration"
                 value="Not VAT-registered (Eazy Access Ltd is below the UK threshold)"
               />
-              <ProcurementRow label="ICO registration" value="ZC137268" />
+              <ProcurementRow
+                label="ICO registration"
+                value="ZC137268 (issued 2026-05-06)"
+              />
               <ProcurementRow
                 label="Accountable director"
                 value="Abdur-Rahman Morris"
