@@ -1,6 +1,42 @@
 import { describe, expect, it } from 'vitest';
 import type { CompositeScore } from '@flintmere/scoring';
 import { buildReportEmail } from './report-email';
+import type { GmcGroundTruth } from './gmc/types';
+
+function makeGmcGroundTruth(
+  overrides: Partial<GmcGroundTruth> = {},
+): GmcGroundTruth {
+  return {
+    fetchedAt: '2026-05-08T09:30:00Z',
+    gmcAccountId: '123456789',
+    gmcAccountName: 'Meridian Coffee Roasters',
+    totalProductsRead: 412,
+    truncated: false,
+    destinationCounts: { approved: 312, disapproved: 47, pending: 53 },
+    topIssues: [
+      {
+        code: 'missing_value',
+        description: '[gtin] Missing value',
+        severity: 'error',
+        productCount: 41,
+        sampleProducts: [
+          { offerId: 'sku-001', title: 'Single-origin Ethiopian — 250g' },
+          { offerId: 'sku-002', title: 'House blend espresso — 1kg' },
+        ],
+      },
+      {
+        code: 'invalid_value',
+        description: '[gtin] Invalid value',
+        severity: 'error',
+        productCount: 6,
+        sampleProducts: [
+          { offerId: 'sku-099', title: 'Decaf Brazilian — 500g' },
+        ],
+      },
+    ],
+    ...overrides,
+  };
+}
 
 function makeScore(overrides: Partial<CompositeScore> = {}): CompositeScore {
   return {
@@ -117,5 +153,99 @@ describe('buildReportEmail', () => {
     });
     expect(email.html).not.toContain('<script>');
     expect(email.html).toContain('&lt;script&gt;');
+  });
+});
+
+describe('buildReportEmail — GMC ground truth section (ADR 0023 slice 3)', () => {
+  it('omits the GMC banner when no ground truth was fetched', () => {
+    const email = buildReportEmail({
+      score: makeScore(),
+      ...baseInput,
+      gmcGroundTruth: null,
+    });
+    expect(email.html).not.toContain('ground truth');
+    expect(email.html).not.toContain('Currently disapproved');
+    expect(email.text).not.toContain('Currently disapproved');
+  });
+
+  it('omits the GMC banner when the field is absent on the input', () => {
+    // Backwards-compat: callers that don't yet pass gmcGroundTruth get
+    // the same render they had before slice 3 landed.
+    const email = buildReportEmail({ score: makeScore(), ...baseInput });
+    expect(email.html).not.toContain('Currently disapproved');
+  });
+
+  it('renders the deterministic disapproval lede when ground truth is present', () => {
+    const email = buildReportEmail({
+      score: makeScore(),
+      ...baseInput,
+      gmcGroundTruth: makeGmcGroundTruth(),
+    });
+    expect(email.html).toContain('Currently disapproved');
+    expect(email.html).toContain('read directly from your Google Merchant Center');
+    // Lede: "47 of 412 products disapproved" (412 = 312 approved + 47 disapproved + 53 pending)
+    expect(email.html).toContain('47 of 412 products disapproved');
+    // Subline carries the per-status counts + account label.
+    expect(email.html).toContain('312 approved');
+    expect(email.html).toContain('53 pending');
+    expect(email.html).toContain('Meridian Coffee Roasters');
+  });
+
+  it("renders Google's verbatim issue descriptions and codes", () => {
+    // Per ADR 0023: "direct disapproval-reason quotes (Google's own language)".
+    // We must NOT translate the description through founder-speak — the
+    // proof of "we read your real GMC" is Google's own copy.
+    const email = buildReportEmail({
+      score: makeScore(),
+      ...baseInput,
+      gmcGroundTruth: makeGmcGroundTruth(),
+    });
+    expect(email.html).toContain('[gtin] Missing value');
+    expect(email.html).toContain('code: missing_value');
+    expect(email.html).toContain('41 products');
+  });
+
+  it('includes sample product titles in the email (private surface)', () => {
+    // Sample product titles are appropriate in the email (sent only to
+    // the merchant) but excluded from the public score page panel.
+    const email = buildReportEmail({
+      score: makeScore(),
+      ...baseInput,
+      gmcGroundTruth: makeGmcGroundTruth(),
+    });
+    expect(email.html).toContain('Single-origin Ethiopian — 250g');
+    expect(email.text).toContain('Single-origin Ethiopian — 250g');
+  });
+
+  it('surfaces a truncation note when the read budget exhausted', () => {
+    const email = buildReportEmail({
+      score: makeScore(),
+      ...baseInput,
+      gmcGroundTruth: makeGmcGroundTruth({
+        truncated: true,
+        totalProductsRead: 250,
+      }),
+    });
+    // HTML escapes apostrophes; assert against the unambiguous substring.
+    expect(email.html).toContain('API budget ran out');
+    expect(email.html).toContain('250 products');
+    // Text variant carries the unescaped form.
+    expect(email.text).toContain("Google's API budget ran out");
+  });
+
+  it('drops to an all-approved lede when no products are disapproved', () => {
+    const email = buildReportEmail({
+      score: makeScore(),
+      ...baseInput,
+      gmcGroundTruth: makeGmcGroundTruth({
+        destinationCounts: { approved: 412, disapproved: 0, pending: 0 },
+        topIssues: [],
+      }),
+    });
+    // Lede pivots to the all-approved framing — the banner eyebrow keeps
+    // its fixed identity ("Currently disapproved") because that's what
+    // the section IS, but the deterministic anchor flips to the
+    // good-news shape.
+    expect(email.html).toContain('412 products approved by Google');
   });
 });

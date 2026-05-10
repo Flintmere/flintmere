@@ -127,6 +127,11 @@ export async function POST(req: NextRequest) {
       scaledRevenueEstimate: result.scaledRevenueEstimate,
       pillars: result.pillars,
       issues: result.issues.slice(0, 10),
+      // Per ADR 0023 slice 3 — null today (no merchant has connected
+      // GMC pre-Google-OAuth-verification). Wires the field into the
+      // client envelope so the GmcPublicPageOptIn toggle can mount the
+      // moment a real connection lands.
+      gmcGroundTruth: result.gmcGroundTruth,
     },
     { status: 200 },
   );

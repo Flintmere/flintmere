@@ -23,6 +23,7 @@ import { ScanForm } from '@/components/ScanForm';
 import { BenchmarkOptIn } from '@/components/scan/BenchmarkOptIn';
 import { ErrorBlock } from '@/components/scan/ErrorBlock';
 import { PublicPageOptIn } from '@/components/scan/PublicPageOptIn';
+import { GmcPublicPageOptIn } from '@/components/scan/GmcPublicPageOptIn';
 import { Results } from '@/components/scan/Results';
 import { ScanningOverlay } from '@/components/scan/ScanningOverlay';
 import type { ScanState } from '@/components/scan/types';
@@ -140,6 +141,12 @@ export default function ScanPage() {
             scanId={state.result.id}
             shopDomain={state.result.shopDomain}
           />
+          {state.result.gmcGroundTruth ? (
+            <GmcPublicPageOptIn
+              scanId={state.result.id}
+              shopDomain={state.result.shopDomain}
+            />
+          ) : null}
           <EmailGate
             scanId={state.result.id}
             shopDomain={state.result.shopDomain}
