@@ -3,6 +3,10 @@ import {
   __resetRateLimitState,
   checkScanRateLimit,
   checkCheckoutRateLimit,
+  checkScanActionRateLimit,
+  checkOneTimeSecretConsumeRateLimit,
+  checkGmcAccessRequestRateLimit,
+  checkOauthFlowRateLimit,
 } from './rate-limit'
 
 const FIXED_NOW = 1_700_000_000_000
@@ -261,6 +265,84 @@ describe('checkCheckoutRateLimit — per-email + per-IP', () => {
       now: FIXED_NOW + 3_600_000,
     })
     expect(recovered.ok).toBe(true)
+  })
+})
+
+describe('possession-gated public endpoint buckets (PR-B)', () => {
+  beforeEach(() => {
+    __resetRateLimitState()
+  })
+
+  it('checkScanActionRateLimit allows 30 burst then blocks the 31st', () => {
+    for (let i = 0; i < 30; i++) {
+      const r = checkScanActionRateLimit({
+        ip: '203.0.113.55',
+        now: FIXED_NOW + i,
+      })
+      expect(r.ok).toBe(true)
+    }
+    const blocked = checkScanActionRateLimit({
+      ip: '203.0.113.55',
+      now: FIXED_NOW + 30,
+    })
+    expect(blocked.ok).toBe(false)
+    expect(blocked.retryAfterSec).toBeGreaterThan(0)
+  })
+
+  it('checkGmcAccessRequestRateLimit caps at 5 burst', () => {
+    for (let i = 0; i < 5; i++) {
+      const r = checkGmcAccessRequestRateLimit({
+        ip: '203.0.113.56',
+        now: FIXED_NOW + i,
+      })
+      expect(r.ok).toBe(true)
+    }
+    const blocked = checkGmcAccessRequestRateLimit({
+      ip: '203.0.113.56',
+      now: FIXED_NOW + 5,
+    })
+    expect(blocked.ok).toBe(false)
+  })
+
+  it('checkOauthFlowRateLimit + checkOneTimeSecretConsumeRateLimit cap at 20 burst', () => {
+    for (let i = 0; i < 20; i++) {
+      expect(
+        checkOauthFlowRateLimit({ ip: '203.0.113.57', now: FIXED_NOW + i }).ok,
+      ).toBe(true)
+      expect(
+        checkOneTimeSecretConsumeRateLimit({
+          ip: '203.0.113.58',
+          now: FIXED_NOW + i,
+        }).ok,
+      ).toBe(true)
+    }
+    expect(
+      checkOauthFlowRateLimit({ ip: '203.0.113.57', now: FIXED_NOW + 20 }).ok,
+    ).toBe(false)
+    expect(
+      checkOneTimeSecretConsumeRateLimit({
+        ip: '203.0.113.58',
+        now: FIXED_NOW + 20,
+      }).ok,
+    ).toBe(false)
+  })
+
+  it('buckets are independent — exhausting one does not affect another', () => {
+    for (let i = 0; i < 5; i++) {
+      checkGmcAccessRequestRateLimit({
+        ip: '203.0.113.59',
+        now: FIXED_NOW + i,
+      })
+    }
+    expect(
+      checkGmcAccessRequestRateLimit({
+        ip: '203.0.113.59',
+        now: FIXED_NOW + 5,
+      }).ok,
+    ).toBe(false)
+    expect(
+      checkScanActionRateLimit({ ip: '203.0.113.59', now: FIXED_NOW + 5 }).ok,
+    ).toBe(true)
   })
 })
 

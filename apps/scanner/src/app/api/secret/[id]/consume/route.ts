@@ -24,6 +24,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { checkOneTimeSecretConsumeRateLimit } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -32,7 +33,30 @@ interface Params {
   params: Promise<{ id: string }>;
 }
 
-export async function POST(_req: NextRequest, { params }: Params) {
+export async function POST(req: NextRequest, { params }: Params) {
+  // Per-IP rate limit added 2026-05-10 (P2-M pre-launch audit).
+  // Existence-probing risk: 404 vs 410 distinguishes "live" from "burned"
+  // IDs. A bucket caps the probing rate without blocking legitimate
+  // browser-driven consume (one POST per click).
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-real-ip') ||
+    null;
+  const rl = checkOneTimeSecretConsumeRateLimit({ ip });
+  if (!rl.ok) {
+    return NextResponse.json(
+      {
+        ok: false,
+        code: 'rate-limited',
+        retryAfterSec: rl.retryAfterSec,
+      },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(rl.retryAfterSec) },
+      },
+    );
+  }
+
   const { id } = await params;
   const now = new Date();
 

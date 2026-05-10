@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { checkScanActionRateLimit } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -8,8 +9,35 @@ export const dynamic = 'force-dynamic';
 // The scan id is the capability — whoever holds the Results URL can toggle it.
 // Idempotent. Separate from publishedToBenchmark (aggregate-only consent).
 // POST = opt in. DELETE = opt back out. Both operate on the same column.
+//
+// Per-IP rate limit added 2026-05-10 (P1-G pre-launch audit) — sustained
+// ID enumeration without a bucket would exhaust DB connections on the
+// single-droplet deployment.
+function readIp(req: NextRequest): string | null {
+  return (
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-real-ip') ||
+    null
+  );
+}
+
+function rateLimited(retryAfterSec: number): NextResponse {
+  return NextResponse.json(
+    {
+      ok: false,
+      code: 'rate-limited',
+      message: 'Too many requests.',
+      retryAfterSec,
+    },
+    {
+      status: 429,
+      headers: { 'Retry-After': String(retryAfterSec) },
+    },
+  );
+}
+
 export async function POST(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
@@ -19,6 +47,9 @@ export async function POST(
       { status: 400 },
     );
   }
+
+  const rl = checkScanActionRateLimit({ ip: readIp(req) });
+  if (!rl.ok) return rateLimited(rl.retryAfterSec);
 
   const scan = await prisma.scan.findUnique({
     where: { id },
@@ -78,7 +109,7 @@ export async function POST(
 }
 
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
@@ -88,6 +119,9 @@ export async function DELETE(
       { status: 400 },
     );
   }
+
+  const rl = checkScanActionRateLimit({ ip: readIp(req) });
+  if (!rl.ok) return rateLimited(rl.retryAfterSec);
 
   const scan = await prisma.scan.findUnique({
     where: { id },

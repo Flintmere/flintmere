@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db';
 import { normaliseShopDomain } from '@/lib/gmc/oauth';
+import { checkGmcAccessRequestRateLimit } from '@/lib/rate-limit';
 
 // Per ADR 0023 §slice 2b — pre-verification waiting list capture.
 // Receives the request when a paid audit's owner clicks the connect
@@ -21,6 +22,30 @@ const BodySchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  // Per-IP rate limit added 2026-05-10 (P1-F pre-launch audit). Audit
+  // IDs appear in delivery emails — anyone with one (legitimate or
+  // leaked) can write rows to scanner_gmc_access_requests. 5/hour
+  // matches lead-capture posture (write + downstream notification).
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-real-ip') ||
+    null;
+  const rl = checkGmcAccessRequestRateLimit({ ip });
+  if (!rl.ok) {
+    return NextResponse.json(
+      {
+        ok: false,
+        code: 'rate-limited',
+        message: 'Too many requests.',
+        retryAfterSec: rl.retryAfterSec,
+      },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(rl.retryAfterSec) },
+      },
+    );
+  }
+
   let body: z.infer<typeof BodySchema>;
   try {
     body = BodySchema.parse(await req.json());
