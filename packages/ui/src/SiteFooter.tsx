@@ -223,6 +223,13 @@ export function SiteFooter() {
           >
             Support
           </Link>
+          <span aria-hidden="true">,</span>
+          <Link
+            href="/sitemap"
+            className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
+          >
+            Sitemap
+          </Link>
         </nav>
       </div>
     </footer>
