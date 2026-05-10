@@ -5,15 +5,9 @@ import {
 } from './lib/host-routing';
 
 /**
- * Host-routing + Content-Security-Policy middleware.
- *
- * Two responsibilities, intentionally co-located so a single response
- * carries both decisions (host-aware rewrites and a per-request CSP
- * with a unique nonce). Splitting them into two middlewares would mean
- * one has to re-derive the other's response shape — fragile.
- *
- * Host routing — C1 architecture (council-ratified 2026-05-03, extended
- * to three hosts 2026-05-03). One Next.js app serves three hosts:
+ * Host-routing middleware — implements the C1 architecture
+ * (council-ratified 2026-05-03, extended to three hosts 2026-05-03).
+ * One Next.js app serves three hosts:
  *
  *   GET https://audit.flintmere.com/pricing  → 301 https://flintmere.com/pricing
  *   GET https://flintmere.com/scan           → 301 https://audit.flintmere.com/scan
@@ -29,24 +23,6 @@ import {
  * Reads the `x-forwarded-host` header before falling back to `host` —
  * Coolify's Traefik sets the forwarded header; the underlying `host`
  * inside the container is the internal service name.
- *
- * CSP — added 2026-05-09 pre-launch security audit P0-2. Every
- * pass-through and rewrite response carries a strict policy with a
- * per-request nonce. The nonce is also propagated via the `x-nonce`
- * request header so server components (root layout) can read it via
- * `headers()` and pass to inline `<Script>` tags. Next.js internal
- * hydration scripts pick up the same nonce automatically.
- *
- * Allowlist — explicit rather than `'strict-dynamic'` for first
- * deployment. Easier to debug violations (the offending URL is named
- * in the console) and forces every external resource to be intentional.
- * Tighten to strict-dynamic in a follow-up once the allowlist has
- * stabilised against real traffic.
- *
- * Redirect responses (cross-host 301 + RSC 204 noop) skip CSP — they
- * have no body for an injected script to execute against, and the
- * browser will follow the redirect to the target host where the new
- * response sets its own CSP.
  */
 export function middleware(request: NextRequest): NextResponse {
   // Three fallbacks in priority order. Coolify/Traefik should set
@@ -108,15 +84,6 @@ export function middleware(request: NextRequest): NextResponse {
     return redirectResponse;
   }
 
-  // CSP nonce + new request headers, threaded through both rewrite
-  // and pass paths. The same nonce appears in: (a) the request's
-  // x-nonce header (so server components can read via headers()),
-  // (b) the response's Content-Security-Policy header.
-  const nonce = generateCspNonce();
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-nonce', nonce);
-  const csp = buildCsp(nonce);
-
   // Same-host rewrite — currently only standards.flintmere.com/ → /standards.
   const rewriteTo = rewritePathForHost(
     requestHost,
@@ -125,10 +92,7 @@ export function middleware(request: NextRequest): NextResponse {
   if (rewriteTo) {
     const url = request.nextUrl.clone();
     url.pathname = rewriteTo;
-    const rewriteResponse = NextResponse.rewrite(url, {
-      request: { headers: requestHeaders },
-    });
-    rewriteResponse.headers.set('Content-Security-Policy', csp);
+    const rewriteResponse = NextResponse.rewrite(url);
     annotateHostDiagnostics(rewriteResponse, {
       forwardedHost,
       directHost,
@@ -139,10 +103,7 @@ export function middleware(request: NextRequest): NextResponse {
     return rewriteResponse;
   }
 
-  const passResponse = NextResponse.next({
-    request: { headers: requestHeaders },
-  });
-  passResponse.headers.set('Content-Security-Policy', csp);
+  const passResponse = NextResponse.next();
   annotateHostDiagnostics(passResponse, {
     forwardedHost,
     directHost,
@@ -151,64 +112,6 @@ export function middleware(request: NextRequest): NextResponse {
     decision: 'pass',
   });
   return passResponse;
-}
-
-/**
- * Cryptographically random CSP nonce. 16 bytes (128 bits) of entropy
- * encoded base64 — well above the 64-bit floor recommended by the CSP
- * spec. Edge-runtime compatible (uses Web Crypto + btoa, not Node
- * Buffer or randomBytes).
- */
-function generateCspNonce(): string {
-  const bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
-  let binary = '';
-  for (const b of bytes) binary += String.fromCharCode(b);
-  return btoa(binary);
-}
-
-/**
- * Build the per-request Content-Security-Policy header value.
- *
- * Allowlist rationale (audit-time inventory of every external resource
- * the app loads):
- *   - script-src: self for Next chunks; nonce for the Plausible inline
- *     init at layout.tsx; plausible.io for the Plausible loader;
- *     challenges.cloudflare.com for Turnstile; js.stripe.com for
- *     Stripe.js (loaded by @stripe/stripe-js on /audit/checkout).
- *   - connect-src: same external endpoints + Sentry's EU ingest
- *     (events tunneled through /monitoring but the SDK still resolves
- *     the public DSN at construction time).
- *   - frame-src: Turnstile challenge iframe + Stripe Element iframe +
- *     Stripe 3DS challenge (hooks.stripe.com).
- *   - style-src 'unsafe-inline': Tailwind + Next.js generate inline
- *     styles aggressively. Without this, every styled-jsx and
- *     css-in-js component breaks. Documented concession; tighten via
- *     hash-based style-src in a follow-up if/when the codebase moves
- *     fully to CSS modules.
- *   - frame-ancestors 'none': scanner + marketing are not embeddable
- *     (security-posture.md §CSP). Shopify-app embedding posture lives
- *     in apps/shopify-app — out of scope here.
- *   - upgrade-insecure-requests: nudges any stray http:// URL to https.
- */
-function buildCsp(nonce: string): string {
-  const directives = [
-    "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' https://plausible.io https://challenges.cloudflare.com https://js.stripe.com`,
-    "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' blob: data: https:",
-    "font-src 'self' data:",
-    "connect-src 'self' https://plausible.io https://challenges.cloudflare.com https://api.stripe.com https://*.ingest.de.sentry.io https://*.ingest.sentry.io",
-    "frame-src https://challenges.cloudflare.com https://js.stripe.com https://hooks.stripe.com",
-    "worker-src 'self' blob:",
-    "manifest-src 'self'",
-    "frame-ancestors 'none'",
-    "object-src 'none'",
-    "base-uri 'self'",
-    "form-action 'self'",
-    'upgrade-insecure-requests',
-  ];
-  return directives.join('; ');
 }
 
 /**
