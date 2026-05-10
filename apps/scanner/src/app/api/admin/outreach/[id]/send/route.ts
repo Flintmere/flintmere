@@ -18,7 +18,7 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { z } from 'zod'
-import { requireAdmin } from '@/lib/admin-auth'
+import { requireAdmin, verifyAdminSmokeToken } from '@/lib/admin-auth'
 import { sendOutreach } from '@/lib/outreach/send'
 
 const bodySchema = z.object({
@@ -30,7 +30,9 @@ export async function POST(
   req: Request,
   context: { params: Promise<{ id: string }> },
 ) {
-  const admin = await requireAdmin(cookies, process.env)
+  const admin =
+    verifyAdminSmokeToken(req.headers, process.env) ??
+    (await requireAdmin(cookies, process.env))
   if (!admin) {
     return NextResponse.json({ ok: false, reason: 'unauth' }, { status: 401 })
   }

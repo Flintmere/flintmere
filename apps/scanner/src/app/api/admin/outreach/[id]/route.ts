@@ -20,7 +20,7 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { z } from 'zod'
-import { requireAdmin } from '@/lib/admin-auth'
+import { requireAdmin, verifyAdminSmokeToken } from '@/lib/admin-auth'
 import { prisma } from '@/lib/db'
 import { recordUnsubscribe, OUTREACH_STATUS } from '@/lib/outreach/db'
 
@@ -41,7 +41,9 @@ export async function PATCH(
   req: Request,
   context: { params: Promise<{ id: string }> },
 ) {
-  const admin = await requireAdmin(cookies, process.env)
+  const admin =
+    verifyAdminSmokeToken(req.headers, process.env) ??
+    (await requireAdmin(cookies, process.env))
   if (!admin) {
     return NextResponse.json({ ok: false, message: 'unauth' }, { status: 401 })
   }
