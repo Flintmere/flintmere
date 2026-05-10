@@ -253,8 +253,32 @@ export function PillarWheel({
   const activePillar = pillars[safeActive]!;
   const activeId = String(safeActive + 1).padStart(2, '0');
   const reduced = useReducedMotion();
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  // Captures whichever element opened the modal so close-cleanup can return
+  // focus accurately. On desktop that's the "+ read full spec" button; on
+  // mobile (panel hidden below lg) that's the wedge group itself. A single
+  // ref unifies both paths so SR + keyboard users land back where they
+  // launched from.
+  const modalTriggerRef = useRef<HTMLElement | SVGGElement | null>(null);
   const closeRef = useRef<HTMLButtonElement | null>(null);
+
+  // Below the lg breakpoint the spotlight panel is hidden (mobile-fold
+  // direction, council critique 2026-05-10). The modal is the panel on
+  // mobile — wedge tap opens it directly. matchMedia is read at click
+  // time (not stored in state) to avoid hydration mismatch + the +0.5KB
+  // useMediaQuery hook.
+  const handleWedgeActivate = useCallback(
+    (idx: number, trigger: SVGGElement | null) => {
+      setActive(idx);
+      if (
+        typeof window !== 'undefined' &&
+        window.matchMedia('(max-width: 1023px)').matches
+      ) {
+        modalTriggerRef.current = trigger;
+        setModalOpen(true);
+      }
+    },
+    [setActive],
+  );
 
   const handleKey = useCallback(
     (e: KeyboardEvent<SVGGElement>, idx: number) => {
@@ -273,10 +297,10 @@ export function PillarWheel({
         setActive(len - 1);
       } else if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
-        setActive(idx);
+        handleWedgeActivate(idx, e.currentTarget);
       }
     },
-    [pillars.length],
+    [pillars.length, setActive, handleWedgeActivate],
   );
 
   // Modal — body scroll lock + ESC handler + focus management
@@ -295,7 +319,7 @@ export function PillarWheel({
     return () => {
       window.removeEventListener('keydown', onKey);
       document.body.style.overflow = prevOverflow;
-      triggerRef.current?.focus();
+      modalTriggerRef.current?.focus();
     };
   }, [modalOpen]);
 
@@ -382,7 +406,7 @@ export function PillarWheel({
                         '%',
                         ' percent',
                       )} of total score`}
-                      onClick={() => setActive(w.idx)}
+                      onClick={(e) => handleWedgeActivate(w.idx, e.currentTarget)}
                       onKeyDown={(e) => handleKey(e, w.idx)}
                       className="pillar-wedge"
                       data-active={isActive ? 'true' : 'false'}
@@ -524,11 +548,16 @@ export function PillarWheel({
           </motion.p>
         </div>
 
-        {/* Spotlight panel — Apple feature-card register */}
-        <div
+        {/* Spotlight panel — Apple feature-card register.
+            Hidden below lg: on mobile the modal IS the panel (wedge tap opens
+            it directly). Council critique 2026-05-10 — wheel-as-selector and
+            panel-as-detail were competing for fold; mobile composition is now
+            single-column wheel-only with modal as the deep-dive. */}
+        <section
           aria-live="polite"
           aria-atomic="true"
-          className="order-2 lg:order-1"
+          aria-label={`Pillar ${activeId} deep-dive: ${activePillar.name}`}
+          className="hidden lg:block lg:order-1"
         >
           <AnimatePresence mode="wait">
             <motion.div
@@ -648,9 +677,11 @@ export function PillarWheel({
                 </motion.p>
 
                 <motion.button
-                  ref={triggerRef}
                   variants={bodyLineVariants}
-                  onClick={() => setModalOpen(true)}
+                  onClick={(e) => {
+                    modalTriggerRef.current = e.currentTarget;
+                    setModalOpen(true);
+                  }}
                   className="pillar-spec-trigger mt-10 inline-flex items-center gap-3 font-mono uppercase"
                   style={{
                     fontSize: 'clamp(11px, 1vw, 13px)',
@@ -676,7 +707,7 @@ export function PillarWheel({
               </div>
             </motion.div>
           </AnimatePresence>
-        </div>
+        </section>
       </div>
 
       {/* Spotlight modal — Apple iPhone-overview deep-dive register */}
