@@ -16,7 +16,7 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { z } from 'zod'
-import { requireAdmin } from '@/lib/admin-auth'
+import { requireAdmin, verifyAdminSmokeToken } from '@/lib/admin-auth'
 import { prisma } from '@/lib/db'
 
 const bodySchema = z.object({
@@ -97,7 +97,9 @@ function parseIntOrNull(s: string): number | null {
 }
 
 export async function POST(req: Request) {
-  const admin = await requireAdmin(cookies, process.env)
+  const admin =
+    verifyAdminSmokeToken(req.headers, process.env) ??
+    (await requireAdmin(cookies, process.env))
   if (!admin) {
     return NextResponse.json({ ok: false, message: 'unauth' }, { status: 401 })
   }
