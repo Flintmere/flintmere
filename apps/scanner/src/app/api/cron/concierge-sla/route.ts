@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { runSlaScan } from '@/lib/concierge-sla';
+import { verifyCronSecret } from '@/lib/cron-auth';
 
 // Coolify-scheduled cron endpoint for the Concierge SLA monitor.
 // Configured as a Scheduled Task on the scanner application:
@@ -16,9 +17,9 @@ import { runSlaScan } from '@/lib/concierge-sla';
 // not necessarily the scanner web container. Public URL routes
 // through Traefik regardless. The CRON_SECRET is the gate either way.
 //
-// Authentication: shared secret in the X-Cron-Secret header. Set
-// CRON_SECRET in scanner Coolify env to a random 32+ char string.
-// Without it set, the route hard-403s — fail closed.
+// Authentication: shared secret in the X-Cron-Secret header via
+// verifyCronSecret (constant-time, no length leak — see cron-auth.ts).
+// Without CRON_SECRET set, the route fails closed.
 //
 // Force-dynamic: this route depends on runtime DB state, must not be
 // prerendered. The `headers()` call alone signals dynamic, but we set
@@ -26,30 +27,10 @@ import { runSlaScan } from '@/lib/concierge-sla';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let mismatch = 0;
-  for (let i = 0; i < a.length; i++) {
-    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return mismatch === 0;
-}
-
 export async function POST() {
-  const expected = process.env.CRON_SECRET;
-  if (!expected || expected.length < 32) {
-    return NextResponse.json(
-      { error: 'CRON_SECRET not configured (must be ≥32 chars)' },
-      { status: 503 },
-    );
-  }
-
   const hdrs = await headers();
-  const supplied = hdrs.get('x-cron-secret') ?? '';
-
-  if (!timingSafeEqual(supplied, expected)) {
-    return NextResponse.json({ error: 'unauthorised' }, { status: 403 });
-  }
+  const authError = verifyCronSecret(hdrs.get('x-cron-secret'));
+  if (authError) return authError;
 
   try {
     const result = await runSlaScan();
@@ -58,9 +39,12 @@ export async function POST() {
       { status: 200 },
     );
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
+    // Don't leak err.message to the response body — Prisma errors can
+    // contain connection strings and SQL fragments. Log full context
+    // server-side; return a generic code.
+    console.error('[concierge-sla-cron] failed', err);
     return NextResponse.json(
-      { event: 'concierge-sla-scan-failed', error: message },
+      { event: 'concierge-sla-scan-failed', code: 'internal-error' },
       { status: 500 },
     );
   }

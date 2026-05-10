@@ -144,12 +144,15 @@ export async function POST(req: NextRequest) {
         error: err instanceof Error ? err.message : String(err),
       }),
     )
+    // Don't echo err.message into the response body — unhandled errors
+    // can carry stack frames, DB connection strings, or prompt fragments.
+    // Server-side log above retains the full context.
     return NextResponse.json(
       {
         ok: false,
         code: 'internal-error',
         message: 'Audit-assist failed. Try again.',
-        detail: err instanceof Error ? err.message : String(err),
+        detail: 'Internal error — see server logs.',
       },
       { status: 500 },
     )
@@ -165,11 +168,15 @@ function mapGenerationError(err: AuditDraftGenerationError): NextResponse {
       message: err.message,
     }),
   )
-  // Admin-only route — include the underlying error message in `detail`
-  // so smoke / curl callers can diagnose without docker-logs round-trips.
-  // The friendly `message` stays user-facing-safe; `detail` carries the
-  // raw cause (Vertex error text, prompt-violation reason, etc.).
+  // Admin-only route, but defense-in-depth: vertex-error + llm-schema-fail
+  // carry Vertex error text that can echo prompt fragments (merchant
+  // catalog data + email metadata). For those two codes, redact the
+  // detail and rely on the structured server log above. Other codes
+  // (config / scan-shape / catalog-fetch) carry low-PII operator-useful
+  // detail and stay verbose so smoke callers can diagnose without
+  // docker-logs round-trips.
   const detail = err.message
+  const safeDetail = 'See server logs for full error.'
   switch (err.code) {
     case 'config-missing':
       return NextResponse.json(
@@ -219,7 +226,7 @@ function mapGenerationError(err: AuditDraftGenerationError): NextResponse {
           ok: false,
           code: 'vertex-error',
           message: 'LLM provider rejected the request.',
-          detail,
+          detail: safeDetail,
         },
         { status: 502 },
       )
@@ -229,7 +236,7 @@ function mapGenerationError(err: AuditDraftGenerationError): NextResponse {
           ok: false,
           code: 'llm-schema-fail',
           message: 'LLM produced malformed output twice. Check the prompt.',
-          detail,
+          detail: safeDetail,
         },
         { status: 502 },
       )

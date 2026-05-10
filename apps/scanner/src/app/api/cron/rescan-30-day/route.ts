@@ -1,6 +1,7 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { runDay30Rescans } from '@/lib/rescan-30-day';
+import { verifyCronSecret } from '@/lib/cron-auth';
 
 // Coolify-scheduled cron endpoint for the Day-30 audit re-scan promise.
 // Configured as a Scheduled Task on the scanner application:
@@ -11,8 +12,9 @@ import { runDay30Rescans } from '@/lib/rescan-30-day';
 // scanner web container name (otherwise Coolify errors "More than one
 // container exists").
 //
-// Mirror of /api/cron/concierge-sla — same auth shape, same fail-closed
-// posture, same force-dynamic. Public HTTPS through Traefik, not localhost.
+// Mirror of /api/cron/concierge-sla — same auth shape (verifyCronSecret),
+// same fail-closed posture, same force-dynamic. Public HTTPS through
+// Traefik, not localhost.
 //
 // Idempotency: handled inside runDay30Rescans via the rescanCompletedAt
 // + rescanEmailSentAt columns. Re-firing daily is safe — completed rows
@@ -22,30 +24,10 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const maxDuration = 300;
 
-function timingSafeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let mismatch = 0;
-  for (let i = 0; i < a.length; i++) {
-    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return mismatch === 0;
-}
-
 export async function POST() {
-  const expected = process.env.CRON_SECRET;
-  if (!expected || expected.length < 32) {
-    return NextResponse.json(
-      { error: 'CRON_SECRET not configured (must be ≥32 chars)' },
-      { status: 503 },
-    );
-  }
-
   const hdrs = await headers();
-  const supplied = hdrs.get('x-cron-secret') ?? '';
-
-  if (!timingSafeEqual(supplied, expected)) {
-    return NextResponse.json({ error: 'unauthorised' }, { status: 403 });
-  }
+  const authError = verifyCronSecret(hdrs.get('x-cron-secret'));
+  if (authError) return authError;
 
   try {
     const result = await runDay30Rescans();
@@ -54,9 +36,12 @@ export async function POST() {
       { status: 200 },
     );
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
+    // Don't leak err.message to the response body — Prisma errors can
+    // contain connection strings and SQL fragments. Log full context
+    // server-side; return a generic code.
+    console.error('[rescan-30-day-cron] failed', err);
     return NextResponse.json(
-      { event: 'rescan-30-day-failed', error: message },
+      { event: 'rescan-30-day-failed', code: 'internal-error' },
       { status: 500 },
     );
   }

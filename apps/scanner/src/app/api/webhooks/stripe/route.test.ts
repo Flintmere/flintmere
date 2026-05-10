@@ -72,7 +72,7 @@ describe('POST /api/webhooks/stripe', () => {
     vi.doUnmock('@/lib/db');
   });
 
-  it('returns 400 when signature verification fails', async () => {
+  it('returns 401 when signature verification fails', async () => {
     setupEnv();
     vi.resetModules();
     const constructEvent = vi.fn().mockImplementation(() => {
@@ -86,7 +86,7 @@ describe('POST /api/webhooks/stripe', () => {
     const { POST } = await import('./route');
     const res = await POST(makeRequest());
 
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(401);
     const body = await res.json();
     expect(body.code).toBe('bad-signature');
     expect(constructEvent).toHaveBeenCalledTimes(1);
