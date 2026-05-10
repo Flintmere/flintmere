@@ -122,12 +122,16 @@ export async function POST(req: NextRequest) {
     process.env.NEXT_PUBLIC_MARKETING_URL ?? 'https://flintmere.com';
   const token = signUnsubToken(lead.id);
   const unsubscribeUrl = `${scannerUrl}/api/unsubscribe/${token}`;
+  const persistedScoreJson = scan.scoreJson as unknown as CompositeScore & {
+    gmcGroundTruth?: import('@/lib/gmc/types').GmcGroundTruth | null;
+  };
   const mail = buildReportEmail({
-    score: scan.scoreJson as unknown as CompositeScore,
+    score: persistedScoreJson,
     unsubscribeUrl,
     appUrl: marketingUrl,
     auditUrl: `${scannerUrl}/audit`,
     recipientEmail: email,
+    gmcGroundTruth: persistedScoreJson.gmcGroundTruth ?? null,
   });
 
   const send = await sendEmail({

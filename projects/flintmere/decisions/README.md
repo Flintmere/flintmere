@@ -36,6 +36,14 @@ One file per significant decision. Name them `NNNN-slug.md` (4-digit zero-padded
 
 - **Status:** Proposed / Accepted / Superseded by NNNN
 - **Date:** YYYY-MM-DD
+- **Affects:**
+  Files, services, and top-of-repo docs that need walking when this lands.
+  Standing reconcile candidates: `README.md` (stack / surfaces / positioning),
+  `projects/flintmere/PROJECT.md` (stack / surfaces / positioning),
+  `projects/flintmere/STATUS.md` (infra state),
+  `projects/flintmere/BUSINESS.md` (pricing / tiers / positioning),
+  `CLAUDE.md` (product snapshot, canon, load map).
+  Write `none` for purely internal decisions (process, naming).
 - **Context:**
   What problem are we solving. What constraints are in play.
 - **Decision:**
@@ -47,6 +55,12 @@ One file per significant decision. Name them `NNNN-slug.md` (4-digit zero-padded
 ```
 
 Write ADRs for anything you'd want to explain to a future collaborator in three months. "Why did we pick X?" answers live here, not in commit messages.
+
+## Reconcile discipline
+
+ADRs are append-only — they capture new truth but don't trigger downstream reconciliation. The `Affects:` field names what does. When an ADR lands (or amends), walk every doc in `Affects:` in the same commit and reconcile against the new truth. Don't defer to a "later docs sweep"; the truth forks while you wait.
+
+Standing pattern observed in ADRs 0018 and 0023 — formalised here so every ADR carries the same explicit reconcile contract.
 
 ## When to write one
 
