@@ -7,7 +7,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = {
   title: 'Cookies — tracking, analytics, storage',
   description:
-    'Cookies and similar technologies used by Flintmere. One functional cookie on the scanner; no tracking, analytics, or advertising cookies on the marketing site.',
+    'Cookies and similar technologies used by Flintmere. No first-party cookies on the marketing site or scanner — CSRF protection uses a request-origin check, not a cookie. No tracking, analytics, or advertising cookies anywhere.',
   alternates: { canonical: '/cookies' },
 };
 
@@ -16,8 +16,8 @@ export default function Cookies() {
     <LegalShell
       eyebrow="Cookies"
       title="Almost none. On purpose."
-      summary="The marketing site at flintmere.com sets no cookies. The scanner at audit.flintmere.com sets one functional cookie for CSRF protection. The Shopify app uses Shopify&rsquo;s session cookie, scoped to the embedded admin. We do not use any third-party tracking, advertising, or cross-site analytics cookies, anywhere."
-      lastUpdated="2026-04-23"
+      summary="Neither the marketing site at flintmere.com nor the scanner at audit.flintmere.com sets any first-party cookies — CSRF protection is enforced by a request-origin check, not a cookie. The Shopify app uses Shopify&rsquo;s session cookie, scoped to the embedded admin. We do not use any third-party tracking, advertising, or cross-site analytics cookies, anywhere."
+      lastUpdated="2026-05-10"
       anchorNumeral="04"
     >
       <Clause n="01" heading="What is a cookie">

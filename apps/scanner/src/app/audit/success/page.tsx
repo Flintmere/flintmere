@@ -4,6 +4,7 @@ import { Bracket, SiteFooter } from '@flintmere/ui';
 export const metadata: Metadata = {
   title: 'Audit booked',
   description: 'Your Flintmere concierge audit is booked. Delivered within three working days.',
+  robots: { index: false, follow: false },
 };
 
 interface Props {
