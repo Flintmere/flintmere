@@ -30,6 +30,12 @@ export interface SendEmailInput {
   subject: string;
   html: string;
   text: string;
+  /** Override RESEND_FROM_ADDRESS. Used by outreach to send from the
+   * team.flintmere.com subdomain instead of the apex transactional
+   * address. Falls back to the env default when omitted. */
+  from?: string;
+  /** Override RESEND_REPLY_TO. Falls back to env default when omitted. */
+  replyTo?: string;
   /** Optional headers (we use List-Unsubscribe for one-click PECR/GDPR compliance). */
   headers?: Record<string, string>;
   tags?: Array<{ name: string; value: string }>;
@@ -44,8 +50,8 @@ export interface SendEmailResult {
 
 export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult> {
   const resend = client();
-  const from = process.env.RESEND_FROM_ADDRESS ?? 'Flintmere <hello@flintmere.com>';
-  const replyTo = process.env.RESEND_REPLY_TO ?? 'hello@flintmere.com';
+  const from = input.from ?? process.env.RESEND_FROM_ADDRESS ?? 'Flintmere <hello@flintmere.com>';
+  const replyTo = input.replyTo ?? process.env.RESEND_REPLY_TO ?? 'hello@flintmere.com';
 
   if (!resend) {
     // eslint-disable-next-line no-console
