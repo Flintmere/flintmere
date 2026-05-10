@@ -324,6 +324,18 @@ model OutreachTarget {
   followedUpAt   DateTime?      @map("followed_up_at")
   repliedAt      DateTime?      @map("replied_at")
   droppedReason  String?        @map("dropped_reason")
+  // Auto-enrichment scaffolding (cron: /api/cron/outreach-enrich).
+  // `enrichmentDraft` is a structured JSON blob produced by Gemini 2.5
+  // Flash against the merchant's public About + Contact pages — see
+  // lib/outreach/enrich.ts §EnrichmentDraft. Operator reviews + clicks
+  // 'apply' in the admin UI, or auto-applies when both conditions hold:
+  //   (a) OUTREACH_AUTO_APPLY_ENRICHMENT=true env var set
+  //   (b) draft.email.confidence='high' AND domain matches shop_domain
+  // `enrichmentAttemptedAt` is the cron's last-touched timestamp; the
+  // 24h re-attempt window stops the cron from re-fetching every hour.
+  enrichmentDraft       Json?     @map("enrichment_draft")
+  enrichmentAttemptedAt DateTime? @map("enrichment_attempted_at")
+  enrichmentFailedReason String?  @map("enrichment_failed_reason")
   sends          OutreachSend[]
 
   @@index([status])

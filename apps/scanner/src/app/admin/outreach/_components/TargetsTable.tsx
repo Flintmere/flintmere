@@ -3,6 +3,12 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 
+interface EnrichmentDraftShape {
+  recipientEmail?: { value: string | null; confidence: string }
+  firstName?: { value: string | null; confidence: string }
+  llmReasoning?: string
+}
+
 interface Target {
   id: string
   shopDomain: string
@@ -17,6 +23,9 @@ interface Target {
   createdAt: Date
   sentAt: Date | null
   repliedAt: Date | null
+  enrichmentDraft: unknown
+  enrichmentAttemptedAt: Date | null
+  enrichmentFailedReason: string | null
 }
 
 interface TargetsTableProps {
@@ -153,6 +162,17 @@ function TargetRow(props: {
   const [email, setEmail] = useState(t.recipientEmail ?? '')
   const [firstName, setFirstName] = useState(t.firstName ?? '')
 
+  const draft = (t.enrichmentDraft && typeof t.enrichmentDraft === 'object')
+    ? (t.enrichmentDraft as EnrichmentDraftShape)
+    : null
+  const draftEmail = draft?.recipientEmail?.value ?? null
+  const draftName = draft?.firstName?.value ?? null
+  const hasUsableDraft = (draftEmail || draftName) && !t.recipientEmail
+  const applyDraft = () => {
+    if (draftEmail) setEmail(draftEmail)
+    if (draftName) setFirstName(draftName)
+  }
+
   const enrichDirty = email !== (t.recipientEmail ?? '') || firstName !== (t.firstName ?? '')
   const canQueue = t.status === 'enriched' && t.recipientEmail && t.score != null
   const canSend = t.status === 'queued'
@@ -161,7 +181,23 @@ function TargetRow(props: {
 
   return (
     <tr style={{ borderBottom: '1px solid var(--color-line-soft)' }}>
-      <td style={td}>{t.shopDomain}</td>
+      <td style={td}>
+        <div>{t.shopDomain}</div>
+        {hasUsableDraft && (
+          <div style={draftHintStyle}>
+            <button type="button" onClick={applyDraft} disabled={busy} style={draftBtnStyle}>
+              apply draft
+            </button>
+            {draftEmail && <span>{draftEmail} <em style={confStyle}>({draft?.recipientEmail?.confidence})</em></span>}
+            {draftName && <span>· {draftName} <em style={confStyle}>({draft?.firstName?.confidence})</em></span>}
+          </div>
+        )}
+        {t.enrichmentFailedReason && !hasUsableDraft && (
+          <div style={draftHintStyle}>
+            <em style={{ color: 'var(--color-alert)' }}>enrich failed: {t.enrichmentFailedReason}</em>
+          </div>
+        )}
+      </td>
       <td style={td}>
         <input
           type="email"
@@ -330,4 +366,27 @@ const btnStyleSend: React.CSSProperties = {
   ...btnStyle,
   background: 'var(--color-ink)',
   color: 'var(--color-paper)',
+}
+const draftHintStyle: React.CSSProperties = {
+  marginTop: '0.25rem',
+  fontSize: '0.6875rem',
+  color: 'var(--color-ink-2)',
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '0.4rem',
+  alignItems: 'center',
+}
+const draftBtnStyle: React.CSSProperties = {
+  fontFamily: 'var(--font-mono)',
+  fontSize: '0.625rem',
+  padding: '0.1rem 0.4rem',
+  border: '1px solid var(--color-line)',
+  background: 'transparent',
+  color: 'var(--color-ink)',
+  cursor: 'pointer',
+}
+const confStyle: React.CSSProperties = {
+  fontStyle: 'normal',
+  color: 'var(--color-ink-2)',
+  fontSize: '0.6875rem',
 }
