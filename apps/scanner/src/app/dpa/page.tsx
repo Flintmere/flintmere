@@ -109,7 +109,7 @@ export default function DPA() {
             can satisfy its own UK GDPR Article 33 72-hour notification
             deadline. Where Flintmere is the controller for its own data
             subjects, the 72-hour ICO notification commitment in the Security
-            Posture (Clause 09) applies.
+            Posture (Clause 10) applies.
           </li>
           <li>
             On termination, delete or return all personal data as required by

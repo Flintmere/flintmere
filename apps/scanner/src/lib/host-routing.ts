@@ -100,6 +100,7 @@ export const HOST_AGNOSTIC_PREFIXES: readonly string[] = [
   '/api/',
   '/_next/',
   '/static/',
+  '/.well-known/',
   '/sitemap.xml',
   '/robots.txt',
   '/opengraph-image',

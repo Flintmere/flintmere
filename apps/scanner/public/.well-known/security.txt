@@ -1,0 +1,9 @@
+# Flintmere security disclosure
+# RFC 9116 — https://www.rfc-editor.org/rfc/rfc9116
+
+Contact: https://flintmere.com/contact?topic=security
+Expires: 2027-05-10T00:00:00Z
+Encryption: https://flintmere.com/security
+Preferred-Languages: en
+Canonical: https://flintmere.com/.well-known/security.txt
+Policy: https://flintmere.com/security
