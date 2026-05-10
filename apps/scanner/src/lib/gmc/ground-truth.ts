@@ -190,7 +190,17 @@ async function recordError(
     where: { id: connId },
     data: { lastErrorCode: code, lastErrorAt: new Date() },
   });
-  console.warn(`gmc-ground-truth: ${code} on conn ${connId}: ${message}`);
+  // Structured log — `message` originates from Google Content API error
+  // bodies, which can contain newlines / control chars that corrupt
+  // log-aggregator output if interpolated raw. JSON.stringify normalises.
+  console.warn(
+    JSON.stringify({
+      event: 'gmc-ground-truth.error',
+      code,
+      connId,
+      message,
+    }),
+  );
 }
 
 function describe(err: unknown): string {

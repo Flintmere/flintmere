@@ -59,6 +59,20 @@ describe('GET /api/auth/google/callback', () => {
     expect(location).toContain('reason=access_denied');
   });
 
+  it('replaces an off-allowlist ?error= with reason=unknown', async () => {
+    // Hostile / buggy IdP smuggling arbitrary text through the error
+    // param should never reach the merchant-visible reason= surface.
+    const res = await GET(
+      makeRequest(
+        '?error=' + encodeURIComponent('<script>alert(1)</script>'),
+      ),
+    );
+    expect(res.status).toBe(307);
+    const location = res.headers.get('location') ?? '';
+    expect(location).toContain('reason=unknown');
+    expect(location).not.toContain('script');
+  });
+
   it('returns 400 when code missing', async () => {
     const state = signState({ normalisedDomain: 'acme.com', auditId: 'aud_1' });
     const res = await GET(makeRequest(`?state=${encodeURIComponent(state)}`));

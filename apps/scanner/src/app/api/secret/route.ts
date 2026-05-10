@@ -21,6 +21,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { hashIp } from '@/lib/hash';
 import { prisma } from '@/lib/db';
 
@@ -31,6 +32,12 @@ const MAX_CIPHERTEXT_BYTES = 10_000;
 const IV_BYTES = 12;
 const AUTH_TAG_BYTES = 16;
 const TTL_HOURS = 24;
+
+const BodySchema = z.object({
+  ciphertext: z.string().min(1),
+  iv: z.string().min(1),
+  authTag: z.string().min(1),
+});
 
 interface Bucket {
   tokens: number;
@@ -85,29 +92,16 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let body: unknown;
+  let parsed: z.infer<typeof BodySchema>;
   try {
-    body = await req.json();
+    parsed = BodySchema.parse(await req.json());
   } catch {
     return NextResponse.json({ ok: false, code: 'invalid-body' }, { status: 400 });
   }
 
-  const ciphertextRaw =
-    typeof body === 'object' && body !== null && 'ciphertext' in body
-      ? (body as { ciphertext: unknown }).ciphertext
-      : null;
-  const ivRaw =
-    typeof body === 'object' && body !== null && 'iv' in body
-      ? (body as { iv: unknown }).iv
-      : null;
-  const authTagRaw =
-    typeof body === 'object' && body !== null && 'authTag' in body
-      ? (body as { authTag: unknown }).authTag
-      : null;
-
-  const ciphertext = decodeBase64(ciphertextRaw);
-  const iv = decodeBase64(ivRaw, IV_BYTES);
-  const authTag = decodeBase64(authTagRaw, AUTH_TAG_BYTES);
+  const ciphertext = decodeBase64(parsed.ciphertext);
+  const iv = decodeBase64(parsed.iv, IV_BYTES);
+  const authTag = decodeBase64(parsed.authTag, AUTH_TAG_BYTES);
 
   if (!ciphertext || !iv || !authTag) {
     return NextResponse.json(

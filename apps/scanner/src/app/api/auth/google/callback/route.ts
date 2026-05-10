@@ -17,6 +17,23 @@ import { prisma } from '@/lib/db';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+const ALLOWED_OAUTH_ERRORS = new Set([
+  'access_denied',
+  'invalid_request',
+  'unauthorized_client',
+  'unsupported_response_type',
+  'invalid_scope',
+  'server_error',
+  'temporarily_unavailable',
+  'admin_policy_enforced',
+  'disallowed_useragent',
+  'org_internal',
+]);
+
+function isAllowedOauthError(value: string): boolean {
+  return ALLOWED_OAUTH_ERRORS.has(value);
+}
+
 export async function GET(request: NextRequest) {
   if (!isFeatureEnabled()) {
     return new NextResponse('Not Found', { status: 404 });
@@ -25,9 +42,14 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const errorParam = url.searchParams.get('error');
   if (errorParam) {
+    // Allowlist Google's documented OAuth error codes. Anything off-list
+    // becomes 'unknown' so a hostile or buggy IdP can't smuggle arbitrary
+    // text into the merchant-visible /audit/connect?reason= surface.
+    // Allowlist sourced from RFC 6749 §4.1.2.1 + Google's docs.
+    const safeReason = isAllowedOauthError(errorParam) ? errorParam : 'unknown';
     const dest = new URL('/audit/connect', url);
     dest.searchParams.set('status', 'denied');
-    dest.searchParams.set('reason', errorParam);
+    dest.searchParams.set('reason', safeReason);
     return NextResponse.redirect(dest);
   }
 
@@ -48,8 +70,15 @@ export async function GET(request: NextRequest) {
   try {
     tokens = await exchangeCodeForTokens({ code, redirectUri });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'exchange-failed';
-    console.warn('gmc-callback: exchange-failed', message);
+    // Don't log err.message — Google's ExchangeCodeForTokensError can
+    // include partial code value, redirect_uri, or client_id in the
+    // message string. The OAuth code is single-use and already spent
+    // by the time the error fires, but redaction is the right log
+    // discipline. Structured event tag is sufficient for alerting.
+    void err;
+    console.warn(
+      JSON.stringify({ event: 'gmc-callback.exchange-failed' }),
+    );
     const dest = new URL('/audit/connect', url);
     dest.searchParams.set('status', 'exchange-failed');
     return NextResponse.redirect(dest);
