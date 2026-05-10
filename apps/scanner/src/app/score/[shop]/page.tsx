@@ -9,6 +9,17 @@ import {
 } from '@/lib/copy';
 import { scoreUrl, validateDomainSegment } from '@/lib/badge-url';
 import type { CompositeScore, PillarId } from '@flintmere/scoring';
+import type { GmcGroundTruth } from '@/lib/gmc/types';
+import { GmcPanel } from '@/components/scan/GmcPanel';
+
+// Per ADR 0023 slice 3: GmcPanel mounts here when the merchant has
+// connected GMC AND has separately consented to publish GMC counts on
+// the public page (`publishGmcOnPublicPage`, distinct from the parent
+// `publishPublicPage` consent). The 2026-04-24 precedent — publish_public_page
+// split from published_to_benchmark — is the pattern: each new data
+// class on a public surface gets its own consent column + endpoint +
+// toggle. Sample product titles are excluded from the public render
+// (see `publicSafeIssue` in lib/gmc-copy.ts).
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -34,6 +45,7 @@ async function loadScore(shop: string) {
       scoreJson: true,
       completedAt: true,
       publicPageAt: true,
+      publishGmcOnPublicPage: true,
     },
   });
   return scan;
@@ -91,9 +103,15 @@ export default async function ScorePage({ params }: PageProps) {
   const scan = await loadScore(domain);
   if (!scan || scan.score === null || scan.grade === null) notFound();
 
-  const composite = scan.scoreJson as unknown as CompositeScore | null;
+  const composite = scan.scoreJson as unknown as
+    | (CompositeScore & { gmcGroundTruth?: GmcGroundTruth | null })
+    | null;
   const pillars = composite?.pillars ?? [];
   const runPillars = pillars.filter((p) => !p.locked);
+  const gmcGroundTruth =
+    scan.publishGmcOnPublicPage && composite?.gmcGroundTruth
+      ? composite.gmcGroundTruth
+      : null;
 
   const scannedOn = formatScanned(scan.completedAt);
 
@@ -172,6 +190,8 @@ export default async function ScorePage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {gmcGroundTruth ? <GmcPanel gmcGroundTruth={gmcGroundTruth} /> : null}
 
       {runPillars.length > 0 ? (
         <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-24">

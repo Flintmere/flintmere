@@ -14,6 +14,7 @@ import type {
   RevenueEstimate,
   SuppressionEstimate,
 } from '@flintmere/scoring';
+import type { GmcGroundTruth } from '@/lib/gmc/types';
 
 export type ScanState =
   | { phase: 'idle' }
@@ -87,4 +88,11 @@ export interface ScanResult {
      */
     affectedProductExamples?: Array<{ title: string; handle: string }>;
   }>;
+  /**
+   * Per ADR 0023 slice 3 — Google Merchant Center ground truth, set when
+   * the merchant has connected GMC and the read succeeded. Null when no
+   * connection exists or Google returned an error. Optional for
+   * backwards compatibility with scans persisted before 2026-05-06.
+   */
+  gmcGroundTruth?: GmcGroundTruth | null;
 }
