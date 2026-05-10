@@ -136,6 +136,18 @@ function maybeSweep(now: number) {
   for (const [k, b] of leadIpBuckets) {
     if (b.tokens >= LEAD_IP_POLICY.capacity) leadIpBuckets.delete(k);
   }
+  for (const [k, b] of scanActionIpBuckets) {
+    if (b.tokens >= SCAN_ACTION_POLICY.capacity) scanActionIpBuckets.delete(k);
+  }
+  for (const [k, b] of oneTimeSecretIpBuckets) {
+    if (b.tokens >= ONE_TIME_SECRET_POLICY.capacity) oneTimeSecretIpBuckets.delete(k);
+  }
+  for (const [k, b] of gmcRequestIpBuckets) {
+    if (b.tokens >= GMC_REQUEST_POLICY.capacity) gmcRequestIpBuckets.delete(k);
+  }
+  for (const [k, b] of oauthFlowIpBuckets) {
+    if (b.tokens >= OAUTH_FLOW_POLICY.capacity) oauthFlowIpBuckets.delete(k);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -371,6 +383,120 @@ export function checkLeadRateLimit(args: {
   return { ok: true, retryAfterSec: 0 };
 }
 
+// ---------------------------------------------------------------------------
+// Possession-gated public endpoints (added 2026-05-10 pre-launch P1 pass).
+//
+// Four separate buckets, each with a policy tuned to the endpoint group's
+// risk profile. All per-IP (no email / cookie key on these paths).
+//
+//   • scan-action       — /api/scan/[id] GET, /api/scan/[id]/publish (POST/DEL),
+//                         /api/scan/[id]/publish-public-page (POST/DEL).
+//                         Possession-gated by scan UUID. 30/hour: generous
+//                         for legitimate merchant repeat-interaction; tight
+//                         enough that ID-enumeration floods cap fast.
+//
+//   • one-time-secret   — /api/secret/[id]/consume. Existence-probing risk:
+//                         404 vs 410 distinguishes "live" from "burned" IDs.
+//                         60/hour: legitimate consume is one-shot per ID,
+//                         so 60 attempts/hour from one IP is already
+//                         abusive but doesn't block legitimate browser
+//                         multi-fetch (preflight + GET + POST).
+//
+//   • gmc-request       — /api/audit/gmc-access-request. POST writes to DB.
+//                         5/hour: matches lead-capture posture (write +
+//                         downstream email risk).
+//
+//   • oauth-flow        — /api/auth/google/start + /disconnect. DB lookups
+//                         + outbound redirect. 60/hour: OAuth flows can
+//                         legitimately involve multiple starts (back-button,
+//                         token-expiry, error-recovery) without being abuse.
+// ---------------------------------------------------------------------------
+
+const scanActionIpBuckets = new Map<string, Bucket>();
+const oneTimeSecretIpBuckets = new Map<string, Bucket>();
+const gmcRequestIpBuckets = new Map<string, Bucket>();
+const oauthFlowIpBuckets = new Map<string, Bucket>();
+
+const SCAN_ACTION_POLICY: BucketPolicy = {
+  capacity: 30,
+  refillRate: 30 / 3600,
+};
+const ONE_TIME_SECRET_POLICY: BucketPolicy = {
+  capacity: 20,
+  refillRate: 60 / 3600,
+};
+const GMC_REQUEST_POLICY: BucketPolicy = {
+  capacity: 5,
+  refillRate: 5 / 3600,
+};
+const OAUTH_FLOW_POLICY: BucketPolicy = {
+  capacity: 20,
+  refillRate: 60 / 3600,
+};
+
+function checkPerIpBucket(
+  map: Map<string, Bucket>,
+  policy: BucketPolicy,
+  ip: string | null,
+  now: number,
+): RateLimitResult {
+  const ipKey = (ip && hashIp(ip)) || 'anon';
+  maybeSweep(now);
+  const result = consumeToken(map, ipKey, policy, now, /* dryRun */ false);
+  if (!result.consumed) {
+    return { ok: false, reason: 'ip', retryAfterSec: result.retryAfterSec };
+  }
+  return { ok: true, retryAfterSec: 0 };
+}
+
+export function checkScanActionRateLimit(args: {
+  ip: string | null;
+  now?: number;
+}): RateLimitResult {
+  return checkPerIpBucket(
+    scanActionIpBuckets,
+    SCAN_ACTION_POLICY,
+    args.ip,
+    args.now ?? Date.now(),
+  );
+}
+
+export function checkOneTimeSecretConsumeRateLimit(args: {
+  ip: string | null;
+  now?: number;
+}): RateLimitResult {
+  return checkPerIpBucket(
+    oneTimeSecretIpBuckets,
+    ONE_TIME_SECRET_POLICY,
+    args.ip,
+    args.now ?? Date.now(),
+  );
+}
+
+export function checkGmcAccessRequestRateLimit(args: {
+  ip: string | null;
+  now?: number;
+}): RateLimitResult {
+  return checkPerIpBucket(
+    gmcRequestIpBuckets,
+    GMC_REQUEST_POLICY,
+    args.ip,
+    args.now ?? Date.now(),
+  );
+}
+
+export function checkOauthFlowRateLimit(args: {
+  ip: string | null;
+  now?: number;
+}): RateLimitResult {
+  return checkPerIpBucket(
+    oauthFlowIpBuckets,
+    OAUTH_FLOW_POLICY,
+    args.ip,
+    args.now ?? Date.now(),
+  );
+}
+
 /** Test helper — clears state between tests. Not for production use. */
 export function __resetRateLimitState() {
   ipBuckets.clear();
@@ -380,5 +506,9 @@ export function __resetRateLimitState() {
   adminLoginIpBuckets.clear();
   auditDraftGenerateBuckets.clear();
   leadIpBuckets.clear();
+  scanActionIpBuckets.clear();
+  oneTimeSecretIpBuckets.clear();
+  gmcRequestIpBuckets.clear();
+  oauthFlowIpBuckets.clear();
   lastSweep = 0;
 }

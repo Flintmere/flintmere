@@ -16,6 +16,7 @@ vi.mock('@/lib/db', () => ({
 }));
 
 import { POST } from './route';
+import { __resetRateLimitState } from '@/lib/rate-limit';
 
 function makeRequest(body: unknown): NextRequest {
   return new NextRequest('http://localhost:3001/api/audit/gmc-access-request', {
@@ -30,6 +31,7 @@ describe('POST /api/audit/gmc-access-request', () => {
     auditFindUnique.mockReset();
     accessRequestCreate.mockReset();
     accessRequestCreate.mockResolvedValue({ id: 'gar_1' });
+    __resetRateLimitState();
   });
 
   afterEach(() => {

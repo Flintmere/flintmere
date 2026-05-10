@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { checkScanActionRateLimit } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -7,10 +8,11 @@ export const dynamic = 'force-dynamic';
 // Merchant-driven benchmark contribution. The scan id is the
 // capability — whoever has it (the merchant who ran the scan, via
 // their Results URL) can flip the flag. Same trust model as GET
-// /api/scan/[id], which already exposes the full result to anyone
-// holding the id. Operation is idempotent.
+// /api/scan/[id]. Operation is idempotent.
+//
+// Per-IP rate limit added 2026-05-10 (P1-G pre-launch audit).
 export async function POST(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
@@ -18,6 +20,26 @@ export async function POST(
     return NextResponse.json(
       { ok: false, code: 'bad-request', message: 'Missing scan id.' },
       { status: 400 },
+    );
+  }
+
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-real-ip') ||
+    null;
+  const rl = checkScanActionRateLimit({ ip });
+  if (!rl.ok) {
+    return NextResponse.json(
+      {
+        ok: false,
+        code: 'rate-limited',
+        message: 'Too many requests.',
+        retryAfterSec: rl.retryAfterSec,
+      },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(rl.retryAfterSec) },
+      },
     );
   }
 

@@ -6,6 +6,7 @@ import {
   signState,
 } from '@/lib/gmc/oauth';
 import { prisma } from '@/lib/db';
+import { checkOauthFlowRateLimit } from '@/lib/rate-limit';
 
 // Per ADR 0023 §slice 2 — OAuth start endpoint. Behind FEATURE_GMC_OAUTH.
 // Caller posts an audit id; we look up the audit, validate eligibility,
@@ -20,6 +21,24 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   if (!isFeatureEnabled()) {
     return new NextResponse('Not Found', { status: 404 });
+  }
+
+  // Per-IP rate limit added 2026-05-10 (P2-M pre-launch audit). OAuth
+  // start hits DB before Google redirect; without a bucket, audit-id
+  // enumeration could exhaust connections.
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    null;
+  const rl = checkOauthFlowRateLimit({ ip });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: 'rate-limited', retryAfterSec: rl.retryAfterSec },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(rl.retryAfterSec) },
+      },
+    );
   }
 
   const url = new URL(request.url);
