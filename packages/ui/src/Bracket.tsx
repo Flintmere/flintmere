@@ -14,16 +14,24 @@
  * - default: inherits from the parent (used inline in body / headings).
  * - display: 0.8em — used inside display headings that already set the scale.
  * - micro: 11px / 0.14em tracking — used in mono captions.
- * - saks: clamp(48px, 12vw, 200px), weight 700 — Saks-Fifth-Avenue logotype-
+ * - saks: clamp(36px, 12vw, 200px), weight 700 — Saks-Fifth-Avenue logotype-
  *   scale event for hero anchors. The bracket characters become the brand
  *   mark at hero scale, not inline formatting. Use sparingly — typically once
  *   per top-level surface as the page's cover-art moment.
  *   (Added 2026-04-29 under design-extravagant skill, dispatch #2.
  *    Mobile floor lowered 96→48 on 2026-05-02 — operator caught
  *    `[ from £197 ]` on /pricing being clipped by overflow-hidden at the
- *    96px floor on iPhone 14 Pro Max. The 12vw scale rate keeps desktop
- *    impact — at 1280px viewport renders at 153.6px, at 1440px at 172.8px,
- *    near the 200px ceiling on ultrawide.)
+ *    96px floor on iPhone 14 Pro Max.
+ *    Mobile floor lowered 48→36 on 2026-05-11 — operator caught the new
+ *    hero `[ suppressed ]` (10 chars, longer than `[ from £197 ]`) being
+ *    clipped at the 48px floor on a 365px viewport. The .bracket primitive
+ *    enforces white-space: nowrap so the bracket inline unit cannot wrap
+ *    internally; at Geist Mono 700 / 48px, 10 chars + brackets + 0.16em
+ *    margins ≈ 330px > 317px available after hero padding. 36px math:
+ *    ≈250px, comfortable fit on 320px viewport too.
+ *    The 12vw scale rate keeps desktop impact — at 400px viewport already
+ *    matches old behaviour, at 1280px renders at 153.6px, at 1440px at
+ *    172.8px, near the 200px ceiling on ultrawide.)
  */
 
 import * as React from 'react';
@@ -39,7 +47,7 @@ const SIZE_CLASS: Record<Required<BracketProps>['size'], string> = {
   default: 'text-[inherit]',
   display: 'text-[0.8em]', // display heading already sets the scale
   micro: 'text-[11px] tracking-[0.14em]',
-  saks: 'text-[clamp(48px,12vw,200px)] tracking-[-0.02em] leading-[1]',
+  saks: 'text-[clamp(36px,12vw,200px)] tracking-[-0.02em] leading-[1]',
 };
 
 export function Bracket({
