@@ -55,7 +55,7 @@ export function Aggregates() {
           style={{ fontSize: 'clamp(40px, 5.5vw, 88px)', maxWidth: '20ch' }}
         >
           <span className="sr-only">
-            We publish a vertical's median, never a store's name.
+            We publish a vertical’s median, never a store’s name.
           </span>
           <span aria-hidden="true">
             {WORDS.map((w, i) => (
@@ -78,7 +78,7 @@ export function Aggregates() {
                 ['--reveal-delay' as string]: `${bracketDelay}ms`,
               }}
             >
-              a <Bracket>store's name</Bracket>.
+              a <Bracket>store’s name</Bracket>.
             </span>
           </span>
         </h2>
