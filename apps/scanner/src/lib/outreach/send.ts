@@ -10,9 +10,15 @@
  *   4. Sign the unsubscribe URL via lib/outreach/unsubscribe.ts.
  *   5. Call sendEmail() with team.flintmere.com From + Reply-To overrides
  *      AND the List-Unsubscribe + List-Unsubscribe-Post headers (RFC 8058).
- *   6. INSERT into scanner_outreach_sends; unique-violation on (target_id,
- *      kind) means a concurrent invocation already sent — return idempotent
- *      result, do NOT re-send.
+ *   6. INSERT into scanner_outreach_sends. Unique-violation on (target_id,
+ *      kind) is reconciled by reconcileExistingSend():
+ *      - prior deliveryStatus='sent' → short-circuit as idempotent replay
+ *        (concurrent invocation already delivered; do not advance status
+ *        twice, do not overwrite the audit row).
+ *      - prior deliveryStatus='failed' → update the row in place with this
+ *        attempt's result; status-advancement at step 7 then runs as normal
+ *        so a recovered transient (Resend 4xx, bad scope, throttle) actually
+ *        moves the target from queued → sent without operator surgery.
  *   7. Update OutreachTarget status (sent → followed_up → … per state machine).
  *
  * Pre-send invariants enforced:
@@ -27,6 +33,7 @@ import { prisma } from '../db';
 import { renderEmail, type SendKind, type TemplateInput } from './template';
 import { buildUnsubscribeUrl } from './unsubscribe';
 import { isUnsubscribed, recordUnsubscribe, OUTREACH_STATUS } from './db';
+import { reconcileExistingSend } from './reconcile';
 import type { OutreachTarget } from '../../generated/prisma';
 
 export interface SendOutreachInput {
@@ -180,8 +187,9 @@ export async function sendOutreach(input: SendOutreachInput): Promise<SendOutcom
     ],
   });
 
-  // Idempotent INSERT — unique on (target_id, kind). Race winner inserts;
-  // race loser hits unique-violation and we treat as replay.
+  // Idempotent INSERT — unique on (target_id, kind). The catch path handles
+  // two distinct scenarios via reconcileExistingSend(): genuine race (prior
+  // row was 'sent') and recovered retry (prior row was 'failed').
   try {
     await prisma.outreachSend.create({
       data: {
@@ -197,15 +205,42 @@ export async function sendOutreach(input: SendOutreachInput): Promise<SendOutcom
       },
     });
   } catch (err: unknown) {
-    if (isUniqueViolation(err)) {
+    if (!isUniqueViolation(err)) throw err;
+
+    const existing = await prisma.outreachSend.findUnique({
+      where: { targetId_kind: { targetId: target.id, kind: input.kind } },
+      select: { id: true, deliveryStatus: true, resendMessageId: true },
+    });
+    if (!existing) {
+      // Unique violation but row not found — race lost between violation and
+      // lookup (DELETE in another connection). Re-raise rather than swallow.
+      throw err;
+    }
+    const action = reconcileExistingSend(existing);
+    if (action.kind === 'short-circuit-replay') {
       return {
         ok: true,
-        resendMessageId: resendResult.id,
+        resendMessageId: action.resendMessageId,
         idempotentReplay: true,
         status: target.status,
       };
     }
-    throw err;
+    // update-in-place: prior attempt failed; overwrite with this attempt's
+    // result so the audit row stays canonical AND a successful retry can
+    // fall through to status-advancement below.
+    await prisma.outreachSend.update({
+      where: { id: existing.id },
+      data: {
+        subjectVariant: tplInput.variant ?? 'A',
+        subject: rendered.subject,
+        bodyHtml: rendered.bodyHtml,
+        bodyText: rendered.bodyText,
+        resendMessageId: resendResult.id,
+        deliveryStatus: resendResult.sent ? 'sent' : 'failed',
+        errorMessage: resendResult.sent ? null : resendResult.reason ?? 'unknown',
+        sentAt: new Date(),
+      },
+    });
   }
 
   // Advance the target's status. Initial → sent. Followup → followed_up.
