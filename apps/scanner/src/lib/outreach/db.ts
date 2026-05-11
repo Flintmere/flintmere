@@ -58,16 +58,26 @@ export async function recordUnsubscribe(
  * eligible when:
  *   - kind='initial' AND status='queued'
  *   - kind='followup' AND status='sent' AND sent_at < now() - 5d
- * Ordered by createdAt to drain in upload order.
+ * Both kinds also require recipient_email + score + grade + product_count
+ * (defence in depth; statusForRow in cohort/route.ts only assigns 'queued'
+ * when all four are present, but a manual operator override could push a
+ * row to 'queued' without the data — the send orchestrator throws there,
+ * so filtering at fetch time avoids gratuitous failed-send rows).
  */
 export async function findEligibleTargets(
   kind: 'initial' | 'followup',
   limit: number,
   now: Date = new Date(),
 ): Promise<OutreachTarget[]> {
+  const dataGuards = {
+    recipientEmail: { not: null },
+    score: { not: null },
+    grade: { not: null },
+    productCount: { not: null },
+  };
   if (kind === 'initial') {
     return prisma.outreachTarget.findMany({
-      where: { status: OUTREACH_STATUS.queued },
+      where: { status: OUTREACH_STATUS.queued, ...dataGuards },
       orderBy: { createdAt: 'asc' },
       take: limit,
     });
@@ -78,6 +88,7 @@ export async function findEligibleTargets(
     where: {
       status: OUTREACH_STATUS.sent,
       sentAt: { lte: cutoff },
+      ...dataGuards,
     },
     orderBy: { sentAt: 'asc' },
     take: limit,

@@ -79,6 +79,13 @@ describe('renderInitialEmail', () => {
     }
   });
 
+  it('includes a privacy-notice link (PECR + GDPR Article 13)', () => {
+    const out = renderInitialEmail(baseInput);
+    for (const body of [out.bodyText, out.bodyHtml]) {
+      expect(body).toContain('https://flintmere.com/privacy');
+    }
+  });
+
   it('sign-off uses team voice — sender name + "The Flintmere team"', () => {
     const out = renderInitialEmail(baseInput);
     expect(out.bodyText).toContain('Best,\nAbu\nThe Flintmere team');
@@ -104,5 +111,12 @@ describe('renderFollowupEmail', () => {
     const out = renderFollowupEmail(baseInput);
     expect(out.bodyText).toContain('13205428');
     expect(out.bodyText).toContain(baseInput.unsubscribeUrl);
+  });
+
+  it('includes a privacy-notice link', () => {
+    const out = renderFollowupEmail(baseInput);
+    for (const body of [out.bodyText, out.bodyHtml]) {
+      expect(body).toContain('https://flintmere.com/privacy');
+    }
   });
 });

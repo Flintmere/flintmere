@@ -17,6 +17,11 @@
 const COMPANY_FOOTER =
   'Sent by Eazy Access Ltd, registered in England and Wales, company no. 13205428, registered office 71-75 Shelton Street, London, WC2H 9JQ. ICO data-controller registration ZC137268.';
 
+// PECR + GDPR Article 13: include a route to the privacy notice on first
+// contact. Hardcoded per anti-waste rule #6 (public URL, identical across
+// envs, never rotated).
+const PRIVACY_NOTICE_URL = 'https://flintmere.com/privacy';
+
 export interface TemplateInput {
   shopDomain: string;
   /** Display name; defaults to shop_domain if absent. */
@@ -107,6 +112,7 @@ The Flintmere team
 
 —
 ${COMPANY_FOOTER}
+Privacy notice: ${PRIVACY_NOTICE_URL}
 
 Reply with "unsubscribe" or click ${input.unsubscribeUrl} if you'd prefer
 not to hear from us — we won't email you again.`;
@@ -122,7 +128,8 @@ not to hear from us — we won't email you again.`;
       <p style="margin:0 0 16px 0;">We also run a £197 catalog audit, delivered within three working days &mdash; top priorities identified, top fixes spec&rsquo;d &mdash; and a £349/month Concierge retainer that keeps the score moving as the channels evolve. Worth a 15-minute reply if either&rsquo;s interesting; details at:<br><a href="${esc(input.auditUrl)}" style="color:#0A0A0B;">${esc(input.auditUrl)}</a></p>
       <p style="margin:0 0 16px 0;">Best,<br>${esc(input.senderName)}<br>The Flintmere team</p>
       <hr style="border:none;border-top:1px solid #E5E5E2;margin:24px 0;">
-      <p style="margin:0 0 12px 0;font-size:12px;color:#8B8D95;line-height:1.55;">${esc(COMPANY_FOOTER)}</p>
+      <p style="margin:0 0 8px 0;font-size:12px;color:#8B8D95;line-height:1.55;">${esc(COMPANY_FOOTER)}</p>
+      <p style="margin:0 0 12px 0;font-size:12px;color:#8B8D95;line-height:1.55;">Privacy notice: <a href="${PRIVACY_NOTICE_URL}" style="color:#5A5C64;">${PRIVACY_NOTICE_URL}</a></p>
       <p style="margin:0;font-size:12px;color:#8B8D95;line-height:1.55;">Reply with &ldquo;unsubscribe&rdquo; or <a href="${esc(input.unsubscribeUrl)}" style="color:#5A5C64;">click here</a> if you&rsquo;d prefer not to hear from us &mdash; we won&rsquo;t email you again.</p>
     </div>
   </body>
@@ -149,6 +156,7 @@ ${input.senderName}
 
 —
 ${COMPANY_FOOTER}
+Privacy notice: ${PRIVACY_NOTICE_URL}
 
 Click ${input.unsubscribeUrl} to opt out of any further emails from us.`;
 
@@ -161,7 +169,8 @@ Click ${input.unsubscribeUrl} to opt out of any further emails from us.`;
       <p style="margin:0 0 16px 0;">The free scan is here if you want the breakdown:<br><a href="${esc(input.rescanUrl)}" style="color:#0A0A0B;">${esc(input.rescanUrl)}</a></p>
       <p style="margin:0 0 16px 0;">Best,<br>${esc(input.senderName)}</p>
       <hr style="border:none;border-top:1px solid #E5E5E2;margin:24px 0;">
-      <p style="margin:0 0 12px 0;font-size:12px;color:#8B8D95;line-height:1.55;">${esc(COMPANY_FOOTER)}</p>
+      <p style="margin:0 0 8px 0;font-size:12px;color:#8B8D95;line-height:1.55;">${esc(COMPANY_FOOTER)}</p>
+      <p style="margin:0 0 12px 0;font-size:12px;color:#8B8D95;line-height:1.55;">Privacy notice: <a href="${PRIVACY_NOTICE_URL}" style="color:#5A5C64;">${PRIVACY_NOTICE_URL}</a></p>
       <p style="margin:0;font-size:12px;color:#8B8D95;line-height:1.55;"><a href="${esc(input.unsubscribeUrl)}" style="color:#5A5C64;">Click here</a> to opt out of any further emails from us.</p>
     </div>
   </body>

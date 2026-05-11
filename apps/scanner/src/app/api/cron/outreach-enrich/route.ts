@@ -12,13 +12,14 @@
  * Re-attempt window: 24h. Targets whose last attempt failed naturally
  * retry the next day without thrashing the merchant's site.
  *
- * Auto-apply: gated on env OUTREACH_AUTO_APPLY_ENRICHMENT=true AND draft
+ * Auto-apply: ON by default. Two safety gates inside `canAutoApply`:
  * confidence='high' AND email-domain matches the merchant's apex (e.g.,
- * hello@origincoffee.co.uk for origincoffee.co.uk). Everything else is
- * stored as a draft for operator review in /admin/outreach.
+ * hello@origincoffee.co.uk for origincoffee.co.uk). Lower-confidence
+ * extractions are stored as drafts for operator review in /admin/outreach.
  *
- * Operator opt-out: set OUTREACH_AUTO_APPLY_ENRICHMENT=false (or unset)
- * in Coolify env. Cron still fetches + drafts, just never auto-applies.
+ * Operator opt-out: set OUTREACH_AUTO_APPLY_ENRICHMENT=false in Coolify
+ * env (probation mode for a fresh cohort). Cron still fetches + drafts,
+ * just never auto-applies.
  *
  * Kill switch: disable the scheduled task in Coolify, OR set
  * OUTREACH_ENRICH_BATCH_SIZE=0.
@@ -65,7 +66,10 @@ export async function POST() {
     )
   }
 
-  const autoApplyEnabled = process.env.OUTREACH_AUTO_APPLY_ENRICHMENT === 'true'
+  // Auto-apply ON unless explicitly disabled. The two safety gates inside
+  // canAutoApply (confidence='high' + email-domain matches apex) keep the
+  // failure mode conservative even with auto-apply enabled.
+  const autoApplyEnabled = process.env.OUTREACH_AUTO_APPLY_ENRICHMENT !== 'false'
 
   const cutoff = new Date(Date.now() - RE_ATTEMPT_WINDOW_MS)
   const targets = await prisma.outreachTarget.findMany({
@@ -134,10 +138,12 @@ export async function POST() {
           if (draft.firstName.value) {
             updateData.firstName = draft.firstName.value.trim()
           }
-          // Promote to 'enriched' only when score is also present —
-          // /admin/outreach UI gates queue on score+email both.
+          // Auto-promote past 'enriched' to 'queued' when ALL gates met
+          // (email + score + grade + product_count). The initial-send
+          // cron picks queued targets directly — no operator click.
+          // Memory: "automate over per-row manual gates" 2026-05-11.
           if (target.score != null && target.grade && target.productCount != null) {
-            updateData.status = 'enriched'
+            updateData.status = 'queued'
           }
         }
       }

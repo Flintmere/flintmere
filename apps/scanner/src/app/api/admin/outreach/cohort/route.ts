@@ -15,9 +15,42 @@
 
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { createHash } from 'node:crypto'
 import { z } from 'zod'
 import { requireAdmin, verifyAdminSmokeToken } from '@/lib/admin-auth'
 import { prisma } from '@/lib/db'
+
+/**
+ * Deterministic 50/50 A/B subject-variant assignment, keyed on
+ * shop_domain. Re-uploading the same CSV yields the same variant per
+ * row — preserves experiment integrity. Once a target reaches a
+ * lifecycle status (queued/sent/…), variant freezes.
+ */
+function variantForDomain(shopDomain: string): 'A' | 'B' {
+  const hash = createHash('sha256').update(shopDomain).digest()
+  return (hash[0] ?? 0) % 2 === 0 ? 'A' : 'B'
+}
+
+/**
+ * Status decision shared by insert + pre-lifecycle update paths. When the
+ * row has email + score + grade + product_count, send eligibility is met,
+ * so we auto-promote past 'enriched' to 'queued' — the cron picks queued
+ * rows directly with no operator click required ("automate over per-row
+ * manual gates" memory 2026-05-11). Missing data → 'pending'.
+ */
+function statusForRow(args: {
+  recipientEmail: string | null
+  score: number | null
+  grade: string | null
+  productCount: number | null
+}): 'pending' | 'queued' {
+  const fullyPopulated =
+    !!args.recipientEmail &&
+    args.score != null &&
+    !!args.grade &&
+    args.productCount != null
+  return fullyPopulated ? 'queued' : 'pending'
+}
 
 const bodySchema = z.object({
   csv: z.string().min(1).max(1_000_000),
@@ -127,10 +160,12 @@ export async function POST(req: Request) {
   let skipped = 0
 
   for (const row of rows) {
-    // Status decision: if email + score present at upload time, skip
-    // 'pending' and land on 'enriched'.
-    const hasEnrichmentData = !!row.recipientEmail && row.score != null
-    const statusOnInsert = hasEnrichmentData ? 'enriched' : 'pending'
+    const statusOnInsert = statusForRow({
+      recipientEmail: row.recipientEmail,
+      score: row.score,
+      grade: row.grade,
+      productCount: row.productCount,
+    })
 
     const existing = await prisma.outreachTarget.findUnique({
       where: { shopDomain: row.shopDomain },
@@ -150,15 +185,16 @@ export async function POST(req: Request) {
           rescanUrl: row.rescanUrl,
           source: body.source,
           status: statusOnInsert,
+          subjectVariant: variantForDomain(row.shopDomain),
         },
       })
       inserted += 1
       continue
     }
 
-    // Don't reset status backwards — once a target is sent, replied,
-    // unsubscribed, etc., subsequent CSV uploads update data fields
-    // only and leave the lifecycle alone.
+    // Don't reset status backwards — once a target reaches 'queued' or
+    // any post-send status, the variant and status freeze. Subsequent
+    // CSV uploads refresh data fields only.
     const lifecycleStatuses = new Set([
       'queued',
       'sent',
@@ -169,7 +205,6 @@ export async function POST(req: Request) {
       'dropped',
     ])
     if (lifecycleStatuses.has(existing.status)) {
-      // Only refresh score / product_count / etc — never touch status, email, name.
       await prisma.outreachTarget.update({
         where: { id: existing.id },
         data: {
@@ -185,23 +220,33 @@ export async function POST(req: Request) {
       continue
     }
 
-    // pending / enriched: refresh everything except createdAt + id.
+    // pending / enriched: refresh everything (status auto-promotes to
+    // 'queued' when fully populated). Variant gets the canonical hashed
+    // value — covers existing rows seeded before deterministic variants.
     const newEmail = row.recipientEmail?.toLowerCase().trim() ?? existing.recipientEmail
     const newScore = row.score ?? existing.score
-    const newStatus = newEmail && newScore != null ? 'enriched' : 'pending'
+    const newGrade = row.grade ?? existing.grade
+    const newProductCount = row.productCount ?? existing.productCount
+    const newStatus = statusForRow({
+      recipientEmail: newEmail,
+      score: newScore,
+      grade: newGrade,
+      productCount: newProductCount,
+    })
     await prisma.outreachTarget.update({
       where: { id: existing.id },
       data: {
         recipientEmail: newEmail,
         firstName: row.firstName ?? existing.firstName,
         score: newScore,
-        grade: row.grade ?? existing.grade,
-        productCount: row.productCount ?? existing.productCount,
+        grade: newGrade,
+        productCount: newProductCount,
         ukSignal: row.ukSignal,
         scanId: row.scanId ?? existing.scanId,
         rescanUrl: row.rescanUrl ?? existing.rescanUrl,
         source: body.source,
         status: newStatus,
+        subjectVariant: variantForDomain(row.shopDomain),
       },
     })
     updated += 1
