@@ -220,13 +220,18 @@ export function ManifestoChord() {
       ),
     );
 
-  // Static-layout fallback: render all 3 examples stacked at end-state
-  // (tokens only, prose visually de-emphasised) in normal flow. Fires for
-  // reduced-motion users AND for any viewport below `lg` (1024px) — the
-  // scroll-driven cascade was calibrated for desktop-wide content and
-  // reads as fragmented amber blocks at mobile widths. The static
-  // end-state IS the message — no scroll choreography needed.
+  // Static-layout fallback. Fires for reduced-motion users AND for any
+  // viewport below `lg` (1024px). Two prose-visibility modes:
+  //   - Mobile (`isSmallViewport`): prose VISIBLE alongside tokens
+  //     (`--prose-fade: 0`). Without scroll-driven build-up, the static
+  //     end-state of tokens-only reads as fragmented amber blocks with no
+  //     context. Mobile users get the full example content.
+  //   - Desktop reduced-motion: prose HIDDEN, tokens only
+  //     (`--prose-fade: 1` — the canon end-state). Preserves the
+  //     "marketing prose is invisible to bots; only structured data
+  //     registers" punchline for users who chose to suppress motion.
   if (useStaticLayout) {
+    const proseFade = isSmallViewport ? 0 : 1;
     return (
       <section
         id="manifesto"
@@ -237,7 +242,7 @@ export function ManifestoChord() {
           paddingRight: 'clamp(24px, 6vw, 96px)',
           paddingTop: 'clamp(96px, 14vh, 200px)',
           paddingBottom: 'clamp(96px, 14vh, 200px)',
-          ['--prose-fade' as string]: 1,
+          ['--prose-fade' as string]: proseFade,
         }}
       >
         <div className="mx-auto w-full max-w-[1100px]">
