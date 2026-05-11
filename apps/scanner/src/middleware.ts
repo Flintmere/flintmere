@@ -72,6 +72,64 @@ export function middleware(request: NextRequest): NextResponse {
 
   if (!requestHost) return NextResponse.next();
 
+  // Cross-origin RSC-prefetch handling (added 2026-05-11 after the CSP
+  // cross-subdomain fix in #36 exposed the next layer of the same
+  // problem). Next.js Link prefetch fires fetch() with custom RSC
+  // headers (RSC, next-router-prefetch, next-router-state-tree). For
+  // cross-host Links — Audit on flintmere.com → audit.flintmere.com,
+  // the Standards external, etc. — those custom headers trigger a CORS
+  // preflight. Without explicit Access-Control-Allow-* on the OPTIONS
+  // response, the preflight fails and DevTools fills with "Refused to
+  // fetch ... blocked by CORS policy" + "Failed to fetch RSC payload"
+  // errors. The clicks still work (Next.js falls back to full browser
+  // navigation), but the console is noise visible to every visitor who
+  // opens DevTools.
+  //
+  // Fix: detect cross-origin requests where the Origin header is a
+  // Flintmere host. For OPTIONS preflight, return 204 with the right
+  // Allow headers so the preflight passes. For the actual RSC GET that
+  // follows, return 204 with Allow-Origin so the response can be read
+  // (the prefetch effectively no-ops; Next.js falls back to full nav
+  // on click, which is the natural path for cross-host navigations).
+  // Regular cross-origin GETs (full-page navigations from a Link click)
+  // are unaffected — they bypass CORS by design.
+  const origin = request.headers.get('origin');
+  const isFlintmereOrigin = origin
+    ? /^https:\/\/(flintmere\.com|[\w-]+\.flintmere\.com)$/.test(origin)
+    : false;
+  const selfOrigin = `https://${requestHost}`;
+  const isCrossOriginFlintmere = isFlintmereOrigin && origin !== selfOrigin;
+
+  if (isCrossOriginFlintmere && origin) {
+    if (request.method === 'OPTIONS') {
+      return new NextResponse(null, {
+        status: 204,
+        headers: {
+          'Access-Control-Allow-Origin': origin,
+          'Access-Control-Allow-Methods': 'GET, HEAD',
+          'Access-Control-Allow-Headers':
+            'RSC, next-router-prefetch, next-url, next-router-state-tree, next-router-segment-prefetch',
+          'Access-Control-Max-Age': '86400',
+          'Vary': 'Origin',
+        },
+      });
+    }
+
+    const isRscPrefetchCrossOrigin =
+      request.headers.get('rsc') === '1' ||
+      request.headers.get('next-router-prefetch') === '1' ||
+      request.nextUrl.searchParams.has('_rsc');
+    if (isRscPrefetchCrossOrigin) {
+      return new NextResponse(null, {
+        status: 204,
+        headers: {
+          'Access-Control-Allow-Origin': origin,
+          'Vary': 'Origin',
+        },
+      });
+    }
+  }
+
   // Cross-host 301 takes precedence — no point rewriting if we're about
   // to redirect away.
   const target = targetHostForRedirect(requestHost, request.nextUrl.pathname);
