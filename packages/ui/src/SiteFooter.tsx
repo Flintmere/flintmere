@@ -172,11 +172,18 @@ export function SiteFooter() {
           </div>
         </div>
 
+        {/* Legal nav. Mobile (<sm): 4-col grid, 11px, commas hidden — fits
+            the 7 items into 2 clean rows (4+3) without the trailing-comma
+            orphan that the prior flex-wrap pattern left at end-of-line-1
+            on iPhone-class viewports (operator caught 2026-05-11). Desktop
+            (≥sm): canonical inline-comma flex pattern at 12px. Shorter
+            labels here (Privacy, Terms, DPA…) allow 4-up where the primary
+            nav above can only do 2-up at its 13px scale. */}
         <nav
           aria-label="Footer legal"
-          className="flex items-baseline flex-wrap gap-x-1.5 gap-y-1"
+          className="grid grid-cols-4 gap-x-3 gap-y-2 sm:flex sm:items-baseline sm:flex-wrap sm:gap-x-1.5 sm:gap-y-1"
           style={{
-            fontSize: '12px',
+            fontSize: 'clamp(11px, 1vw, 12px)',
             fontWeight: 500,
             color: 'var(--color-mute-inv)',
             letterSpacing: '0.04em',
@@ -188,42 +195,42 @@ export function SiteFooter() {
           >
             Privacy
           </Link>
-          <span aria-hidden="true">,</span>
+          <span aria-hidden="true" className="hidden sm:inline">,</span>
           <Link
             href="/terms"
             className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
           >
             Terms
           </Link>
-          <span aria-hidden="true">,</span>
+          <span aria-hidden="true" className="hidden sm:inline">,</span>
           <Link
             href="/security"
             className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
           >
             Security
           </Link>
-          <span aria-hidden="true">,</span>
+          <span aria-hidden="true" className="hidden sm:inline">,</span>
           <Link
             href="/cookies"
             className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
           >
             Cookies
           </Link>
-          <span aria-hidden="true">,</span>
+          <span aria-hidden="true" className="hidden sm:inline">,</span>
           <Link
             href="/dpa"
             className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
           >
             DPA
           </Link>
-          <span aria-hidden="true">,</span>
+          <span aria-hidden="true" className="hidden sm:inline">,</span>
           <Link
             href="/support"
             className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
           >
             Support
           </Link>
-          <span aria-hidden="true">,</span>
+          <span aria-hidden="true" className="hidden sm:inline">,</span>
           <Link
             href="/sitemap"
             className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
