@@ -14,7 +14,6 @@ export const metadata = {
   alternates: { canonical: '/' },
 };
 import { ViewportReveal } from '@/components/ViewportReveal';
-import { HeroParallaxFigure } from '@/components/HeroParallaxFigure';
 import { MarketingStickyCta } from '@/components/MarketingStickyCta';
 import { type PillarSpec } from '@/components/sections/PillarWheel';
 import { SCAN_URL } from '@/lib/host-routing';
@@ -159,47 +158,40 @@ export default function MarketingHome() {
       <a href="#hero" className="skip-link">Skip to content</a>
       <MarketingStickyCta href={SCAN_URL} label="Run a free scan" glyph="→" />
       <ViewportReveal>
-      {/* Chapter 1 — Hero (Modern House split + Pentagram Saks logotype scale +
-          A24 single-film credit). Second dispatch under design-extravagant
-          (commit 69d068d). Spec source of truth:
+      {/* Chapter 1 — Hero. Two compositions, one section:
+          - Desktop (≥lg): Modern House split. Photo zone 58% left, paper
+            zone 42% right with ink-on-paper headline. A24 bottom-left
+            mono credit on the photo. No scrim — the colour-edge does the
+            work. Sage hairline anchors the paper column.
+          - Mobile (<lg): overlay composition. Photo fills the viewport;
+            headline + lede + CTA sit on top, anchored to the bottom of
+            the viewport, with a calibrated bottom-up scrim so paper-on-
+            ink text reads at AA-floor contrast where it lives.
+
+          Parallax removed 2026-05-11 — operator caught it post-deploy
+          and called it wasted on the still image. Wrapper component
+          (HeroParallaxFigure) remains in src/components/ but is no
+          longer wired; safe to delete in a follow-up sweep.
+
+          Spec source of truth:
           context/design/extravagant/2026-04-29-chapter-1-hero-modern-house-saks.md.
 
-          Composition (Option α): full-viewport split. Photo zone left 58%,
-          ink-letterboxed, full-bleed wooden tray AVIF, parallax retained, no
-          scrim — the photo's own light contrast carries. Paper zone right
-          42% holds the headline, compressed lede, and single primary CTA.
-          The bracketed word `[ suppressed ]` renders at clamp(140px, 16vw,
-          280px) via the new Bracket size="saks" variant — the bracket
-          characters become the brand mark at hero scale, not inline
-          formatting (Saks Fifth Avenue identity reference).
-
-          Relaxed bans (per dispatch #2): dual-CTA convention suspended (single
-          CTA only; audit CTA relocates to FounderStrip), eyebrow-above-headline
-          suspended (A24 bottom-left credit replaces it), hero-fineprint
-          suspended (covered by FounderStrip + SiteFooter), hero-lede 38→20
-          words.
-
           References:
-          - The Modern House (themodernhouse.com) — split-composition lead.
+          - The Modern House (themodernhouse.com) — split-composition lead (desktop).
           - Pentagram Saks Fifth Avenue (case study) — logotype-scale typography.
           - A24 single-film overview pages — bottom-left mono credit register. */}
       <section
         id="hero"
         aria-labelledby="hero-heading"
-        className="relative isolate overflow-hidden bg-[color:var(--color-paper)] grid grid-cols-1 lg:grid-cols-[58fr_42fr] lg:h-screen lg:min-h-[640px]"
+        className="relative isolate overflow-hidden bg-[color:var(--color-paper)] grid grid-cols-1 lg:grid-cols-[58fr_42fr] lg:h-screen lg:min-h-[640px] max-lg:h-[100svh] max-lg:min-h-[640px]"
       >
-        {/* Photo zone — full-bleed, ink-letterboxed (so asymmetric crops blend
-            into the section edge), warm-treated wooden-tray AVIF. No scrim
-            in Option α — the photo's own composition carries the contrast and
-            keeps the typographic event on paper, not on a darkened image.
-            Mobile: this zone moves below the paper zone via `order-2`, so
-            the headline + CTA land in the first viewport. Desktop: restored
-            to left via `lg:order-1`. Reorder 2026-05-11 — first-viewport
-            CTA is the highest-ROI conversion lever on mobile. */}
+        {/* Photo zone — full-bleed wooden-tray AVIF. On mobile, this is
+            the entire backdrop (the paper zone overlays via absolute
+            positioning). On desktop, left 58% column. */}
         <div
-          className="relative overflow-hidden bg-[color:var(--color-ink)] max-lg:min-h-[56vh] order-2 lg:order-1"
+          className="relative overflow-hidden bg-[color:var(--color-ink)]"
         >
-          <HeroParallaxFigure className="absolute inset-0 w-full h-full">
+          <div className="absolute inset-0 w-full h-full">
             {/* Explicit intrinsic width/height (1344×768 — the source AVIF
                 dimensions) instead of `fill`. With `unoptimized` Next.js
                 renders a bare <img>; squirrelscan's CLS rule (and Lighthouse)
@@ -232,17 +224,35 @@ export default function MarketingHome() {
                 filter: 'var(--image-treatment-warm)',
               }}
             />
-          </HeroParallaxFigure>
+          </div>
 
-          {/* A24 single-film bottom-left credit. Replaces the prior top
-              eyebrow. Tiny mono uppercase tracking-loose; sits on the photo's
-              dark wooden-base region (mean luminance ~0.14, paper-on-ink at
-              #F0EFE8 ⇒ ≈7.8:1, AAA at small text floor). aria-label expands
-              the dot-separators for screen readers (matches Chapter 2 A.5
-              pattern). */}
+          {/* Mobile-only scrim — bottom-up gradient. Calibrated for AA
+              text contrast in the lower 55% of viewport (where the
+              overlaid headline + lede + CTA sit) while letting the image
+              breathe at the top. Opacity steps:
+                bottom edge (CTA + lede region): 0.82 — paper-on-ink ≈6:1
+                mid-low (headline lower half):   0.62 — large display reads fine
+                mid-high (headline top + bracket): 0.32 — still legible at h1 scale
+                top:                              0.00 — image clean
+              Pure rgba on warm ink hex; could be color-mix(var(--color-ink))
+              but RGBA blends predictably across browsers. */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 lg:hidden pointer-events-none"
+            style={{
+              background:
+                'linear-gradient(to top, rgba(20, 18, 14, 0.85) 0%, rgba(20, 18, 14, 0.72) 22%, rgba(20, 18, 14, 0.55) 42%, rgba(20, 18, 14, 0.28) 65%, rgba(20, 18, 14, 0.10) 85%, transparent 100%)',
+            }}
+          />
+
+          {/* A24 single-film bottom-left credit — desktop only. On mobile,
+              the overlaid headline + lede + CTA stack already occupies the
+              bottom region of the viewport, so this credit would collide.
+              Paper-on-ink at #F0EFE8 over the photo's dark wooden-base
+              region (mean luminance ~0.14) gives ≈7.8:1, AAA at small text. */}
           <p
             aria-label="Flintmere catalog readiness scan, 2026, takes 60 seconds, no install required"
-            className="absolute font-mono uppercase"
+            className="absolute font-mono uppercase max-lg:hidden"
             style={{
               bottom: 'clamp(32px, 3vw, 48px)',
               left: 'clamp(32px, 4vw, 64px)',
@@ -257,16 +267,16 @@ export default function MarketingHome() {
           </p>
         </div>
 
-        {/* Paper zone — Saks-scale typography on warm paper. The Bracket
-            saks variant carries the brand-mark scale; the running text flows
-            at clamp(56px, 9vw, 144px). No scrim, no overlay — the colour-edge
-            (warm photo to paper) is the rule. Mobile: `order-1` brings this
-            zone above the photo so the CTA sits in the first viewport. */}
+        {/* Paper / text zone — two roles. Desktop: right 42% column on
+            warm paper, ink-on-paper text, sage hairline anchor. Mobile:
+            absolute overlay on top of the photo zone (covers the whole
+            section, transparent background, paper-on-ink text colours),
+            anchored to the bottom of the viewport via justify-end. */}
         <div
-          className="relative flex flex-col justify-center order-1 lg:order-2"
+          className="relative flex flex-col lg:justify-center max-lg:absolute max-lg:inset-0 max-lg:justify-end max-lg:bg-transparent max-lg:z-10"
           style={{
-            paddingLeft: 'clamp(32px, 5vw, 96px)',
-            paddingRight: 'clamp(32px, 4vw, 64px)',
+            paddingLeft: 'clamp(24px, 5vw, 96px)',
+            paddingRight: 'clamp(24px, 4vw, 64px)',
             paddingTop: 'clamp(48px, 6vw, 96px)',
             paddingBottom: 'clamp(48px, 6vw, 96px)',
           }}
@@ -274,7 +284,7 @@ export default function MarketingHome() {
           <ViewportReveal>
             <h1
               id="hero-heading"
-              className="font-sans tracking-[-0.04em] leading-[0.88] text-[color:var(--color-ink)] max-w-[14ch]"
+              className="font-sans tracking-[-0.04em] leading-[0.88] max-w-[14ch] text-[color:var(--color-ink)] max-lg:text-[color:var(--color-paper-on-ink)]"
               style={{ fontSize: 'var(--scale-h1-anchor)', fontWeight: 700 }}
             >
               Which of your products are{' '}
@@ -283,18 +293,17 @@ export default function MarketingHome() {
             </h1>
           </ViewportReveal>
 
-          {/* Compressed lede (38 → 20 words) per spec §2.5. Geist Sans (NOT
-              mono — mono at body scale on paper reads as code-block). Mute on
-              paper ≈ 6.3:1, AAA. */}
+          {/* Compressed lede (38 → 20 words). Geist Sans (NOT mono — mono at
+              body scale reads as code-block). On paper: mute ≈ 6.3:1 AAA.
+              On ink-scrim (mobile): mute-inv ≈ 5.6:1 AA at body scale. */}
           <p
-            className="font-sans"
+            className="font-sans text-[color:var(--color-mute)] max-lg:text-[color:var(--color-mute-inv)]"
             style={{
               marginTop: 'clamp(28px, 3vw, 48px)',
               maxWidth: '42ch',
               fontSize: 'clamp(15px, 1.1vw, 17px)',
               lineHeight: 1.55,
               fontWeight: 400,
-              color: 'var(--color-mute)',
             }}
           >
             Paste your URL. We estimate how much annual demand is routing to
@@ -302,10 +311,10 @@ export default function MarketingHome() {
             catalog data costing you the sale.
           </p>
 
-          {/* Single primary CTA — radical-reduction per spec §2.4. The audit
-              CTA relocates to FounderStrip (Chapter 3) where the founder copy
-              earns the ask. Amber fill, mono uppercase 12px, tracking 0.14em
-              — visual unchanged from prior hero. */}
+          {/* Single primary CTA — amber fill, mono uppercase 12px,
+              tracking 0.14em. Visual identical across breakpoints; the
+              amber-on-ink composition reads well on both paper and the
+              scrim'd image. */}
           <div style={{ marginTop: 'clamp(40px, 5vw, 64px)' }}>
             <Link
               href={SCAN_URL}
@@ -316,15 +325,12 @@ export default function MarketingHome() {
             </Link>
           </div>
 
-          {/* Decorative sage hairline — relocated from photo zone (prior
-              composition) to paper zone bottom-left. Anchors the typography
-              column to the structural grid (same role The Modern House
-              listings give their single hairline rule). Sage on paper ≈
-              5.5:1 — well above the 3:1 non-text decorative floor per ADR
-              0021 §sage. */}
+          {/* Decorative sage hairline — desktop only. Anchors the paper
+              column to the structural grid. On mobile the scrim is the
+              structural anchor; an additional hairline would compete. */}
           <div
             aria-hidden="true"
-            className="absolute h-[2px]"
+            className="absolute h-[2px] max-lg:hidden"
             style={{
               left: 'clamp(32px, 5vw, 96px)',
               bottom: 'clamp(32px, 4vw, 56px)',
