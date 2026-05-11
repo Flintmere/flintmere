@@ -541,6 +541,30 @@
   100% { background-position: -120% 0; }
 }
 
+/* Hero bracket on mobile — surface-aware override (2026-05-11).
+   The outline-shimmer canon (ink stroke + amber sweep through transparent
+   letterforms) reads cleanly on a clean-paper backdrop because the ink
+   stroke gets full contrast against warm-paper. On the mobile hero,
+   `[ suppressed ]` sits on the overlay-on-image composition — the image
+   underneath is a warm wooden-tray scene + a calibrated scrim that
+   pulls the surface to a mid-toned wash. Against that backdrop, a ~2px
+   ink stroke disappears and the thin amber gradient sweep can't carry
+   the moment alone. Operator caught this immediately after #36 shipped
+   ("suppressed is hard to read").
+
+   Fix: drop the outline-shimmer treatment in the hero specifically at
+   mobile breakpoints. Render the bracket + word as solid paper-on-ink
+   at saks scale. The canon is preserved everywhere else outline-shimmer
+   appears (manifesto, /pricing) — both of those sit on clean paper. */
+@media (max-width: 1023px) {
+  #hero .flintmere-outline-shimmer {
+    color: var(--color-paper-on-ink);
+    -webkit-text-stroke: 0;
+    background-image: none;
+    animation: none;
+  }
+}
+
 /* --- Footer wordmark — shimmering amber outline (closing-chord signature) ---
    Connects to the .text-outlined canon (transparent fill + ink stroke) but
    in amber, with a slow diagonal shimmer-sweep through the letterforms.
