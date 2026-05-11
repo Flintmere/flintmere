@@ -9,7 +9,18 @@ import { AUDIT_URL, SCAN_URL } from '@/lib/host-routing';
  *
  * Desktop (≥md): editorial register kept verbatim from the Batch B redo —
  * sentence-case, comma-delimited inline list, top-right. No pills, no
- * buttons, no chrome bar border. Logo top-left preserved. Hover ink → amber.
+ * buttons, no chrome bar border. Logo top-left preserved.
+ *
+ * Wordmark hover (rev 2026-05-11): scale 1.06 from the left edge, no
+ * colour shift. The earlier ink → amber hover read as a chromatic
+ * collision against the brand mark itself — the wordmark IS the brand
+ * accent already, so swapping it to the diagnostic-warning amber broke
+ * the legibility-of-identity. Scale-up is the operator-approved
+ * affordance: restrained, on-canon, gives a clear "interactive"
+ * signal without colour. transform-origin: left center keeps the
+ * left edge fixed so the layout doesn't shift when the wordmark grows.
+ * Focus-visible outline (sage, the documented decorative focus accent)
+ * replaces the colour shift's implicit keyboard-focus role.
  *
  * Mobile (<md): the comma-list collapses to a single mono "Menu" trigger.
  * Tap opens a paper-on-paper full-screen sheet with the nav items typeset
@@ -117,7 +128,7 @@ export function SiteHeader() {
           <Link
             href="/"
             aria-label="Flintmere home"
-            className="font-mono text-[color:var(--color-ink)] hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)] inline-flex items-center"
+            className="font-mono text-[color:var(--color-ink)] hover:scale-[1.06] transition-transform duration-[var(--duration-instant)] inline-flex items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--color-accent-sage)]"
             style={{
               fontSize: 'clamp(18px, 1.4vw, 20px)',
               fontWeight: 600,
@@ -127,6 +138,7 @@ export function SiteHeader() {
               marginLeft: -8,
               paddingLeft: 8,
               paddingRight: 8,
+              transformOrigin: 'left center',
             }}
           >
             Flintmere<span aria-hidden="true">]</span>
