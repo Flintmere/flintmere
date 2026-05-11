@@ -75,11 +75,18 @@ const TOKEN_INPUT_NAME = 'cf-turnstile-response';
 export interface TurnstileWidgetProps {
   theme?: 'light' | 'dark' | 'auto';
   className?: string;
+  // When this number changes, the widget calls turnstile.reset() and clears
+  // the hidden token input. Use after a form submission completes so the
+  // next submission gets a fresh challenge — Cloudflare's siteverify rejects
+  // single-use tokens with `timeout-or-duplicate`, which surfaces to users
+  // as "second scan fails until I refresh the page" (caught 2026-05-11).
+  resetSignal?: number;
 }
 
 export function TurnstileWidget({
   theme = 'light',
   className,
+  resetSignal,
 }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const widgetIdRef = useRef<string | null>(null);
@@ -205,6 +212,26 @@ export function TurnstileWidget({
       renderedRef.current = false;
     };
   }, [siteKey, theme]);
+
+  // Parent-triggered reset. When resetSignal changes, invalidate the current
+  // token and issue a fresh challenge so the next submission carries a token
+  // Cloudflare hasn't already marked as spent.
+  useEffect(() => {
+    if (resetSignal === undefined) return;
+    const container = containerRef.current;
+    if (!container) return;
+    const input = container.querySelector<HTMLInputElement>(
+      `input[name="${TOKEN_INPUT_NAME}"]`,
+    );
+    if (input) input.value = '';
+    if (widgetIdRef.current && window.turnstile) {
+      try {
+        window.turnstile.reset(widgetIdRef.current);
+      } catch {
+        // reset() throws if widget was removed mid-flight; ignore.
+      }
+    }
+  }, [resetSignal]);
 
   if (!siteKey) {
     return null;

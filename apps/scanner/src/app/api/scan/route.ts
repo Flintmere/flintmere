@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { checkAntiBot } from '@/lib/anti-bot';
 import { hashIp } from '@/lib/hash';
 import { checkScanRateLimit } from '@/lib/rate-limit';
 import { runScanForShop, type ScanSource } from '@/lib/run-scan';
@@ -16,6 +17,10 @@ const BodySchema = z.object({
   // schema so operator-driven bot scans (FlintmereBot UA) and dev/test
   // round-trip without keys; verifyTurnstile bypasses below.
   turnstileToken: z.string().optional().nullable(),
+  // Anti-bot signals from <Honeypot/>. Optional so operator-driven bot
+  // scans and dev tooling round-trip without them. See lib/anti-bot.ts.
+  website: z.string().optional().nullable(),
+  dwellMs: z.number().int().min(0).max(24 * 60 * 60 * 1000).optional().nullable(),
 });
 
 export async function POST(req: NextRequest) {
@@ -38,6 +43,28 @@ export async function POST(req: NextRequest) {
   const source: ScanSource = userAgent?.includes('FlintmereBot') ? 'bot' : 'user';
 
   const normalisedDomain = body.shopUrl.toLowerCase().trim();
+
+  // Anti-bot silent-drop. If the honeypot is filled or the form was
+  // submitted under MIN_PAGE_DWELL_MS, return a rate-limited-shape
+  // response. Bots see "rate-limited" and back off without learning
+  // the trap exists; humans never trip this (real users take seconds
+  // to type a URL). Bot-UA scans bypass entirely.
+  if (source === 'user') {
+    const antiBot = checkAntiBot({
+      website: body.website,
+      dwellMs: body.dwellMs ?? null,
+    });
+    if (!antiBot.ok) {
+      return NextResponse.json(
+        {
+          ok: false,
+          code: 'rate-limited',
+          message: 'Too many scans from this connection. Try again shortly.',
+        },
+        { status: 429, headers: { 'retry-after': '60' } },
+      );
+    }
+  }
 
   // Turnstile verification — same gate as the rate limit: bot scans
   // (operator-curated FlintmereBot UA) skip the human-form CAPTCHA.

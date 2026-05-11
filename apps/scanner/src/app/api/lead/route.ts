@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import type { CompositeScore } from '@flintmere/scoring';
 import { z } from 'zod';
 import { Prisma } from '@/generated/prisma';
+import { checkAntiBot } from '@/lib/anti-bot';
 import { prisma } from '@/lib/db';
 import { checkLeadRateLimit } from '@/lib/rate-limit';
 import { buildReportEmail } from '@/lib/report-email';
@@ -16,6 +17,9 @@ const BodySchema = z.object({
   email: z.string().email(),
   scanId: z.string().min(1),
   consentedAt: z.string().datetime().optional(),
+  // Anti-bot signals from <Honeypot/>. Optional so dev tooling round-trips.
+  website: z.string().optional().nullable(),
+  dwellMs: z.number().int().min(0).max(24 * 60 * 60 * 1000).optional().nullable(),
 });
 
 export async function POST(req: NextRequest) {
@@ -47,6 +51,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       { ok: false, code: 'bad-request', message: 'Invalid email.' },
       { status: 400 },
+    );
+  }
+
+  // Anti-bot silent-drop. Mirror the success envelope so the bot thinks
+  // the lead was captured and the report queued — it can't distinguish
+  // this from the real terminal state. Humans can't trip this (real
+  // users take >3s to type an email after the post-scan view loads).
+  const antiBot = checkAntiBot({
+    website: body.website,
+    dwellMs: body.dwellMs ?? null,
+  });
+  if (!antiBot.ok) {
+    return NextResponse.json(
+      { ok: true, leadId: 'silent', reportSent: false, alreadyRegistered: true },
+      { status: 200 },
     );
   }
 

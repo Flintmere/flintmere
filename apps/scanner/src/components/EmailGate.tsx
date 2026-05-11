@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { Bracket } from '@flintmere/ui';
+import { Honeypot, type HoneypotHandle } from '@/components/Honeypot';
 import { REPLY_SLA } from '@/lib/copy';
 import { track } from '@/lib/plausible';
 import { writeHandoff } from '@/lib/audit-handoff';
@@ -28,6 +29,7 @@ type GateState =
 export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
   const [email, setEmail] = useState('');
   const [state, setState] = useState<GateState>({ phase: 'idle' });
+  const honeypotRef = useRef<HoneypotHandle | null>(null);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +38,10 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
       return;
     }
     setState({ phase: 'submitting' });
+    const antiBot = honeypotRef.current?.getValues() ?? {
+      website: '',
+      dwellMs: 0,
+    };
     try {
       const res = await fetch('/api/lead', {
         method: 'POST',
@@ -44,6 +50,8 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
           email: email.trim(),
           scanId,
           consentedAt: new Date().toISOString(),
+          website: antiBot.website,
+          dwellMs: antiBot.dwellMs,
         }),
       });
       const body = await res.json();
@@ -291,6 +299,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
               border: '1px solid var(--color-paper)',
             }}
           >
+            <Honeypot ref={honeypotRef} />
             <label htmlFor="email" className="sr-only">
               Email address
             </label>

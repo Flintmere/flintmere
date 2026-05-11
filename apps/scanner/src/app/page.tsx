@@ -30,6 +30,7 @@ import { SCAN_URL } from '@/lib/host-routing';
 import { PillarWheelScrollPin } from '@/components/sections/LazyPillarWheelScrollPin';
 import { FounderStrip } from '@/components/sections/LazyFounderStrip';
 import { ManifestoChord } from '@/components/sections/LazyManifestoChord';
+import { ScanCallout } from '@/components/sections/ScanCallout';
 
 /**
  * Marketing home — Batch B expand-to-five arc 2026-04-29.
@@ -191,9 +192,12 @@ export default function MarketingHome() {
             into the section edge), warm-treated wooden-tray AVIF. No scrim
             in Option α — the photo's own composition carries the contrast and
             keeps the typographic event on paper, not on a darkened image.
-            Mobile: this zone stacks on top, min-height 56vh. */}
+            Mobile: this zone moves below the paper zone via `order-2`, so
+            the headline + CTA land in the first viewport. Desktop: restored
+            to left via `lg:order-1`. Reorder 2026-05-11 — first-viewport
+            CTA is the highest-ROI conversion lever on mobile. */}
         <div
-          className="relative overflow-hidden bg-[color:var(--color-ink)] max-lg:min-h-[56vh]"
+          className="relative overflow-hidden bg-[color:var(--color-ink)] max-lg:min-h-[56vh] order-2 lg:order-1"
         >
           <HeroParallaxFigure className="absolute inset-0 w-full h-full">
             {/* Explicit intrinsic width/height (1344×768 — the source AVIF
@@ -256,9 +260,10 @@ export default function MarketingHome() {
         {/* Paper zone — Saks-scale typography on warm paper. The Bracket
             saks variant carries the brand-mark scale; the running text flows
             at clamp(56px, 9vw, 144px). No scrim, no overlay — the colour-edge
-            (warm photo to paper) is the rule. */}
+            (warm photo to paper) is the rule. Mobile: `order-1` brings this
+            zone above the photo so the CTA sits in the first viewport. */}
         <div
-          className="relative flex flex-col justify-center"
+          className="relative flex flex-col justify-center order-1 lg:order-2"
           style={{
             paddingLeft: 'clamp(32px, 5vw, 96px)',
             paddingRight: 'clamp(32px, 4vw, 64px)',
@@ -460,6 +465,16 @@ export default function MarketingHome() {
         </p>
       </section>
 
+      {/* Chapter 2.5 — Post-Pillars scan re-invite. Operator caught
+          2026-05-11 that the page had no free-scan CTA between the hero
+          and the footer; the FounderStrip CTA points at the paid £197
+          audit, not the free scan. This callout sits on opaque paper at
+          z:1 (matching the curtain-pair). */}
+      <ScanCallout
+        eyebrow="// your turn"
+        headline="Run the seven checks on your store."
+      />
+
       {/* Curtain pair — chapters 3 + 4 share a position:relative wrapper
           so chapter 3's sticky-bottom-0 unsticks at the wrapper's bottom
           (end of chapter 4) instead of all the way to <main>'s end.
@@ -476,6 +491,16 @@ export default function MarketingHome() {
             context/design/extravagant/2026-04-29-chapter-4-manifesto-claim-review.md */}
         <ManifestoChord />
       </div>
+
+      {/* Chapter 4.5 — Post-Manifesto scan re-invite. Picks up the user
+          where the chord left them ("this is what an AI agent reads on
+          your store. The rest is invisible.") with the natural follow-up:
+          see what's invisible on YOUR store. Sits between curtain-pair
+          and the sticky footer reveal. */}
+      <ScanCallout
+        eyebrow="// now yours"
+        headline="See what's invisible on your store."
+      />
 
       {/* Chapter 5 — Footer (sticky-reveal mechanic; Batch B 2026-04-29).
           Pinned at viewport bottom (z:0) via .flintmere-footer-sticky;
