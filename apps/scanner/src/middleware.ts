@@ -8,9 +8,9 @@ import {
  * Host-routing + Content-Security-Policy middleware.
  *
  * Two responsibilities, intentionally co-located so a single response
- * carries both decisions (host-aware rewrites and the per-request CSP
- * with a unique nonce). Splitting them would mean one middleware has
- * to re-derive the other's response shape — fragile.
+ * carries both decisions (host-aware rewrites and the per-response CSP).
+ * Splitting them would mean one middleware has to re-derive the other's
+ * response shape — fragile.
  *
  * Host routing — C1 architecture (council-ratified 2026-05-03, extended
  * to three hosts 2026-05-03). One Next.js app serves three hosts:
@@ -26,27 +26,30 @@ import {
  * Cross-host 301 90-day window: 2026-05-03 → 2026-08-03. After that,
  * evaluate via Plausible whether to flip cross-host requests to 404.
  *
- * CSP — added 2026-05-10 after the first attempt (PR #10, reverted as
- * 2933814) broke the homepage. The bug was setting CSP only on the
- * response header; Next.js's auto-nonce extraction reads CSP from the
- * REQUEST header during SSR — without it on the request side, Next's
- * framework scripts shipped without nonce attributes and the strict
- * script-src blocked them. Per Vercel's canonical example, CSP must
- * be set on BOTH request and response headers.
+ * CSP — allowlist mode (rewritten 2026-05-11 after PageSpeed surfaced
+ * false-positive violations on force-static pages). The previous attempt
+ * used per-request nonces + `'strict-dynamic'`; that flow can't work for
+ * `export const dynamic = 'force-static'` pages because middleware
+ * doesn't run at build time, so the prerendered HTML ships <script>
+ * tags with no nonce attributes. At request time the fresh per-request
+ * nonce in the CSP matches nothing in the body, every chunk reports a
+ * violation, and DevTools fills with noise.
  *
- * Shipped as `Content-Security-Policy-Report-Only` for safe rollout —
- * browser observes violations in DevTools but does not block. After
- * an observation window with zero unexpected violations, flip the
- * header name to `Content-Security-Policy` to enforce. The nonce flow
- * is identical in both modes; only enforcement differs.
+ * Allowlist trade-off: we lose the nonce-based defence against inline-
+ * XSS in exchange for a CSP that actually matches what we serve. The
+ * residual XSS surface is constrained by zod everywhere we accept user
+ * input + ServerComponents-only rendering of dynamic strings + the
+ * other defence-in-depth layers (Turnstile, honeypot, rate-limit,
+ * idempotent unique indexes).
  *
- * `'strict-dynamic'` propagates nonce-trust to scripts loaded by
- * nonce'd scripts (Plausible loader, Turnstile loader, Stripe.js
- * loader all become transitively trusted via nonce'd Next runtime →
- * <Script>-rendered loader → external resource). Removes the need to
- * enumerate every external script domain in script-src; connect-src
- * and frame-src still need explicit allowlists since strict-dynamic
- * doesn't extend to those directives.
+ * `upgrade-insecure-requests` is intentionally omitted — the directive
+ * is ignored when delivered in a report-only policy (PageSpeed warning
+ * 2026-05-11) AND we serve nothing over plain HTTP; Coolify already
+ * redirects 80→443 at the edge.
+ *
+ * Enforced (not Report-Only) — the directives now match reality, no
+ * observation window needed. Flip back to Report-Only by renaming the
+ * header if real-world violations appear post-deploy.
  *
  * Redirects (cross-host 301 + RSC 204 noop) skip CSP — empty body,
  * nothing for an injected script to act against, browser follows to
@@ -112,24 +115,7 @@ export function middleware(request: NextRequest): NextResponse {
     return redirectResponse;
   }
 
-  // CSP nonce + new request headers, threaded through both rewrite and
-  // pass paths. The same nonce appears on:
-  //   request headers  — x-nonce (server components read via headers())
-  //                    — Content-Security-Policy (Next reads to extract
-  //                      nonce, attaches to framework scripts during SSR)
-  //   response headers — Content-Security-Policy-Report-Only (browser
-  //                      observes; flip to Content-Security-Policy to
-  //                      enforce after observation window)
-  const nonce = generateCspNonce();
-  const csp = buildCsp(nonce);
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-nonce', nonce);
-  // Setting CSP on the REQUEST is the load-bearing line. Next.js
-  // extracts the nonce from this header during SSR and attaches it to
-  // every framework script it emits. Without this, no internal scripts
-  // have nonce attributes and strict CSP blocks them — the failure
-  // mode that broke PR #10 on first deploy.
-  requestHeaders.set('Content-Security-Policy', csp);
+  const csp = buildCsp();
 
   // Same-host rewrite — currently only standards.flintmere.com/ → /standards.
   const rewriteTo = rewritePathForHost(
@@ -139,10 +125,8 @@ export function middleware(request: NextRequest): NextResponse {
   if (rewriteTo) {
     const url = request.nextUrl.clone();
     url.pathname = rewriteTo;
-    const rewriteResponse = NextResponse.rewrite(url, {
-      request: { headers: requestHeaders },
-    });
-    rewriteResponse.headers.set('Content-Security-Policy-Report-Only', csp);
+    const rewriteResponse = NextResponse.rewrite(url);
+    rewriteResponse.headers.set('Content-Security-Policy', csp);
     annotateHostDiagnostics(rewriteResponse, {
       forwardedHost,
       directHost,
@@ -153,10 +137,8 @@ export function middleware(request: NextRequest): NextResponse {
     return rewriteResponse;
   }
 
-  const passResponse = NextResponse.next({
-    request: { headers: requestHeaders },
-  });
-  passResponse.headers.set('Content-Security-Policy-Report-Only', csp);
+  const passResponse = NextResponse.next();
+  passResponse.headers.set('Content-Security-Policy', csp);
   annotateHostDiagnostics(passResponse, {
     forwardedHost,
     directHost,
@@ -168,45 +150,42 @@ export function middleware(request: NextRequest): NextResponse {
 }
 
 /**
- * Cryptographically random CSP nonce. 16 bytes (128 bits) of entropy
- * encoded base64 — well above the 64-bit floor recommended by the CSP
- * spec. Edge-runtime compatible (Web Crypto + btoa, not Node Buffer
- * or randomBytes).
- */
-function generateCspNonce(): string {
-  const bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
-  let binary = '';
-  for (const b of bytes) binary += String.fromCharCode(b);
-  return btoa(binary);
-}
-
-/**
- * Build the per-request Content-Security-Policy header value.
+ * Build the Content-Security-Policy header value.
  *
- * `'strict-dynamic'` is the structural choice: it propagates trust
- * from nonce'd scripts (Next.js framework scripts + nonce'd <Script>
- * components) to anything those scripts load. Plausible's loader,
- * Turnstile's loader, and Stripe.js's loader are all loaded by
- * Next-rendered components — they inherit trust transitively without
- * needing explicit https:// allowlists in script-src.
+ * Allowlist mode — see file header for the trade-off rationale.
  *
- * connect-src and frame-src still need explicit allowlists — those
- * directives don't honour strict-dynamic.
+ * script-src 'unsafe-inline' covers Next.js's bootstrap inline (the
+ * `self.__next_f` flight-data hydration) + the Plausible init shim.
+ * Per CSP3, `'unsafe-inline'` is honoured only when no nonce/hash is
+ * present in the same directive; since we no longer emit nonces, it
+ * applies.
  *
- * style-src 'unsafe-inline' is a documented concession — Tailwind +
- * styled-jsx + JSX `style={{...}}` props all emit inline styles;
- * nonce-based style-src would need every callsite updated. Tighten
- * via hash-based or move to CSS modules in a follow-up.
+ * Host allowlist covers the three external script loaders we ship:
+ *  - plausible.io  — analytics loader (apps/scanner/src/app/layout.tsx)
+ *  - challenges.cloudflare.com — Turnstile widget loader
+ *  - js.stripe.com — Stripe Elements + Payment Element loader
+ *
+ * Sentry's client SDK is bundled via webpack (served from /_next/static/
+ * chunks/* under 'self') and its tunnel route /monitoring is same-origin,
+ * so Sentry needs no script-src entry. We keep its ingest hosts in
+ * connect-src as a fallback in case the tunnel rewrite is bypassed.
+ *
+ * style-src 'unsafe-inline' is unchanged — Tailwind + styled-jsx + JSX
+ * `style={{...}}` props all emit inline styles.
  *
  * frame-ancestors 'none' enforces non-embeddability per security-
  * posture.md §CSP. Shopify-app embedding lives in apps/shopify-app
  * (not gated here).
+ *
+ * upgrade-insecure-requests deliberately omitted — every Flintmere
+ * resource is HTTPS by construction (Coolify edge redirects 80→443),
+ * and the directive is a no-op in that posture. It also generates a
+ * PageSpeed warning when delivered in Report-Only mode.
  */
-function buildCsp(nonce: string): string {
+function buildCsp(): string {
   const directives = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
+    "script-src 'self' 'unsafe-inline' https://plausible.io https://challenges.cloudflare.com https://js.stripe.com",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' blob: data: https:",
     "font-src 'self' data:",
@@ -218,7 +197,6 @@ function buildCsp(nonce: string): string {
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
-    'upgrade-insecure-requests',
   ];
   return directives.join('; ');
 }

@@ -31,13 +31,22 @@ import type { ScanState } from '@/components/scan/types';
 export default function ScanPage() {
   const [state, setState] = useState<ScanState>({ phase: 'idle' });
 
-  const runScan = async (url: string, turnstileToken: string) => {
+  const runScan = async (
+    url: string,
+    turnstileToken: string,
+    antiBot: { website: string; dwellMs: number },
+  ) => {
     setState({ phase: 'scanning', url });
     try {
       const res = await fetch('/api/scan', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ shopUrl: url, turnstileToken }),
+        body: JSON.stringify({
+          shopUrl: url,
+          turnstileToken,
+          website: antiBot.website,
+          dwellMs: antiBot.dwellMs,
+        }),
       });
       const body = await res.json();
       if (!res.ok) {
