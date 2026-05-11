@@ -189,7 +189,14 @@ function buildCsp(): string {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' blob: data: https:",
     "font-src 'self' data:",
-    "connect-src 'self' https://plausible.io https://challenges.cloudflare.com https://api.stripe.com https://*.ingest.de.sentry.io https://*.ingest.sentry.io",
+    // Cross-subdomain RSC prefetches need explicit allowlist. The C1
+    // host architecture spans flintmere.com (marketing) + audit (scanner)
+    // + standards + app — Next.js Link prefetches between these issue
+    // `fetch()` calls that hit connect-src. `'self'` alone covers only
+    // the current origin; without the four hosts below, hovering a
+    // cross-host link in production trips a CSP block (caught live
+    // 2026-05-11 immediately after the enforced flip in #33).
+    "connect-src 'self' https://flintmere.com https://audit.flintmere.com https://app.flintmere.com https://standards.flintmere.com https://plausible.io https://challenges.cloudflare.com https://api.stripe.com https://*.ingest.de.sentry.io https://*.ingest.sentry.io",
     "frame-src https://challenges.cloudflare.com https://js.stripe.com https://hooks.stripe.com",
     "worker-src 'self' blob:",
     "manifest-src 'self'",
