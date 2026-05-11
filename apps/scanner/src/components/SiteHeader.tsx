@@ -11,16 +11,23 @@ import { AUDIT_URL, SCAN_URL } from '@/lib/host-routing';
  * sentence-case, comma-delimited inline list, top-right. No pills, no
  * buttons, no chrome bar border. Logo top-left preserved.
  *
- * Wordmark hover (rev 2026-05-11): scale 1.06 from the left edge, no
- * colour shift. The earlier ink → amber hover read as a chromatic
- * collision against the brand mark itself — the wordmark IS the brand
- * accent already, so swapping it to the diagnostic-warning amber broke
- * the legibility-of-identity. Scale-up is the operator-approved
- * affordance: restrained, on-canon, gives a clear "interactive"
- * signal without colour. transform-origin: left center keeps the
- * left edge fixed so the layout doesn't shift when the wordmark grows.
- * Focus-visible outline (sage, the documented decorative focus accent)
- * replaces the colour shift's implicit keyboard-focus role.
+ * Hover affordance canon (rev 2026-05-11, council-ratified):
+ *  - Wordmark (logo, button-class identity): scale 1.06 from left edge,
+ *    no colour shift. transform-origin: left center keeps the layout
+ *    stable. Operator-approved.
+ *  - Nav items / Menu trigger / sheet items (text destinations):
+ *    underline + 4px offset + sage focus-visible outline. Convention
+ *    for text links, not scale — at 14–16px the scale-up is sub-pixel
+ *    and reads as anti-aliasing shimmer, and the comma-delimited inline
+ *    list packs tightly enough that transform-grown items collide with
+ *    their separators. Underline is the canonical text-link micro-
+ *    interaction and doesn't disturb the baseline grid.
+ *
+ * Both moves drop the prior ink → amber colour shift. Council
+ * resolution: amber was failing WCAG 1.4.1 (colour-only affordance);
+ * consistency between wordmark and nav is by ROLE, not by mechanic —
+ * logos and text destinations are different element classes and
+ * deserve different conventions.
  *
  * Mobile (<md): the comma-list collapses to a single mono "Menu" trigger.
  * Tap opens a paper-on-paper full-screen sheet with the nav items typeset
@@ -166,7 +173,7 @@ export function SiteHeader() {
                 <span key={item.label} className="contents">
                   <Link
                     href={item.href}
-                    className="site-nav-item hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
+                    className="site-nav-item hover:underline underline-offset-4 decoration-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
                     {...(item.external
                       ? { target: '_blank', rel: 'noopener noreferrer' }
                       : {})}
@@ -197,15 +204,17 @@ export function SiteHeader() {
               <span aria-hidden="true">&rarr;</span>
             </Link>
 
-            {/* Mobile trigger — mono caption. The Tempo-style restraint:
-                one word, no chrome, hover lifts to amber. */}
+            {/* Mobile trigger — mono caption. Tempo-style restraint:
+                one word, no chrome. Hover affordance is underline +
+                sage focus outline (text-destination class), matching
+                the desktop nav items. */}
             <button
               ref={triggerRef}
               type="button"
               aria-expanded={open}
               aria-controls="mobile-menu-sheet"
               onClick={() => setOpen(true)}
-              className="md:hidden site-nav-item font-mono uppercase text-[color:var(--color-ink)] hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
+              className="md:hidden site-nav-item font-mono uppercase text-[color:var(--color-ink)] hover:underline underline-offset-4 decoration-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
               style={{
                 fontSize: 12,
                 letterSpacing: '0.18em',
@@ -269,7 +278,7 @@ export function SiteHeader() {
               ref={closeRef}
               type="button"
               onClick={() => setOpen(false)}
-              className="site-nav-item font-mono uppercase text-[color:var(--color-ink)] hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
+              className="site-nav-item font-mono uppercase text-[color:var(--color-ink)] hover:underline underline-offset-4 decoration-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
               style={{
                 fontSize: 12,
                 letterSpacing: '0.18em',
@@ -317,7 +326,7 @@ export function SiteHeader() {
                         : {})}
                     >
                       <span
-                        className="font-sans text-[color:var(--color-ink)] group-hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
+                        className="font-sans text-[color:var(--color-ink)] group-hover:underline underline-offset-4 decoration-1"
                         style={{
                           fontSize: 'clamp(28px, 6.5vw, 40px)',
                           fontWeight: 500,
