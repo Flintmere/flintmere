@@ -14,8 +14,13 @@
  * council seat #36. Score appears in line 1 of the initial body.
  */
 
+// "(trading as Flintmere)" matches the canonical phrasing on /privacy,
+// /terms, /dpa, /about — bridges the brand→entity gap so recipients
+// don't read "Sent by Eazy Access Ltd" as a different sender from the
+// Flintmere brand they see in the body. PECR identity preserved
+// (Eazy Access Ltd is the legal sender).
 const COMPANY_FOOTER =
-  'Sent by Eazy Access Ltd, registered in England and Wales, company no. 13205428, registered office 71-75 Shelton Street, London, WC2H 9JQ. ICO data-controller registration ZC137268.';
+  'Sent by Eazy Access Ltd (trading as Flintmere), registered in England and Wales, company no. 13205428, registered office 71-75 Shelton Street, London, WC2H 9JQ. ICO data-controller registration ZC137268.';
 
 // PECR + GDPR Article 13: include a route to the privacy notice on first
 // contact. Hardcoded per anti-waste rule #6 (public URL, identical across

@@ -96,7 +96,7 @@ function ackPage(state: string, status: number): NextResponse {
       }
     </p>
     <p style="font-size:0.8125rem; color:#5A5C64; margin-top:2.5rem;">
-      Eazy Access Ltd · Companies House 13205428 · ICO ZC137268 · <a href="https://flintmere.com">flintmere.com</a>
+      Eazy Access Ltd (trading as Flintmere) · Companies House 13205428 · ICO ZC137268 · <a href="https://flintmere.com">flintmere.com</a>
     </p>
   </main>
 </body>

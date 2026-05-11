@@ -79,6 +79,16 @@ describe('renderInitialEmail', () => {
     }
   });
 
+  it('bridges the brand→entity gap with "trading as Flintmere"', () => {
+    // Matches canonical phrasing on /privacy, /terms, /dpa, /about.
+    // Without this bridge, recipients see "Sent by Eazy Access Ltd" and
+    // wonder if the email is actually from Flintmere.
+    const out = renderInitialEmail(baseInput);
+    for (const body of [out.bodyText, out.bodyHtml]) {
+      expect(body).toContain('Eazy Access Ltd (trading as Flintmere)');
+    }
+  });
+
   it('includes a privacy-notice link (PECR + GDPR Article 13)', () => {
     const out = renderInitialEmail(baseInput);
     for (const body of [out.bodyText, out.bodyHtml]) {
@@ -117,6 +127,13 @@ describe('renderFollowupEmail', () => {
     const out = renderFollowupEmail(baseInput);
     for (const body of [out.bodyText, out.bodyHtml]) {
       expect(body).toContain('https://flintmere.com/privacy');
+    }
+  });
+
+  it('also bridges brand→entity with "trading as Flintmere"', () => {
+    const out = renderFollowupEmail(baseInput);
+    for (const body of [out.bodyText, out.bodyHtml]) {
+      expect(body).toContain('Eazy Access Ltd (trading as Flintmere)');
     }
   });
 });
