@@ -142,14 +142,64 @@ const ROUND2_SEED_CATEGORIES = [
   'List_of_pasta',
 ];
 
-// Read SEED_SET env: 'round1' | 'round2' | 'all' (default round1).
+const ROUND3_SEED_CATEGORIES = [
+  // DTC + subscription + indie-leaning categories
+  'Category:Subscription_box_services',
+  'Category:Direct-to-consumer_brands',
+  'Category:Online_food_retailers',
+  'Category:Meal_kit_companies',
+  'Category:Brand_name_breads',
+  'Category:Granola_brands',
+  'Category:Yogurt_brands',
+  'Category:Plant-based_milk_brands',
+  'Category:Protein_bar_manufacturers',
+  'Category:Frozen_dessert_brands',
+  'Category:Bottled_water_brands',
+  'Category:Bottled_juice_brands',
+  'Category:Functional_beverages',
+  'Category:Sports_drinks',
+  'Category:Cold-brewed_coffee_brands',
+  'Category:Frozen_yogurt_brands',
+  'Category:Energy_drink_brands',
+  'Category:Meat_alternatives',
+  'Category:Vegan_brands',
+  'Category:Plant-based_food_brands',
+  'Category:Gluten-free_food_brands',
+  // Region drilldowns
+  'Category:Brewing_companies_of_the_United_Kingdom',
+  'Category:Brewing_companies_of_the_United_States',
+  'Category:Brewing_companies_of_Scotland',
+  'Category:Wineries_of_the_United_States',
+  'Category:Wineries_of_the_United_Kingdom',
+  'Category:Distilleries_of_the_United_States',
+  'Category:Distilleries_of_Scotland',
+  'Category:Coffee_companies_of_the_United_States',
+  'Category:Coffee_companies_of_the_United_Kingdom',
+  'Category:Tea_companies_of_the_United_Kingdom',
+  'Category:Chocolate_companies_of_the_United_Kingdom',
+  'Category:Ice_cream_brands_of_the_United_States',
+  'Category:Cheese_companies_of_the_United_Kingdom',
+  'Category:Bakeries_of_the_United_States',
+  'Category:Bakeries_of_the_United_Kingdom',
+  'Category:Restaurants_of_the_United_Kingdom',
+  // More countries I missed
+  'Category:Food_and_drink_companies_of_Argentina',
+  'Category:Food_and_drink_companies_of_Israel',
+  'Category:Food_and_drink_companies_of_Turkey',
+  'Category:Food_and_drink_companies_of_Russia',
+  'Category:Food_and_drink_companies_of_Hong_Kong',
+];
+
+// Read SEED_SET env: 'round1' | 'round2' | 'round3' | 'all' (default round1).
 const SEED_SET = process.env.SEED_SET ?? 'round1';
 const SEED_CATEGORIES =
   SEED_SET === 'round2'
     ? ROUND2_SEED_CATEGORIES
-    : SEED_SET === 'all'
-      ? [...DEFAULT_SEED_CATEGORIES, ...ROUND2_SEED_CATEGORIES]
-      : DEFAULT_SEED_CATEGORIES;
+    : SEED_SET === 'round3'
+      ? ROUND3_SEED_CATEGORIES
+      : SEED_SET === 'all'
+        ? [...DEFAULT_SEED_CATEGORIES, ...ROUND2_SEED_CATEGORIES, ...ROUND3_SEED_CATEGORIES]
+        : DEFAULT_SEED_CATEGORIES;
 
 // Domains we KNOW are not the official-website target.
 const NOISE_DOMAINS = new Set([
