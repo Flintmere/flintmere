@@ -172,16 +172,19 @@ export function SiteFooter() {
           </div>
         </div>
 
-        {/* Legal nav. Mobile (<sm): 4-col grid, 11px, commas hidden — fits
-            the 7 items into 2 clean rows (4+3) without the trailing-comma
-            orphan that the prior flex-wrap pattern left at end-of-line-1
-            on iPhone-class viewports (operator caught 2026-05-11). Desktop
-            (≥sm): canonical inline-comma flex pattern at 12px. Shorter
-            labels here (Privacy, Terms, DPA…) allow 4-up where the primary
-            nav above can only do 2-up at its 13px scale. */}
+        {/* Legal nav. Always flex-wrap — the prior `grid grid-cols-4 +
+            sm:flex` hybrid (#40, 2026-05-11 morning) didn't fully cascade
+            on desktop and rendered items as block-stacked one-per-row
+            (operator caught: "legal stuff on full screen should be
+            horizontal").
+            Canon now: always flex-wrap; mobile keeps commas hidden +
+            smaller font so the 7 items wrap cleanly without the
+            trailing-comma orphan that motivated the original grid
+            experiment. Desktop (≥sm) restores commas + 12px and the items
+            flow inline. */}
         <nav
           aria-label="Footer legal"
-          className="grid grid-cols-4 gap-x-3 gap-y-2 sm:flex sm:items-baseline sm:flex-wrap sm:gap-x-1.5 sm:gap-y-1"
+          className="flex items-baseline flex-wrap gap-x-3 gap-y-1.5 sm:gap-x-1.5 sm:gap-y-1"
           style={{
             fontSize: 'clamp(11px, 1vw, 12px)',
             fontWeight: 500,
