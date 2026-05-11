@@ -49,7 +49,7 @@ function todayUtc() {
 const OUTPUT_DIR =
   process.env.OUTPUT_DIR ?? resolve(REPO_ROOT, 'data/discovery', todayUtc());
 
-const SEED_CATEGORIES = [
+const DEFAULT_SEED_CATEGORIES = [
   'Category:Food_and_drink_companies_of_the_United_States',
   'Category:Food_and_drink_companies_of_the_United_Kingdom',
   'Category:Food_and_drink_companies_of_Canada',
@@ -89,6 +89,67 @@ const SEED_CATEGORIES = [
   'Category:Vegetarian_restaurant_chains',
   'Category:Pet_food_brands',
 ];
+
+const ROUND2_SEED_CATEGORIES = [
+  // Broader food + drink categories I missed in round 1
+  'Category:Ice_cream_brands',
+  'Category:Candy_brands',
+  'Category:Beverage_companies',
+  'Category:Bakery_brands',
+  'Category:Breakfast_foods',
+  'Category:Frozen_food_brands',
+  'Category:Dairy_products_companies',
+  'Category:Meat_processing_companies',
+  'Category:Seafood_companies',
+  'Category:Wine_brands',
+  'Category:Beer_brands',
+  'Category:Whisky_distilleries',
+  'Category:Vegan_food_companies',
+  'Category:Organic_food_companies',
+  'Category:Fair_trade_companies',
+  'Category:Cereal_brands',
+  'Category:Energy_bar_manufacturers',
+  'Category:Sauce_manufacturers',
+  'Category:Tea_brands',
+  'Category:Coffee_brands',
+  // Country subcategories I missed
+  'Category:Food_and_drink_companies_of_China',
+  'Category:Food_and_drink_companies_of_South_Africa',
+  'Category:Food_and_drink_companies_of_Brazil',
+  'Category:Food_and_drink_companies_of_Mexico',
+  'Category:Food_and_drink_companies_of_Belgium',
+  'Category:Food_and_drink_companies_of_Switzerland',
+  'Category:Food_and_drink_companies_of_Finland',
+  'Category:Food_and_drink_companies_of_Austria',
+  'Category:Food_and_drink_companies_of_Poland',
+  'Category:Food_and_drink_companies_of_Greece',
+  'Category:Food_and_drink_companies_of_Portugal',
+  'Category:Food_and_drink_companies_of_South_Korea',
+  // "List of" pages — high-yield aggregator articles
+  'List_of_coffee_companies',
+  'List_of_chocolate_companies',
+  'List_of_confectionery_brands',
+  'List_of_tea_companies',
+  'List_of_breakfast_cereals',
+  'List_of_dairy_product_brands',
+  'List_of_ice_cream_brands',
+  'List_of_olive_oil_brands',
+  'List_of_hot_sauces',
+  'List_of_sodas',
+  'List_of_breweries',
+  'List_of_microbreweries',
+  'List_of_artisanal_food_brands',
+  'List_of_pasta',
+];
+
+// Read SEED_SET env: 'round1' | 'round2' | 'all' (default round1).
+const SEED_SET = process.env.SEED_SET ?? 'round1';
+const SEED_CATEGORIES =
+  SEED_SET === 'round2'
+    ? ROUND2_SEED_CATEGORIES
+    : SEED_SET === 'all'
+      ? [...DEFAULT_SEED_CATEGORIES, ...ROUND2_SEED_CATEGORIES]
+      : DEFAULT_SEED_CATEGORIES;
 
 // Domains we KNOW are not the official-website target.
 const NOISE_DOMAINS = new Set([
