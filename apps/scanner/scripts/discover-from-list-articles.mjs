@@ -42,7 +42,7 @@ function todayUtc() {
 const OUTPUT_DIR =
   process.env.OUTPUT_DIR ?? resolve(REPO_ROOT, 'data/discovery', `${todayUtc()}-lists`);
 
-const LIST_ARTICLES = [
+const DEFAULT_LIST_ARTICLES = [
   'List_of_coffee_companies',
   'List_of_chocolate_companies',
   'List_of_chocolate_brands',
@@ -78,6 +78,63 @@ const LIST_ARTICLES = [
   'List_of_vegan_brands',
   'List_of_organic_food_brands',
 ];
+
+const ROUND2_LIST_ARTICLES = [
+  // Spirits
+  'List_of_whisky_brands',
+  'List_of_vodka_brands',
+  'List_of_gin_brands',
+  'List_of_rum_brands',
+  'List_of_tequila_brands',
+  'List_of_liqueurs',
+  'List_of_bourbons',
+  'List_of_distilleries',
+  'List_of_wine_brands',
+  'List_of_champagnes',
+  // Beer
+  'List_of_breweries_in_Scotland',
+  'List_of_breweries_in_Wales',
+  'List_of_craft_breweries',
+  // Niche food
+  'List_of_kombucha_brands',
+  'List_of_smoothie_brands',
+  'List_of_hot_chocolate_brands',
+  'List_of_oat_milk_brands',
+  'List_of_almond_milk_brands',
+  'List_of_jam_and_preserve_brands',
+  'List_of_chocolate_bar_brands',
+  'List_of_candy_bars',
+  'List_of_gum_brands',
+  'List_of_chewing_gum_brands',
+  'List_of_chip_brands',
+  'List_of_pretzel_brands',
+  'List_of_cracker_brands',
+  'List_of_granola_brands',
+  'List_of_nut_butter_brands',
+  // Beverages
+  'List_of_kombucha_companies',
+  'List_of_meal_kit_companies',
+  'List_of_protein_powder_brands',
+  'List_of_canned_food_brands',
+  'List_of_frozen_food_brands',
+  'List_of_sauce_brands',
+  'List_of_condiment_brands',
+  'List_of_mustard_brands',
+  'List_of_ketchup_brands',
+  'List_of_mayonnaise_brands',
+  'List_of_dessert_brands',
+  'List_of_cake_brands',
+  'List_of_pie_brands',
+  'List_of_donut_brands',
+];
+
+const LIST_SET = process.env.LIST_SET ?? 'default';
+const LIST_ARTICLES =
+  LIST_SET === 'round2'
+    ? ROUND2_LIST_ARTICLES
+    : LIST_SET === 'all'
+      ? [...DEFAULT_LIST_ARTICLES, ...ROUND2_LIST_ARTICLES]
+      : DEFAULT_LIST_ARTICLES;
 
 const NOISE_DOMAINS = new Set([
   'wikipedia.org',
