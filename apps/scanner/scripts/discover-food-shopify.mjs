@@ -190,16 +190,50 @@ const ROUND3_SEED_CATEGORIES = [
   'Category:Food_and_drink_companies_of_Hong_Kong',
 ];
 
-// Read SEED_SET env: 'round1' | 'round2' | 'round3' | 'all' (default round1).
+const ROUND4_SEED_CATEGORIES = [
+  // Spirits subcategories — high indie-Shopify density
+  'Category:Whisky_brands',
+  'Category:Vodka_brands',
+  'Category:Gin_brands',
+  'Category:Rum_brands',
+  'Category:Tequila_brands',
+  'Category:Liqueur_brands',
+  'Category:Bourbon_brands',
+  // Region drilldowns
+  'Category:Food_and_drink_companies_of_England',
+  'Category:Food_and_drink_companies_of_Scotland',
+  'Category:Food_and_drink_companies_of_Wales',
+  'Category:Food_and_drink_companies_of_Northern_Ireland',
+  // Niche food product brands
+  'Category:Honey_brands',
+  'Category:Maple_syrup_brands',
+  'Category:Cookie_brands',
+  'Category:Bread_brands',
+  'Category:Cake_brands',
+  'Category:Healthy_snacks',
+  'Category:Spice_brands',
+  'Category:Sausage_brands',
+  'Category:Cured_meats',
+  'Category:Yogurt_brands',
+  // High-yield aggregator categories
+  'Category:American_food_brands',
+  'Category:British_food_brands',
+  'Category:Australian_food_brands',
+  'Category:Canadian_food_brands',
+];
+
+// Read SEED_SET env: 'round1' | 'round2' | 'round3' | 'round4' | 'all' (default round1).
 const SEED_SET = process.env.SEED_SET ?? 'round1';
 const SEED_CATEGORIES =
   SEED_SET === 'round2'
     ? ROUND2_SEED_CATEGORIES
     : SEED_SET === 'round3'
       ? ROUND3_SEED_CATEGORIES
-      : SEED_SET === 'all'
-        ? [...DEFAULT_SEED_CATEGORIES, ...ROUND2_SEED_CATEGORIES, ...ROUND3_SEED_CATEGORIES]
-        : DEFAULT_SEED_CATEGORIES;
+      : SEED_SET === 'round4'
+        ? ROUND4_SEED_CATEGORIES
+        : SEED_SET === 'all'
+          ? [...DEFAULT_SEED_CATEGORIES, ...ROUND2_SEED_CATEGORIES, ...ROUND3_SEED_CATEGORIES, ...ROUND4_SEED_CATEGORIES]
+          : DEFAULT_SEED_CATEGORIES;
 
 // Domains we KNOW are not the official-website target.
 const NOISE_DOMAINS = new Set([
