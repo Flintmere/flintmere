@@ -30,8 +30,12 @@
  *   - Visible paragraph is aria-hidden; sr-only narrates the natural
  *     prose so screen readers get clean text regardless of fade state
  *   - aria-live="polite" on the demo region announces example changes
- *   - Reduced-motion: all 3 examples render at end-state (tokens only)
- *     stacked statically in normal flow — no pin, no scroll runway
+ *   - Reduced-motion AND mobile (<1024px): all 3 examples render at
+ *     end-state (tokens only) stacked statically in normal flow — no
+ *     pin, no scroll runway. The cascade is desktop-only by canon
+ *     (rev 2026-05-11) — on mobile the long token strings wrap to
+ *     multi-line amber blocks and the 400vh pinned runway reads as
+ *     "page is stuck" rather than as cinema.
  *
  * Council pre-flight: #1 Massimo (typographic event), #2 Composition
  * (three demonstrations earn the runway), #3 Marie (scroll-driven mass
@@ -130,9 +134,32 @@ export function ManifestoChord() {
   const [fade, setFade] = useState(0);
   const [overall, setOverall] = useState(0);
   const reducedMotion = useReducedMotion() ?? false;
+  // Small-viewport detection (added 2026-05-11 after operator caught the
+  // scroll-driven cascade rendering as a fragmented wall of multi-line
+  // amber-token blocks with half-faded prose between them on a 365px
+  // viewport). The cascade is calibrated for desktop-wide content where
+  // each token fits inline; on mobile the long token strings wrap to 3-4
+  // lines each and the page-locked 400vh runway feels like the page is
+  // stuck. Fall back to the static end-state layout below `lg` (1024px).
+  //
+  // useState initializer reads matchMedia synchronously — this component
+  // is `'use client'` + lazy-mounted with `ssr: false`, so the initializer
+  // always runs client-side and the first paint already has the right
+  // viewport answer. No flash, no 300vh layout shift on mount.
+  const [isSmallViewport, setIsSmallViewport] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(max-width: 1023px)').matches;
+  });
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1023px)');
+    const onChange = (e: MediaQueryListEvent) => setIsSmallViewport(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  const useStaticLayout = reducedMotion || isSmallViewport;
 
   useEffect(() => {
-    if (reducedMotion) {
+    if (useStaticLayout) {
       setFade(1);
       setOverall(1);
       return;
@@ -176,7 +203,7 @@ export function ManifestoChord() {
       window.removeEventListener('resize', onScroll);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [reducedMotion]);
+  }, [useStaticLayout]);
 
   const example = EXAMPLES[exampleIndex] ?? EXAMPLES[0]!;
 
@@ -193,10 +220,13 @@ export function ManifestoChord() {
       ),
     );
 
-  // Reduced-motion fallback: render all 3 examples stacked at end-state
-  // (tokens only, prose hidden) in normal flow. The static end-state IS
-  // the message — no scroll choreography needed when motion is suppressed.
-  if (reducedMotion) {
+  // Static-layout fallback: render all 3 examples stacked at end-state
+  // (tokens only, prose visually de-emphasised) in normal flow. Fires for
+  // reduced-motion users AND for any viewport below `lg` (1024px) — the
+  // scroll-driven cascade was calibrated for desktop-wide content and
+  // reads as fragmented amber blocks at mobile widths. The static
+  // end-state IS the message — no scroll choreography needed.
+  if (useStaticLayout) {
     return (
       <section
         id="manifesto"
