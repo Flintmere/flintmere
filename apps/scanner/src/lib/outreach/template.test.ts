@@ -100,6 +100,39 @@ describe('renderInitialEmail', () => {
     const out = renderInitialEmail(baseInput);
     expect(out.bodyText).toContain('Best,\nAbu\nThe Flintmere team');
   });
+
+  it('renders the score with the legibility-bracket signature in HTML', () => {
+    // The Flintmere brand signature: `[ 47/100 ]` in mono with hairline ink
+    // brackets, on the load-bearing noun. See `memory/design/tokens.md`
+    // §Signature. Plain `<strong>` was the prior pre-canon rendering.
+    const out = renderInitialEmail(baseInput);
+    expect(out.bodyHtml).toContain('[&nbsp;42/100&nbsp;]');
+    expect(out.bodyHtml).not.toContain('<strong>42/100</strong>');
+  });
+
+  it('renders the sign-off wordmark with the legibility-bracket signature', () => {
+    // The second canonical brand beat per the cold-email letterhead spec:
+    // `The [ Flintmere ] team`. Mono span around the wordmark.
+    const out = renderInitialEmail(baseInput);
+    expect(out.bodyHtml).toContain('[&nbsp;Flintmere&nbsp;]');
+  });
+
+  it('uses paper canon background (#f7f7f4), not white', () => {
+    // Paper canon per `apps/scanner/src/app/globals.css --color-paper`.
+    // White (#FFFFFF) was the pre-canon background.
+    const out = renderInitialEmail(baseInput);
+    expect(out.bodyHtml).toContain('background:#f7f7f4');
+    expect(out.bodyHtml).not.toContain('background:#FFFFFF');
+  });
+
+  it('uses anchor-text links, not raw-URL paste, for body CTAs', () => {
+    // Raw URL paste reads as marketing-template generic; anchor text reads
+    // as letterhead. The URL still appears in the href (separate assertion
+    // below covers that), but visible link text is human-readable.
+    const out = renderInitialEmail(baseInput);
+    expect(out.bodyHtml).toContain('run the free scan');
+    expect(out.bodyHtml).toContain('see audit + retainer details');
+  });
 });
 
 describe('renderFollowupEmail', () => {
@@ -135,5 +168,14 @@ describe('renderFollowupEmail', () => {
     for (const body of [out.bodyText, out.bodyHtml]) {
       expect(body).toContain('Eazy Access Ltd (trading as Flintmere)');
     }
+  });
+
+  it('sign-off uses team voice in both bodies', () => {
+    // Per `memory/feedback_always_team_voice.md` — every customer-facing
+    // surface uses team voice; sender name alone is borderline. Followup
+    // previously omitted the team line; aligned with initial here.
+    const out = renderFollowupEmail(baseInput);
+    expect(out.bodyText).toContain('Best,\nAbu\nThe Flintmere team');
+    expect(out.bodyHtml).toContain('[&nbsp;Flintmere&nbsp;]');
   });
 });
