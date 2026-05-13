@@ -11,6 +11,7 @@
  */
 
 import { sendEmail, type SendEmailResult } from '../resend';
+import { DAILY_HEALTH_CHECK_MARKDOWN } from './health-check';
 import type { ComposedBrief, BriefState } from './types';
 
 const FROM_DEFAULT = 'Flintmere <hello@flintmere.com>';
@@ -49,8 +50,15 @@ export async function sendDailyBrief(
 ): Promise<SendEmailResult> {
   const to = input.to ?? process.env.DAILY_BRIEF_RECIPIENT ?? RECIPIENT_DEFAULT;
   const from = input.from ?? process.env.DAILY_BRIEF_FROM ?? FROM_DEFAULT;
-  const html = renderHtml(input.brief, input.state);
-  const text = renderText(input.brief, input.state);
+  // Prepend the deterministic health-check block. Single source of truth
+  // in health-check.ts; the LLM is instructed (system prompt) not to
+  // produce its own Daily health check section.
+  const withHealthCheck: ComposedBrief = {
+    ...input.brief,
+    bodyMarkdown: `${DAILY_HEALTH_CHECK_MARKDOWN}\n${input.brief.bodyMarkdown}`,
+  };
+  const html = renderHtml(withHealthCheck, input.state);
+  const text = renderText(withHealthCheck, input.state);
   return sendEmail({
     to,
     from,
