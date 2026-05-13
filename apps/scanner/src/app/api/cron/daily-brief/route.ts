@@ -4,8 +4,9 @@
  *   curl -fsS -X POST -H "X-Cron-Secret: $CRON_SECRET" \
  *        https://audit.flintmere.com/api/cron/daily-brief
  *
- * Frequency: 0 6 * * 1-5 (06:00 UTC = 07:00 BST weekdays). Lands in the
- * operator inbox before the 9-to-5 day-job starts.
+ * Frequency: 0 6 * * * (06:00 UTC = 07:00 BST every day). Lands in the
+ * operator inbox before the 9-to-5 day-job starts on weekdays and ahead
+ * of weekend Flintmere blocks per the cadence runbook.
  *
  * Pipeline:
  *   1. verifyCronSecret — HMAC-compared header check; 403 on mismatch.
