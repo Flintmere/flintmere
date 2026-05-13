@@ -123,21 +123,14 @@ export default async function OG() {
             style={{
               display: 'flex',
               alignItems: 'baseline',
-              fontWeight: 500,
+              fontFamily: 'GeistMono',
+              fontWeight: 700,
               fontSize: 36,
-              letterSpacing: -1,
+              letterSpacing: -1.4,
             }}
           >
             <span>Flintmere</span>
-            <span
-              style={{
-                fontFamily: 'GeistMono',
-                fontWeight: 700,
-                marginLeft: 2,
-              }}
-            >
-              ]
-            </span>
+            <span style={{ marginLeft: 2 }} aria-hidden="true">]</span>
           </div>
           <div
             style={{
