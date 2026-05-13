@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { formatLondonDate, formatLondonWeekday } from './state';
 import { extractTodayBlock } from './compose';
 import { renderMarkdownToHtml, renderText, renderHtml } from './email';
+import { DAILY_HEALTH_CHECK_MARKDOWN } from './health-check';
 import type { BriefState, ComposedBrief } from './types';
 
 describe('formatLondonDate', () => {
@@ -141,6 +142,25 @@ describe('renderText', () => {
     expect(text).toContain('First.');
     expect(text).toContain('2026-05-13');
     expect(text).toContain('The [ Flintmere ] team');
+  });
+});
+
+describe('DAILY_HEALTH_CHECK_MARKDOWN', () => {
+  it('lists the five canonical tabs', () => {
+    expect(DAILY_HEALTH_CHECK_MARKDOWN).toContain('BetterStack');
+    expect(DAILY_HEALTH_CHECK_MARKDOWN).toContain('Resend');
+    expect(DAILY_HEALTH_CHECK_MARKDOWN).toContain('Plausible');
+    expect(DAILY_HEALTH_CHECK_MARKDOWN).toContain('Admin outreach');
+    expect(DAILY_HEALTH_CHECK_MARKDOWN).toContain('Sentry');
+  });
+
+  it('renders cleanly through markdown→HTML', () => {
+    const html = renderMarkdownToHtml(DAILY_HEALTH_CHECK_MARKDOWN);
+    expect(html).toContain('<h2');
+    expect(html).toContain('Daily health check');
+    expect(html).toContain('<ol');
+    expect(html).toContain('uptime.betterstack.com');
+    expect(html).toContain('eu.plausible.io');
   });
 });
 
