@@ -24,7 +24,8 @@
     "audit:csv": "tsx scripts/export-audit-csv.ts",
     "audit:deliver": "tsx scripts/audit-deliver.ts",
     "audit:markdown": "tsx scripts/dump-audit-markdown.ts",
-    "audit:sla-monitor": "tsx scripts/concierge-sla-monitor.ts"
+    "audit:sla-monitor": "tsx scripts/concierge-sla-monitor.ts",
+    "scrub:test-shop": "tsx scripts/scrub-test-shop.ts"
   },
   "dependencies": {
     "@flintmere/llm": "workspace:*",
