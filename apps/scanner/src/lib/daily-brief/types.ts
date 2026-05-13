@@ -9,10 +9,19 @@ export interface BriefState {
   date: string;
   /** Short weekday — 'Mon' | 'Tue' | … */
   weekday: string;
-  /** Raw markdown from context/operator-daily-playbook.md. */
+  /** Raw markdown from context/operator-daily-playbook.md. Empty when
+   *  the file isn't present (always the case in the prod container;
+   *  operator-local in dev). */
   playbookContent: string;
-  /** Raw markdown from the active marketing-launch cadence runbook. */
+  /** Raw markdown from the bundled cadence snapshot
+   *  (apps/scanner/src/lib/daily-brief/cadence-snapshot.ts). Always
+   *  present; regenerated via `pnpm sync-cadence`. */
   cadenceContent: string;
+  /** Filename of the cadence runbook the snapshot was taken from. */
+  cadenceSource: string;
+  /** ISO timestamp of the snapshot. Surfaced so the LLM knows how stale
+   *  the cadence is. */
+  cadenceSnapshotAt: string;
   /** Live counts pulled from the scanner DB. */
   outreach: OutreachSnapshot;
   /** Non-fatal collection errors. Surfaced in the brief footer so the

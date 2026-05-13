@@ -90,7 +90,7 @@ async function composeViaVertex(
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: buildUserPrompt(state) },
     ],
-    maxOutputTokens: 2048,
+    maxOutputTokens: 8192,
     temperature: 0.2,
     responseMimeType: 'application/json',
     tag: 'daily-brief',
@@ -133,8 +133,21 @@ function buildUserPrompt(state: BriefState): string {
       ? `\nCollector warnings (surface in brief footer):\n  - ${state.warnings.join('\n  - ')}`
       : '';
 
+  // Cadence is always present (bundled snapshot). Playbook is operator-
+  // local and absent on prod — the LLM should compose from cadence in
+  // that case rather than apologise for the missing playbook.
+  const playbookBlock = state.playbookContent
+    ? [
+        '----- BEGIN OPERATOR DAILY PLAYBOOK -----',
+        state.playbookContent,
+        '----- END OPERATOR DAILY PLAYBOOK -----',
+        '',
+      ].join('\n')
+    : '(operator playbook not available in this environment — compose from the cadence runbook alone; do not mention the missing playbook)\n';
+
   return [
     `Today's date: ${state.date} (${state.weekday}, Europe/London).`,
+    `Cadence snapshot taken: ${state.cadenceSnapshotAt} from ${state.cadenceSource}.`,
     '',
     'Live outreach state:',
     `  queued: ${outreach.queued}`,
@@ -146,28 +159,34 @@ function buildUserPrompt(state: BriefState): string {
     `  ${lastSendLine}`,
     warnings,
     '',
-    '----- BEGIN OPERATOR DAILY PLAYBOOK -----',
-    state.playbookContent || '(playbook unavailable)',
-    '----- END OPERATOR DAILY PLAYBOOK -----',
-    '',
+    playbookBlock,
     '----- BEGIN MARKETING-LAUNCH CADENCE -----',
-    state.cadenceContent || '(cadence unavailable)',
+    state.cadenceContent,
     '----- END MARKETING-LAUNCH CADENCE -----',
     '',
-    "Compose today's brief now. Output JSON only.",
+    "Compose today's brief now. Find today's tasks by matching today's",
+    'date and weekday against the cadence runbook (W0/W1/W2 day-by-day',
+    'blocks). Output JSON only.',
   ].join('\n');
 }
 
 // ---- Fallback ----
 
 function fallbackBrief(state: BriefState, reason: string): ComposedBrief {
-  const todayBlock = extractTodayBlock(state.playbookContent) ?? state.playbookContent;
+  // Prefer the playbook's `## Today —` block (operator-authored,
+  // most specific). Fall back to the whole playbook, then the cadence
+  // snapshot. The cadence is always present (bundled), so the brief
+  // never ships empty.
+  const todayBlock =
+    extractTodayBlock(state.playbookContent) ||
+    state.playbookContent ||
+    state.cadenceContent;
   const subject = `Daily brief · ${state.weekday} ${state.date} (fallback)`;
-  const preheader = `LLM compose unavailable — raw playbook block. ${reason}.`;
+  const preheader = `LLM compose unavailable — source block raw. ${reason}.`;
   const bodyMarkdown = [
     `## ${state.weekday} ${state.date} — fallback brief`,
     '',
-    `LLM compose failed (${reason}). Surfacing today's playbook block raw so the channel doesn't go silent.`,
+    `LLM compose failed (${reason}). Surfacing source content raw so the channel doesn't go silent.`,
     '',
     todayBlock,
     '',

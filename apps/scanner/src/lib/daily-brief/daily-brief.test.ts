@@ -123,6 +123,8 @@ describe('renderText', () => {
       weekday: 'Wed',
       playbookContent: '',
       cadenceContent: '',
+      cadenceSource: 'test.md',
+      cadenceSnapshotAt: '2026-05-13T00:00:00.000Z',
       outreach: {
         queued: 0,
         sent: 0,
@@ -154,6 +156,8 @@ describe('renderHtml', () => {
       weekday: 'Wed',
       playbookContent: '',
       cadenceContent: '',
+      cadenceSource: 'test.md',
+      cadenceSnapshotAt: '2026-05-13T00:00:00.000Z',
       outreach: {
         queued: 0,
         sent: 0,
