@@ -13,8 +13,8 @@
 import { sendEmail, type SendEmailResult } from '../resend';
 import type { ComposedBrief, BriefState } from './types';
 
-const FROM_DEFAULT = 'Flintmere <cron@team.flintmere.com>';
-const RECIPIENT_DEFAULT = 'hello@flintmere.com';
+const FROM_DEFAULT = 'Flintmere <hello@flintmere.com>';
+const RECIPIENT_DEFAULT = 'info@eazyaccess.org';
 
 const STYLE_BODY =
   "margin:0;padding:0;background:#f7f7f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#0a0a0b;font-size:15px;line-height:1.65;";
@@ -38,9 +38,9 @@ const STYLE_PREHEADER =
 export interface SendDailyBriefInput {
   brief: ComposedBrief;
   state: BriefState;
-  /** Override the recipient. Defaults to DAILY_BRIEF_RECIPIENT env or `hello@flintmere.com`. */
+  /** Override the recipient. Defaults to DAILY_BRIEF_RECIPIENT env or `info@eazyaccess.org`. */
   to?: string;
-  /** Override the sender. Defaults to DAILY_BRIEF_FROM env or `Flintmere <cron@team.flintmere.com>`. */
+  /** Override the sender. Defaults to DAILY_BRIEF_FROM env or `Flintmere <hello@flintmere.com>`. */
   from?: string;
 }
 
