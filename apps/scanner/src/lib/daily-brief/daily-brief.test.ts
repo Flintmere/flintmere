@@ -1,7 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { formatLondonDate, formatLondonWeekday } from './state';
 import { extractTodayBlock } from './compose';
-import { renderMarkdownToHtml, renderText, renderHtml } from './email';
+import {
+  renderMarkdownToHtml,
+  renderText,
+  renderHtml,
+  buildBriefAttachment,
+} from './email';
 import { DAILY_HEALTH_CHECK_MARKDOWN } from './health-check';
 import type { BriefState, ComposedBrief } from './types';
 
@@ -141,6 +146,77 @@ describe('renderText', () => {
     expect(text).toContain('## Today');
     expect(text).toContain('First.');
     expect(text).toContain('2026-05-13');
+    expect(text).toContain('The [ Flintmere ] team');
+  });
+});
+
+describe('buildBriefAttachment', () => {
+  const brief: ComposedBrief = {
+    subject: 'Daily brief · Wed 2026-05-13',
+    preheader: 'p',
+    bodyMarkdown: '## Pre-flight\n1. Open laptop.',
+  };
+  const state: BriefState = {
+    date: '2026-05-13',
+    weekday: 'Wed',
+    playbookContent: '',
+    cadenceContent: '',
+    cadenceSource: '2026-05-11-marketing-launch-and-cadence.md',
+    cadenceSnapshotAt: '2026-05-13T12:27:40.372Z',
+    outreach: {
+      queued: 0,
+      sent: 30,
+      replied: 0,
+      bounced: 0,
+      unsubscribed: 0,
+      lastSendAt: new Date('2026-05-13T08:00:49.021Z'),
+      todaysSends: 15,
+    },
+    warnings: [],
+  };
+
+  it('emits a dated, sortable filename', () => {
+    const { filename } = buildBriefAttachment(brief, state);
+    expect(filename).toBe('flintmere-brief-2026-05-13.md');
+  });
+
+  it('emits a UTF-8 Buffer', () => {
+    const { content } = buildBriefAttachment(brief, state);
+    expect(Buffer.isBuffer(content)).toBe(true);
+    expect(content.toString('utf8')).toContain('## Pre-flight');
+  });
+
+  it('opens with YAML frontmatter carrying state', () => {
+    const text = buildBriefAttachment(brief, state).content.toString('utf8');
+    expect(text.startsWith('---\n')).toBe(true);
+    expect(text).toContain('date: 2026-05-13');
+    expect(text).toContain('weekday: Wed');
+    expect(text).toContain('cadence_source: "2026-05-11-marketing-launch-and-cadence.md"');
+    expect(text).toContain('  sent: 30');
+    expect(text).toContain('  todays_sends: 15');
+    expect(text).toContain('  last_send_at: 2026-05-13T08:00:49.021Z');
+  });
+
+  it('encodes warnings as a YAML list when present', () => {
+    const stateWithWarnings: BriefState = {
+      ...state,
+      warnings: ['outreach DB query failed: "connection refused"'],
+    };
+    const text = buildBriefAttachment(brief, stateWithWarnings).content.toString('utf8');
+    expect(text).toMatch(/warnings: \n  - "outreach DB query failed: \\"connection refused\\""/);
+  });
+
+  it('escapes quotes and backslashes in YAML string values', () => {
+    const briefWithSpecials: ComposedBrief = {
+      ...brief,
+      subject: 'has "quote" and \\backslash',
+    };
+    const text = buildBriefAttachment(briefWithSpecials, state).content.toString('utf8');
+    expect(text).toContain('subject: "has \\"quote\\" and \\\\backslash"');
+  });
+
+  it('closes with the bracket signature footer', () => {
+    const text = buildBriefAttachment(brief, state).content.toString('utf8');
     expect(text).toContain('The [ Flintmere ] team');
   });
 });
