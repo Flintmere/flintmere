@@ -25,7 +25,8 @@
     "audit:deliver": "tsx scripts/audit-deliver.ts",
     "audit:markdown": "tsx scripts/dump-audit-markdown.ts",
     "audit:sla-monitor": "tsx scripts/concierge-sla-monitor.ts",
-    "scrub:test-shop": "tsx scripts/scrub-test-shop.ts"
+    "scrub:test-shop": "tsx scripts/scrub-test-shop.ts",
+    "sync-cadence": "tsx scripts/sync-cadence.ts"
   },
   "dependencies": {
     "@flintmere/llm": "workspace:*",
