@@ -20,7 +20,7 @@ Five tabs, one glance each. ≤5 min. If anything red, drop a line into today's 
 
 1. **BetterStack** — https://uptime.betterstack.com — any monitor red in the last 24h?
 2. **Resend** — https://resend.com/emails — bounces or complaints since yesterday?
-3. **Plausible** — https://eu.plausible.io/audit.flintmere.com — yesterday's pageviews (single site covers both \`flintmere.com\` and \`audit.flintmere.com\` — same Next.js app behind two domains). Note anything zero or unusually high.
+3. **Plausible** — https://plausible.io/audit.flintmere.com — yesterday's pageviews (single site covers both \`flintmere.com\` and \`audit.flintmere.com\` — same Next.js app behind two domains). Note anything zero or unusually high.
 4. **Admin outreach** — https://audit.flintmere.com/admin/outreach — queued / sent / replied. Anything stuck?
 5. **Sentry** — https://sentry.io/organizations/flintmere/issues/?project=flintmere-scanner — any new error in 24h?
 

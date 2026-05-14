@@ -236,7 +236,7 @@ describe('DAILY_HEALTH_CHECK_MARKDOWN', () => {
     expect(html).toContain('Daily health check');
     expect(html).toContain('<ol');
     expect(html).toContain('uptime.betterstack.com');
-    expect(html).toContain('eu.plausible.io');
+    expect(html).toContain('plausible.io');
   });
 });
 
