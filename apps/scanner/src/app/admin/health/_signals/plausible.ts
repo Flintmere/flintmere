@@ -5,8 +5,8 @@ interface PlausibleAggregateResponse {
   results: { pageviews: { value: number } };
 }
 
-const DASHBOARD_URL = 'https://eu.plausible.io/audit.flintmere.com';
-const STATS_BASE = 'https://eu.plausible.io/api/v1/stats/aggregate';
+const DASHBOARD_URL = 'https://plausible.io/audit.flintmere.com';
+const STATS_BASE = 'https://plausible.io/api/v1/stats/aggregate';
 
 async function pageviewsForSite(
   siteId: string,
