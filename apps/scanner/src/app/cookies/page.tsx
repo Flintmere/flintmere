@@ -17,7 +17,7 @@ export default function Cookies() {
       eyebrow="Cookies"
       title="Almost none. On purpose."
       summary="Neither the marketing site at flintmere.com nor the scanner at audit.flintmere.com sets any first-party cookies — CSRF protection is enforced by a request-origin check, not a cookie. The Shopify app uses Shopify&rsquo;s session cookie, scoped to the embedded admin. We do not use any third-party tracking, advertising, or cross-site analytics cookies, anywhere."
-      lastUpdated="2026-05-10"
+      lastUpdated="2026-05-14"
       anchorNumeral="04"
     >
       <Clause n="01" heading="What is a cookie">
@@ -29,19 +29,13 @@ export default function Cookies() {
         </p>
       </Clause>
 
-      <Clause n="02" heading="Cookies on flintmere.com (marketing)">
-        <p>
-          The marketing site sets <strong>no cookies</strong>. No analytics,
-          no ad pixels, no A/B testing, no session storage. You can confirm
-          this in your browser dev tools. If we ever add a strictly necessary
-          cookie (for example, to remember a banner dismissal), we&rsquo;ll
-          update this page first.
-        </p>
-      </Clause>
-
-      <Clause n="03" heading="Cookies on flintmere.com and audit.flintmere.com (marketing + scanner)">
+      <Clause n="02" heading="Cookies on flintmere.com and audit.flintmere.com (marketing + scanner)">
         <p>
           The marketing site and the public scanner set <strong>no cookies</strong>.
+          No analytics, no ad pixels, no A/B testing, no session storage. You
+          can confirm this in your browser dev tools.
+        </p>
+        <p className="mt-4">
           CSRF protection on the scan form is enforced by a request-origin
           check, not by a cookie. Scan results are stored server-side, indexed
           by a short random ID — that ID lives in the URL, not in a cookie.
@@ -53,7 +47,7 @@ export default function Cookies() {
         </p>
       </Clause>
 
-      <Clause n="04" heading="Cookies in the Shopify app (app.flintmere.com)">
+      <Clause n="03" heading="Cookies in the Shopify app (app.flintmere.com)">
         <p>
           The embedded Shopify app relies on Shopify&rsquo;s own session
           token (issued by Shopify Admin) to authenticate requests. This is
@@ -62,7 +56,7 @@ export default function Cookies() {
         </p>
       </Clause>
 
-      <Clause n="05" heading="What we do not use">
+      <Clause n="04" heading="What we do not use">
         <ul className="mt-4 list-disc pl-6 space-y-2">
           <li>No Google Analytics, Google Tag Manager, or Google Ads pixels</li>
           <li>No Meta / Facebook pixel</li>
@@ -73,7 +67,7 @@ export default function Cookies() {
         </ul>
       </Clause>
 
-      <Clause n="06" heading="How to control cookies">
+      <Clause n="05" heading="How to control cookies">
         <p>
           We set no cookies on the marketing site or scanner today, so
           there is nothing to block. For any future non-essential cookie
@@ -82,7 +76,7 @@ export default function Cookies() {
         </p>
       </Clause>
 
-      <Clause n="07" heading="Questions">
+      <Clause n="06" heading="Questions">
         <p>
           Send a message via our{' '}
           <a href="/contact?topic=privacy" className="underline">
