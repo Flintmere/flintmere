@@ -163,12 +163,13 @@ Support triage, docs audits, finance snapshots, vendor review, internal coordina
 
 Skills: `support-triage`, `docs-coherence-audit`, `finance-snapshot`, `vendor-review`, `incident-postmortem`, `internal-coordination-brief`.
 
-## The four workflow rules (full text in `memory/PROCESS.md`)
+## The five workflow rules (full text in `memory/PROCESS.md`)
 
 1. **Plan first.** Outline files, approach, steps before writing code.
 2. **600-line limit.** No file over 600 lines. Split by responsibility.
 3. **Conserve tokens.** Terse. No re-reads. Batch independent tool calls. Prefer `Edit` over `Write` on existing files.
-4. **Convene the Standing Council.** Reason through every non-trivial change through the relevant 36-member lenses.
+4. **Convene the Standing Council.** Reason through every non-trivial change through the relevant 39-member lenses.
+5. **Convene the orchestra when complexity warrants.** For tasks with ≥3 independent investigative branches (new feature touching 3+ services, audit across 3+ orthogonal lenses, greenfield codebase research spanning 3+ folders, any "design/build X end-to-end" with unknowns in different places), dispatch parallel sub-agents — one per branch — and synthesise as conductor. Skip for single-file edits, clear-repro bugs, lint/format/rename/dep-bumps, or anything sequential by nature. See `memory/PROCESS.md` §5 for the full trigger list, cost model, and synthesis discipline.
 
 ## Six anti-waste rules (added 2026-04-25 after the Sentry-integration arc cost ~4h of iterate-fix-iterate; rule 6 added 2026-04-26 after Plausible env-var detour)
 

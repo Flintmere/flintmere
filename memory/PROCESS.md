@@ -6,6 +6,7 @@
 2. **600-line limit.** No single code or HTML file over 600 lines. Split if needed.
 3. **Conserve tokens.** Terse. No re-reads. No restating. Batch independent tool calls. Prefer `Edit` over `Write`.
 4. **Convene the Standing Council.** Reason through every non-trivial change through the relevant members' lenses.
+5. **Convene the orchestra when complexity warrants.** For tasks with ≥3 independent investigative branches, dispatch parallel sub-agents and synthesise as conductor.
 
 ## Workflow Rules (expanded)
 
@@ -27,6 +28,29 @@ Do not exceed 600 lines in any single code or HTML file. If a file would exceed 
 Any non-trivial change — code, copy, documentation, architecture, naming, APIs, schemas, infrastructure — must be informed by the relevant Standing Council members. You do not need to literally roleplay each member, but you must reason through the change as if each relevant member has reviewed it.
 
 If a domain isn't represented (e.g. regulatory area not covered, or shipping in a language with no expert), **add a new council member** rather than skip the perspective. The minimum council size is 17; new specialists can be added when needed but never removed.
+
+### 5. Convene the orchestra when complexity warrants
+For tasks with **≥3 independent investigative branches**, dispatch parallel sub-agents — one per branch — before synthesising as **conductor**. The pattern only pays off when branches genuinely don't depend on each other; sequential work stays sequential. Conductor synthesises agent reports into one recommendation; agents never commit code unless explicitly told to. Apply the Standing Council pass over the synthesis, not over the agent dispatches.
+
+**Fire the orchestra when:**
+- Designing a new feature that touches 3+ services, layers, or external APIs
+- Auditing a surface across 3+ orthogonal lenses (e.g. security + performance + accessibility)
+- Greenfield codebase research spanning 3+ folders or domains
+- Any "design X end-to-end" or "build X" where the unknowns sit in different places
+- A "should we build this?" question whose answer depends on independent feasibility checks
+
+**Don't fire it for:**
+- Single-file edits, renames, deletions
+- Bugs with a clear repro and one likely cause
+- Lint / format / dep-bump / doc tweak
+- Sequential work where step N's question depends on step N-1's answer
+- Anything answerable in <30s from memory + a single file read
+
+**Cost model:** every agent dispatch costs context and wall-clock. The break-even is around the third independent investigation. Two-branch work goes inline; four-branch work goes orchestra; three is judgement (default to orchestra when branches touch genuinely different domains, inline when they share idiom).
+
+**Council pre-flight (the conductor's brief):** before dispatching, name the branches by what they will *answer*, not by which file they will *read*. One sentence per branch describing the question + the form the answer should take + a length cap. Agents that get prescribed steps instead of questions return shallow work; agents that get vague missions return drift.
+
+**The synthesis is the deliverable.** Agent reports are intermediate artefacts the user mostly does not see. The conductor must restate the findings, surface contradictions between agents, name the trade-offs they imply, and produce a single recommendation. A synthesis that just concatenates the three reports is a failed conductor turn.
 
 ## Standing Council
 
@@ -114,6 +138,7 @@ These three rules replace a recurring `improve-codebase-architecture` audit skil
 
 ## Changelog
 
+- 2026-05-14: Added **Workflow Rule 5 — Convene the orchestra when complexity warrants.** Codifies the conductor-orchestra pattern (parallel sub-agent dispatch + conductor synthesis) as a durable default rather than an ad-hoc invocation. Triggered by operator after the unified daily-health-monitor design dispatch (3 parallel agents → synthesis → buildable Phase 1) showed the pattern's value vs serial investigation. Concrete triggers + anti-triggers + cost model + pre-flight + synthesis-as-deliverable note included so the rule fires automatically when ≥3 independent investigative branches exist, skips for single-file edits / clear-repro bugs / lint-format-rename-dep-bumps / sequential work. CLAUDE.md "four workflow rules" updated to five.
 - 2026-04-14: Split from `CLAUDE.md`. No content change.
 - 2026-04-14: Added council members #32 Blockchain engineer (EVM), #33 Backend engineer (Node.js/Next.js), #34 Full-stack debugging engineer. Current size: 34. (Merged from main commit `31e6556`.)
 - 2026-04-16: Added #35 Product analyst and #36 Operations manager. Current size: 36. Added for pilot of data-intelligence and admin-ops departments; council members ship before the departments they own.
