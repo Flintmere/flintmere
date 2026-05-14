@@ -59,17 +59,86 @@ export async function sendDailyBrief(
   };
   const html = renderHtml(withHealthCheck, input.state);
   const text = renderText(withHealthCheck, input.state);
+  const attachment = buildBriefAttachment(withHealthCheck, input.state);
   return sendEmail({
     to,
     from,
     subject: input.brief.subject,
     html,
     text,
+    attachments: [attachment],
     tags: [
       { name: 'kind', value: 'daily-brief' },
       { name: 'date', value: input.state.date },
     ],
   });
+}
+
+/**
+ * Build the markdown attachment that ships with every brief.
+ *
+ * Goal: a self-documenting `.md` file the operator can save off the
+ * email and re-read later. YAML frontmatter carries date, cadence
+ * source, outreach state, and any collector warnings so the file is
+ * self-explanatory if shared or archived.
+ *
+ * Filename is sortable: `flintmere-brief-YYYY-MM-DD.md`. Operator can
+ * drop a folder of these into any markdown reader and skim the day-
+ * by-day history.
+ */
+export function buildBriefAttachment(
+  brief: ComposedBrief,
+  state: BriefState,
+): { filename: string; content: Buffer } {
+  const frontmatter = buildFrontmatter(brief, state);
+  const body = brief.bodyMarkdown;
+  const footer = [
+    '',
+    '---',
+    '',
+    `Composed by Flintmere · ${state.date} · ${state.weekday}.`,
+    `The [ Flintmere ] team`,
+    '',
+  ].join('\n');
+  const full = `${frontmatter}\n\n# ${brief.subject}\n\n${body}\n${footer}`;
+  return {
+    filename: `flintmere-brief-${state.date}.md`,
+    content: Buffer.from(full, 'utf8'),
+  };
+}
+
+function buildFrontmatter(brief: ComposedBrief, state: BriefState): string {
+  const lastSendAt = state.outreach.lastSendAt
+    ? state.outreach.lastSendAt.toISOString()
+    : 'null';
+  const warnings =
+    state.warnings.length === 0
+      ? '[]'
+      : '\n' + state.warnings.map((w) => `  - ${yamlString(w)}`).join('\n');
+  return [
+    '---',
+    `date: ${state.date}`,
+    `weekday: ${state.weekday}`,
+    `subject: ${yamlString(brief.subject)}`,
+    `cadence_source: ${yamlString(state.cadenceSource)}`,
+    `cadence_snapshot_at: ${state.cadenceSnapshotAt}`,
+    `outreach:`,
+    `  queued: ${state.outreach.queued}`,
+    `  sent: ${state.outreach.sent}`,
+    `  replied: ${state.outreach.replied}`,
+    `  bounced: ${state.outreach.bounced}`,
+    `  unsubscribed: ${state.outreach.unsubscribed}`,
+    `  todays_sends: ${state.outreach.todaysSends}`,
+    `  last_send_at: ${lastSendAt}`,
+    `warnings: ${warnings}`,
+    '---',
+  ].join('\n');
+}
+
+// YAML 1.2 plain-scalar safety — single-line quoted string. Good enough
+// for a brief's frontmatter; we don't carry multi-line values here.
+function yamlString(s: string): string {
+  return `"${s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 }
 
 // ---- HTML render ----
@@ -97,6 +166,7 @@ export function renderHtml(brief: ComposedBrief, state: BriefState): string {
     body,
     warningsBlock,
     `<hr style="${STYLE_RULE}" />`,
+    `<p style="${STYLE_FOOTER}">Markdown copy attached as <span style="${STYLE_BRACKET}">flintmere-brief-${esc(state.date)}.md</span> &mdash; save it for the archive.</p>`,
     `<p style="${STYLE_FOOTER}">Composed by Flintmere &middot; <span style="${STYLE_BRACKET}">${esc(state.date)}</span> &middot; ${esc(state.weekday)}.</p>`,
     `<p style="${STYLE_FOOTER_LAST}">The <span style="${STYLE_BRACKET}">[&nbsp;Flintmere&nbsp;]</span> team</p>`,
     '</div>',
@@ -115,6 +185,7 @@ export function renderText(brief: ComposedBrief, state: BriefState): string {
     warnings,
     '',
     `--`,
+    `Markdown copy attached as flintmere-brief-${state.date}.md — save for the archive.`,
     `Flintmere · ${state.date} · ${state.weekday}`,
     `The [ Flintmere ] team`,
   ].join('\n');
