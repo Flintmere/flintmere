@@ -66,6 +66,20 @@ export function standardsUrl(path: string): string {
 }
 
 /**
+ * Absolute scanner origin for OAuth redirect URIs and post-consent
+ * browser redirects. Behind Traefik/Coolify, `request.url` self-reports
+ * the container origin (`https://0.0.0.0:3000`), so building OAuth URLs
+ * from the request produced redirect URIs Google rejects
+ * (2026-06-06 GMC dry run, Error 400: invalid_request). In production we
+ * pin the public scanner host rather than trust forwarded headers; in
+ * dev the request origin (localhost) is already correct.
+ */
+export function scannerOrigin(requestUrl: string): string {
+  if (isProd) return `https://${SCANNER_HOST}`;
+  return new URL(requestUrl).origin;
+}
+
+/**
  * Canonical absolute URL for a given pathname. Used by metadata
  * (`<link rel="canonical">`, OpenGraph `url`, JSON-LD `@id`) to declare
  * which host owns a route regardless of which host served the request.

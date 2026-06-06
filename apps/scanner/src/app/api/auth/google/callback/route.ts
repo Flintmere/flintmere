@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { exchangeCodeForTokens, isFeatureEnabled, verifyState } from '@/lib/gmc/oauth';
 import { sealRefreshToken } from '@/lib/gmc/token-storage';
 import { prisma } from '@/lib/db';
+import { scannerOrigin } from '@/lib/host-url';
 
 // Per ADR 0023 §slice 2 — OAuth callback. Behind FEATURE_GMC_OAUTH.
 // Google redirects here with ?code= and ?state= after consent.
@@ -40,6 +41,9 @@ export async function GET(request: NextRequest) {
   }
 
   const url = new URL(request.url);
+  // Public origin for redirect URI + browser redirects — behind Traefik,
+  // `request.url` self-reports the container origin (0.0.0.0:3000).
+  const origin = scannerOrigin(request.url);
   const errorParam = url.searchParams.get('error');
   if (errorParam) {
     // Allowlist Google's documented OAuth error codes. Anything off-list
@@ -47,7 +51,7 @@ export async function GET(request: NextRequest) {
     // text into the merchant-visible /audit/connect?reason= surface.
     // Allowlist sourced from RFC 6749 §4.1.2.1 + Google's docs.
     const safeReason = isAllowedOauthError(errorParam) ? errorParam : 'unknown';
-    const dest = new URL('/audit/connect', url);
+    const dest = new URL('/audit/connect', origin);
     dest.searchParams.set('status', 'denied');
     dest.searchParams.set('reason', safeReason);
     return NextResponse.redirect(dest);
@@ -64,7 +68,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'invalid-state' }, { status: 400 });
   }
 
-  const redirectUri = new URL('/api/auth/google/callback', url).toString();
+  // Must byte-match the redirect_uri the start route sent to Google.
+  const redirectUri = new URL('/api/auth/google/callback', origin).toString();
 
   let tokens;
   try {
@@ -79,7 +84,7 @@ export async function GET(request: NextRequest) {
     console.warn(
       JSON.stringify({ event: 'gmc-callback.exchange-failed' }),
     );
-    const dest = new URL('/audit/connect', url);
+    const dest = new URL('/audit/connect', origin);
     dest.searchParams.set('status', 'exchange-failed');
     return NextResponse.redirect(dest);
   }
@@ -111,7 +116,7 @@ export async function GET(request: NextRequest) {
     },
   });
 
-  const dest = new URL('/audit/connect', url);
+  const dest = new URL('/audit/connect', origin);
   dest.searchParams.set('status', 'ok');
   dest.searchParams.set('audit', state.auditId);
   return NextResponse.redirect(dest);
