@@ -1,39 +1,33 @@
 /**
- * Daily-brief state collection.
+ * Daily-brief state collection (ADR 0026).
  *
- * Cadence content travels with every build via the bundled snapshot
- * (apps/scanner/src/lib/daily-brief/cadence-snapshot.ts) — generated
- * by `pnpm sync-cadence`. No runtime fs read for cadence; it's a TS
- * import.
+ * The brief reports live marketing-pipeline state: the social queue
+ * (posted / scheduled / failed), outreach counters, outreach batches
+ * awaiting approval, and — on Mondays only — a PostHog metrics rollup.
  *
- * Playbook content is operator-local (context/operator-daily-playbook.md
- * is gitignored). In the prod container the file isn't present, the
- * read is silently absent (`playbookContent` is empty, no warning).
- * In local dev the read succeeds and the LLM gets richer context.
- *
- * The DB snapshot is unchanged: counts by status, today's sends,
- * last-send timestamp.
+ * Every collector runs through Promise.allSettled: a single failing
+ * query degrades to an empty snapshot + a warning, never a silent brief
+ * or a hard crash. The channel never goes dark.
  */
 
-import { readFile } from 'node:fs/promises';
-import { join, dirname } from 'node:path';
-import { stat } from 'node:fs/promises';
 import { prisma } from '../db';
-import {
-  cadenceMarkdown,
-  cadenceFilename,
-  cadenceSnapshotAt,
-} from './cadence-snapshot';
-import type { BriefState, OutreachSnapshot } from './types';
+import { OUTREACH_STATUS } from '../outreach/db';
+import { buildApproveUrl } from '../outreach/approval';
+import { fetchPosthogRollup } from './posthog-rollup';
+import type {
+  BriefState,
+  OutreachSnapshot,
+  SocialSnapshot,
+  ApprovalSnapshot,
+  PosthogRollup,
+} from './types';
 
-const PLAYBOOK_PATH_FROM_ROOT = 'context/operator-daily-playbook.md';
 const LONDON_TZ = 'Europe/London';
+const DEFAULT_BASE_URL = 'https://audit.flintmere.com';
 
 export interface CollectOptions {
   /** Override for tests. */
   now?: Date;
-  /** Override repo root for tests. */
-  repoRoot?: string;
 }
 
 export async function collectBriefState(
@@ -41,22 +35,15 @@ export async function collectBriefState(
 ): Promise<BriefState> {
   const now = options.now ?? new Date();
   const warnings: string[] = [];
+  const isMonday = formatLondonWeekday(now) === 'Mon';
 
-  const repoRoot = options.repoRoot ?? (await findRepoRoot(process.cwd()));
-
-  const [playbookResult, outreachResult] = await Promise.allSettled([
-    readPlaybook(repoRoot),
-    snapshotOutreach(now),
-  ]);
-
-  let playbookContent = '';
-  if (playbookResult.status === 'fulfilled') {
-    playbookContent = playbookResult.value;
-  } else if (!isEnoent(playbookResult.reason)) {
-    // ENOENT is the expected prod case — silent. Anything else is a
-    // real surprise that the operator should see.
-    warnings.push(`playbook read failed: ${describe(playbookResult.reason)}`);
-  }
+  const [outreachResult, socialResult, approvalsResult, posthogResult] =
+    await Promise.allSettled([
+      snapshotOutreach(now),
+      snapshotSocial(now),
+      snapshotApprovals(),
+      isMonday ? fetchPosthogRollup() : Promise.resolve(null),
+    ]);
 
   const outreach: OutreachSnapshot =
     outreachResult.status === 'fulfilled'
@@ -68,42 +55,47 @@ export async function collectBriefState(
     );
   }
 
+  const social: SocialSnapshot =
+    socialResult.status === 'fulfilled' ? socialResult.value : emptySocialSnapshot();
+  if (socialResult.status === 'rejected') {
+    warnings.push(
+      `social queue query failed — posts omitted: ${describe(socialResult.reason)}`,
+    );
+  }
+
+  const approvals: ApprovalSnapshot =
+    approvalsResult.status === 'fulfilled'
+      ? approvalsResult.value
+      : { pending: [] };
+  if (approvalsResult.status === 'rejected') {
+    warnings.push(
+      `approval batch query failed — pending list omitted: ${describe(approvalsResult.reason)}`,
+    );
+  }
+
+  let posthog: PosthogRollup | null = null;
+  if (posthogResult.status === 'fulfilled') {
+    posthog = posthogResult.value;
+  } else if (isMonday) {
+    posthog = { visitors7d: 0, scans7d: 0, available: false };
+    warnings.push(`posthog rollup failed: ${describe(posthogResult.reason)}`);
+  }
+  if (isMonday && posthog && !posthog.available) {
+    warnings.push('posthog rollup unavailable');
+  }
+
   return {
     date: formatLondonDate(now),
     weekday: formatLondonWeekday(now),
-    playbookContent,
-    cadenceContent: cadenceMarkdown,
-    cadenceSource: cadenceFilename,
-    cadenceSnapshotAt,
     outreach,
+    social,
+    approvals,
+    posthog,
     warnings,
   };
 }
 
-// ---- Repo-root discovery (dev-only; prod skips the playbook read) ----
-
-async function findRepoRoot(start: string): Promise<string> {
-  let cur = start;
-  for (let i = 0; i < 8; i++) {
-    try {
-      const marker = await stat(join(cur, 'pnpm-workspace.yaml'));
-      if (marker.isFile()) return cur;
-    } catch {
-      // walk up
-    }
-    const parent = dirname(cur);
-    if (parent === cur) break;
-    cur = parent;
-  }
-  return start;
-}
-
-async function readPlaybook(repoRoot: string): Promise<string> {
-  const path = join(repoRoot, PLAYBOOK_PATH_FROM_ROOT);
-  return readFile(path, 'utf8');
-}
-
-// ---- DB snapshot ----
+// ---- DB snapshots ----
 
 async function snapshotOutreach(now: Date): Promise<OutreachSnapshot> {
   const todayStart = londonMidnight(now);
@@ -138,6 +130,53 @@ async function snapshotOutreach(now: Date): Promise<OutreachSnapshot> {
   };
 }
 
+async function snapshotSocial(now: Date): Promise<SocialSnapshot> {
+  const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const week = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const [posted, queued, failed, newest] = await Promise.all([
+    prisma.socialPost.findMany({
+      where: { status: 'posted', postedAt: { gte: dayAgo } },
+      select: { body: true, externalId: true },
+    }),
+    prisma.socialPost.findMany({
+      where: { status: 'queued', scheduledAt: { lte: week } },
+      orderBy: { scheduledAt: 'asc' },
+      select: { body: true, scheduledAt: true },
+    }),
+    prisma.socialPost.findMany({
+      where: { status: 'failed' },
+      select: { body: true, errorMessage: true },
+    }),
+    prisma.socialPost.findFirst({ orderBy: { createdAt: 'desc' }, select: { createdAt: true } }),
+  ]);
+  return {
+    postedLast24h: posted,
+    queuedNext7d: queued,
+    failed,
+    xCredentialsMissing: !process.env.X_API_KEY,
+    lastAgentInsertAt: newest?.createdAt ?? null,
+  };
+}
+
+async function snapshotApprovals(): Promise<ApprovalSnapshot> {
+  const groups = await prisma.outreachTarget.groupBy({
+    by: ['batchId'],
+    where: { status: OUTREACH_STATUS.readyForApproval, batchId: { not: null } },
+    _count: { _all: true },
+    _min: { updatedAt: true },
+  });
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? DEFAULT_BASE_URL;
+  return {
+    pending: groups.map((g) => ({
+      batchId: g.batchId!,
+      count: g._count._all,
+      oldestStagedAt: g._min.updatedAt ?? new Date(0),
+      approveUrl: secret ? buildApproveUrl(g.batchId!, secret, baseUrl) : null,
+    })),
+  };
+}
+
 function emptyOutreachSnapshot(): OutreachSnapshot {
   return {
     queued: 0,
@@ -147,6 +186,16 @@ function emptyOutreachSnapshot(): OutreachSnapshot {
     unsubscribed: 0,
     lastSendAt: null,
     todaysSends: 0,
+  };
+}
+
+function emptySocialSnapshot(): SocialSnapshot {
+  return {
+    postedLast24h: [],
+    queuedNext7d: [],
+    failed: [],
+    xCredentialsMissing: !process.env.X_API_KEY,
+    lastAgentInsertAt: null,
   };
 }
 
@@ -171,15 +220,6 @@ export function formatLondonWeekday(d: Date): string {
 function londonMidnight(now: Date): Date {
   const ymd = formatLondonDate(now);
   return new Date(`${ymd}T00:00:00Z`);
-}
-
-function isEnoent(err: unknown): boolean {
-  return (
-    typeof err === 'object' &&
-    err !== null &&
-    'code' in err &&
-    (err as { code?: string }).code === 'ENOENT'
-  );
 }
 
 function describe(err: unknown): string {

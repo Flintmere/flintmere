@@ -10,8 +10,8 @@
  *
  * Pipeline:
  *   1. verifyCronSecret — HMAC-compared header check; 403 on mismatch.
- *   2. collectBriefState — playbook + cadence + outreach snapshot, all
- *      partial-failure tolerant.
+ *   2. collectBriefState — social queue + outreach approvals + outreach
+ *      counters (+ Monday PostHog rollup), all partial-failure tolerant.
  *   3. composeBrief — Gemini 2.5 Flash on Vertex; falls back to a
  *      deterministic template on Vertex failure so the channel never
  *      goes silent.
@@ -57,6 +57,13 @@ export async function POST() {
         subject: brief.subject,
         warnings: state.warnings,
         outreach: state.outreach,
+        social: {
+          postedLast24h: state.social.postedLast24h.length,
+          queuedNext7d: state.social.queuedNext7d.length,
+          failed: state.social.failed.length,
+          xCredentialsMissing: state.social.xCredentialsMissing,
+        },
+        approvalsPending: state.approvals.pending.length,
       },
       { status: 200 },
     );

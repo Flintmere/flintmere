@@ -1,14 +1,15 @@
 /**
  * Compose today's brief via Gemini 2.5 Flash on Vertex (per ADR 0005).
  *
- * The LLM's job is narrow: given the playbook + cadence + outreach state,
- * extract today's tasks, order them by time of day, end with bandwidth
- * math. Voice constraints (British, no banned phrases, baby steps) live
- * in the system prompt; the playbook content is the authoritative source
- * for what's due — the LLM is not licensed to invent tasks.
+ * The LLM narrates live marketing-pipeline state (ADR 0026): what the
+ * social queue shipped since yesterday, what's scheduled next, what
+ * outreach awaits approval, and the Monday PostHog rollup. Voice
+ * constraints (British, no banned phrases, baby steps) live in the
+ * system prompt; live pipeline state is the authoritative source — the
+ * LLM is not licensed to invent tasks or activity.
  *
- * On Vertex failure we fall back to a deterministic template that emits
- * today's playbook block raw. The channel never goes silent.
+ * On Vertex failure we fall back to a deterministic report built from
+ * state. The channel never goes silent.
  */
 
 import { VertexProvider, type CompletionOpts } from '@flintmere/llm';
@@ -16,6 +17,7 @@ import type { BriefState, ComposedBrief } from './types';
 
 const SUBJECT_MAX = 90;
 const PREHEADER_MAX = 140;
+const BODY_EXCERPT = 120;
 
 const SYSTEM_PROMPT = [
   "You are composing the Flintmere operator's daily brief — a baby-step",
@@ -25,10 +27,16 @@ const SYSTEM_PROMPT = [
   'never customer-visible.',
   '',
   'Source material (in priority order):',
-  '  1. The operator daily playbook — authoritative for what is due today',
-  '     (may be absent in this environment; compose from cadence then).',
-  '  2. The marketing-launch cadence runbook — week-by-week day-by-day.',
-  '  3. Live outreach DB state — concrete counters to ground the brief.',
+  '  1. Live pipeline state (social queue, outreach approvals, PostHog) —',
+  '     authoritative for what HAPPENED and what\'s SCHEDULED.',
+  '  2. The operator does NOT execute marketing tasks. Agents draft, the',
+  '     app publishes. Mention an operator action ONLY when state demands',
+  '     a human: a pending approve link, a failed X post, missing X',
+  '     credentials, a stale agent heartbeat.',
+  '',
+  'Report shape: lead with what shipped since yesterday, then what\'s',
+  'scheduled next, then (only if any) the needs-you list. If nothing',
+  'needs the operator, say so in one line — that is the normal, good case.',
   '',
   'Voice (binding):',
   '',
@@ -58,30 +66,25 @@ const SYSTEM_PROMPT = [
   '    "Run this even on bandwidth-crash days."',
   '    "If all five clear, move on."',
   '    "Note anything zero or unusually high."',
-  '    "Don\'t publish. Final polish + schedule lands Sun 2026-05-17."',
   '',
-  'Honest pushback (load-bearing). If a cadence task is stale or',
-  'contradicted by live state, flag it in ONE sharp sentence — do not',
-  'soften it.',
-  '  Bad: "This may suggest the cadence runbook needs to be updated to',
-  '        reflect current activity."',
-  '  Good: "Cadence says 9 June. DB shows 15 sent today. Cadence is stale."',
+  'Honest pushback (load-bearing). If live state contradicts itself or',
+  'looks stale, flag it in ONE sharp sentence — do not soften it.',
+  '  Bad: "This may suggest the pipeline needs attention."',
+  '  Good: "Agent last ran 12 days ago. The weekly routine has stopped."',
   '',
   'DO NOT include a Daily health check section. The five-tab glance is',
   'prepended deterministically before your body. Start your body with',
-  'the first action item BEYOND the health check (drafting block,',
-  'outreach review, deploy verification, whatever today calls for).',
+  'the shipped-since-yesterday summary.',
   '',
   'Output shape (markdown):',
-  "  • Lead with a single tight line of framing ('today is X kind of day').",
-  '  • Order tasks by time of day or execution order.',
-  '  • Number every step. Steps are imperatives.',
+  "  • Lead with a single tight line of framing ('quiet day' / 'two posts",
+  "    shipped, one batch waiting').",
+  '  • Group steps under `##` section headings (e.g. "Shipped",',
+  '    "Scheduled next", "Needs you"). Skip empty sections.',
   '  • Use fenced ```bash``` blocks for any shell command — operator',
   '    copies verbatim.',
-  '  • Group steps under `##` section headings (e.g. "Pre-flight",',
-  '    "Drafting block", "End of day"). Skip empty sections.',
-  '  • Close with a one-sentence bandwidth footer: total active minutes',
-  '    spread across the day.',
+  '  • A deterministic "Needs you" footer is appended after your body;',
+  '    don\'t duplicate approve links or failure lines — summarise in prose.',
   '',
   'Length budget: ≤450 words (the prepended health-check adds ~80 more).',
   '',
@@ -158,33 +161,83 @@ function validateAndClamp(raw: unknown): ComposedBrief {
   };
 }
 
+function excerpt(body: string): string {
+  const clean = body.replace(/\s+/g, ' ').trim();
+  return clean.length > BODY_EXCERPT ? `${clean.slice(0, BODY_EXCERPT)}…` : clean;
+}
+
 function buildUserPrompt(state: BriefState): string {
-  const outreach = state.outreach;
+  const { outreach, social, approvals } = state;
   const lastSendLine = outreach.lastSendAt
     ? `last send at ${outreach.lastSendAt.toISOString()}`
     : 'no sends yet';
+
+  const postedBlock =
+    social.postedLast24h.length > 0
+      ? social.postedLast24h.map((p) => `  - "${excerpt(p.body)}"`).join('\n')
+      : '  (none)';
+  const queuedBlock =
+    social.queuedNext7d.length > 0
+      ? social.queuedNext7d
+          .map((p) => `  - ${p.scheduledAt.toISOString()} — "${excerpt(p.body)}"`)
+          .join('\n')
+      : '  (none)';
+  const failedBlock =
+    social.failed.length > 0
+      ? social.failed
+          .map((p) => `  - "${excerpt(p.body)}" — ${p.errorMessage ?? 'unknown error'}`)
+          .join('\n')
+      : '  (none)';
+  const approvalBlock =
+    approvals.pending.length > 0
+      ? approvals.pending
+          .map(
+            (b) =>
+              `  - batch ${b.batchId}: ${b.count} emails, oldest staged ${b.oldestStagedAt.toISOString()}` +
+              (b.approveUrl ? ` — approve: ${b.approveUrl}` : ' — (no approve link: ADMIN_SESSION_SECRET unset)'),
+          )
+          .join('\n')
+      : '  (none)';
+
+  const heartbeat = social.lastAgentInsertAt
+    ? social.lastAgentInsertAt.toISOString()
+    : 'never (agent has not run)';
+
+  const posthogBlock =
+    state.posthog !== null
+      ? [
+          '',
+          'Monday PostHog rollup (last 7 days):',
+          state.posthog.available
+            ? `  visitors: ${state.posthog.visitors7d}\n  scans: ${state.posthog.scans7d}`
+            : '  (PostHog query unavailable — see warnings)',
+        ].join('\n')
+      : '';
+
   const warnings =
     state.warnings.length > 0
       ? `\nCollector warnings (surface in brief footer):\n  - ${state.warnings.join('\n  - ')}`
       : '';
 
-  // Cadence is always present (bundled snapshot). Playbook is operator-
-  // local and absent on prod — the LLM should compose from cadence in
-  // that case rather than apologise for the missing playbook.
-  const playbookBlock = state.playbookContent
-    ? [
-        '----- BEGIN OPERATOR DAILY PLAYBOOK -----',
-        state.playbookContent,
-        '----- END OPERATOR DAILY PLAYBOOK -----',
-        '',
-      ].join('\n')
-    : '(operator playbook not available in this environment — compose from the cadence runbook alone; do not mention the missing playbook)\n';
-
   return [
     `Today's date: ${state.date} (${state.weekday}, Europe/London).`,
-    `Cadence snapshot taken: ${state.cadenceSnapshotAt} from ${state.cadenceSource}.`,
     '',
-    'Live outreach state:',
+    'Social posts shipped in the last 24h:',
+    postedBlock,
+    '',
+    'Social posts scheduled in the next 7 days:',
+    queuedBlock,
+    '',
+    'Failed social posts (unresolved):',
+    failedBlock,
+    '',
+    `X credentials present: ${social.xCredentialsMissing ? 'NO (posts cannot publish)' : 'yes'}`,
+    `Weekly content agent last inserted: ${heartbeat}`,
+    '',
+    'Outreach batches awaiting approval:',
+    approvalBlock,
+    '',
+    'Live outreach counters:',
     `  queued: ${outreach.queued}`,
     `  sent: ${outreach.sent}`,
     `  replied: ${outreach.replied}`,
@@ -192,74 +245,77 @@ function buildUserPrompt(state: BriefState): string {
     `  unsubscribed: ${outreach.unsubscribed}`,
     `  today's sends so far: ${outreach.todaysSends}`,
     `  ${lastSendLine}`,
+    posthogBlock,
     warnings,
     '',
-    playbookBlock,
-    '----- BEGIN MARKETING-LAUNCH CADENCE -----',
-    state.cadenceContent,
-    '----- END MARKETING-LAUNCH CADENCE -----',
-    '',
-    "Compose today's brief now. Find today's tasks by matching today's",
-    'date and weekday against the cadence runbook (W0/W1/W2 day-by-day',
-    'blocks). Output JSON only.',
+    "Compose today's brief now. Lead with what shipped, then what's",
+    'scheduled, then (only if state demands it) what needs the operator.',
+    'Output JSON only.',
   ].join('\n');
 }
 
 // ---- Fallback ----
 
 function fallbackBrief(state: BriefState, reason: string): ComposedBrief {
-  // Prefer the playbook's `## Today —` block (operator-authored,
-  // most specific). Fall back to the whole playbook, then the cadence
-  // snapshot. The cadence is always present (bundled), so the brief
-  // never ships empty.
-  const todayBlock =
-    extractTodayBlock(state.playbookContent) ||
-    state.playbookContent ||
-    state.cadenceContent;
+  const { outreach, social, approvals } = state;
   const subject = `Daily brief · ${state.weekday} ${state.date} (fallback)`;
-  const preheader = `LLM compose unavailable — source block raw. ${reason}.`;
+  const preheader = `LLM compose unavailable — pipeline state raw. ${reason}.`;
+
+  const shipped =
+    social.postedLast24h.length > 0
+      ? social.postedLast24h.map((p) => `- "${excerpt(p.body)}"`)
+      : ['- Nothing posted in the last 24h.'];
+  const scheduled =
+    social.queuedNext7d.length > 0
+      ? social.queuedNext7d.map(
+          (p) => `- ${p.scheduledAt.toISOString().slice(0, 16).replace('T', ' ')} — "${excerpt(p.body)}"`,
+        )
+      : ['- Nothing scheduled in the next 7 days.'];
+
+  const needsYou: string[] = [];
+  for (const b of approvals.pending) {
+    const link = b.approveUrl ? ` — approve: ${b.approveUrl}` : '';
+    needsYou.push(`- ${b.count} outreach emails awaiting approval (${b.batchId})${link}`);
+  }
+  for (const f of social.failed) {
+    needsYou.push(`- Failed X post "${excerpt(f.body)}" — ${f.errorMessage ?? 'unknown'}`);
+  }
+  if (social.xCredentialsMissing && social.queuedNext7d.length > 0) {
+    needsYou.push('- X API keys missing — posts are queued but cannot publish.');
+  }
+
+  const posthogLines =
+    state.posthog !== null && state.posthog.available
+      ? ['', '## Last 7 days', '', `- visitors: ${state.posthog.visitors7d}`, `- scans: ${state.posthog.scans7d}`]
+      : [];
+
   const bodyMarkdown = [
     `## ${state.weekday} ${state.date} — fallback brief`,
     '',
-    `LLM compose failed (${reason}). Surfacing source content raw so the channel doesn't go silent.`,
+    `LLM compose failed (${reason}). Pipeline state raw so the channel doesn't go silent.`,
     '',
-    todayBlock,
+    '## Shipped',
     '',
-    '---',
+    ...shipped,
+    '',
+    '## Scheduled next',
+    '',
+    ...scheduled,
+    ...posthogLines,
     '',
     '## Outreach state',
     '',
-    `- queued: ${state.outreach.queued}`,
-    `- sent: ${state.outreach.sent}`,
-    `- replied: ${state.outreach.replied}`,
-    `- today's sends so far: ${state.outreach.todaysSends}`,
-    state.outreach.lastSendAt
-      ? `- last send: ${state.outreach.lastSendAt.toISOString()}`
+    `- queued: ${outreach.queued}`,
+    `- sent: ${outreach.sent}`,
+    `- replied: ${outreach.replied}`,
+    `- today's sends so far: ${outreach.todaysSends}`,
+    outreach.lastSendAt
+      ? `- last send: ${outreach.lastSendAt.toISOString()}`
       : '- last send: none',
+    ...(needsYou.length > 0 ? ['', '## Needs you', '', ...needsYou] : ['', 'Nothing needs you right now.']),
   ].join('\n');
-  return { subject: subject.slice(0, SUBJECT_MAX), preheader, bodyMarkdown };
-}
 
-/** Best-effort `## Today —` block extraction from the playbook. Returns
- *  null if no heading matches; caller falls back to the whole document. */
-export function extractTodayBlock(playbook: string): string | null {
-  const lines = playbook.split('\n');
-  let start = -1;
-  for (let i = 0; i < lines.length; i++) {
-    if (/^##\s+Today\s+/.test(lines[i]!)) {
-      start = i;
-      break;
-    }
-  }
-  if (start === -1) return null;
-  let end = lines.length;
-  for (let i = start + 1; i < lines.length; i++) {
-    if (/^##\s+/.test(lines[i]!)) {
-      end = i;
-      break;
-    }
-  }
-  return lines.slice(start, end).join('\n').trim();
+  return { subject: subject.slice(0, SUBJECT_MAX), preheader: preheader.slice(0, PREHEADER_MAX), bodyMarkdown };
 }
 
 // ---- Vertex bootstrap ----

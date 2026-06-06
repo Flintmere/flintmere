@@ -26,7 +26,6 @@
     "audit:markdown": "tsx scripts/dump-audit-markdown.ts",
     "audit:sla-monitor": "tsx scripts/concierge-sla-monitor.ts",
     "scrub:test-shop": "tsx scripts/scrub-test-shop.ts",
-    "sync-cadence": "tsx scripts/sync-cadence.ts",
     "social:queue": "tsx scripts/queue-social-posts.ts",
     "outreach:stage": "tsx scripts/stage-outreach-batch.ts"
   },

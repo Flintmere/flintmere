@@ -1,14 +1,49 @@
 import { describe, it, expect } from 'vitest';
 import { formatLondonDate, formatLondonWeekday } from './state';
-import { extractTodayBlock } from './compose';
 import {
   renderMarkdownToHtml,
   renderText,
   renderHtml,
   buildBriefAttachment,
+  renderPipelineFooter,
 } from './email';
 import { DAILY_HEALTH_CHECK_MARKDOWN } from './health-check';
-import type { BriefState, ComposedBrief } from './types';
+import type { BriefState, ComposedBrief, SocialSnapshot } from './types';
+
+// ---- Fixtures ----
+
+function emptySocial(): SocialSnapshot {
+  return {
+    postedLast24h: [],
+    queuedNext7d: [],
+    failed: [],
+    xCredentialsMissing: false,
+    lastAgentInsertAt: null,
+  };
+}
+
+function baseState(overrides: Partial<BriefState> = {}): BriefState {
+  return {
+    date: '2026-05-13',
+    weekday: 'Wed',
+    outreach: {
+      queued: 0,
+      sent: 0,
+      replied: 0,
+      bounced: 0,
+      unsubscribed: 0,
+      lastSendAt: null,
+      todaysSends: 0,
+    },
+    social: emptySocial(),
+    approvals: { pending: [] },
+    posthog: null,
+    warnings: [],
+    ...overrides,
+  };
+}
+
+// ---- Date helpers ----
 
 describe('formatLondonDate', () => {
   it('emits YYYY-MM-DD in Europe/London', () => {
@@ -30,40 +65,7 @@ describe('formatLondonWeekday', () => {
   });
 });
 
-describe('extractTodayBlock', () => {
-  it('extracts the block between `## Today —` and the next `##` heading', () => {
-    const playbook = [
-      '# Title',
-      '',
-      '## Daily health check',
-      'preamble',
-      '',
-      '## Today — Wed 2026-05-13',
-      '',
-      'first step',
-      'second step',
-      '',
-      '## Tomorrow — Thu 2026-05-14',
-      'tomorrow content',
-    ].join('\n');
-    const block = extractTodayBlock(playbook);
-    expect(block).toContain('Today — Wed 2026-05-13');
-    expect(block).toContain('first step');
-    expect(block).toContain('second step');
-    expect(block).not.toContain('Tomorrow');
-    expect(block).not.toContain('Daily health check');
-  });
-
-  it('returns null when no `## Today —` heading present', () => {
-    expect(extractTodayBlock('## Something else\nbody')).toBeNull();
-  });
-
-  it('extracts to end of document when no following `##` heading', () => {
-    const playbook = '## Today — Wed\nbody line\n';
-    const block = extractTodayBlock(playbook);
-    expect(block).toContain('body line');
-  });
-});
+// ---- Markdown renderer ----
 
 describe('renderMarkdownToHtml', () => {
   it('renders an h2', () => {
@@ -117,52 +119,32 @@ describe('renderMarkdownToHtml', () => {
   });
 });
 
+// ---- Text render ----
+
 describe('renderText', () => {
   it('returns markdown body verbatim plus footer', () => {
     const brief: ComposedBrief = {
       subject: 's',
       preheader: 'p',
-      bodyMarkdown: '## Today\nFirst.',
+      bodyMarkdown: '## Shipped\nFirst.',
     };
-    const state: BriefState = {
-      date: '2026-05-13',
-      weekday: 'Wed',
-      playbookContent: '',
-      cadenceContent: '',
-      cadenceSource: 'test.md',
-      cadenceSnapshotAt: '2026-05-13T00:00:00.000Z',
-      outreach: {
-        queued: 0,
-        sent: 0,
-        replied: 0,
-        bounced: 0,
-        unsubscribed: 0,
-        lastSendAt: null,
-        todaysSends: 0,
-      },
-      warnings: [],
-    };
-    const text = renderText(brief, state);
-    expect(text).toContain('## Today');
+    const text = renderText(brief, baseState());
+    expect(text).toContain('## Shipped');
     expect(text).toContain('First.');
     expect(text).toContain('2026-05-13');
     expect(text).toContain('The [ Flintmere ] team');
   });
 });
 
+// ---- Attachment ----
+
 describe('buildBriefAttachment', () => {
   const brief: ComposedBrief = {
     subject: 'Daily brief · Wed 2026-05-13',
     preheader: 'p',
-    bodyMarkdown: '## Pre-flight\n1. Open laptop.',
+    bodyMarkdown: '## Shipped\n- Two posts went out.',
   };
-  const state: BriefState = {
-    date: '2026-05-13',
-    weekday: 'Wed',
-    playbookContent: '',
-    cadenceContent: '',
-    cadenceSource: '2026-05-11-marketing-launch-and-cadence.md',
-    cadenceSnapshotAt: '2026-05-13T12:27:40.372Z',
+  const state = baseState({
     outreach: {
       queued: 0,
       sent: 30,
@@ -172,8 +154,22 @@ describe('buildBriefAttachment', () => {
       lastSendAt: new Date('2026-05-13T08:00:49.021Z'),
       todaysSends: 15,
     },
-    warnings: [],
-  };
+    social: {
+      ...emptySocial(),
+      postedLast24h: [{ body: 'a', externalId: '1' }],
+      queuedNext7d: [{ body: 'b', scheduledAt: new Date('2026-05-14T09:00:00Z') }],
+    },
+    approvals: {
+      pending: [
+        {
+          batchId: 'b1',
+          count: 20,
+          oldestStagedAt: new Date('2026-05-12T09:00:00Z'),
+          approveUrl: 'https://audit.flintmere.com/api/approve?token=t',
+        },
+      ],
+    },
+  });
 
   it('emits a dated, sortable filename', () => {
     const { filename } = buildBriefAttachment(brief, state);
@@ -183,7 +179,7 @@ describe('buildBriefAttachment', () => {
   it('emits a UTF-8 Buffer', () => {
     const { content } = buildBriefAttachment(brief, state);
     expect(Buffer.isBuffer(content)).toBe(true);
-    expect(content.toString('utf8')).toContain('## Pre-flight');
+    expect(content.toString('utf8')).toContain('## Shipped');
   });
 
   it('opens with YAML frontmatter carrying state', () => {
@@ -191,17 +187,18 @@ describe('buildBriefAttachment', () => {
     expect(text.startsWith('---\n')).toBe(true);
     expect(text).toContain('date: 2026-05-13');
     expect(text).toContain('weekday: Wed');
-    expect(text).toContain('cadence_source: "2026-05-11-marketing-launch-and-cadence.md"');
+    expect(text).toContain('  posted_last_24h: 1');
+    expect(text).toContain('  queued_next_7d: 1');
+    expect(text).toContain('approvals_pending: 1');
     expect(text).toContain('  sent: 30');
     expect(text).toContain('  todays_sends: 15');
     expect(text).toContain('  last_send_at: 2026-05-13T08:00:49.021Z');
   });
 
   it('encodes warnings as a YAML list when present', () => {
-    const stateWithWarnings: BriefState = {
-      ...state,
+    const stateWithWarnings = baseState({
       warnings: ['outreach DB query failed: "connection refused"'],
-    };
+    });
     const text = buildBriefAttachment(brief, stateWithWarnings).content.toString('utf8');
     expect(text).toMatch(/warnings: \n  - "outreach DB query failed: \\"connection refused\\""/);
   });
@@ -220,6 +217,8 @@ describe('buildBriefAttachment', () => {
     expect(text).toContain('The [ Flintmere ] team');
   });
 });
+
+// ---- Health check block ----
 
 describe('DAILY_HEALTH_CHECK_MARKDOWN', () => {
   it('lists the five canonical tabs', () => {
@@ -240,39 +239,94 @@ describe('DAILY_HEALTH_CHECK_MARKDOWN', () => {
   });
 });
 
+// ---- HTML render ----
+
 describe('renderHtml', () => {
   it('wraps composed brief in letterhead chrome and surfaces warnings', () => {
     const brief: ComposedBrief = {
       subject: 'Daily brief · Wed 2026-05-13',
-      preheader: 'Today: drafting block at 19:00.',
-      bodyMarkdown: '## Pre-flight\n1. Open laptop.',
+      preheader: 'Quiet day. Two posts scheduled.',
+      bodyMarkdown: '## Shipped\nNothing posted.',
     };
-    const state: BriefState = {
-      date: '2026-05-13',
-      weekday: 'Wed',
-      playbookContent: '',
-      cadenceContent: '',
-      cadenceSource: 'test.md',
-      cadenceSnapshotAt: '2026-05-13T00:00:00.000Z',
-      outreach: {
-        queued: 0,
-        sent: 0,
-        replied: 0,
-        bounced: 0,
-        unsubscribed: 0,
-        lastSendAt: null,
-        todaysSends: 0,
-      },
+    const state = baseState({
       warnings: ['outreach DB query failed — counters omitted: connection refused'],
-    };
+    });
     const html = renderHtml(brief, state);
     expect(html).toContain('<!doctype html>');
-    expect(html).toContain('Today: drafting block at 19:00.'); // preheader
+    expect(html).toContain('Quiet day. Two posts scheduled.'); // preheader
     expect(html).toContain('<h2');
-    expect(html).toContain('Pre-flight');
+    expect(html).toContain('Shipped');
     expect(html).toContain('Collector warnings');
     expect(html).toContain('connection refused');
     expect(html).toContain('[&nbsp;Flintmere&nbsp;]');
     expect(html).toContain('2026-05-13');
+  });
+});
+
+// ---- Deterministic pipeline footer ----
+
+describe('renderPipelineFooter', () => {
+  it('footer lists pending approval batch with link', () => {
+    const state = baseState({
+      approvals: {
+        pending: [
+          {
+            batchId: 'b1',
+            count: 20,
+            oldestStagedAt: new Date('2026-05-12T09:00:00Z'),
+            approveUrl: 'https://audit.flintmere.com/api/approve?token=t',
+          },
+        ],
+      },
+    });
+    const footer = renderPipelineFooter(state);
+    expect(footer).toContain('## Needs you');
+    expect(footer).toContain('[ approve ] 20 outreach emails (b1)');
+    expect(footer).toContain('/api/approve?token=t');
+  });
+
+  it('footer absent when nothing needs the operator', () => {
+    const footer = renderPipelineFooter(baseState());
+    expect(footer).toBe('');
+    expect(footer).not.toContain('Needs you');
+  });
+
+  it('footer flags missing X credentials only when posts are queued', () => {
+    const queued = baseState({
+      social: {
+        ...emptySocial(),
+        xCredentialsMissing: true,
+        queuedNext7d: [{ body: 'queued post', scheduledAt: new Date('2026-05-14T09:00:00Z') }],
+      },
+    });
+    expect(renderPipelineFooter(queued)).toContain('[ setup ] X API keys missing');
+
+    const emptyQueue = baseState({
+      social: { ...emptySocial(), xCredentialsMissing: true },
+    });
+    expect(renderPipelineFooter(emptyQueue)).not.toContain('[ setup ] X API keys missing');
+  });
+
+  it('footer flags a failed X post', () => {
+    const state = baseState({
+      social: {
+        ...emptySocial(),
+        failed: [{ body: 'a post that failed to publish', errorMessage: '401 unauthorized' }],
+      },
+    });
+    const footer = renderPipelineFooter(state);
+    expect(footer).toContain('[ failed ] X post');
+    expect(footer).toContain('401 unauthorized');
+  });
+
+  it('footer flags a stale weekly agent heartbeat', () => {
+    const state = baseState({
+      social: {
+        ...emptySocial(),
+        lastAgentInsertAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000),
+      },
+    });
+    const footer = renderPipelineFooter(state);
+    expect(footer).toContain('[ stale ] weekly content agent last ran');
   });
 });
