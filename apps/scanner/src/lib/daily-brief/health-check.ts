@@ -2,7 +2,7 @@
  * Daily health check — the canonical five-tab glance every brief opens
  * with. Hardcoded because the URLs never change and we want every
  * brief to surface them without LLM variability (compose was producing
- * its own "Daily health check" section with cadence/DB observations
+ * its own "Daily health check" section with pipeline observations
  * instead of the tab list — confusing).
  *
  * The compose system prompt tells the LLM NOT to include its own

@@ -12,7 +12,7 @@ canon_sources:
   - memory/VOICE.md
   - apps/scanner/src/lib/audit-pricing.ts
 canon_audit_run: pending — runbook is operator-internal, audit fires when copy ships
-status: live (W0 starts today)
+status: superseded 2026-06-06 — see decisions/0026-marketing-automation-pipeline.md + plans/2026-06-06-marketing-automation-spec.md (manual cadence replaced by the automated pipeline; do not action the day-by-day tasks below)
 ---
 
 # Marketing Launch + Cadence Runbook

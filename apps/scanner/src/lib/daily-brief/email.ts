@@ -53,9 +53,10 @@ export async function sendDailyBrief(
   // Prepend the deterministic health-check block. Single source of truth
   // in health-check.ts; the LLM is instructed (system prompt) not to
   // produce its own Daily health check section.
+  const footer = renderPipelineFooter(input.state);
   const withHealthCheck: ComposedBrief = {
     ...input.brief,
-    bodyMarkdown: `${DAILY_HEALTH_CHECK_MARKDOWN}\n${input.brief.bodyMarkdown}`,
+    bodyMarkdown: `${DAILY_HEALTH_CHECK_MARKDOWN}\n${input.brief.bodyMarkdown}${footer}`,
   };
   const html = renderHtml(withHealthCheck, input.state);
   const text = renderText(withHealthCheck, input.state);
@@ -120,8 +121,12 @@ function buildFrontmatter(brief: ComposedBrief, state: BriefState): string {
     `date: ${state.date}`,
     `weekday: ${state.weekday}`,
     `subject: ${yamlString(brief.subject)}`,
-    `cadence_source: ${yamlString(state.cadenceSource)}`,
-    `cadence_snapshot_at: ${state.cadenceSnapshotAt}`,
+    `social:`,
+    `  posted_last_24h: ${state.social.postedLast24h.length}`,
+    `  queued_next_7d: ${state.social.queuedNext7d.length}`,
+    `  failed: ${state.social.failed.length}`,
+    `  x_credentials_missing: ${state.social.xCredentialsMissing}`,
+    `approvals_pending: ${state.approvals.pending.length}`,
     `outreach:`,
     `  queued: ${state.outreach.queued}`,
     `  sent: ${state.outreach.sent}`,
@@ -139,6 +144,33 @@ function buildFrontmatter(brief: ComposedBrief, state: BriefState): string {
 // for a brief's frontmatter; we don't carry multi-line values here.
 function yamlString(s: string): string {
   return `"${s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
+}
+
+// ---- Deterministic "Needs you" footer ----
+//
+// Appended after the LLM body in both HTML and text renders (same
+// mechanism as the prepended health check). Empty string when nothing
+// needs the operator — the normal, good case.
+
+export function renderPipelineFooter(state: BriefState): string {
+  const lines: string[] = [];
+  for (const b of state.approvals.pending) {
+    const link = b.approveUrl ? ` — approve: ${b.approveUrl}` : '';
+    lines.push(`- [ approve ] ${b.count} outreach emails (${b.batchId})${link}`);
+  }
+  for (const f of state.social.failed) {
+    lines.push(`- [ failed ] X post "${f.body.slice(0, 50)}…" — ${f.errorMessage ?? 'unknown'}`);
+  }
+  if (state.social.xCredentialsMissing && state.social.queuedNext7d.length > 0) {
+    lines.push('- [ setup ] X API keys missing — posts are queued but cannot publish. developer.x.com → create app on @flintmere_ → 4 keys → Coolify env (X_API_KEY, X_API_KEY_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET) → redeploy.');
+  }
+  const heartbeat = state.social.lastAgentInsertAt;
+  const eightDays = 8 * 24 * 60 * 60 * 1000;
+  if (heartbeat && Date.now() - heartbeat.getTime() > eightDays) {
+    lines.push(`- [ stale ] weekly content agent last ran ${heartbeat.toISOString().slice(0, 10)} — check the scheduled routine.`);
+  }
+  if (lines.length === 0) return '';
+  return ['', '---', '', '## Needs you', '', ...lines].join('\n');
 }
 
 // ---- HTML render ----

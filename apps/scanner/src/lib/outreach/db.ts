@@ -13,6 +13,7 @@ export type { OutreachTarget };
 export const OUTREACH_STATUS = {
   pending: 'pending',
   enriched: 'enriched',
+  readyForApproval: 'ready_for_approval',
   queued: 'queued',
   sent: 'sent',
   followedUp: 'followed_up',
