@@ -9,7 +9,7 @@ import { prisma } from '@/lib/db';
 // seal the refresh token at rest, upsert the MerchantGmcConnection,
 // then redirect to the merchant-facing post-connect page.
 //
-// `gmcAccountId` is left null at create-time; slice 2a-3's Content API
+// `gmcAccountId` is left null at create-time; slice 2a-3's Merchant API
 // client backfills it on the first scan after connect by calling
 // `accounts.list` (the merchant may have multiple accounts and the
 // account picker happens server-side, not at consent).

@@ -2,9 +2,11 @@
  * GMC OAuth flow primitives — state signing, auth URL building, token
  * exchange, revocation, feature flag, domain canonicalisation.
  *
- * Per ADR 0023, the OAuth scope is read-only `auth/content` (Google
- * Content API for Shopping). Refresh tokens persist via
- * `lib/gmc/token-storage.ts`; access tokens never persist.
+ * Per ADR 0023 (+ §Amendment 2026-05-21), the OAuth scope is
+ * `auth/content` — the same scope the Merchant API uses; read-only use
+ * is enforced at the call-site (`lib/gmc/merchant-api.ts`). Refresh
+ * tokens persist via `lib/gmc/token-storage.ts`; access tokens never
+ * persist.
  *
  * State CSRF model: signed HMAC-SHA256 over a base64url'd JSON payload.
  * Same shape as `lib/unsub-token.ts`. State carries the merchant
@@ -12,9 +14,9 @@
  * the connection without trusting query params. TTL 10 minutes.
  *
  * Feature flag: `FEATURE_GMC_OAUTH=true` enables the routes;
- * default is off, routes 404. Per ADR 0023 §Rollout slice 2,
- * Scenario A2 ships backend behind the flag while Google reviews
- * `auth/content` scope addition (1–3 weeks variable).
+ * default is off, routes 404. Flag flips after the operator submits
+ * and clears Google's sensitive-scope verification on `auth/content`
+ * (ADR 0023 §Amendment 2026-05-21 sequencing).
  */
 
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';

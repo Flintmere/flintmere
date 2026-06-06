@@ -17,12 +17,12 @@
 import type { MerchantGmcConnection } from '@/generated/prisma';
 import { prisma } from '../db';
 import {
-  type ContentApiClient,
+  type GmcApiClient,
   GmcApiError,
   PER_CALL_TIMEOUT_MS,
   TOTAL_BUDGET_MS,
-  createContentApiClient,
-} from './content-api';
+  createMerchantApiClient,
+} from './merchant-api';
 import { openRefreshToken } from './token-storage';
 import type { GmcDestinationCounts, GmcGroundTruth, GmcIssue } from './types';
 
@@ -36,7 +36,7 @@ const SAMPLE_PRODUCTS_PER_ISSUE = 5;
  * `createContentApiClient`; tests inject a stub `ContentApiClient`.
  */
 export interface GroundTruthDeps {
-  clientFactory?: (refreshToken: string) => ContentApiClient;
+  clientFactory?: (refreshToken: string) => GmcApiClient;
   now?: () => number;
 }
 
@@ -63,7 +63,7 @@ export async function fetchGmcGroundTruth(
     return null;
   }
 
-  const factory = deps.clientFactory ?? createContentApiClient;
+  const factory = deps.clientFactory ?? createMerchantApiClient;
   const now = deps.now ?? Date.now;
   const client = factory(refreshToken);
   const deadline = now() + TOTAL_BUDGET_MS;
@@ -190,7 +190,7 @@ async function recordError(
     where: { id: connId },
     data: { lastErrorCode: code, lastErrorAt: new Date() },
   });
-  // Structured log — `message` originates from Google Content API error
+  // Structured log — `message` originates from Google Merchant API error
   // bodies, which can contain newlines / control chars that corrupt
   // log-aggregator output if interpolated raw. JSON.stringify normalises.
   console.warn(

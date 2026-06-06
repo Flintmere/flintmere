@@ -184,10 +184,11 @@ export default function Terms() {
         <p className="mt-4">
           <strong>Google Merchant Center connection (optional).</strong> If
           you grant us OAuth access to your GMC, you authorise us to read
-          (read-only, scope <code>auth/content</code>) the account-level and
+          (scope <code>auth/content</code>, restricted to read-only methods
+          at our call-site) the account-level and
           per-product diagnostic data Google maintains for your feed. You
           warrant that you have authority to grant access to the GMC account
-          you connect. We never request a write scope, never modify your
+          you connect. We never call a write method, never modify your
           GMC, never write back, never share GMC data with third parties
           beyond the sub-processors listed in the Privacy Policy, and never
           use GMC data for advertising or resale. You may revoke at any time
