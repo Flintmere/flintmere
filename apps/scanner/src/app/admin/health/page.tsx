@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/lib/admin-auth';
 import { fetchBetterStack } from './_signals/betterstack';
-import { fetchPlausibleViews } from './_signals/plausible';
+import { fetchPosthogViews } from './_signals/posthog';
 import { fetchResendBounces } from './_signals/resend';
 import { fetchOutreachCounts } from './_signals/outreach';
 import { fetchSentryNewIssues } from './_signals/sentry';
@@ -31,15 +31,13 @@ export default async function AdminHealthPage() {
   const admin = await requireAdmin(cookies, process.env);
   if (!admin) redirect('/admin/login?error=unauth');
 
-  const [betterstack, resend, plausible, outreach, sentry] = await Promise.all(
-    [
-      fetchBetterStack(),
-      fetchResendBounces(),
-      fetchPlausibleViews(),
-      fetchOutreachCounts(),
-      fetchSentryNewIssues(),
-    ],
-  );
+  const [betterstack, resend, posthog, outreach, sentry] = await Promise.all([
+    fetchBetterStack(),
+    fetchResendBounces(),
+    fetchPosthogViews(),
+    fetchOutreachCounts(),
+    fetchSentryNewIssues(),
+  ]);
 
   return (
     <main
@@ -111,7 +109,7 @@ export default async function AdminHealthPage() {
         >
           <HealthCard title="BetterStack" signal={betterstack} />
           <HealthCard title="Resend" signal={resend} />
-          <HealthCard title="Plausible" signal={plausible} />
+          <HealthCard title="PostHog" signal={posthog} />
           <HealthCard title="Outreach" signal={outreach} />
           <HealthCard title="Sentry" signal={sentry} />
         </section>

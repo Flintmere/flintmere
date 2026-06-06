@@ -234,9 +234,10 @@ export default function Privacy() {
             source.
           </li>
           <li>
-            <strong>Plausible Analytics</strong> (Plausible Insights OÜ,
-            Estonia · EU) — cookieless product analytics. No IP storage, no
-            cross-site tracking, no advertising profile. Per ADR 0013.
+            <strong>PostHog</strong> (PostHog, Inc., US — data hosted in the EU,
+            AWS Frankfurt) — product analytics and session replay, configured
+            cookieless. No advertising profile, no cross-site tracking. Processing
+            is covered by PostHog&apos;s Data Processing Agreement. Per ADR 0025.
           </li>
           <li>
             <strong>BetterStack</strong> (EU) — uptime monitoring (no user
@@ -251,6 +252,15 @@ export default function Privacy() {
             verification.
           </li>
         </ul>
+        <p className="mt-4">
+          We use session replay on our public sites to understand usability
+          problems and debug reported issues. Recordings capture page
+          interactions (clicks, scrolling, navigation); all keyboard input is
+          masked before it leaves your browser and is never visible to us.
+          Recordings carry no persistent identifier and are retained on
+          PostHog&apos;s EU infrastructure for a limited period before automatic
+          deletion. Lawful basis: legitimate interest (service improvement).
+        </p>
       </Clause>
 
       <Clause n="06" heading="International transfers">

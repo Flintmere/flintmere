@@ -225,7 +225,7 @@ describe('DAILY_HEALTH_CHECK_MARKDOWN', () => {
   it('lists the five canonical tabs', () => {
     expect(DAILY_HEALTH_CHECK_MARKDOWN).toContain('BetterStack');
     expect(DAILY_HEALTH_CHECK_MARKDOWN).toContain('Resend');
-    expect(DAILY_HEALTH_CHECK_MARKDOWN).toContain('Plausible');
+    expect(DAILY_HEALTH_CHECK_MARKDOWN).toContain('PostHog');
     expect(DAILY_HEALTH_CHECK_MARKDOWN).toContain('Admin outreach');
     expect(DAILY_HEALTH_CHECK_MARKDOWN).toContain('Sentry');
   });
@@ -236,7 +236,7 @@ describe('DAILY_HEALTH_CHECK_MARKDOWN', () => {
     expect(html).toContain('Daily health check');
     expect(html).toContain('<ol');
     expect(html).toContain('uptime.betterstack.com');
-    expect(html).toContain('plausible.io');
+    expect(html).toContain('eu.posthog.com');
   });
 });
 

@@ -15,6 +15,7 @@ import {
   STRIPE_BAND_METADATA_KEY,
   type AuditBandSlug,
 } from '@/lib/audit-pricing';
+import { captureServerEvent } from '@/lib/analytics-server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -230,6 +231,11 @@ async function finaliseConciergeBooking(args: {
   });
 
   if (row.notificationSentAt) return;
+
+  await captureServerEvent('concierge_paid', {
+    shop: shopUrl,
+    band: bandSlug,
+  });
 
   // Issue the branded Stripe Invoice as a downloadable artefact for the
   // merchant's accounts team. Failure here doesn't block the email send —

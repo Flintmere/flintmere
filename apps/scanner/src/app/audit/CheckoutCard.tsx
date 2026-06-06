@@ -37,7 +37,7 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js';
-import { track } from '@/lib/plausible';
+import { track } from '@/lib/analytics';
 import { readAndConsumeHandoff } from '@/lib/audit-handoff';
 import {
   bandBySlug,

@@ -20,7 +20,7 @@
  *   - scanner_resend_processed_events — idempotency ledger; preserve
  *   - Resend sent-email log (vendor-side; cannot scrub from script)
  *   - Stripe charge / refund history (vendor-side; cannot scrub)
- *   - Plausible page-view events (vendor-side; operator-filter only)
+ *   - PostHog page-view events (vendor-side; operator-filter only)
  *
  * Usage:
  *   # dry run — print what would be deleted, no writes

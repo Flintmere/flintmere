@@ -24,7 +24,7 @@ import {
  * URLs are also passed through — single-origin convenience.
  *
  * Cross-host 301 90-day window: 2026-05-03 → 2026-08-03. After that,
- * evaluate via Plausible whether to flip cross-host requests to 404.
+ * evaluate via PostHog whether to flip cross-host requests to 404.
  *
  * CSP — allowlist mode (rewritten 2026-05-11 after PageSpeed surfaced
  * false-positive violations on force-static pages). The previous attempt
@@ -213,13 +213,12 @@ export function middleware(request: NextRequest): NextResponse {
  * Allowlist mode — see file header for the trade-off rationale.
  *
  * script-src 'unsafe-inline' covers Next.js's bootstrap inline (the
- * `self.__next_f` flight-data hydration) + the Plausible init shim.
- * Per CSP3, `'unsafe-inline'` is honoured only when no nonce/hash is
- * present in the same directive; since we no longer emit nonces, it
- * applies.
+ * `self.__next_f` flight-data hydration). Per CSP3, `'unsafe-inline'`
+ * is honoured only when no nonce/hash is present in the same directive;
+ * since we no longer emit nonces, it applies.
  *
- * Host allowlist covers the three external script loaders we ship:
- *  - plausible.io  — analytics loader (apps/scanner/src/app/layout.tsx)
+ * Host allowlist covers the external script loaders we ship:
+ *  - (PostHog loads same-origin via the /ingest proxy — no host entry needed)
  *  - challenges.cloudflare.com — Turnstile widget loader
  *  - js.stripe.com — Stripe Elements + Payment Element loader
  *
@@ -243,7 +242,7 @@ export function middleware(request: NextRequest): NextResponse {
 function buildCsp(): string {
   const directives = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://plausible.io https://challenges.cloudflare.com https://js.stripe.com",
+    "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://js.stripe.com",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' blob: data: https:",
     "font-src 'self' data:",
@@ -254,7 +253,7 @@ function buildCsp(): string {
     // the current origin; without the four hosts below, hovering a
     // cross-host link in production trips a CSP block (caught live
     // 2026-05-11 immediately after the enforced flip in #33).
-    "connect-src 'self' https://flintmere.com https://audit.flintmere.com https://app.flintmere.com https://standards.flintmere.com https://plausible.io https://challenges.cloudflare.com https://api.stripe.com https://*.ingest.de.sentry.io https://*.ingest.sentry.io",
+    "connect-src 'self' https://flintmere.com https://audit.flintmere.com https://app.flintmere.com https://standards.flintmere.com https://challenges.cloudflare.com https://api.stripe.com https://*.ingest.de.sentry.io https://*.ingest.sentry.io",
     "frame-src https://challenges.cloudflare.com https://js.stripe.com https://hooks.stripe.com",
     "worker-src 'self' blob:",
     "manifest-src 'self'",
@@ -298,6 +297,6 @@ function annotateHostDiagnostics(
  */
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon|opengraph-image|api/healthz).*)',
+    '/((?!_next/static|_next/image|ingest|favicon.ico|icon.svg|apple-icon|opengraph-image|api/healthz).*)',
   ],
 };

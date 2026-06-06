@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { track } from '@/lib/plausible'
+import { track } from '@/lib/analytics'
 import type { Vertical } from '@/lib/audit-draft/schema'
 import { StageLedger } from '@/components/StageLedger'
 
@@ -67,7 +67,7 @@ export function DraftForm({ defaultShopUrl }: DraftFormProps) {
             `Audit-assist failed (HTTP ${res.status}${data.code ? ` · ${data.code}` : ''})`,
         )
       }
-      // Plausible custom event — cookieless, no PII. `shop` is the
+      // PostHog custom event — cookieless, no PII. `shop` is the
       // normalised public hostname; analytics is fine to count by it.
       if (data.telemetry) {
         track('audit_draft_generated', {

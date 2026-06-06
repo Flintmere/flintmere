@@ -32,8 +32,9 @@ export default function Cookies() {
       <Clause n="02" heading="Cookies on flintmere.com and audit.flintmere.com (marketing + scanner)">
         <p>
           The marketing site and the public scanner set <strong>no cookies</strong>.
-          No analytics, no ad pixels, no A/B testing, no session storage. You
-          can confirm this in your browser dev tools.
+          No analytics cookies, no ad pixels, and nothing written to{' '}
+          <code>localStorage</code> or <code>sessionStorage</code>. You can
+          confirm this in your browser dev tools.
         </p>
         <p className="mt-4">
           CSRF protection on the scan form is enforced by a request-origin
@@ -41,9 +42,10 @@ export default function Cookies() {
           by a short random ID — that ID lives in the URL, not in a cookie.
         </p>
         <p className="mt-4">
-          For product analytics we use <strong>Plausible (EU, cookieless)</strong>.
-          No cookies are set, no cross-site tracking is performed, no IP
-          addresses are stored. Per ADR 0013.
+          For product analytics we use <strong>PostHog (EU-hosted, configured
+          cookieless)</strong>. Our PostHog configuration stores no cookies and
+          no browser-storage identifiers — analytics state lives in page memory
+          only. No cross-site tracking is performed. Per ADR 0025.
         </p>
       </Clause>
 
@@ -61,9 +63,11 @@ export default function Cookies() {
           <li>No Google Analytics, Google Tag Manager, or Google Ads pixels</li>
           <li>No Meta / Facebook pixel</li>
           <li>No LinkedIn, TikTok, X, or Reddit pixels</li>
-          <li>No A/B testing or session-replay tools on the marketing site or scanner</li>
           <li>No third-party chat widgets that set cookies</li>
-          <li>No fingerprinting or &ldquo;cookieless&rdquo; tracking workarounds</li>
+          <li>
+            No device fingerprinting, hidden ID regeneration, or ETag / cache
+            tracking workarounds
+          </li>
         </ul>
       </Clause>
 

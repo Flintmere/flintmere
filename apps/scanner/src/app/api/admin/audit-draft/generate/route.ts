@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
       }),
     )
     // Response includes the props the client needs to fire the
-    // Plausible `audit_draft_generated` event without a follow-up
+    // PostHog `audit_draft_generated` event without a follow-up
     // round-trip.
     return NextResponse.json(
       {

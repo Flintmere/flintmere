@@ -59,6 +59,8 @@ describe('classifyRoute', () => {
     ['/api/contact', 'both'],
     ['/api/healthz', 'both'],
     ['/api/webhooks/stripe', 'both'],
+    ['/ingest/e/', 'both'],
+    ['/ingest/static/array.js', 'both'],
     ['/sitemap.xml', 'both'],
     ['/robots.txt', 'both'],
     ['/_next/static/foo.js', 'both'],
@@ -168,6 +170,12 @@ describe('targetHostForRedirect', () => {
     expect(targetHostForRedirect(MARKETING_HOST, '/api/scan')).toBeNull();
     expect(targetHostForRedirect(SCANNER_HOST, '/sitemap.xml')).toBeNull();
     expect(targetHostForRedirect(STANDARDS_HOST, '/api/contact')).toBeNull();
+  });
+
+  it('does not cross-host-redirect the PostHog /ingest proxy on any host', () => {
+    expect(targetHostForRedirect(MARKETING_HOST, '/ingest/e/')).toBeNull();
+    expect(targetHostForRedirect(SCANNER_HOST, '/ingest/e/')).toBeNull();
+    expect(targetHostForRedirect(STANDARDS_HOST, '/ingest/static/array.js')).toBeNull();
   });
 
   it('does not redirect unknown routes (let the 404 handler render)', () => {
