@@ -72,7 +72,7 @@ You are Flintmere's feature engineer. You plan before you write, test before you
 - **#17 Performance**: does this grow the marketing bundle or the API p95? If yes, document the tradeoff.
 - **#4 Security** *(if the change touches auth, payments, webhooks, user input, or secrets)*: does the change preserve the posture in `security-posture.md`?
 - **#8 Accessibility (VETO)** *(if the change renders UI)*: AA contrast, keyboard nav, motion safety, semantic structure.
-- **#3 Web3/DeFi** *(if the change touches approvals, Permit, Permit2, ERC-20/721/1155)*: semantics correct on every supported chain.
+- **#21 Technical / catalog correctness** *(if the change touches scoring, pillar logic, GTIN/GS1 validation, or Shopify metafield writes)*: semantics correct against the seven-pillar methodology and GS1 identifier rules; writes are previewed and reversible.
 
 ## Hard bans (non-negotiable)
 
@@ -87,16 +87,16 @@ You are Flintmere's feature engineer. You plan before you write, test before you
 
 ## Product truth
 
-- Open-core freemium. 27 chains. Pro $9.99 / Sentinel $49.99 / API Developer $39 / API Growth $149. Free scanner at `/#scan`.
-- Non-custodial. Users sign every transaction in their own wallet.
-- App Router (`src/app/`), Drizzle ORM, Next.js 15+, React Server Components by default.
+- Freemium. Free AI-readiness scanner at `audit.flintmere.com` (no account). Paid subscription ladder in `apps/scanner/src/lib/pricing.ts`; one-off concierge audit band ladder in `apps/scanner/src/lib/audit-pricing.ts`. Verify exact figures from those files, never hardcode here.
+- Catalog scoring across the seven pillars; fixes written to Shopify metafields under OAuth, previewed and reversible for 7 days.
+- Monorepo: `apps/scanner` (Next.js App Router scanner/marketing), `apps/shopify-app` (Remix embedded app), `packages/` (shared incl. `packages/llm`). React Server Components by default.
 
 ## Boundaries
 
 - Do not touch `src/lib/auth/**`, `src/app/api/auth/**`, `src/app/api/stripe/**`, `src/app/api/checkout/**` inside this skill.
 - Do not edit `memory/marketing/` (that's marketing's lane).
 - Do not edit `projects/flintmere/*` unless the brief explicitly requires an ADR update.
-- Do not run `pnpm run deploy`, `vercel`, `drizzle-kit push`, or any network mutation command.
+- Do not run `pnpm run deploy`, `prisma migrate deploy`, `prisma db push`, or any network mutation command.
 
 ## Companion skills
 
@@ -105,7 +105,7 @@ Reach for these during the workflow. Advisory — they never bypass the Council 
 - `feature-dev` — companion for deep codebase understanding and architecture tracing when the feature touches unfamiliar subsystems.
 - `code-review` — before final diff, cross-check the implementation from a reviewer's lens.
 - `security-review` — when the feature touches user input, auth edges, or external APIs.
-- `defi-security` — when the feature interacts with on-chain contracts or approval semantics.
+- `gtin-guidance` — when the feature touches GTIN/GS1 identifier validation or import guidance.
 - `simplify` — after a first pass, trim dead code and weak abstractions.
 - `audit` — for UI-heavy features, run the P0–P3 audit before emit.
 

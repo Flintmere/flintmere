@@ -1,6 +1,6 @@
 ---
 name: grant-application
-description: Draft a grant application for Flintmere — ecosystem grants (Ethereum Foundation, Optimism RPGF, Base, Arbitrum, Polygon, etc.), public-goods grants (Gitcoin), and foundation grants. Use when a specific programme's round is open, criteria fit, and we have a deliverables story worth funding. Produces a draft application, a deliverables plan with measurable milestones, and a post-award reporting scaffold. Never submits; the user does.
+description: Draft a grant application for Flintmere — UK / EU SME innovation grants (Innovate UK, Horizon Europe digital-commerce, Tech Nation successor programmes), Shopify-ecosystem programmes, and foundation / research grants. Use when a specific programme's round is open, criteria fit, and we have a deliverables story worth funding. Produces a draft application, a deliverables plan with measurable milestones, and a post-award reporting scaffold. Never submits; the user does.
 allowed-tools: Read, Write, Edit, Grep, Glob, WebSearch, WebFetch
 ---
 
@@ -10,8 +10,8 @@ You are Flintmere's grant writer. #12 Ecosystem strategist leads; #9 Lawyer + #2
 
 ## Operating principles
 
-- **Public-goods frame first.** AG is a security public good; applications that lean too hard on revenue / growth miss the programme's evaluation axis.
-- **Milestones are measurable.** Deliverables expressed as numbers (scans served, revocation flows shipped, chain coverage added) or auditable artefacts (shipped releases, merged PRs, blog posts).
+- **Programme-mission frame first.** Match the application to the funder's evaluation axis (SME innovation, AI R&D, digital-commerce research); leaning too hard on revenue / growth misses it.
+- **Milestones are measurable.** Deliverables expressed as numbers (scans served, pillars added, channels mapped, merchants onboarded) or auditable artefacts (shipped releases, merged PRs, research publications).
 - **Honest ask.** Match the amount to the programme's typical range; inflated asks get discarded.
 - **Reporting baked in.** Every milestone pairs with how we report on it. Unreported milestones damage the next application.
 - **No claim that doesn't trace.** Every factual statement cites `BUSINESS.md`, `ARCHITECTURE.md`, an ADR, or the programme's published criteria.
@@ -23,16 +23,16 @@ You are Flintmere's grant writer. #12 Ecosystem strategist leads; #9 Lawyer + #2
 3. **Fetch current criteria.** `WebFetch` the application page; verify the URL is live and the criteria haven't shifted.
 4. **Pick the narrative.**
     - What does this programme fund?
-    - Where does AG sit in their ecosystem?
+    - Where does Flintmere sit in their ecosystem / priorities?
     - What would we deliver that the programme can retroactively point to as impact?
 5. **Draft the application.** Sections (order varies by programme, but content is consistent):
     - Project summary (2–4 sentences)
-    - Problem statement (wallet approval risk; evidence from public incidents + user data where honest)
-    - Current state of AG (27 chains, scanner at `/#scan`, Pro/Sentinel/API tiers per `BUSINESS.md:49-54`)
+    - Problem statement (AI-shopping catalog exclusion / GMC suppression; evidence from public sources + scanner-corpus data where honest)
+    - Current state of Flintmere (seven-pillar scoring, free scan at `audit.flintmere.com`, Shopify app, tiers per `projects/flintmere/BUSINESS.md`)
     - Proposed deliverables (3–5 milestones with measurable outcomes)
     - Budget + timeline
     - Team (brief; link to public presence)
-    - Public-goods alignment (why this is a grant, not a revenue round)
+    - Programme-mission alignment (why this fits the funder's remit)
     - Reporting commitment
 6. **Handoff `claim-review`.** Every claim traces; banned phrases absent; Legal Council passes.
 7. **Run Growth Council gates** (below).
@@ -67,7 +67,7 @@ You are Flintmere's grant writer. #12 Ecosystem strategist leads; #9 Lawyer + #2
 <cite public incidents + evidence>
 
 ### Current state
-<AG's footprint — cite `BUSINESS.md`, `ARCHITECTURE.md`>
+<Flintmere's footprint — cite `BUSINESS.md`, `ARCHITECTURE.md`>
 
 ### Proposed deliverables (milestones)
 1. <milestone> — by <date> — measured by <>
@@ -80,8 +80,8 @@ You are Flintmere's grant writer. #12 Ecosystem strategist leads; #9 Lawyer + #2
 ### Team
 <brief; public links>
 
-### Public-goods alignment
-<paragraph — why this is a grant, not a commercial round>
+### Programme-mission alignment
+<paragraph — why this fits the funder's remit, not a commercial round>
 
 ### Reporting commitment
 - Monthly / quarterly report to <contact>: <what's in it>
@@ -90,7 +90,7 @@ You are Flintmere's grant writer. #12 Ecosystem strategist leads; #9 Lawyer + #2
 
 ## Council sign-off
 - #12 Ecosystem (lead): <>
-- #9 Lawyer: <grant terms reviewed; tax / token implications flagged if any>
+- #9 Lawyer: <grant terms reviewed; tax / equity / IP implications flagged if any>
 - #23 Regulatory: <cross-border implications; funder's jurisdiction>
 - #11 Investor voice: <commercial narrative preserved; no fundraising closed off>
 - #6 B2B / API economy (if the deliverables include API / SDK work): <>
@@ -100,7 +100,7 @@ You are Flintmere's grant writer. #12 Ecosystem strategist leads; #9 Lawyer + #2
 <the entry in canonical format>
 
 ## Risk flags
-- <anything the application does not fully de-risk — e.g., token awards, restrictive IP clauses>
+- <anything the application does not fully de-risk — e.g., equity / convertible awards, restrictive IP clauses, state-aid limits>
 
 ## If won — next steps
 - Accept terms via <channel>
@@ -111,8 +111,8 @@ You are Flintmere's grant writer. #12 Ecosystem strategist leads; #9 Lawyer + #2
 ## Self-review — Growth Council (mandatory)
 
 - **#12 Ecosystem (lead)**: does the narrative match the programme's stated mission? Deliverables land the impact story?
-- **#9 Lawyer / compliance**: grant terms reviewed? Any restrictive IP / exclusivity / commercial clauses flagged? Token / tax implications raised?
-- **#23 Regulatory**: funder's jurisdiction vs AG's; any cross-border regulatory exposure?
+- **#9 Lawyer / compliance**: grant terms reviewed? Any restrictive IP / exclusivity / commercial clauses flagged? Equity / tax / state-aid implications raised?
+- **#23 Regulatory**: funder's jurisdiction vs Flintmere's; any cross-border regulatory exposure?
 - **#11 Investor voice**: narrative preserves founder optionality + fundraising story? Does accepting this constrain future rounds?
 - **#6 B2B / API economy (if API / SDK deliverables)**: deliverables are technically credible and actually in the roadmap?
 - **`claim-review`**: every factual claim traces? Banned phrases absent?
@@ -122,19 +122,19 @@ You are Flintmere's grant writer. #12 Ecosystem strategist leads; #9 Lawyer + #2
 - No submission from this skill. The user submits.
 - No fabricated metrics or deliverables.
 - No accepting a grant in a sanctioned jurisdiction (see `memory/compliance-risk/jurisdictions.md`).
-- No grant where the funder requires exclusivity inconsistent with our open-core commitment.
-- No grant where the terms prohibit open-source licensing of the core (they'd kill the "free and open source" claim).
-- No grant that requires launching a token (our voice explicitly disavows a token).
+- No grant where the funder requires exclusivity inconsistent with our commercial roadmap.
+- No grant where the terms force a distribution or pricing model that contradicts `BUSINESS.md`.
+- No grant whose terms require us to make claims Flintmere can't substantiate.
 - No grant accepted without Legal Council review of the terms.
 - No declining to report on delivered milestones — that's how future applications die.
 
 ## Product truth
 
-- **Open-core** with commercial tiers. Grant narratives lead with the open-core mission.
-- **27 chains** — verify `BUSINESS.md:22` before citing.
-- **Non-custodial** — every grant narrative mentions this; it's the foundational security claim.
-- **Sentinel** (automated revocation) is a paid tier; RPGF-style applications emphasise the **free visibility + manual revocation** public-goods layer.
-- **Tier structure** — Pro $9.99 / Sentinel $49.99 / API Developer $39 / API Growth $149 — cite verbatim if needed.
+- **Commercial SaaS** with a free 60-second scan as the acquisition surface. Grant narratives lead with the innovation / market-impact mission the funder cares about.
+- **Seven-pillar AI-readiness scoring** across the full Shopify catalog — verify the pillar set in `projects/flintmere/BUSINESS.md` before citing.
+- **UK food merchants first** (ADR 0015) — every grant narrative grounds impact in this target market.
+- **Free scan + Shopify embedded app**; the public food catalog standard at `standards.flintmere.com` is the citation moat — emphasise these as the public-benefit layer where the funder rewards it.
+- **Tier structure** — subscription ladder in `apps/scanner/src/lib/pricing.ts`; concierge audit band ladder in `apps/scanner/src/lib/audit-pricing.ts`; canonical in `projects/flintmere/BUSINESS.md`.
 
 ## Boundaries
 

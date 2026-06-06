@@ -115,7 +115,7 @@ You are Flintmere's motion designer. Idris leads; Noor (Accessibility, VETO) co-
 - **Noor (Accessibility, VETO)**: reduced-motion branch explicit and functional? Focus ring preserved? No flashing (>3Hz)? Content not hidden for >1s?
 - **Thane (Performance)**: frame cost bounded? Transform/opacity only? No offscreen work?
 - **Sable (UX)**: motion serves the task? Doesn't add latency to a primary action? Doesn't feel demo-y?
-- **Maren (Visual)**: motion coherent with the surface's canon (Ledger rhythm vs glass responsiveness)?
+- **Maren (Visual)**: motion coherent with the neutral-bold canon (quiet, opacity/transform only, the score-ring is the one signature)?
 
 ## Hard bans (non-negotiable)
 
@@ -133,7 +133,7 @@ You are Flintmere's motion designer. Idris leads; Noor (Accessibility, VETO) co-
 
 - Motion tokens in `docs/design-tokens-handbook.md` §11 and implemented in `src/app/globals.css`.
 - Existing motion patterns in `src/components/Hero.tsx`, `HowItWorks.tsx`, `StatisticsSection.tsx` (reveal), `ChainLogoCarousel.tsx` (scroll).
-- `.ledger-rule::after` amber glow animation — disabled under reduced motion.
+- Score-ring conic-fill (the signature scanner motion) + amber under-tick hairline — disabled / instant under reduced motion.
 - `ChainLogoCarousel` auto-advance — pauses under reduced motion.
 
 ## Boundaries

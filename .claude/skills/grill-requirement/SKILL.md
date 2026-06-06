@@ -69,7 +69,7 @@ Cite the brackets in the artefact. Downstream skills size their work to the brac
 
 > "What single observable shows this worked?"
 
-One metric. Pre-declared. Tied to the funnel events Plausible already tracks (`scan_started`, `email_captured`, `concierge_clicked`) or a new event proposed via `define-metric` first.
+One metric. Pre-declared. Tied to the funnel events PostHog already tracks (ADR 0025) (`scan_started`, `email_captured`, `concierge_clicked`) or a new event proposed via `define-metric` first.
 
 Reject:
 - "Users will love it"

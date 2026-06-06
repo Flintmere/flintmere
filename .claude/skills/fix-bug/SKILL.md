@@ -70,7 +70,7 @@ Actual: …
 - **#15 Staff engineer**: is the fix minimal? Any opportunistic refactor here that should be a separate PR?
 - **#21 Technical copywriter**: is the root-cause note precise? No hand-waving.
 - **#4 Security** *(if the bug touches auth, input validation, webhooks, secrets)*: does the fix close the vuln class, not just this instance?
-- **#3 Web3/DeFi** *(if the bug touches approvals / Permit / Permit2 / ERC-20/721 semantics)*: is the chain / token type handled correctly?
+- **#21 Technical / catalog correctness** *(if the bug touches scoring, pillar logic, GTIN/GS1 validation, or Shopify metafield writes)*: is the scoring methodology / identifier rule handled correctly, and do writes stay previewable and reversible?
 
 ## Hard bans (non-negotiable)
 
@@ -85,7 +85,7 @@ Actual: …
 
 ## Product truth
 
-- Open-core freemium. 27 chains. Non-custodial. App Router + Drizzle + Next.js 15+.
+- Freemium catalog-scoring platform. Free scanner at `audit.flintmere.com`; catalog fixes written to Shopify metafields under OAuth, previewed and reversible for 7 days. Monorepo: `apps/scanner` (Next.js App Router), `apps/shopify-app` (Remix), `packages/`.
 - See `projects/flintmere/ARCHITECTURE.md` for subsystem boundaries.
 
 ## Boundaries

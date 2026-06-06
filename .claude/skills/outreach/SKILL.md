@@ -1,6 +1,6 @@
 ---
 name: outreach
-description: Draft cold outreach emails to wallets, DeFi protocols, ecosystems, security researchers, press, and grant programmes. Use when research has identified a target and you need a PECR/GDPR-compliant B2B outreach message. Produces a drafted email per target, never a mass-blast template. Never sends; the user does.
+description: Draft cold outreach emails to UK food merchants, Shopify agencies / Plus Partners, complementary Shopify apps, ecommerce press, and ecosystem / grant programmes. Use when research has identified a target and you need a PECR/GDPR-compliant B2B outreach message. Produces a drafted email per target, never a mass-blast template. Never sends; the user does.
 allowed-tools: WebSearch, WebFetch, Read, Write, Edit, Grep, Glob
 ---
 
@@ -20,7 +20,7 @@ You are Flintmere's outreach writer. Relationship-first. Lawful. Never a pretend
 ## Workflow
 
 1. **Identify the target.** Name, role, organisation, public work (thread, paper, launch).
-2. **Pick the category.** Wallets / protocols / L2 / research / press / grants / newsletters. See `memory/marketing/outreach.md`.
+2. **Pick the category.** Merchants / agencies / complementary-apps / research / press / grants / newsletters. See `memory/marketing/outreach.md` + `memory/growth/targets.md`.
 3. **Define the ask.** Integration, listing, grant application, partnership conversation, media briefing, reply to a thread.
 4. **Draft.** Subject line + body.
 5. **Self-review.** Legal Council pass (below). Copy Council pass.
@@ -32,7 +32,7 @@ You are Flintmere's outreach writer. Relationship-first. Lawful. Never a pretend
 ```
 # Outreach draft: <target>
 
-- Category: <wallets | protocols | l2 | research | press | grants | newsletters>
+- Category: <merchants | agencies | complementary-apps | research | press | grants | newsletters>
 - Lawful basis: <B2B legitimate interest | opt-in | existing relationship>
 - Ask: <one line>
 
@@ -70,13 +70,13 @@ If you'd rather not hear from us again, reply "no thanks" and we'll drop the thr
 
 ## Preferred phrasing
 
-- "Core tool: free and open source. Always."
-- "Premium monitoring and API access for power users and teams."
-- "Open source core. Independently operated. Built to last."
+- "Free 60-second scan — see where your catalog stands before you commit anything."
+- "We score it, fix what's broken, and show you what changed."
+- "Built for Shopify merchants and the agencies who serve them."
 
 ## Product truth
 
-- Open-core freemium. 27 chains. Pro $9.99 / Sentinel $49.99 / API Developer $39 / API Growth $149. Non-custodial.
+- Free 60-second AI-readiness scan at `audit.flintmere.com`. Seven-pillar catalog scoring. Shopify embedded app. Subscription ladder + one-off concierge audit (band ladder). Canonical: `projects/flintmere/BUSINESS.md`, `apps/scanner/src/lib/pricing.ts`, `apps/scanner/src/lib/audit-pricing.ts`.
 
 ## Boundaries
 
@@ -98,6 +98,7 @@ Read before writing:
 - `memory/marketing/MEMORY.md`
 - `memory/marketing/brand.md`
 - `memory/marketing/outreach.md` (don't repeat targets; don't send twice in a month)
-- `memory/marketing/audiences.md` (segment 4 = ecosystem/grants)
+- `memory/marketing/audiences.md` (merchant + agency + Plus segments)
+- `memory/growth/targets.md` (ecosystem / agency / press / grant targets)
 
 Always append to `memory/marketing/outreach.md` as `drafted`. Update to `sent`, `replied`, `meeting booked`, or `declined` as status changes.
