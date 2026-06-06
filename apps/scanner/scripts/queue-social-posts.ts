@@ -49,20 +49,20 @@ async function main(): Promise<void> {
     }
   }
 
-  for (const p of posts) {
-    const created = await prisma.socialPost.create({
-      data: {
-        channel: 'x',
-        body: p.body,
-        altText: p.altText ?? null,
-        utmCampaign: p.utmCampaign,
-        scheduledAt: new Date(p.scheduledAt),
-      },
-    });
-    console.log(`queued ${created.id} for ${p.scheduledAt}: ${p.body.slice(0, 60)}…`);
-  }
+  const { count } = await prisma.socialPost.createMany({
+    data: posts.map((p) => ({
+      channel: 'x',
+      body: p.body,
+      altText: p.altText ?? null,
+      utmCampaign: p.utmCampaign,
+      scheduledAt: new Date(p.scheduledAt),
+    })),
+  });
 
-  console.log(`done — ${posts.length} queued`);
+  for (const p of posts) {
+    console.log(`queued for ${p.scheduledAt}: ${p.body.slice(0, 60)}…`);
+  }
+  console.log(`done — ${count} queued`);
   await prisma.$disconnect();
 }
 

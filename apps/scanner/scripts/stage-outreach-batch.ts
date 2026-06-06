@@ -40,14 +40,21 @@ async function main(): Promise<void> {
   }
 
   const batchId = `batch-${new Date().toISOString().slice(0, 10)}-${Math.random().toString(36).slice(2, 8)}`;
-  await prisma.outreachTarget.updateMany({
-    where: { id: { in: candidates.map((c) => c.id) } },
+  const { count } = await prisma.outreachTarget.updateMany({
+    where: {
+      id: { in: candidates.map((c) => c.id) },
+      status: OUTREACH_STATUS.enriched,
+    },
     data: { status: OUTREACH_STATUS.readyForApproval, batchId },
   });
 
+  if (count !== candidates.length) {
+    console.log(`skipped ${candidates.length - count} targets whose status changed mid-run`);
+  }
+
   const secret = process.env.ADMIN_SESSION_SECRET;
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://audit.flintmere.com';
-  console.log(`staged ${candidates.length} targets under ${batchId}`);
+  console.log(`staged ${count} targets under ${batchId}`);
   for (const c of candidates) console.log(`  - ${c.shopDomain}`);
   if (secret) {
     console.log(`approve URL: ${buildApproveUrl(batchId, secret, baseUrl)}`);
