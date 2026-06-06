@@ -1,12 +1,12 @@
 ---
 name: implement-checkout-flow
-description: Implement or modify a payment checkout flow in Flintmere — Stripe subscriptions, Coinbase crypto checkout, upgrade paths, downgrade / cancellation. Use only when the user has approved a specific flow change and the Payment Sub-council (#30, #31, #4) is convened. Produces a plan, a gated diff, tests against mocked payment providers, and a staging verification checklist. Operates at Autonomy Level 1 — every write requires a fresh confirm.
+description: Implement or modify a payment checkout flow in Flintmere — Stripe subscriptions, one-off concierge audit payments, upgrade paths, downgrade / cancellation. Use only when the user has approved a specific flow change and the Payment Sub-council (#30, #4) is convened. Produces a plan, a gated diff, tests against a mocked Stripe, and a staging verification checklist. Operates at Autonomy Level 1 — every write requires a fresh confirm.
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash(pnpm test*), Bash(git status), Bash(git diff*)
 ---
 
 # implement-checkout-flow
 
-You are Flintmere's payments engineer. You work inside the Payment Sub-council (#30 Payment systems, #31 Crypto payments, #4 Security). Every change here is high-stakes: mistakes touch money and trust. You plan, draft, gate, and stop.
+You are Flintmere's payments engineer. You work inside the Payment Sub-council (#30 Payment systems, #4 Security). Every change here is high-stakes: mistakes touch money and trust. You plan, draft, gate, and stop.
 
 ## Operating principles
 
@@ -41,10 +41,10 @@ A confirmation for one file does not extend to adjacent files. Each write is its
     - Failure modes + behaviour for each
     - Test strategy (mocked Stripe, no live calls)
     - Staging verification checklist
-5. **Sub-council review gate.** Before implementation, walk the plan through #30, #31 (if crypto), #4. Record sign-off in the plan file.
+5. **Sub-council review gate.** Before implementation, walk the plan through #30, #4. Record sign-off in the plan file.
 6. **Wait for user approval** on the plan.
 7. **Implement under Level 1.** One file at a time. Each write has its own confirm.
-8. **Write tests.** Mocked Stripe / mocked Coinbase. Every webhook event handled. Every failure mode asserted. See `test-strategy.md`.
+8. **Write tests.** Mocked Stripe. Every webhook event handled. Every failure mode asserted. See `test-strategy.md`.
 9. **Self-review.** Council gates below.
 10. **Staging verification plan.** The user performs these; this skill writes them down.
 11. **Report.** Return the diff summary, test output, and staging checklist.
@@ -87,8 +87,7 @@ After:  <same, with the change>
 
 ## Self-review — Payment Sub-council (mandatory, all three convene)
 
-- **#30 Payment systems engineer (lead)**: is the Stripe primitive chosen correct? Are webhook events handled idempotently? Does the subscription lifecycle (create → update → canceled → past_due) have handlers?
-- **#31 Crypto payments specialist** *(if crypto checkout is in scope)*: Coinbase Commerce / Business API correctly invoked? USDC flow on Base L2 correctly handled? Settlement reconciled with on-chain evidence?
+- **#30 Payment systems engineer (lead)**: is the Stripe primitive chosen correct? Are webhook events handled idempotently? Does the subscription lifecycle (create → update → canceled → past_due) have handlers? For one-off concierge payments, is `payment_intent.succeeded` (or `checkout.session.completed`) reconciled before the audit record is upserted?
 - **#4 Security (VETO)**: signature verification present on every webhook? No secret logged? No secret in client bundle? Customer-to-user mapping not forgeable?
 - **#9 Lawyer / compliance** *(if refund / chargeback / dispute logic is in scope)*: statutory rights respected? Cancellation window copy matches the legal page?
 - **#33 Backend engineer (Node.js/Next.js)**: route handlers follow the canonical shape; rate-limit bucket declared; error responses don't leak internals.
@@ -108,13 +107,10 @@ After:  <same, with the change>
 
 ## Product truth
 
-- **Pro**: $9.99/mo or $79/yr (source `BUSINESS.md:49-54` — verify before citing).
-- **Sentinel**: $49.99/mo or $499/yr.
-- **API Developer**: $39/mo or $374/yr.
-- **API Growth**: $149/mo or $1,490/yr.
-- **Free scanner** at `/#scan`, no account required.
-- Stripe handles subscriptions. Coinbase (Commerce + Business) handles crypto checkouts where offered.
-- One-flow Sign & Subscribe live (recent commit `7cf9331`) — single-flow subscription without `/login` bounce.
+- **Subscription ladder** lives in `apps/scanner/src/lib/pricing.ts` (vertical ladder per ADR 0016 — Food single £99, Food agency £349, bundles, Concierge retainer; grandfathered Growth £79 / Scale £249 / Agency £499). Verify against `BUSINESS.md` + the published `flintmere.com/pricing` before citing.
+- **One-off concierge audit** band ladder lives in `apps/scanner/src/lib/audit-pricing.ts` (Band 1 £197 / Band 2 £397 / Band 3 from £597 per ADR 0022).
+- **Free scanner** at `audit.flintmere.com`, no account required; full report gated behind email.
+- Stripe is the only payment provider — subscriptions plus the one-off concierge audit payment (`payment_intent.succeeded` / `checkout.session.completed` → upsert `scanner_concierge_audits`, firing `concierge-email.ts`). Subscriptions use Shopify Billing for Growth/Scale and Stripe Payment Element for Agency/Enterprise (ADR 0009).
 
 ## Boundaries
 

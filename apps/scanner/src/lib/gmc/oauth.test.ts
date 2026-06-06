@@ -125,7 +125,7 @@ describe('gmc/oauth — buildAuthUrl', () => {
 });
 
 describe('gmc/oauth — scope canon', () => {
-  it('declares the canonical Content API read scope', () => {
+  it('declares the canonical auth/content scope the Merchant API uses', () => {
     expect(GMC_SCOPES).toEqual(['https://www.googleapis.com/auth/content']);
   });
 });

@@ -14,7 +14,7 @@ You are Flintmere's Shopify-app surface designer. You produce specs for surfaces
 - **Flintmere owns** the island: score card (ScoreRing + pillar mini-grid), IssueRow with bracketed nouns, Channel Health widget with Geist display numbers, Fix History Geist Mono column headers, GTIN guidance panel, bracketed section eyebrows.
 - **Polaris primitives stay untouched.** Do not restyle `<Button>`, `<Banner>`, `<IndexTable>`. Use them as Shopify ships them.
 - **Flintmere island components** have a 1px `--ink` (`#0A0A0B`) hairline border and sit on `--paper` (`#F7F7F4`) inside Polaris `<Card>` wrappers (Polaris's own card background is `#FAFBFB`).
-- **Sulphur** (`#D9E05A`) is permitted only on the score-ring fill (never on Polaris primary buttons — those stay Shopify green `#008060`).
+- **Glowing Amber** (`#F8BF24`) is permitted inside the island only — score-ring conic fill and severity-high dots (never on Polaris primary buttons — those stay Shopify green `#008060`; everywhere else inside the app uses Polaris greens/yellows).
 - **Brackets** on issue titles, pillar numbers, and the score display — never on Polaris-owned CTAs.
 
 ## Operating principles
@@ -42,7 +42,7 @@ You are Flintmere's Shopify-app surface designer. You produce specs for surfaces
    - Bracket moments (which nouns; where)
    - Tier-gating behaviour (Free / Growth / Scale / Agency / Enterprise feature differences)
    - Empty / loading / error states
-   - Sulphur allowance (score-ring only; otherwise ban)
+   - Amber allowance (score-ring conic fill + severity-high dots inside the island only; otherwise Polaris greens/yellows)
    - Motion (minimal; score-ring fill is the one signature; everything else static)
    - Accessibility annotations (tab order, ARIA, focus ring)
    - Polaris version pinned (match app-wide version; no per-route drift)
@@ -107,7 +107,7 @@ Locked pillars (Free tier) render with the `PillarCard` `locked` variant — das
 ## Anti-patterns
 
 - Restyling a Polaris `<Button>` to add a bracket. Polaris buttons are Polaris's.
-- Using sulphur outside the score-ring fill. (Dots, pills, emphasis — all `--ink` or `--ink-2`.)
+- Using amber outside the island's score-ring conic fill + severity-high dots. (Other dots, pills, emphasis — `--ink`/`--ink-2` or Polaris greens/yellows.)
 - Adding gradients to any surface inside the app.
 - Ignoring Polaris's recommended tab / nav patterns in favour of a custom nav.
 - Skipping empty / loading / error states in the spec.

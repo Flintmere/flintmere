@@ -152,7 +152,7 @@ If CANCEL:
 
 ## Product truth
 
-- Vercel, Neon, Cloudflare are **infra triad** — switching any one is a significant engineering commitment.
+- DigitalOcean (droplet) + Coolify (deploy/orchestration) + PostgreSQL are the **infra triad** — switching any one is a significant engineering commitment.
 - Stripe is **high lock-in** — customer IDs, subscription history all live there. Switching is a major project.
 - Anthropic (Claude API + Claude Code) is **medium lock-in for the API**, **high lock-in for the skill framework** — pilots 1–6 are Claude Code-native.
 - Email vendor switching is **low cost** but disruptive to deliverability — schedule warmup.
@@ -173,7 +173,7 @@ Reach for these during review. All advisory.
 - `WebFetch` — for current pricing on alternatives. Read-only.
 - `policy-alignment` — if switching to a vendor with platform-policy implications.
 - `legal-page-draft` — handoff if DPA / Privacy Policy update needed (Level 1, #24 VETO).
-- `webhook-review` — handoff if vendor change affects webhook handlers (Stripe, Coinbase).
+- `webhook-review` — handoff if vendor change affects webhook handlers (Stripe, Shopify).
 - `claim-review` — if recommendation cites a public security or compliance claim by the vendor.
 
 ## Memory

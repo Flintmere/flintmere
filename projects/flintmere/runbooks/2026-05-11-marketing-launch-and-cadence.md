@@ -12,7 +12,7 @@ canon_sources:
   - memory/VOICE.md
   - apps/scanner/src/lib/audit-pricing.ts
 canon_audit_run: pending — runbook is operator-internal, audit fires when copy ships
-status: live (W0 starts today)
+status: superseded 2026-06-06 — see decisions/0026-marketing-automation-pipeline.md + plans/2026-06-06-marketing-automation-spec.md (manual cadence replaced by the automated pipeline; do not action the day-by-day tasks below)
 ---
 
 # Marketing Launch + Cadence Runbook
@@ -89,7 +89,7 @@ This is the floor. If a week loses the Wed block to engineering, the §Bandwidth
 
 ### Wed 2026-05-13 — 90 minutes (drafting block)
 8. **Write the first founder post** (60 min) — use the brief in §First four posts → Post 1. Save the draft to `context/marketing/2026-05-19-linkedin-founder-intro.md`. **Do not publish yet.**
-9. **Set up Plausible site filter for marketing** (15 min) — Plausible is already on the stack. Confirm both `flintmere.com` and `audit.flintmere.com` are tracked. Note the share-link URL for the weekly review.
+9. **Confirm PostHog tracks both domains** (15 min) — PostHog is already on the stack (single EU project; hosts split via the `$host` property, ADR 0025). Confirm both `flintmere.com` and `audit.flintmere.com` appear in the acquisition-by-host insight. Bookmark the Flintmere — operator dashboard for the weekly review.
 10. **Create the UTM template** (15 min) — see §UTM scheme. Bookmark a UTM builder (Chrome extension, free).
 
 ### Thu 2026-05-14 — 90 minutes (design block)
@@ -116,7 +116,7 @@ This is the floor. If a week loses the Wed block to engineering, the §Bandwidth
 - [ ] LinkedIn company page exists + branded.
 - [ ] Personal LinkedIn profile updated.
 - [ ] `@flintmere` X handle claimed.
-- [ ] Plausible confirmed tracking both domains.
+- [ ] PostHog confirmed tracking both domains.
 - [ ] UTM template documented.
 - [ ] Founder post drafted, OG image rendered, scheduled for Mon 2026-05-19.
 - [ ] Carousel-render path decided.
@@ -133,7 +133,7 @@ If any of these slip past Sun: do not start W1. Push everything by one week. The
 
 ### Mon 2026-05-18 — 30 min (weekly review)
 - Confirm Sunday's scheduled post is queued for 09:30 tomorrow.
-- Pull last-7-day Plausible numbers for `audit.flintmere.com` — establish baseline before the first post hits.
+- Pull last-7-day PostHog numbers for `audit.flintmere.com` — establish baseline before the first post hits.
 
 ### Tue 2026-05-19 — POST 1 GOES LIVE, 09:30 BST
 - **Watch the first hour.** Reply to every genuine comment (not just emoji). LinkedIn weights early engagement heavily.
@@ -180,7 +180,7 @@ If any of these slip past Sun: do not start W1. Push everything by one week. The
 ## Week 2: 2026-05-25 → 2026-05-31
 
 ### Mon 2026-05-25 — 30 min weekly review
-- Pull Plausible numbers; compare W1 baseline vs W2 with Post 1 live.
+- Pull PostHog numbers; compare W1 baseline vs W2 with Post 1 live.
 
 ### Tue 2026-05-26 — POST 2 GOES LIVE (X, ~11:00 BST)
 - Pin to profile. Watch first 2hr for replies (X moves faster than LinkedIn).
@@ -278,7 +278,7 @@ By end of W8 (Sun 2026-07-12) you have:
 # Operator weekly rhythm
 
 ```
-Mon  09:00–09:30  Weekly review (Plausible + LinkedIn + X analytics)
+Mon  09:00–09:30  Weekly review (PostHog + LinkedIn + X analytics)
 Wed  19:00–20:30  Drafting block (one long-form post OR blog section)
 Thu  19:00–20:30  Design / outreach block (slides, OG images, email batches)
 Fri  18:00–19:00  Publish + respond to replies + log to content-history.md
@@ -423,7 +423,7 @@ Both paths must produce: 1080×1350 PNG per slide, alt-text per slide (in a sibl
 
 - **LinkedIn (personal + company page)** — primary channel.
 - **X** — secondary channel.
-- **Plausible** — already deployed for both domains.
+- **PostHog** — already deployed for both domains (ADR 0025).
 - **Resend** — already in stack; outreach pipeline live.
 - **Adobe Stock** — operator licence per `imagery.md`.
 - **Runware** — operator override only.
@@ -459,7 +459,7 @@ Examples:
 - Blog post 1 internal scan CTA: `?utm_source=blog&utm_medium=organic&utm_campaign=first-food-scans&utm_content=above-fold`
 - Outreach: `?utm_source=outreach&utm_medium=email&utm_campaign=agency-may-2026`
 
-Plausible auto-captures these. Monday weekly-review reads them.
+PostHog auto-captures these. Monday weekly-review reads them.
 
 ---
 

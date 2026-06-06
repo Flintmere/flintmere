@@ -1,6 +1,6 @@
 ---
 name: funnel-analysis
-description: Analyse Flintmere's conversion funnel end-to-end (homepage → scan → connect → risky-approval-surfaced → revoke → upgrade). Use when conversion is below target, a step's drop-off is unexplained, or a redesign / new flow lands and we want to see the impact. Produces a funnel breakdown with per-step drop, hypothesised causes, and per-step experiment proposals. Read-only.
+description: Analyse Flintmere's conversion funnel end-to-end (homepage → scan → email gate → score view → install → fix-apply → upgrade). Use when conversion is below target, a step's drop-off is unexplained, or a redesign / new flow lands and we want to see the impact. Produces a funnel breakdown with per-step drop, hypothesised causes, and per-step experiment proposals. Read-only.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---
 
@@ -10,7 +10,7 @@ You are Flintmere's funnel analyst. #35 Product analyst leads. The job: find whe
 
 ## Operating principles
 
-- **Funnel ≠ pipeline.** A funnel is **per-session per-user** behaviour, aggregated. We never report "user 0xabc dropped at step 3."
+- **Funnel ≠ pipeline.** A funnel is **per-session per-user** behaviour, aggregated. We never report "shop acme.myshopify.com dropped at step 3."
 - **Per-step rate, not absolute count.** A 90% → 80% drop is the signal; the absolute n is a denominator check.
 - **Compare cohorts.** Same week vs prior week. New traffic vs returning. Mobile vs desktop. The diff between cohorts is where causes hide.
 - **Hypotheses are testable.** Every hypothesis pairs with an experiment proposal that could falsify it.
@@ -21,34 +21,33 @@ You are Flintmere's funnel analyst. #35 Product analyst leads. The job: find whe
 ### Free-tier value funnel
 1. Homepage session
 2. Scan completed
-3. Wallet connected (optional path)
-4. Risky approval surfaced
-5. Revoke action initiated
-6. Revoke confirmed in wallet
+3. Email gate submitted (full report unlocked)
+4. Score view reached
+5. Shopify app install initiated
+6. First scorecard rendered in-app
 
-### Pro conversion funnel
+### Growth conversion funnel
 1. Homepage / blog session
 2. Pricing page view
-3. CTA click (Upgrade to Pro)
-4. Auth (sign in or sign up)
-5. Stripe checkout open
-6. Stripe checkout success
-7. Pro subscription active
+3. CTA click (Upgrade to Growth)
+4. Shopify Managed Pricing approval screen
+5. Subscription confirmed
+6. First Tier-1 fix applied within 7 days
+7. Growth subscription active at day 30
 
-### Sentinel funnel
-1. Sentinel page view (organic or referred from in-app upsell)
-2. Demo / contact CTA click
+### Concierge audit funnel
+1. Audit landing page view (organic or referred from in-app upsell)
+2. Band-selection / contact CTA click
+3. Checkout open (Stripe one-off)
+4. Payment success
+5. Audit deliverable shipped
+
+### Agency-tier funnel
+1. Agency landing page view
+2. "Talk to us" / agency-tier CTA click
 3. Form submitted / call booked
-4. Demo completed
-5. Sentinel subscription started
-
-### API tier funnel
-1. API docs view
-2. "Get an API key" CTA click
-3. Auth
-4. API key issued (Developer tier)
-5. First successful API call within 7 days
-6. Upgrade to Growth tier (when relevant)
+4. Agency tier subscription started
+5. First client seat activated within 7 days
 
 ## Workflow
 
@@ -124,7 +123,7 @@ You are Flintmere's funnel analyst. #35 Product analyst leads. The job: find whe
 - **#24 Data protection (VETO if cohort split risks re-identification)**: cohort sizes ≥50?
 - **#7 Visual designer / surface owner**: per-step UX hypotheses respect what's actually on the page?
 - **#34 Full-stack debugging engineer**: error-log spikes cited correctly? Not conflating frontend errors with funnel drop?
-- **#30 Payment systems engineer (Pro / Sentinel funnel)**: Stripe-checkout-stage hypotheses respect Stripe's actual UX?
+- **#30 Payment systems engineer (Growth / concierge funnel)**: Shopify Managed Pricing + Stripe-checkout-stage hypotheses respect the actual checkout UX?
 
 ## Hard bans (non-negotiable)
 
@@ -137,11 +136,11 @@ You are Flintmere's funnel analyst. #35 Product analyst leads. The job: find whe
 
 ## Product truth
 
-- The free-tier funnel's value moment is **revoke**, not Pro upgrade. A free-tier scan that ends in a revoke is a win even with no upgrade.
-- The Pro funnel has a **two-call-to-action** problem: sign-up + payment. Drop at the auth step is often "I'll come back" — track returning sessions, not just same-session conversion.
-- **Sentinel is a sales motion**, not a self-serve funnel. Demo-booking is the primary conversion signal, not "Sentinel signups."
-- **API tier activation** is "first call within 7 days," not "API key issued." A key without a call is not an activation.
-- Mobile underperforms desktop on signed-transaction-required steps — wallet UX on mobile is the constraint, often not our fault. Don't propose a fix to mobile we can't actually deliver.
+- The free-tier funnel's value moment is **the score view + email gate**, not the Growth upgrade. A free scan that ends in an unlocked report is a win even with no install.
+- The Growth funnel routes through **Shopify Managed Pricing**, not a separate auth + payment step. Drop at the pricing-approval screen is often "I'll come back" — track returning sessions, not just same-session conversion.
+- **Concierge audit is a sales motion**, not a self-serve funnel. CTA click + checkout-open is the primary conversion signal, not raw landing-page views.
+- **Install activation** is "first scorecard rendered within 24h," not "app installed." An install without a rendered scorecard is not an activation; **fix activation** is "first Tier-1 fix applied within 7 days."
+- Mobile underperforms desktop on install steps — Shopify admin install UX on mobile is the constraint, often not our fault. Don't propose a fix to mobile we can't actually deliver.
 
 ## Boundaries
 

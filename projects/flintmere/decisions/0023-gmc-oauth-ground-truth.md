@@ -100,6 +100,8 @@ No vetoes. Operator strategic ratification 2026-05-06 (*"we need track a or ever
 
 ## Amendment 2026-05-06 — verification timeline + scenario actuality
 
+> **[Corrected by §Amendment 2026-05-21 below.** The "fresh verification submitted / 4–6-week response window" claims in this section did not match GCP console state — no sensitive-scope verification was ever submitted. Kept unedited as the historical record per `decisions/README.md` §Reconcile discipline.]
+
 The original plan (slice 1) named two scenarios for Google Trust & Safety verification of the `auth/content` sensitive scope:
 
 - **Scenario A** — Eazy Access Ltd's existing GCP project verified for sensitive scopes already → slices 2–5 ship in 5–7 days.
@@ -119,3 +121,43 @@ Implications carried into the live plan:
 - ICO data-controller registration **ZC137268** issued and disclosed on `/about` + `/privacy` (commit `b79c787`). Adds a UK regulatory data point not foreseen in the original ADR.
 
 The 16-0 ratification stands. This amendment captures schedule-actuality and one mechanical hardening (`pickAccount` fail-closed); no scope or strategy change.
+
+## Amendment 2026-05-21 — verification-record correction + Merchant API migration prerequisite
+
+*Decided 2026-05-21 (Standing Council convene, that session); drafted 2026-06-06. Canon sources: this ADR's §Amendment 2026-05-06 format, `context/handover-2026-05-21-2255.md` (operator-screenshot-verified ground truth), `decisions/README.md` §Reconcile discipline.*
+
+### Corrections of record
+
+Source: operator screenshots of the GCP console, 2026-05-21 session.
+
+- **§Amendment 2026-05-06's "Scenario A3" is retired as factually wrong.** No sensitive-scope verification was ever submitted. The Verification Centre on the OAuth project reads: *"Verification is not required since your app is not requesting any sensitive or restricted scopes."* The "4–6-week Google response window" clock never existed. There is no pending review and no reply email coming.
+- **Brand verification is COMPLETE** on the project (*"Your branding has been verified and is being shown to users"*).
+- **The OAuth project is `caramel-park-446612-j9`** (console label `fluentsmtpeazyaccess`), not `flintmere-production` as session records assumed. Decision: GMC OAuth stays on `caramel-park-446612-j9` — it is already brand-verified, has Merchant API enabled, and carries the "Flintmere OAuth Client" credential. Project-per-product is consistent with existing precedent.
+- `context/summaries/2026-05-06-0850-jet-fighter-track-a-backend.md` carries the same false submission claims; annotated with a correction banner on this amendment pass. `context/operator-daily-playbook.md` §Track A updated to the corrected state on the same pass.
+
+### New facts
+
+- **Content API for Shopping is officially deprecated.** Google's API library page: *"This API is deprecated. Please use Merchant API instead."* The Merchant API (`merchantapi.googleapis.com`) is already enabled on the project.
+- **Codebase exposure is small and contained** (read-only walk, 2026-05-21): single binding point at `lib/gmc/content-api.ts:90`; two Content API methods (`accounts.authinfo` at `:95`, `productstatuses.list` at `:117`); single scope constant at `lib/gmc/oauth.ts:23`. Domain types in `lib/gmc/types.ts` are normalised at our boundary — Google shapes don't leak. Estimated migration: ~6–10 engineering hours.
+- **Customer-facing copy references the `auth/content` scope literally** at `apps/scanner/src/app/privacy/page.tsx` (clause 11), `apps/scanner/src/app/terms/page.tsx:187`, and `apps/scanner/src/app/audit/connect/_shared/ScopeCredits.tsx:10`. Migration requires a coordinated copy pass; the 2026-05-09 canon-protection binding fires on those surfaces, and Legal Council (#9 + #23 + #24) re-reviews the scope-disclosure language.
+
+### Decision
+
+**Migrate the GMC client from Content API for Shopping to Merchant API BEFORE submitting any scope verification to Google.**
+
+Rejected alternatives:
+- *Submit now on the deprecated scope* — worse expected value: if rejected, we lose 1–3 weeks AND still have to migrate.
+- *Submit and migrate in parallel* — a live OAuth flow would ask real merchants to grant a deprecated scope; trust risk on the exact surface whose purpose is trust.
+
+### Sequencing impact
+
+Slices 2–5 now sequence: **Merchant API migration (~6–10 h, fresh branch from `main`) → scope-verification submission on the new scope set → Google clearance (estimated 1–3 weeks; brand verification already complete) → `FEATURE_GMC_OAUTH=true` flag flip → slices 3–5.**
+
+Verifications carried open (close during migration, before submission):
+- Content API sunset date — confirm from Google's migration guide / release notes before committing the timeline.
+- The exact OAuth scope set Merchant API requires — confirm from Google docs at migration time; do not assume scope parity with Content API.
+- Redirect URI on the "Flintmere OAuth Client" credential includes `https://audit.flintmere.com/api/auth/google/callback` — operator console check.
+
+### Council sign-off
+
+Standing Council convened 2026-05-21 on migrate-first vs submit-now-on-deprecated. Lenses: #15 Tech lead · #4 Security · #18 DBA · #10 DevOps · #11 Investor voice · #9 + #23 + #24 Legal Council · #36 Product · #37 Consumer psychologist · #24 Data protection · #1 Founder. **Verdict: unanimous migrate-first.** The original 16-0 Track-A ratification stands; this amendment corrects the verification record and inserts the migration prerequisite — no scope or strategy change to Track A itself.

@@ -10,7 +10,7 @@ You are Flintmere's marketing-surface designer. You compose marketing pages that
 
 ## The canon (non-negotiable — from `memory/design/tokens.md`)
 
-- **Palette**: warm near-white `--paper` (`#F7F7F4`) + near-black `--ink` (`#0A0A0B`). No sulphur on marketing. Zero gradients. Zero shadows.
+- **Palette**: warm near-white `--paper` (`#F7F7F4`) + near-black `--ink` (`#0A0A0B`). Glowing Amber `#F8BF24` is the diagnostic accent (display-scale + under-tick + amber-fill CTA only, never body text on paper); sage `#5A6B4D` is the decorative-only second accent. Two atmosphere-only gradients (`--gradient-paper-warmth`, `--gradient-amber-radial`) + one elevation (`--shadow-paper-1`) per `tokens.md` §Corners, surfaces, motion floors. No glassmorphism, no backdrop blur.
 - **Typography**: Geist Sans (display + body) + Geist Mono (micro + bracket tokens). No Fraunces, no Space Grotesk, no Caveat.
 - **Signature**: one `[ bracketed word ]` moment per section. Two per page maximum. Bracket the key noun — never verbs or fillers.
 - **Sharp corners.** No border-radius except circular shapes.
@@ -84,7 +84,7 @@ One bracket per section is the target. If a section feels undressed without a br
 - Stock photography of merchants at laptops.
 - Scroll-driven parallax or 3D effects.
 - Frosted-glass or gradient hero backgrounds.
-- Drop-cap ornaments, deckle edges, or any Ledger-era carryover.
+- Drop-cap ornaments, deckle edges, grain textures, `.ledger-rule` hairlines, or any other retired Ledger-era carryover (see `tokens.md` §Retired).
 - "As seen on" logo strips before we have real press coverage.
 
 ## Motion allowance (from `motion.md`)
@@ -105,7 +105,7 @@ One bracket per section is the target. If a section feels undressed without a br
 ## Anti-patterns
 
 - Skipping the bracket — every marketing section has one.
-- Two sulphur accents on marketing (none is the rule; sulphur is scanner-only).
+- More than one amber moment per view on marketing (one amber-fill CTA OR one display-scale accent per view; amber is the diagnostic accent, used sparingly on paper).
 - Overloading a hero with both giant display + line-art + stats + a CTA cluster — pick fewer elements and let them breathe.
 - Specifying `bg-white` — use `--paper` for warm near-white.
 - Specifying `rounded-*` on marketing cards — sharp corners only.

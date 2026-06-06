@@ -1,12 +1,12 @@
 ---
 name: webhook-review
-description: Review an Flintmere webhook handler (Stripe, Coinbase, or future provider) for signature verification, idempotency, error handling, side-effect safety, and observability. Use when a webhook handler is new, changed, or suspected in an incident. Produces a review report with findings by severity and recommended fixes. Read-only — fixes go to `implement-checkout-flow` or `fix-bug`.
+description: Review an Flintmere webhook handler (Stripe, Shopify, or a future provider) for signature verification, idempotency, error handling, side-effect safety, and observability. Use when a webhook handler is new, changed, or suspected in an incident. Produces a review report with findings by severity and recommended fixes. Read-only — fixes go to `implement-checkout-flow` or `fix-bug`.
 allowed-tools: Read, Grep, Glob, Bash(git log*), Bash(git show*)
 ---
 
 # webhook-review
 
-You are Flintmere's webhook reviewer. You read handlers cold and find the failure modes before production does. You do not fix; you report. #4 Security leads this skill. Payment handlers convene #30 and #31.
+You are Flintmere's webhook reviewer. You read handlers cold and find the failure modes before production does. You do not fix; you report. #4 Security leads this skill. Payment handlers convene #30.
 
 ## Operating principles
 
@@ -91,8 +91,7 @@ For every webhook handler in scope:
 ## Self-review — Webhook Council (mandatory)
 
 - **#4 Security (lead)**: is every P0 / P1 correctly classified? Would a fix of the handler code alone close the class, or does it need a schema / middleware change?
-- **#30 Payment systems engineer** *(for Stripe handlers)*: are all relevant Subscription + Invoice events handled? Are test modes distinguishable from live mode at the handler level?
-- **#31 Crypto payments specialist** *(for Coinbase Commerce / Business handlers)*: are settlement events handled correctly? Is the on-chain evidence reconciled before entitlement?
+- **#30 Payment systems engineer** *(for Stripe handlers)*: are all relevant Subscription + Invoice events handled? For the one-off concierge audit, is `payment_intent.succeeded` / `checkout.session.completed` reconciled before the audit record is upserted? Are test modes distinguishable from live mode at the handler level?
 - **#34 Full-stack debugging engineer**: if this handler failed silently in production, would you be able to find out? Are the logs useful without a debugger attached?
 - **#19 Privacy / GDPR**: is any PII landing in logs that shouldn't?
 
@@ -106,9 +105,10 @@ For every webhook handler in scope:
 
 ## Product truth
 
-- Stripe is the source of truth for subscription state.
-- Coinbase Commerce handles one-time crypto payments; Coinbase Business handles managed settlement.
-- Webhooks are retried by the provider. Our handlers are idempotent by contract.
+- Stripe is the source of truth for subscription state and the only payment provider.
+- Stripe handles the one-off concierge audit payment: `payment_intent.succeeded` / `checkout.session.completed` → upsert `scanner_concierge_audits` → fire `concierge-email.ts`.
+- Shopify webhooks (`products/*`, `app-uninstalled`, GDPR DSAR/redact) are HMAC-verified and drive drift re-scores + data-protection flows.
+- Webhooks are retried by the provider. Our handlers are idempotent by contract (Stripe keyed on event ID; Shopify keyed on `shopify_webhook_id` in `webhook_events`).
 - Stripe timeout window: 10 seconds for handler response.
 
 ## Boundaries

@@ -378,10 +378,10 @@ export default function Privacy() {
           revocable at any time.
         </p>
         <p className="mt-4">
-          <strong>Pre-verification waiting list.</strong> While Google&rsquo;s
-          Trust &amp; Safety review of our integration is still in flight,
-          the connect surface captures expressions of interest instead of
-          starting the OAuth flow. If you submit your details there, we
+          <strong>Pre-verification waiting list.</strong> Until Google&rsquo;s
+          verification of our integration completes and the connect flow
+          opens, the connect surface captures expressions of interest
+          instead of starting the OAuth flow. If you submit your details there, we
           store your email, the audit ID that brought you to the page, your
           shop URL, and any optional message you leave. We use this only to
           write to you the day access opens — at most a single email, after
@@ -391,11 +391,10 @@ export default function Privacy() {
         </p>
         <p className="mt-4">
           <strong>Scope.</strong> We request a single OAuth scope:{' '}
-          <code>https://www.googleapis.com/auth/content</code> — Google&rsquo;s
-          Content API for Shopping scope. We restrict our use to read-only
-          API methods: <code>accounts.list</code>,{' '}
-          <code>accountstatuses.get</code>, <code>productstatuses.list</code>,
-          and <code>accounts.reports.search</code>. We do not call any
+          <code>https://www.googleapis.com/auth/content</code> — the scope
+          Google&rsquo;s Merchant API uses. We restrict our use to read-only
+          API methods: <code>accounts.list</code> and{' '}
+          <code>products.list</code>. We do not call any
           method that writes to your GMC account, products, settings, or
           feeds. Google does not currently publish a separate read-only
           variant of this scope; the read-only commitment is enforced at

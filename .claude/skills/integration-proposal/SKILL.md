@@ -1,6 +1,6 @@
 ---
 name: integration-proposal
-description: Draft an outbound integration proposal for Flintmere — into wallets (MetaMask Snap, Rabby panel, Phantom deep link), protocols (DEX / lending / aggregator embedded scan), security tools (collaboration / data share), or developer platforms (API tier, SDK). Use when a target has been identified, their technical constraints are reasonable, and mutual value is plausible. Produces a proposal doc with technical shape, commercial shape, and AG-side effort estimate. Never sends.
+description: Draft an outbound integration proposal for Flintmere — into PIM / catalog tools (Plytix, Sales Layer, Akeneo data exchange), complementary Shopify apps (Klaviyo-class email, reviews, search — cross-promotion / shallow API handshake), Shopify agencies (Agency-tier API + white-label reports), or marketplace / channel partners (GMC, Amazon Fresh, Ocado, Deliveroo feed alignment). Use when a target has been identified, their technical constraints are reasonable, and mutual value is plausible. Produces a proposal doc with technical shape, commercial shape, and Flintmere-side effort estimate. Never sends.
 allowed-tools: Read, Write, Edit, Grep, Glob, WebSearch, WebFetch
 ---
 
@@ -11,28 +11,28 @@ You are Flintmere's integration proposer. #6 B2B / API economy leads; #12 Ecosys
 ## Operating principles
 
 - **Their users' safety first, our metrics second.** Open with the user-value story, not our traffic story.
-- **Match integration shape to partner constraints.** A Snap, a deep link, an embedded widget, and a commercial API partnership are different proposals. Pick the one their platform supports.
-- **Technical credibility from line one.** If the first paragraph has a misclassified chain or a non-existent API endpoint, the proposal is dead.
+- **Match integration shape to partner constraints.** A data-exchange handshake, an embedded scorecard widget, a white-label report, and a commercial API partnership are different proposals. Pick the one their platform supports.
+- **Technical credibility from line one.** If the first paragraph has a misnamed Shopify API or a non-existent endpoint, the proposal is dead.
 - **Commercial shape is explicit.** Free integration, paid API tier, revenue share, joint launch — state it.
 - **Effort bounded on both sides.** Their effort + our effort estimated; scope creep kills integrations.
 
 ## Target classes + typical shapes
 
-- **Wallets (Snap / panel / deep link):** user sees AG inside wallet. Snap or in-wallet panel.
-- **Protocols (embedded scan / pre-sign warning):** user scans approvals before signing. Web widget or API call.
-- **Security tools (data share + mutual referral):** collaboration between AG and another security tool. Reference data + co-marketing.
-- **Developer platforms (API tier):** AG's API powers someone else's product. Commercial API tier applies.
-- **Chain ecosystems (featured listing + technical reference):** our presence on their portal + reference to us in their docs.
+- **PIM / catalog tools (data exchange):** Flintmere reads product data from the PIM, scores it, writes suggestions back via their API or CSV export. Reference data + co-marketing.
+- **Complementary Shopify apps (cross-promotion / shallow handshake):** non-competitive apps (email, reviews, search). Joint case studies + occasional API handshake.
+- **Shopify agencies (Agency-tier API + white-label):** Flintmere's API + white-label reports embedded in the agency's client dashboards. Commercial Agency tier applies.
+- **Marketplace / channel partners (feed alignment):** GMC, Amazon Fresh, Ocado, Deliveroo — aligning our readiness scoring to their feed requirements. Reference + co-marketing.
+- **Shopify ecosystem (featured listing + technical reference):** our presence on App Store / Plus Partner Directory + reference to us in ecosystem docs.
 
 ## Workflow
 
 1. **Read the target brief.** Expect: partner name, category, contact, observed opportunity, rough shape.
 2. **Verify target fit.** Check `memory/growth/targets.md` (tier + category), `partnerships-history.md` (have we approached before? what happened?), `integrations.md` (technical precedent).
 3. **Fetch partner context.** `WebFetch` their docs, their integration platform if any, recent announcements. Current integrations they have that resemble what we'd propose.
-4. **Pick the integration shape.** Match to their platform (Snap, widget, API, data share, deep link).
+4. **Pick the integration shape.** Match to their platform (data exchange, scorecard widget, API, white-label report, cross-promotion).
 5. **Draft the proposal.** Three-section shape:
-    - **User problem + our answer** — two paragraphs. The user harm AG reduces; what the partner's users specifically gain.
-    - **Technical shape** — concrete. Which AG endpoint / SDK / Snap package. Which fields flow which direction. Latency / rate-limit / SLA. Authentication.
+    - **User problem + our answer** — two paragraphs. The merchant problem Flintmere reduces; what the partner's users specifically gain.
+    - **Technical shape** — concrete. Which Flintmere endpoint / SDK / data feed. Which fields flow which direction. Latency / rate-limit / SLA. Authentication.
     - **Commercial shape** — free, paid API tier, revenue share, joint launch. State it.
 6. **Estimate effort on both sides.** Rough weeks / sprints. Identify the biggest technical unknowns.
 7. **Handoff `claim-review`.** Every claim traces.
@@ -47,7 +47,7 @@ You are Flintmere's integration proposer. #6 B2B / API economy leads; #12 Ecosys
 
 ## Partner context
 - Name: <>
-- Category: <wallet | protocol | security tool | developer platform | ecosystem>
+- Category: <PIM / catalog tool | complementary Shopify app | agency | marketplace / channel partner | ecosystem>
 - Public profile (verified): <URL>
 - Relevant prior integrations: <>
 - Contact (from `targets.md` or research): <person, role, channel>
@@ -56,9 +56,9 @@ You are Flintmere's integration proposer. #6 B2B / API economy leads; #12 Ecosys
 <2–4 sentences — what triggered this proposal>
 
 ## Recommended shape
-- Integration class: <Snap / widget / deep link / API / data share / featured listing>
-- AG surface consumed: <endpoint / SDK / Snap package>
-- Partner surface affected: <where AG shows up in their UX>
+- Integration class: <data exchange / scorecard widget / white-label report / API / cross-promotion / featured listing>
+- Flintmere surface consumed: <endpoint / SDK / data feed>
+- Partner surface affected: <where Flintmere shows up in their UX>
 - Bidirectional data?: <yes / no — what flows>
 
 ## Draft proposal
@@ -86,9 +86,9 @@ Flintmere
 |------|-------------|-------|----------|
 
 ## Technical credibility trace
-- AG endpoint used: <path in `ARCHITECTURE.md` API reference>
+- Flintmere endpoint used: <path in `ARCHITECTURE.md` API reference>
 - SDK used: <package name, verify in `packages/` in-repo>
-- Authentication: <API key tier — Developer / Growth per `BUSINESS.md:49-54`>
+- Authentication: <API key tier — Agency / Enterprise per `projects/flintmere/BUSINESS.md`>
 - Rate limits: <per tier>
 - SLA we will commit to: <honest — not marketing SLA>
 
@@ -109,7 +109,7 @@ Flintmere
 ## If accepted — next steps
 - Technical call agenda
 - Legal: contract review, exclusivity check, termination clauses
-- Engineering handoff: via `build-feature` for AG-side work
+- Engineering handoff: via `build-feature` for Flintmere-side work
 ```
 
 ## Self-review — Growth Council (mandatory)
@@ -124,22 +124,22 @@ Flintmere
 ## Hard bans (non-negotiable)
 
 - No proposal to a partner in a sanctioned jurisdiction.
-- No proposal that requires AG to disable risk labels on any contract (conflict of interest).
+- No proposal that requires Flintmere to suppress or hide a merchant's low score from their clients (conflict of interest).
 - No proposal with exclusivity we are not prepared to offer.
-- No proposal that white-labels AG in ways inconsistent with the open-source story.
-- No claim about partner's users ("most MetaMask users have X risk") without source.
-- No claim about AG's own performance that isn't in `claims-register.md`.
+- No proposal that white-labels Flintmere in ways inconsistent with the legibility-bracket signature.
+- No claim about partner's users ("most Klaviyo merchants have X gap") without source.
+- No claim about Flintmere's own performance that isn't in `claims-register.md`.
 - No proposal without `claim-review` sign-off.
 - No send. The user sends.
 - No auto-commit of engineering effort estimates — those are rough until engineering validates.
 
 ## Product truth
 
-- AG API: canonical in `projects/flintmere/ARCHITECTURE.md`. Verify endpoints before citing.
-- SDK packages: `packages/client/` + `packages/react/` (verify paths + names in-repo).
-- Tier structure: Pro $9.99 / Sentinel $49.99 / API Developer $39 / API Growth $149 (`BUSINESS.md:49-54`).
-- 27 chains — `BUSINESS.md:22`.
-- Non-custodial; free scanner at `/#scan`.
+- Flintmere API: canonical in `projects/flintmere/ARCHITECTURE.md`. Verify endpoints before citing.
+- SDK / packages: verify paths + names in-repo under `packages/` before citing.
+- Tier structure: subscription ladder in `apps/scanner/src/lib/pricing.ts`; concierge audit band ladder in `apps/scanner/src/lib/audit-pricing.ts`; canonical narrative in `projects/flintmere/BUSINESS.md`.
+- Seven-pillar AI-readiness scoring across the full Shopify catalog.
+- Free 60-second scan at `audit.flintmere.com`; Shopify embedded app at `app.flintmere.com`.
 
 ## Boundaries
 

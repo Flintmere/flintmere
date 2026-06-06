@@ -1,6 +1,6 @@
 ---
 name: listing-submission
-description: Prepare a directory / ecosystem-page / awesome-list submission for Flintmere — DeFi Llama, chain ecosystem portals (Base, Arbitrum, Optimism), Product Hunt, awesome-* GitHub lists. Use when a listing opportunity is identified and we have the required assets ready. Produces a submission-ready package with all required fields, copy variants, and a claim-review trace. Never submits; the user does.
+description: Prepare a directory / ecosystem-page / awesome-list submission for Flintmere — Shopify App Store, Shopify Plus Partner directory, SaaS / ecommerce directories (G2, Capterra, AlternativeTo), Product Hunt, awesome-* GitHub lists. Use when a listing opportunity is identified and we have the required assets ready. Produces a submission-ready package with all required fields, copy variants, and a claim-review trace. Never submits; the user does.
 allowed-tools: Read, Write, Edit, Grep, Glob, WebSearch, WebFetch
 ---
 
@@ -11,18 +11,16 @@ You are Flintmere's listing submitter. You prepare submissions for directories, 
 ## Operating principles
 
 - **Every field traces to a source.** Description copy, tagline, category tags — all traceable. No guessing.
-- **Platform-native framing.** A DeFi Llama listing reads differently from a Product Hunt launch. Match tone + length + emphasis to the directory.
+- **Platform-native framing.** A Shopify App Store listing reads differently from a Product Hunt launch. Match tone + length + emphasis to the directory.
 - **No self-hype.** Directories evaluate; users judge. Over-stating in a listing gets the listing removed + the reputation dinged.
 - **Logos + screenshots pre-approved.** Every asset from `context/imagery/` or `public/` — nothing ad-hoc.
-- **Consistent claims across listings.** If the tagline claims "27 chains" on one listing and "28 chains" on another, users notice. All listings stay in sync via `claims-register.md`.
+- **Consistent claims across listings.** If the tagline claims "seven pillars" on one listing and "six" on another, users notice. All listings stay in sync via `claims-register.md`.
 
-## Target classes
-
-- **Canonical DeFi / security directories.** DeFi Llama, Wallet Security Alliance (if exists / emerges), Crypto Security directories.
-- **Chain ecosystem portals.** Base portal, Arbitrum portal, Optimism app directory, Polygon ecosystem page, etc. One per chain we support.
-- **Curated "awesome-*" GitHub lists.** awesome-ethereum, awesome-base, awesome-defi-security, awesome-wallet-security (as they exist / emerge). PR-based submission.
+- **Canonical Shopify / ecommerce directories.** Shopify App Store, Shopify Plus Partner directory, ecommerce-tooling directories.
+- **SaaS / app directories.** G2, Capterra, AlternativeTo, Product Hunt's tools collections — one per relevant category.
+- **Curated "awesome-*" GitHub lists.** awesome-shopify, awesome-ecommerce, awesome-saas (as they exist / emerge). PR-based submission.
 - **Product launch surfaces.** Product Hunt (one-off; high-leverage if timed right).
-- **Comparison / review sites.** G2, Alternativeto, similar — lower priority.
+- **Comparison / review sites.** G2, AlternativeTo, similar — lower priority.
 
 Not covered here: press mentions (marketing/outreach owns that), conference sponsor listings (handled by `sponsorship-brief`).
 
@@ -40,7 +38,7 @@ Not covered here: press mentions (marketing/outreach owns that), conference spon
     - Contact: the canonical operator contact
 5. **Draft the submission.** Per-field fill; each field references its source. Copy variants for character-limit constraints.
 6. **Run `claim-review`.** Every claim traces; banned phrases absent.
-7. **Run platform alignment** (`policy-alignment`) if the directory has content policies (e.g., Product Hunt has category rules; chain portals have ecosystem alignment rules).
+7. **Run platform alignment** (`policy-alignment`) if the directory has content policies (e.g., Product Hunt has category rules; the Shopify App Store has listing + Built-for-Shopify requirements).
 8. **Run Growth Council gates.**
 9. **Emit** to `context/listings/<YYYY-MM-DD>-<directory-slug>.md`.
 10. **Append to `partnerships-history.md`** as `listing submitted` at submission.
@@ -95,7 +93,7 @@ Not covered here: press mentions (marketing/outreach owns that), conference spon
 
 ## Post-submission
 - Monitor for approval / rejection.
-- If approved: add to AG's own public "Where to find us" list (if we maintain one).
+- If approved: add to Flintmere's own public "Where to find us" list (if we maintain one).
 - If rejected: record rationale; update `partnerships-history.md`; consider resubmission after addressing the rationale.
 - If removed later: investigate rationale; #9 Lawyer if terms-of-service issue.
 ```
@@ -104,13 +102,13 @@ Not covered here: press mentions (marketing/outreach owns that), conference spon
 
 - **#12 Ecosystem**: does the listing reach the right segment? Is the category fit honest?
 - **`claim-review`**: every field traces? Banned phrases absent? Claims consistent with other listings?
-- **`policy-alignment`**: any directory content policy (Product Hunt category rules, chain portal alignment rules) respected?
+- **`policy-alignment`**: any directory content policy (Product Hunt category rules, Shopify App Store + Built-for-Shopify rules) respected?
 - **#11 Investor voice** *(on listings visible to investors — Product Hunt, major directories)*: commercial narrative preserved?
 
 ## Hard bans (non-negotiable)
 
 - No submission from this skill. The user submits.
-- No inflated category (claiming "security" when listing in "wallet" increases visibility but violates directory rules).
+- No inflated category (claiming "SEO" when listing under "product information" increases visibility but violates directory rules).
 - No duplicate submissions under different names (violates most directory policies).
 - No paid placement disguised as organic (ASA / FTC rules; label paid placements).
 - No listing with claims that contradict other listings.
@@ -121,9 +119,9 @@ Not covered here: press mentions (marketing/outreach owns that), conference spon
 
 - Canonical name: "Flintmere"
 - Canonical URL: `flintmere.com` (verify current domain + redirects)
-- Category: security tooling for wallet approvals; non-custodial.
-- 27 chains — `BUSINESS.md:22`.
-- Free scanner at `/#scan`; Pro / Sentinel / API tiers — `BUSINESS.md:49-54`.
+- Category: AI-readiness catalog scoring for Shopify food merchants; seven-pillar scoring.
+- Free 60-second scan at `audit.flintmere.com`; Shopify embedded app at `app.flintmere.com`.
+- Subscription ladder + concierge audit band ladder — `projects/flintmere/BUSINESS.md`, `apps/scanner/src/lib/pricing.ts`, `apps/scanner/src/lib/audit-pricing.ts`.
 
 ## Boundaries
 
