@@ -1,4 +1,4 @@
-// PostHog analytics helper — replaces the Plausible helper (ADR 0025,
+// PostHog analytics helper — replaces the prior analytics helper (ADR 0025,
 // superseding ADR 0013). Cookieless-max: persistence 'memory' → zero
 // cookies, zero localStorage identifiers, no consent banner.
 //
