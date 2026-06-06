@@ -27,7 +27,16 @@ export async function captureServerEvent(
       event,
       properties: { ...properties, $process_person_profile: false },
     });
-    await client.shutdown();
+    // shutdown() flushes over the network to PostHog EU and blocks until the
+    // request completes or posthog-node's 10s requestTimeout elapses. This call
+    // sits on the Stripe webhook's payment-confirmation path (before the invoice
+    // and email sends) inside a 10s handler window — cap the wait at 2s so a
+    // PostHog outage or cold start can never delay the customer email or push
+    // the handler past Stripe's deadline.
+    await Promise.race([
+      client.shutdown(),
+      new Promise<void>((resolve) => setTimeout(resolve, 2000)),
+    ]);
   } catch {
     // Swallow — analytics must never break a payment path.
   }

@@ -114,11 +114,12 @@ Each row carries the re-entry trigger that would re-open it.
 
 - **Legal pages updated in lockstep**: `cookies/page.tsx` vendor swap (the
   "cookieless" claim stays literally true under memory persistence);
-  `privacy/page.tsx` sub-processor row → PostHog Inc. (US entity, EU data
-  residency — AWS Frankfurt) plus a new session-replay disclosure clause
-  (what is recorded, input masking, retention, lawful basis: legitimate
-  interest). Privacy clause 09 ("we do not use tracking, analytics, or
-  advertising cookies") remains true and unedited.
+  `privacy/page.tsx` sub-processor row (clause 05) → PostHog Inc. (US entity,
+  EU data residency — AWS Frankfurt) plus a new session-replay disclosure
+  (clause 05 tail — what is recorded, input masking, retention, lawful basis:
+  legitimate interest). The cookies clause ("we do not use tracking,
+  analytics, or advertising cookies") stays literally true under memory
+  persistence and is unedited.
 - **Vendor register + data-sources** rewritten Plausible → PostHog.
 - **STATUS.md** infra state + changelog updated.
 - **Admin health signal** moves to the PostHog Query API (HogQL — yesterday's
