@@ -41,9 +41,10 @@ export default function Cookies() {
           by a short random ID — that ID lives in the URL, not in a cookie.
         </p>
         <p className="mt-4">
-          For product analytics we use <strong>Plausible (EU, cookieless)</strong>.
-          No cookies are set, no cross-site tracking is performed, no IP
-          addresses are stored. Per ADR 0013.
+          For product analytics we use <strong>PostHog (EU-hosted, configured
+          cookieless)</strong>. Our PostHog configuration stores no cookies and
+          no browser-storage identifiers — analytics state lives in page memory
+          only. No cross-site tracking is performed. Per ADR 0025.
         </p>
       </Clause>
 
