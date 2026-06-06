@@ -6,6 +6,31 @@
 // chunk on the marketing surface — 124 KB, 47% of total JS payload).
 
 import * as Sentry from "@sentry/nextjs";
+import posthog from 'posthog-js';
+import {
+  POSTHOG_KEY,
+  POSTHOG_PROXY_PATH,
+  POSTHOG_UI_HOST,
+  posthogKeyIsStub,
+} from '@/lib/analytics-config';
+
+// PostHog Cloud EU via first-party /ingest proxy (next.config.ts rewrites).
+// Cookieless-max per ADR 0025: memory persistence (zero client storage),
+// anonymous events only (no identify() anywhere in this codebase).
+if (typeof window !== 'undefined' && !posthogKeyIsStub()) {
+  posthog.init(POSTHOG_KEY, {
+    api_host: POSTHOG_PROXY_PATH,
+    ui_host: POSTHOG_UI_HOST,
+    defaults: '2026-01-30', // history-change pageviews + pageleave
+    persistence: 'memory', // cookieless: replay works, identity per page-load
+    person_profiles: 'identified_only', // never identified → anonymous pricing
+    capture_performance: { web_vitals: true },
+    session_recording: {
+      maskAllInputs: true,
+      maskTextSelector: '[data-ph-mask]',
+    },
+  });
+}
 
 // Defer Sentry init until after first paint — its setup work
 // (registering global handlers, hooking fetch/XHR, instrumenting the
@@ -26,8 +51,8 @@ const initSentry = () => Sentry.init({
 
   // Tracing disabled on the client. The BrowserTracing integration adds
   // ~40 KB to the marketing bundle for performance telemetry we don't
-  // act on (Plausible covers Core Web Vitals; we don't have an SLA on
-  // home-page latency that needs Sentry). Server-side tracing in
+  // act on. Web vitals: PostHog capture_performance (ADR 0025); we don't
+  // have an SLA on home-page latency that needs Sentry. Server-side tracing in
   // sentry.server.config.ts is unaffected — that's where checkout +
   // webhook + concierge-flow visibility lives. Re-enable here only if
   // a debugging session needs client-side spans for a specific bug.
