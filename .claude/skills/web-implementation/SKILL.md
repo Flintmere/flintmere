@@ -22,7 +22,7 @@ You are Flintmere's web implementation engineer for marketing surfaces. You land
 2. **Read the target component.** Understand the current structure before changing it.
 3. **Show the intended diff.** Summarise: files to change, lines added / removed, assets added.
 4. **Apply the change.** Prefer `Edit` over `Write`. Keep the change scoped to the approved artefact.
-5. **Verify canon.** Fraunces / IBM Plex Sans only. Paper surfaces only on homepage. No `bg-white`, no `bg-slate-*`, no glassmorphism on marketing.
+5. **Verify canon.** Geist Sans + Geist Mono only. Warm `--paper` surfaces on marketing. No `bg-white`, no `bg-slate-*`, no glassmorphism.
 6. **Report.** Return the exact files touched and the diff.
 
 ## Allowed surfaces (marketing only)
@@ -57,10 +57,11 @@ If the artefact implies a change outside this list, stop and ask.
 
 ## Design canon reminders
 
-- Fraunces italic for display; IBM Plex Sans for body; JetBrains Mono for metadata.
-- Paper `#F7F5F0`, ink `#141210`, oxblood `#2D0A0A`.
-- `prefers-reduced-motion` respected. No autoplaying animation.
-- `ink-whisper` is the minimum body-copy token on paper-deep (AA).
+- Geist Sans for display + body; Geist Mono for metadata, bracket tokens, eyebrows.
+- Paper `--paper` `#F7F7F4`, ink `--ink` `#0A0A0B`, Glowing Amber `--accent` `#F8BF24` (diagnostic — display-scale / under-tick / amber-fill CTA only, never body text on paper), sage `--accent-sage` `#5A6B4D` (decorative only).
+- The legibility-bracket signature `[ word ]` (Geist Mono) appears once per section; wordmark is `Flintmere]`.
+- `prefers-reduced-motion` respected (single global `globals.css` block on marketing/scanner). No autoplaying animation.
+- `--mute` (`#5A5C64`, ≈ 6.3:1) is the body-safe muted floor on `--paper`; `--mute-2` is metadata only.
 
 ## Review gates
 
@@ -72,7 +73,7 @@ If the artefact implies a change outside this list, stop and ask.
 
 - Do not refactor. If the component needs refactoring to land the copy, stop and ask.
 - Do not clean up unrelated code you happen to see. Keep the change small.
-- Do not touch the dashboard or docs surfaces (glass canon lives there).
+- Do not touch the dashboard, app, or scanner-diagnostic surfaces (this skill is marketing-only).
 
 ## Companion skills
 
@@ -80,10 +81,10 @@ Reach for these when landing an approved artefact. All advisory; never a substit
 
 - `polish` — final alignment, spacing, micro-detail before commit.
 - `harden` — overflow, i18n, empty-state handling on surfaces that take variable copy.
-- `normalize` — re-align new copy to the Ledger token set when the change is visible at multiple breakpoints.
+- `normalize` — re-align new copy to the neutral-bold token set when the change is visible at multiple breakpoints.
 - `audit` — P0–P3 check on any surface that gains new interaction or markup.
 - `adapt` — verify the surface holds at mobile and at the desktop paper canvas.
-- `typeset` — Fraunces / Plex / JetBrains Mono hierarchy preserved.
+- `typeset` — Geist Sans / Geist Mono hierarchy preserved.
 - `arrange` — visual rhythm on multi-row or multi-column changes.
 - `optimize` — respect Thane's bundle budget. No net growth on marketing pages.
 - `simplify` — before commit, trim any dead code the change introduced.

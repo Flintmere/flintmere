@@ -1,6 +1,6 @@
 ---
 name: design-system-audit
-description: Audit Flintmere's `src/` for design-system drift — ad-hoc hex values, canon crossing (paper utilities on glass or vice versa), unused tokens, inconsistent primitives, motion without reduced-motion branches. Use when drift is suspected, quarterly, or before a major release. Produces a P0–P3 findings report with recommended fixes and handoff targets. Read-only — fixes go to engineering or `design-token` / `design-component`.
+description: Audit Flintmere's `src/` for design-system drift — ad-hoc hex values, retired-utility drift (Ledger/Glass carryover like `glass-*`, `.paper-card`, `.ledger-rule`, `bg-white`/`bg-slate-*`), retired faces, unused tokens, inconsistent primitives, motion without reduced-motion branches. Use when drift is suspected, quarterly, or before a major release. Produces a P0–P3 findings report with recommended fixes and handoff targets. Read-only — fixes go to engineering or `design-token` / `design-component`.
 allowed-tools: Read, Grep, Glob, Bash(pnpm build)
 ---
 
@@ -25,16 +25,15 @@ You are Flintmere's design-system auditor. Kael (Systems) leads; the full Design
   - Close to a canonical token → migrate + flag the cost of one-off values.
   - Genuinely new colour → flag for `design-token` proposal.
 
-### 2. Canon crossing (P0)
+### 2. Retired-utility drift (P0)
 
-- Paper utilities on glass surfaces → violation.
-- Glass utilities on marketing surfaces → violation.
-- Grep `src/app/page.tsx`, `src/components/Hero.tsx`, etc. for `glass-*`. Grep `src/app/(dashboard)/**`, `src/app/account/**` for `paper-*`.
+- Flintmere runs a single neutral-bold canon — there is no second "glass" canon. Any retired Ledger/Glass utility on any surface is a violation.
+- Grep `src/` for retired utilities: `glass-*`, `paper-card`, `ledger-rule`, `deckle-*`, `grain`, `dotted-leader`, and `bg-white` / `bg-slate-*` / `bg-gray-*` / `bg-neutral-*` / `dark:*` (all banned per `tokens.md` §Retired). Any hit → migrate to the canon token / primitive (`.bracket`, `--shadow-paper-1`, the two atmosphere gradients) or delete.
 
 ### 3. Font family drift (P0)
 
-- Grep for `font-family`, `fontFamily`. Only `font-fraunces`, `font-plex`, `font-mono` (and system fallbacks defined in canon).
-- Any fourth family → violation.
+- Grep for `font-family`, `fontFamily`. Only Geist Sans (`font-sans` / default) and Geist Mono (`font-mono`) plus system fallbacks defined in canon.
+- Any retired face (`font-fraunces`, `font-plex`, `font-space-grotesk`, Caveat) or any third family → violation; migrate to Geist Sans / Geist Mono.
 
 ### 4. Motion without reduced-motion branch (P0 via Noor VETO)
 
@@ -151,10 +150,10 @@ You are Flintmere's design-system auditor. Kael (Systems) leads; the full Design
 
 ## Product truth
 
-- Canon authority: `projects/flintmere/DESIGN.md`.
-- Ledger tokens: `tailwind.config.js` + `src/app/globals.css`.
-- Glass tokens: `src/design/tokens.ts`.
-- Noor's contrast floor: `ink-whisper` = 5.18:1 on `paper-deep`, metadata only.
+- Canon authority: `projects/flintmere/DESIGN.md` + `memory/design/tokens.md`.
+- Canon tokens: `tailwind.config.js` + `src/app/globals.css`.
+- Noor's contrast floor: `--mute-2` (`#8B8D95`) ≈ 3.5:1 on `--paper`, metadata only; `--mute` (`#5A5C64`) ≈ 6.3:1 is the body-safe floor.
+- Amber (`#F8BF24`) on `--paper` ≈ 1.7:1 — never body text; flag any amber text on paper as a P0.
 - Thane's −180KB savings: Vanta NET removed; must not return to marketing.
 
 ## Boundaries

@@ -1,6 +1,6 @@
 ---
 name: design-token
-description: Propose a new design token for Flintmere's Ledger or Glass canon — surface colour, text colour, accent, spacing, radius, shadow, easing, duration. Use when a design surface needs a value that doesn't exist in the canon and an ad-hoc hex is not acceptable. Produces a token proposal — name, value, contrast check, usage rationale, migration plan. Hands off to engineering for the canonical file edit. Never writes tokens directly.
+description: Propose a new design token for Flintmere's neutral-bold canon — surface colour, text colour, accent, spacing, radius, shadow, easing, duration. Use when a design surface needs a value that doesn't exist in the canon and an ad-hoc hex is not acceptable. Produces a token proposal — name, value, contrast check, usage rationale, migration plan. Hands off to engineering for the canonical file edit. Never writes tokens directly.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---
 
@@ -12,7 +12,7 @@ You are Flintmere's token proposer. Kael (Systems) leads; Maren (Visual) and Noo
 
 - **Default answer: no.** The canon is closed. A new token must justify itself against existing canon.
 - **Tokens carry meaning.** `text-ink-whisper` is metadata-only, not "a lighter body tone." Propose tokens with semantics, not preferences.
-- **Two canons, chosen deliberately.** A Ledger token does not automatically need a Glass counterpart and vice versa.
+- **One canon, closed by design.** Flintmere runs a single neutral-bold canon (warm paper + ink, Geist Sans/Mono, amber diagnostic accent, sage decorative accent). A new token must earn a seat at that one table.
 - **Every token has a contrast check.** On every surface it could appear on.
 - **Migration plan included.** If the token replaces ad-hoc values already in `src/`, list them and the migration path.
 
@@ -32,7 +32,7 @@ You are Flintmere's token proposer. Kael (Systems) leads; Maren (Visual) and Noo
 4. **Propose the value.**
     - Name (canonical Tailwind / CSS custom property style).
     - Value (hex for colour, ms for timing, etc.).
-    - Canon fit (Ledger / Glass / both, with why).
+    - Canon fit (neutral-bold canon — paper/ink surface, amber diagnostic accent, sage decorative accent; state which role, with why).
 5. **Run contrast checks** on every surface the token could appear on. Document each pair.
 6. **List usage sites.** Which surfaces will consume this token, immediately and in the future.
 7. **Migration plan.** Grep `src/` for ad-hoc values that match or approximate the proposed token. List them. Each one gets a migration commit (engineering handoff).
@@ -46,7 +46,7 @@ You are Flintmere's token proposer. Kael (Systems) leads; Maren (Visual) and Noo
 
 ## Need
 - Surface: <>
-- Canon: Ledger / Glass / both
+- Canon: neutral-bold (the single closed canon)
 - Problem: <what the surface needs that canon doesn't provide>
 
 ## Existing tokens considered and rejected
@@ -57,8 +57,8 @@ You are Flintmere's token proposer. Kael (Systems) leads; Maren (Visual) and Noo
 - Name: `<token-name>`
 - Value: `<hex / ms / px / rem / easing expression>`
 - Classification: <surface | text | accent | spacing | radius | shadow | easing | duration | other>
-- Canon fit: <Ledger / Glass / both>
-- File to update: `tailwind.config.js` / `src/app/globals.css` / `src/design/tokens.ts`
+- Canon fit: <neutral-bold role — paper surface / ink text / amber diagnostic accent / sage decorative accent / structural>
+- File to update: `tailwind.config.js` / `src/app/globals.css`
 
 ## Contrast checks (colour tokens only)
 | Pair | Ratio | Meets AA | Meets AAA |
@@ -82,9 +82,8 @@ You are Flintmere's token proposer. Kael (Systems) leads; Maren (Visual) and Noo
 - Target: engineering (via `build-feature` if it's part of a feature, or a small direct edit)
 - Approved artefact path: `context/design/tokens/<this file>`
 - Files to update:
-    - `tailwind.config.js` (Ledger tokens)
-    - `src/app/globals.css` (Ledger utilities that reference the token)
-    - `src/design/tokens.ts` (Glass tokens)
+    - `tailwind.config.js` (token definitions)
+    - `src/app/globals.css` (CSS custom properties + utilities that reference the token)
     - `memory/design/tokens.md` (update the summary)
 ```
 
@@ -101,24 +100,23 @@ You are Flintmere's token proposer. Kael (Systems) leads; Maren (Visual) and Noo
 - No token proposal without documented "existing tokens considered".
 - No colour token without contrast checks on every surface it could appear on.
 - No easing / duration token that contradicts `motion.md`.
-- No new font family. The three families are final.
+- No new font family. Geist Sans + Geist Mono are final.
 - No proposal that duplicates an existing token with a different name.
 - No writing under `src/` from this skill. Engineering applies approved tokens.
 - No appending to `memory/design/tokens.md` until the token is approved AND committed to the canonical file.
 
 ## Product truth
 
-- **Ledger tokens** — defined in `tailwind.config.js` and `src/app/globals.css`. Surface: paper, paper-sub, paper-deep, oxblood, cream. Text: ink ladder (17:1 → 12:1 → 7.4:1 → 5.18:1). Accents: amber-deep, crimson-paper, ink-blue.
-- **Glass tokens** — `src/design/tokens.ts` (Midnight Amber). Deprecated-but-active; expectation is no new additions.
-- **Fonts** — Fraunces, IBM Plex Sans, JetBrains Mono. Final.
-- **Protected moments** — `text-crimson-paper` on "approved." and equivalent headline accents. Single oxblood CTABand on homepage.
+- **Canon tokens** — defined in `tailwind.config.js` and `src/app/globals.css`. Surface: `--paper` (`#F7F7F4`), `--paper-2` (`#EDECE6`). Text: ink ladder `--ink` / `--ink-2` / `--ink-3` plus `--mute` / `--mute-2`. Accents: `--accent` Glowing Amber (`#F8BF24`, diagnostic — display-scale/under-tick/amber-fill CTA only, never body text on paper), `--accent-sage` (`#5A6B4D`, decorative-only second accent). Semantic: `--alert` (`#E54A2A`), `--ok` (`#3F8F57`). Elevation: single `--shadow-paper-1`. Gradients: `--gradient-paper-warmth`, `--gradient-amber-radial` (atmosphere only).
+- **Fonts** — Geist Sans + Geist Mono. Final.
+- **Signature moment** — the legibility bracket `[ word ]` (Geist Mono, the only place 700 weight appears on paper), one per section. The wordmark is `Flintmere]` (asymmetric closing bracket).
 
 ## Boundaries
 
-- Do not update `tailwind.config.js`, `globals.css`, or `tokens.ts` directly. Engineering owns the canonical file.
+- Do not update `tailwind.config.js` or `globals.css` directly. Engineering owns the canonical file.
 - Do not change an existing token's value without a formal ADR + council review + user sign-off.
 - Do not propose a token that serves a single callsite — inline it instead.
-- Do not propose "themes" — AG runs two canons by design, not multiple themes.
+- Do not propose "themes" — Flintmere runs one closed canon, not multiple themes.
 
 ## Companion skills
 
@@ -137,7 +135,7 @@ Read before proposing:
 - `memory/design/accessibility.md` (contrast floors)
 - `memory/design/performance-budget.md` (if the token implies a new asset)
 - `projects/flintmere/DESIGN.md`
-- `tailwind.config.js` / `src/app/globals.css` / `src/design/tokens.ts` (canonical values)
+- `tailwind.config.js` / `src/app/globals.css` (canonical values)
 
 Append to `memory/design/tokens.md` ONLY after:
 1. Council approves.

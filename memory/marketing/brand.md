@@ -16,7 +16,7 @@ Every headline and major section carries **one bracketed word** — the key noun
 
 - `Your product catalog is [ invisible ] to ChatGPT.`
 - `Missing [ GTIN ] on 412 products.`
-- `[ Six ] pillars. One score.`
+- `[ Seven ] pillars. One score.`
 
 One per section. Two per page maximum. Brackets structure-only — nouns, numbers, identifiers. Never verbs or filler.
 
@@ -62,8 +62,8 @@ Technical-confidence register. Not growth-hack register. Not academic register.
 
 ## Proof standards
 
-- **Pillar count**: 6. Source: `SPEC.md` §4.1. Never "multiple pillars" when the number is known.
-- **Pricing**: Growth £49 / Scale £149 / Agency £399 / Enterprise £499+. Source: `BUSINESS.md` §Tiers.
+- **Pillar count**: 7 (Identifiers, Attributes, Titles, Mapping, Consistency, Checkout eligibility, Crawlability). Source: `https://flintmere.com/methodology` (2026-05-02) + `memory/canon-source-register.md` §A9. Never "multiple pillars" when the number is known; never paraphrase pillar names.
+- **Pricing**: in transition per ADR 0016 — grandfathered Growth £79 / Scale £249 / Agency £499; new sign-ups on the vertical ladder. Code canon: `apps/scanner/src/lib/pricing.ts` (subscriptions) + `apps/scanner/src/lib/audit-pricing.ts` (audit bands per ADR 0022). Never hardcode prices in copy without checking those two files.
 - **SKU bands**: Growth <500, Scale 500–5,000, Enterprise 10,000+. Source: `BUSINESS.md`.
 - **Agency seats**: 25. Source: `BUSINESS.md`.
 - **AI uplift numbers**: 15× YoY / 40% invisible / 5.6M stores / 3–4× at 99% attr completion. Source: `SPEC.md` Appendix A. Cite the year (2025). Never "at least" without anchor.
@@ -87,4 +87,5 @@ Technical-confidence register. Not growth-hack register. Not academic register.
 
 ## Changelog
 
+- 2026-06-06: Proof standards reconciled — pillar count 6 → 7 (methodology canon, 2026-05-02) with full pillar names; hardcoded £49/£149/£399 ladder replaced with ADR 0016 transition framing + code-canonical pointers (`pricing.ts` / `audit-pricing.ts`). Bracket example updated to `[ Seven ]`.
 - 2026-04-19: Rewritten for Flintmere. Replaced Web3 voice brief (token approvals, wallet register, "degen/wagmi" bans) with Shopify-app voice brief (catalog, GTIN, AI agent register; outcome-promise bans; agency-friendly positioning).
