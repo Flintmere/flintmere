@@ -13,7 +13,8 @@
  *                                 (post-ingestion-engine, June 2026+) lands
  *                                 the actual taxonomy under the same
  *                                 routing scaffold.
- *   all hosts                   — APIs (/api/*), Next.js assets, metadata
+ *   all hosts                   — APIs (/api/*), the PostHog capture proxy
+ *                                 (/ingest/*), Next.js assets, metadata
  *                                 files (sitemap, robots, opengraph, icons)
  *
  * Cross-host requests get 301'd to the canonical host. Standards-host root
@@ -22,7 +23,7 @@
  * colliding with the marketing root.
  *
  * Cross-host 90-day window: 2026-05-03 → 2026-08-03. After that, evaluate
- * via Plausible whether to flip to 404 instead of 301. TODO: 2026-08-03.
+ * via PostHog whether to flip to 404 instead of 301. TODO: 2026-08-03.
  *
  * Why this file exists, not constants in middleware.ts: route classification
  * needs to be testable without spinning up Next.js middleware. Helpers
@@ -98,6 +99,7 @@ export const STANDARDS_ROUTES: readonly string[] = ['/standards'];
 /** Path prefixes that are allowed on every host (APIs, assets, metadata). */
 export const HOST_AGNOSTIC_PREFIXES: readonly string[] = [
   '/api/',
+  '/ingest/',
   '/_next/',
   '/static/',
   '/.well-known/',

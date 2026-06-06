@@ -34,7 +34,7 @@ import {
   AUDIT_BANDS,
   type AuditBandSlug,
 } from '@/lib/audit-pricing';
-import { track } from '@/lib/plausible';
+import { track } from '@/lib/analytics';
 import { CheckoutCard } from './CheckoutCard';
 
 // Default band drives the headline price the user sees on land. Anchored

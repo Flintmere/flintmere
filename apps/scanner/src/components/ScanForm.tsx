@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { track } from '@/lib/plausible';
+import { track } from '@/lib/analytics';
 import { Honeypot, type HoneypotHandle } from '@/components/Honeypot';
 import { TurnstileWidget } from '@/components/TurnstileWidget';
 

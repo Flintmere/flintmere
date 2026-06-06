@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Bracket } from '@flintmere/ui';
 import { Honeypot, type HoneypotHandle } from '@/components/Honeypot';
 import { REPLY_SLA } from '@/lib/copy';
-import { track } from '@/lib/plausible';
+import { track } from '@/lib/analytics';
 import { writeHandoff } from '@/lib/audit-handoff';
 
 export interface EmailGateProps {

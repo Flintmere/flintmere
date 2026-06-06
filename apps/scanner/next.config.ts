@@ -19,6 +19,27 @@ const config: NextConfig = {
     // See memory/design/tokens.md §Imagery weight budgets.
     formats: ['image/avif', 'image/webp'],
   },
+  // PostHog Cloud EU first-party proxy (ADR 0025) — ad-blocker-resistant
+  // capture. PostHog's API uses trailing slashes; skipTrailingSlashRedirect
+  // below stops Next.js 308'ing them. Pattern per
+  // posthog.com/docs/advanced/proxy/nextjs.
+  skipTrailingSlashRedirect: true,
+  async rewrites() {
+    return [
+      {
+        source: '/ingest/static/:path*',
+        destination: 'https://eu-assets.i.posthog.com/static/:path*',
+      },
+      {
+        source: '/ingest/array/:path*',
+        destination: 'https://eu-assets.i.posthog.com/array/:path*',
+      },
+      {
+        source: '/ingest/:path*',
+        destination: 'https://eu.i.posthog.com/:path*',
+      },
+    ];
+  },
   async headers() {
     return [
       {

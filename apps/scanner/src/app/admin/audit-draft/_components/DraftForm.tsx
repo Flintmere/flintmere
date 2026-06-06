@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { track } from '@/lib/plausible'
+import { track } from '@/lib/analytics'
 import type { Vertical } from '@/lib/audit-draft/schema'
 import { StageLedger } from '@/components/StageLedger'
 
