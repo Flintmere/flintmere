@@ -35,7 +35,7 @@ export interface SocialBatchResult {
 }
 
 export async function runSocialPostBatch(
-  client: SocialQueuePrisma = prisma as unknown as SocialQueuePrisma,
+  client: SocialQueuePrisma = prisma,
   poster: Poster,
   now: Date = new Date(),
 ): Promise<SocialBatchResult> {
