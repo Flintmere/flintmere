@@ -80,8 +80,12 @@ export async function postTweet(
   });
   const bodyText = await res.text();
   if (res.status === 201) {
-    const parsed = JSON.parse(bodyText) as { data?: { id?: string } };
-    return { ok: true, id: parsed.data?.id ?? '' };
+    try {
+      const parsed = JSON.parse(bodyText) as { data?: { id?: string } };
+      return { ok: true, id: parsed.data?.id ?? '' };
+    } catch {
+      return { ok: false, status: res.status, error: bodyText };
+    }
   }
   return { ok: false, status: res.status, error: bodyText };
 }
