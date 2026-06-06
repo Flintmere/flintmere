@@ -13,9 +13,9 @@ vi.mock('@/lib/db', () => ({
 }));
 
 import { fetchGmcGroundTruth, __testing } from './ground-truth';
-import { GmcApiError, type ContentApiClient } from './content-api';
+import { GmcApiError, type GmcApiClient } from './merchant-api';
 import { sealRefreshToken } from './token-storage';
-import type { ProductStatusEntry } from './content-api';
+import type { ProductStatusEntry } from './merchant-api';
 
 const VALID_KEY = '0'.repeat(64);
 
@@ -63,7 +63,7 @@ function makeStubClient(opts: {
   pages?: ProductStatusEntry[][];
   accountsThrows?: unknown;
   productsThrows?: unknown;
-}): ContentApiClient {
+}): GmcApiClient {
   let pageIdx = 0;
   return {
     async listAccounts() {
@@ -240,7 +240,7 @@ describe('fetchGmcGroundTruth', () => {
   it('skips accounts.list when gmcAccountId already persisted', async () => {
     findUnique.mockResolvedValue(buildConn({ gmcAccountId: '12345' }));
     const listAccountsSpy = vi.fn();
-    const factory = (token: string): ContentApiClient => {
+    const factory = (token: string): GmcApiClient => {
       const stub = makeStubClient({ pages: [[product('p1', 'A', 'approved')]] });
       return {
         listAccounts: async (...args) => {
@@ -258,7 +258,7 @@ describe('fetchGmcGroundTruth', () => {
     findUnique.mockResolvedValue(buildConn({ gmcAccountId: '12345' }));
     let calls = 0;
     let mockNow = 1_000_000_000;
-    const factory = (): ContentApiClient => ({
+    const factory = (): GmcApiClient => ({
       listAccounts: async () => [{ accountId: '12345', accountName: null, websiteUrl: null }],
       listProductStatuses: async () => {
         calls++;
