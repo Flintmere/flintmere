@@ -94,7 +94,7 @@ function templateInputFromTarget(
 
 /**
  * Append cohort attribution to an outbound link. Captured client-side by
- * Plausible on landing; the `t` param is the OutreachTarget id so we can
+ * PostHog on landing; the `t` param is the OutreachTarget id so we can
  * also attribute server-side from request headers when needed.
  *
  * Per `feedback_no_pii_in_url_params` the cuid `t` is not PII (no email,

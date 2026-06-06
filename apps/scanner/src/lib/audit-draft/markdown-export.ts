@@ -247,7 +247,7 @@ function titleCasePillar(pillar: string): string {
 
 /**
  * Mean confidence across every confidence field in the draft. Used by
- * the Plausible event, rounded to 0.05 to keep cardinality low.
+ * the PostHog event, rounded to 0.05 to keep cardinality low.
  */
 export function averageConfidence(draft: AuditDraft): number {
   const values: number[] = [

@@ -50,12 +50,12 @@ Start with `CLAUDE.md` (load map). Then:
 - `projects/flintmere/STATUS.md` — what's shipped, what's next
 - `projects/flintmere/SPEC.md` — original Product & GTM plan (v1.2; ADRs supersede parts)
 - `projects/flintmere/strategy/` — long-form strategy + 12-month proof gates
-- `projects/flintmere/decisions/` — ADRs 0001–0023
+- `projects/flintmere/decisions/` — ADRs 0001–0025
 - `SECURITY.md` — disclosure policy
 
 ## Stack (current)
 
-TypeScript · Next.js 15 · Remix · Prisma · Postgres 16 · BullMQ/Redis · Tailwind v4 · Geist Sans + Mono · Gemini Enterprise Agent Platform — formerly Vertex AI — (Gemini 2.5 Flash + Pro, `europe-west1`) · OpenAI Platform (GPT-4o-mini fallback, ADR 0010) · Resend · Stripe · Sentry · Plausible Cloud EU (ADR 0013) · Coolify on DigitalOcean.
+TypeScript · Next.js 15 · Remix · Prisma · Postgres 16 · BullMQ/Redis · Tailwind v4 · Geist Sans + Mono · Gemini Enterprise Agent Platform — formerly Vertex AI — (Gemini 2.5 Flash + Pro, `europe-west1`) · OpenAI Platform (GPT-4o-mini fallback, ADR 0010) · Resend · Stripe · Sentry · PostHog Cloud EU (ADR 0025) · Coolify on DigitalOcean.
 
 ## License
 

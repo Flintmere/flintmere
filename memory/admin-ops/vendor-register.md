@@ -139,23 +139,24 @@ Single source of truth for vendor relationships. `vendor-review` reads this; `fi
 - DPA in place: yes
 - Notes: PII scrubbing verified before send. Never Shopify access tokens to Sentry.
 
-### Plausible (Cloud, EU)
-- Service: product analytics (cookieless)
-- Plan: Growth ($9/mo, 10K monthly pageviews)
-- Monthly cost: ~£7/mo (USD-billed)
-- Renewal: monthly
-- Lock-in level: **low** — open source; Plausible CE self-host migration possible; PostHog migration via re-instrumentation if triggers in ADR 0013 fire
-- Data processor: yes (aggregated product events; no IP storage by design)
-- DPA in place: yes (Plausible DPA — Estonia / EU; UK→EU adequacy)
+### PostHog (Cloud, EU)
+- Service: product analytics + session replay (cookieless config)
+- Plan: Cloud EU free tier (1M events/mo, 5k replays/mo)
+- Monthly cost: £0
+- Renewal: n/a (free tier; usage/billing alerts set)
+- Lock-in level: **low** — open-source core; portable event names (ADR 0013 mandate carried forward); HogQL + standard export paths
+- Data processor: yes (anonymous product events + masked session replay)
+- DPA in place: yes (PostHog DPA — PostHog Inc., US entity, EU data residency on AWS Frankfurt; UK→EU adequacy applies)
 - Sub-processors: AWS EU
-- Alternatives evaluated: PostHog (cloud + self-host), Umami, Plausible self-host — see ADR 0013
-- Last reviewed: 2026-04-26
-- Notes: cookieless by design; no consent banner needed; supersedes the
-  earlier PostHog plan (see ADR 0013 §Amendment 1 — droplet resource
-  pressure forced Cloud over self-host; council pivoted from PostHog to
-  Plausible for the cookieless story + measurement quality). Migration
-  triggers to PostHog: cohort retention need, 3+ A/B tests/quarter
-  consistently, session replay need, enterprise prospect ask, Series A.
+- Alternatives evaluated: Plausible (Cloud + self-host), PostHog self-host, Umami — see ADRs 0013 + 0025
+- Last reviewed: 2026-06-06
+- Notes: replaces Plausible after its trial lapsed (Plausible has no free
+  tier; tracking went dark). Cookieless-max — `persistence: 'memory'`, zero
+  cookies, zero localStorage identifiers, no consent banner; the ADR 0013
+  cookieless rationale is preserved, the vendor changed (ADR 0025). Anonymous
+  events only (no `identify()`). Paid add-ons (error tracking, group analytics,
+  warehouse, hybrid consent banner for cross-session identity) are gated by the
+  ADR 0025 re-entry triggers.
 
 ### BetterStack Uptime
 - Service: uptime monitoring + status page

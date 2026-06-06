@@ -1,6 +1,6 @@
 # ADR 0013 — Product analytics: Plausible Cloud (EU)
 
-- **Status**: Accepted (amended 2026-04-25 evening — see §Amendment 1)
+- **Status**: Superseded by ADR 0025 (runtime decision only — this ADR remains the canonical record of the cookieless rationale). Amended 2026-04-25 evening — see §Amendment 1.
 - **Date**: 2026-04-25
 - **Decider**: Abu Aaliyah (operator) on council recommendation
 - **Supersedes**: implicit "PostHog self-hosted" assumption baked into Privacy Policy clause 05 + DPA Annex 2 + Cookie Policy clause 02.2 (consent banner commitment for `ph_distinct_id`). Those documents will be updated in lockstep with this decision.
