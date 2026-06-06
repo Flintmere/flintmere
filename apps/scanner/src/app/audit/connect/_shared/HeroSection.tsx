@@ -35,9 +35,15 @@ export function HeroSection({
         </p>
         <h1
           style={{
-            fontSize: 'clamp(48px, 11vw, 144px)',
+            // Sized so the nowrap bracket unit `[ Merchant Center ]`
+            // (~11.7em at 0.8em bracket scale ≈ 9.4em of h1 size) fits the
+            // 1120px container at the cap and a 320px viewport at the
+            // floor. At the previous 144px cap the unit overflowed and
+            // gave the whole page a horizontal scrollbar (operator-caught
+            // 2026-06-06 during the GMC demo dry run).
+            fontSize: 'clamp(36px, 7.5vw, 112px)',
             fontWeight: 600,
-            lineHeight: 0.92,
+            lineHeight: 0.96,
             letterSpacing: '-0.04em',
             margin: 0,
             color: 'var(--color-ink)',
@@ -71,7 +77,7 @@ export function HeroBracketShimmer({ children }: { children: ReactNode }) {
         fontWeight: 700,
       }}
     >
-      <Bracket>{children}</Bracket>
+      <Bracket size="display">{children}</Bracket>
     </span>
   );
 }

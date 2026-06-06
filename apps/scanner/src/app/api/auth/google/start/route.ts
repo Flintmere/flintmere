@@ -6,6 +6,7 @@ import {
   signState,
 } from '@/lib/gmc/oauth';
 import { prisma } from '@/lib/db';
+import { scannerOrigin } from '@/lib/host-url';
 import { checkOauthFlowRateLimit } from '@/lib/rate-limit';
 
 // Per ADR 0023 §slice 2 — OAuth start endpoint. Behind FEATURE_GMC_OAUTH.
@@ -61,7 +62,13 @@ export async function GET(request: NextRequest) {
   }
 
   const state = signState({ normalisedDomain, auditId: audit.id });
-  const redirectUri = new URL('/api/auth/google/callback', url).toString();
+  // Built from the public origin, NOT `request.url` — behind Traefik the
+  // request self-reports as the container origin (0.0.0.0:3000), which
+  // Google rejects as an unauthorized redirect URI.
+  const redirectUri = new URL(
+    '/api/auth/google/callback',
+    scannerOrigin(request.url),
+  ).toString();
   const authUrl = buildAuthUrl({ state, redirectUri });
 
   return NextResponse.redirect(authUrl, { status: 302 });
