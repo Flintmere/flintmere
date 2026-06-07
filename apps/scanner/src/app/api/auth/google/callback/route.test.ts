@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server';
 
 const upsert = vi.fn();
 const exchange = vi.fn();
+const captureServerEvent = vi.fn();
 
 vi.mock('@/lib/db', () => ({
   prisma: {
@@ -10,6 +11,10 @@ vi.mock('@/lib/db', () => ({
       upsert: (...args: unknown[]) => upsert(...args),
     },
   },
+}));
+
+vi.mock('@/lib/analytics-server', () => ({
+  captureServerEvent: (...args: unknown[]) => captureServerEvent(...args),
 }));
 
 vi.mock('@/lib/gmc/oauth', async (importOriginal) => {
@@ -33,6 +38,7 @@ describe('GET /api/auth/google/callback', () => {
   beforeEach(() => {
     upsert.mockReset().mockResolvedValue({});
     exchange.mockReset();
+    captureServerEvent.mockReset().mockResolvedValue(undefined);
     process.env.FEATURE_GMC_OAUTH = 'true';
     process.env.GMC_STATE_SECRET = 'test-state-secret';
     process.env.GMC_TOKEN_KEY = '0'.repeat(64);
@@ -57,6 +63,9 @@ describe('GET /api/auth/google/callback', () => {
     expect(location).toContain('/audit/connect');
     expect(location).toContain('status=denied');
     expect(location).toContain('reason=access_denied');
+    expect(captureServerEvent).toHaveBeenCalledWith('oauth_callback_denied', {
+      reason: 'access_denied',
+    });
   });
 
   it('replaces an off-allowlist ?error= with reason=unknown', async () => {
@@ -109,6 +118,10 @@ describe('GET /api/auth/google/callback', () => {
     expect(upsertArg.create.refreshTokenCipher.length).toBeGreaterThan(0);
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toContain('status=ok');
+    expect(captureServerEvent).toHaveBeenCalledWith('oauth_callback_ok', {
+      shop: 'acme.com',
+      audit_id: 'aud_1',
+    });
   });
 
   it('redirects to exchange-failed when token exchange throws', async () => {
@@ -118,5 +131,21 @@ describe('GET /api/auth/google/callback', () => {
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toContain('status=exchange-failed');
     expect(upsert).not.toHaveBeenCalled();
+    expect(captureServerEvent).toHaveBeenCalledWith('oauth_callback_denied', {
+      reason: 'exchange_failed',
+    });
+    expect(captureServerEvent).not.toHaveBeenCalledWith(
+      'oauth_callback_ok',
+      expect.anything(),
+    );
+  });
+
+  it('does not leak raw off-allowlist error text into the denied event', async () => {
+    await GET(
+      makeRequest('?error=' + encodeURIComponent('<script>alert(1)</script>')),
+    );
+    expect(captureServerEvent).toHaveBeenCalledWith('oauth_callback_denied', {
+      reason: 'unknown',
+    });
   });
 });

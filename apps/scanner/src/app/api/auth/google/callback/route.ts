@@ -3,6 +3,7 @@ import { exchangeCodeForTokens, isFeatureEnabled, verifyState } from '@/lib/gmc/
 import { sealRefreshToken } from '@/lib/gmc/token-storage';
 import { prisma } from '@/lib/db';
 import { scannerOrigin } from '@/lib/host-url';
+import { captureServerEvent } from '@/lib/analytics-server';
 
 // Per ADR 0023 §slice 2 — OAuth callback. Behind FEATURE_GMC_OAUTH.
 // Google redirects here with ?code= and ?state= after consent.
@@ -51,6 +52,11 @@ export async function GET(request: NextRequest) {
     // text into the merchant-visible /audit/connect?reason= surface.
     // Allowlist sourced from RFC 6749 §4.1.2.1 + Google's docs.
     const safeReason = isAllowedOauthError(errorParam) ? errorParam : 'unknown';
+    // Funnel step (ADR 0023 §measurement, spec 2026-06-07): consent declined
+    // or aborted at Google. `reason` is the allowlisted code only — never the
+    // raw param — so the same redaction that protects the merchant-visible
+    // surface protects the analytics property.
+    await captureServerEvent('oauth_callback_denied', { reason: safeReason });
     const dest = new URL('/audit/connect', origin);
     dest.searchParams.set('status', 'denied');
     dest.searchParams.set('reason', safeReason);
@@ -84,6 +90,14 @@ export async function GET(request: NextRequest) {
     console.warn(
       JSON.stringify({ event: 'gmc-callback.exchange-failed' }),
     );
+    // Funnel step (ADR 0023 §measurement, spec 2026-06-07): the consent
+    // succeeded but the token exchange failed — a not-ok callback. Tagged
+    // distinctly from a user-side denial so the funnel can separate
+    // misconfiguration from merchant choice. No shop/domain: the exchange
+    // failed before we trusted the state payload's binding.
+    await captureServerEvent('oauth_callback_denied', {
+      reason: 'exchange_failed',
+    });
     const dest = new URL('/audit/connect', origin);
     dest.searchParams.set('status', 'exchange-failed');
     return NextResponse.redirect(dest);
@@ -114,6 +128,14 @@ export async function GET(request: NextRequest) {
       lastErrorCode: null,
       lastErrorAt: null,
     },
+  });
+
+  // Funnel step 3 (ADR 0023 §measurement, spec 2026-06-07): the connection
+  // is persisted — the OAuth round-trip cleared. `ground_truth_rendered` is
+  // captured client-side downstream when a GMC panel actually paints.
+  await captureServerEvent('oauth_callback_ok', {
+    shop: state.normalisedDomain,
+    audit_id: state.auditId,
   });
 
   const dest = new URL('/audit/connect', origin);

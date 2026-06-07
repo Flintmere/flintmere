@@ -17,6 +17,7 @@
  */
 
 import { useState } from 'react';
+import { track } from '@/lib/analytics';
 
 export interface GmcPublicPageOptInProps {
   scanId: string;
@@ -54,6 +55,11 @@ export function GmcPublicPageOptIn({
         });
         return;
       }
+      // Funnel tail (ADR 0023 §measurement, spec 2026-06-07): the merchant
+      // gave the separate, explicit consent to publish GMC counts publicly.
+      // Distinct from reading ground truth privately — this is the public-
+      // visibility opt-in only.
+      track('gmc_publish_opted_in', { shop: body.domain ?? shopDomain });
       setState({ phase: 'success', domain: body.domain ?? shopDomain });
     } catch (err) {
       setState({

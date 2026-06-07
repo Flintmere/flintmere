@@ -13,6 +13,7 @@
  */
 
 import { Bracket } from '@flintmere/ui';
+import { TrackOnMount } from '@/components/TrackOnMount';
 import {
   GMC_PANEL_EYEBROW,
   GMC_PANEL_HEADING,
@@ -26,9 +27,16 @@ import type { GmcGroundTruth } from '@/lib/gmc/types';
 
 export interface GmcPanelProps {
   gmcGroundTruth: GmcGroundTruth;
+  /**
+   * Where this panel is rendering — distinguishes the public score page from
+   * the merchant's private scan results in the funnel (ADR 0023 §measurement,
+   * spec 2026-06-07). Defaults to 'public' so the existing /score/[shop]
+   * call-site is unchanged.
+   */
+  surface?: 'public' | 'private';
 }
 
-export function GmcPanel({ gmcGroundTruth }: GmcPanelProps) {
+export function GmcPanel({ gmcGroundTruth, surface = 'public' }: GmcPanelProps) {
   const { destinationCounts, topIssues, fetchedAt } = gmcGroundTruth;
   const total =
     destinationCounts.approved +
@@ -42,6 +50,9 @@ export function GmcPanel({ gmcGroundTruth }: GmcPanelProps) {
       aria-label="Google Merchant Center ground truth"
       className="bg-[color:var(--color-paper-2)] border-y border-[color:var(--color-line)]"
     >
+      {/* Funnel step 4 (ADR 0023 §measurement, spec 2026-06-07): the payoff —
+          real ground truth painted. Renders nothing, no layout change. */}
+      <TrackOnMount event="ground_truth_rendered" props={{ surface }} />
       <div className="mx-auto max-w-[1280px] px-8 py-20 md:py-24">
         <p className="eyebrow mb-6 text-[color:var(--color-ink-2)]">
           {GMC_PANEL_EYEBROW}

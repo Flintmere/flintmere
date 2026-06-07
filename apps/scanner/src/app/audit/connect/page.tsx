@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { SiteFooter } from '@flintmere/ui';
+import { TrackOnMount } from '@/components/TrackOnMount';
 import { prisma } from '@/lib/db';
 import { isFeatureEnabled, normaliseShopDomain } from '@/lib/gmc/oauth';
 import { pickState } from './pick-state';
@@ -103,6 +104,12 @@ export default async function AuditConnectPage({ searchParams }: Props) {
 
   return (
     <main id="main" className="flintmere-main">
+      {/* Funnel step 1 (ADR 0023 §measurement, spec 2026-06-07). Renders
+          nothing; emits connect_page_viewed once on hydration with the state
+          the merchant landed in, so the funnel reads view → start → ok →
+          ground-truth. No visual change. */}
+      <TrackOnMount event="connect_page_viewed" props={{ state }} />
+
       <a href="#connect-body" className="skip-link">
         Skip to content
       </a>

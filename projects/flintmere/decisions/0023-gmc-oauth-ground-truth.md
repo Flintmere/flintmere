@@ -53,6 +53,7 @@ The 2026-05-06 jet-fighter plan specced two tracks: Track A (GMC OAuth, credibil
 - **Embedded ingestion engine slips ~5 weeks.** Operator-ratified opportunity cost. The v2 strategic report's named centrepiece is paused for the credibility floor without which it would inherit the same crater on launch.
 - **No new env-var abstraction reflexes.** `GOOGLE_OAUTH_CLIENT_ID` is environment-specific (different across dev/staging/prod) so it earns its env-var per `feedback_dont_abstract_public_values`. `GOOGLE_OAUTH_CLIENT_SECRET` and `GMC_TOKEN_KEY` are operator-rotated secrets.
 - **Plausible event additions (slice 2):** `gmc_connect_started`, `gmc_connect_completed`, `gmc_connect_failed`, `gmc_disconnected`. Funnel attribution from audit-CTA → connect → ground-truth-rendered.
+  - **Correction 2026-06-07 (connect-friction spec):** these Plausible event names are superseded. Analytics moved to PostHog (project 195011 EU) per ADR 0025 (Plausible retired). The connect funnel is now `connect_page_viewed → oauth_started → oauth_callback_ok / oauth_callback_denied → ground_truth_rendered → gmc_publish_opted_in`, captured server-side in the OAuth routes (`captureServerEvent`) and client-side on the connect / score surfaces. The ≥40% connect-rate threshold is unchanged; it now reads off the PostHog funnel. See `context/requirements/2026-06-07-gmc-connect-friction.md`.
 
 ## Rollout
 
