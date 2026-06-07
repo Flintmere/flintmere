@@ -6,17 +6,21 @@
  * needs a completed scan for the merchant's domain — one that read GMC now
  * that a connection exists.
  *
- * The dedupe collision (spec): the merchant may have run a scan moments
- * before connecting (e.g. from the audit email), which would 429 a fresh
- * scan inside `rate-limit.ts` `DOMAIN_DEDUPE_MS = 30_000`. We side-step it by
- * NOT going through the HTTP `/api/scan` path at all. Instead:
+ * This step calls `runScanForShop` directly — the trusted server path that
+ * bypasses the `/api/scan` HTTP route and its per-IP / per-domain limiter
+ * (`rate-limit.ts` `DOMAIN_DEDUPE_MS = 30_000`). The limiter is anti-abuse on
+ * the public form, not on this gated post-connect step. So reuse is NOT a
+ * dedupe-collision workaround — a fresh run can never 429 here. Reuse is a
+ * pure cost optimisation (skip a redundant catalog + GMC fetch) and must
+ * never win over correctness. Specifically:
  *
- *   1. Reuse a recent completed scan row for the domain if one exists inside
- *      REUSE_WINDOW_MS — covers the 30s-dedupe collision and avoids a
- *      redundant catalog + GMC fetch.
- *   2. Otherwise run `runScanForShop` directly (trusted server path, no
- *      per-IP / per-domain limiter — the limiter is anti-abuse on the public
- *      form, not on this gated post-connect step).
+ *   1. Reuse a recent completed scan row ONLY when it already carries GMC
+ *      ground truth (`extractGroundTruth(scoreJson) !== null`) — i.e. it was
+ *      run after the connection existed.
+ *   2. Otherwise run `runScanForShop` directly. This covers the primary
+ *      journey (merchant scanned from the audit email BEFORE connecting, so
+ *      the recent row has `gmcGroundTruth: null`): we must re-run so the scan
+ *      reads GMC via the now-live connection, not reuse the pre-connect row.
  *
  * Returns a discriminated result so the payoff page can render the score +
  * ground truth on success, or a retriable state on failure (never a blank).
@@ -27,8 +31,8 @@ import { runScanForShop } from './run-scan';
 import type { GmcGroundTruth } from './gmc/types';
 
 // A scan completed within this window is fresh enough to reuse rather than
-// re-run. Comfortably larger than DOMAIN_DEDUPE_MS (30s) so the collision
-// case always reuses; small enough that the payoff reflects current state.
+// re-run — but only when that row already carries GMC ground truth (see the
+// reuse guard below). Small enough that the payoff reflects current state.
 export const REUSE_WINDOW_MS = 10 * 60 * 1000;
 
 export interface PostConnectScanOk {
@@ -85,16 +89,24 @@ export async function resolvePostConnectScan(
     select: { id: true, normalisedDomain: true, score: true, grade: true, scoreJson: true },
   });
 
+  // Reuse only when the recent row already carries GMC ground truth — i.e. it
+  // was run after a connection existed. A pre-connect scan (the primary
+  // journey: scanned from the audit email, then connected) has
+  // `gmcGroundTruth: null` and must NOT be reused, or the payoff page would
+  // render without ground truth right after OAuth, defeating the feature.
   if (recent && recent.score !== null && recent.grade !== null) {
-    return {
-      status: 'ok',
-      scanId: recent.id,
-      shopDomain: recent.normalisedDomain,
-      score: recent.score,
-      grade: recent.grade,
-      gmcGroundTruth: extractGroundTruth(recent.scoreJson),
-      reused: true,
-    };
+    const groundTruth = extractGroundTruth(recent.scoreJson);
+    if (groundTruth !== null) {
+      return {
+        status: 'ok',
+        scanId: recent.id,
+        shopDomain: recent.normalisedDomain,
+        score: recent.score,
+        grade: recent.grade,
+        gmcGroundTruth: groundTruth,
+        reused: true,
+      };
+    }
   }
 
   const result = await run({ shopUrl, source: 'user' });
