@@ -117,7 +117,10 @@ describe('GET /api/auth/google/callback', () => {
     expect(upsertArg.create.scopes).toEqual(['https://www.googleapis.com/auth/content']);
     expect(upsertArg.create.refreshTokenCipher.length).toBeGreaterThan(0);
     expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toContain('status=ok');
+    // Fix 1 — success routes to the auto-scan payoff, not the dead-end card.
+    const okLocation = res.headers.get('location') ?? '';
+    expect(okLocation).toContain('/audit/connect/results');
+    expect(okLocation).toContain('audit=aud_1');
     expect(captureServerEvent).toHaveBeenCalledWith('oauth_callback_ok', {
       shop: 'acme.com',
       audit_id: 'aud_1',

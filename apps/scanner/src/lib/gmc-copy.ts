@@ -34,6 +34,30 @@ export const GMC_PUBLIC_FOOTNOTE =
 export const GMC_EMAIL_FOOTNOTE =
   "Issue descriptions above are Google's verbatim language. Sample product titles are pulled from your Merchant Center feed at the time of scan.";
 
+// --- Private post-connect payoff (connect-friction spec 2026-06-07) -------
+// This data is rendered only to the connected merchant on their own results —
+// never on a public surface. Public publication stays a separate, explicit
+// opt-in (GmcPublicPageOptIn). Access is restricted to read-only at our
+// call-site (never described as a "read-only scope" — Google's Content/Merchant
+// API scope is write-capable; we restrict ourselves at the call-site).
+
+export const GMC_PRIVATE_EYEBROW = 'Your account · read directly from Google';
+
+export const GMC_PRIVATE_FOOTNOTE =
+  "This is your own Merchant Center data, shown only to you. It stays private until you choose to publish it. Issue descriptions are Google's verbatim language.";
+
+// Shown when the connection exists but Google returned no Merchant Center
+// data yet (empty edge case) — honest, never a blank.
+export const GMC_PRIVATE_EMPTY_HEADING = 'Connected — no Merchant Center data yet';
+export const GMC_PRIVATE_EMPTY_BODY =
+  "Your Google connection is live, but we didn't read any product data from your Merchant Center on this scan. This is normal if your account is new or your feed is still syncing. Your next scan will read it.";
+
+// Shown when the ground-truth read errored — we degrade to the modelled
+// estimate and label it honestly. We never fabricate ground truth (#24).
+export const GMC_PRIVATE_DEGRADED_HEADING = 'Showing modelled estimates, not read';
+export const GMC_PRIVATE_DEGRADED_BODY =
+  "We couldn't read your Google Merchant Center on this scan, so the figures below are modelled from public signals — not read from your account. Your next scan will try the live read again.";
+
 export function gmcLede(gmc: GmcGroundTruth): string {
   const total =
     gmc.destinationCounts.approved +
