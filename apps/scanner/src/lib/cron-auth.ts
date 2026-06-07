@@ -22,15 +22,16 @@ function digest(value: string): Buffer {
 }
 
 // Returns null on success — caller proceeds. Returns a NextResponse to
-// return verbatim on failure (503 if CRON_SECRET unconfigured, 403 if
+// return verbatim on failure (503 if the secret is unconfigured, 403 if
 // header missing or mismatch).
-export function verifyCronSecret(
+function verifySharedSecret(
   suppliedHeader: string | null,
+  expected: string | undefined,
+  envName: string,
 ): NextResponse | null {
-  const expected = process.env.CRON_SECRET
   if (!expected || expected.length < 32) {
     return NextResponse.json(
-      { error: 'CRON_SECRET not configured (must be ≥32 chars)' },
+      { error: `${envName} not configured (must be ≥32 chars)` },
       { status: 503 },
     )
   }
@@ -41,4 +42,23 @@ export function verifyCronSecret(
   }
 
   return null
+}
+
+export function verifyCronSecret(
+  suppliedHeader: string | null,
+): NextResponse | null {
+  return verifySharedSecret(suppliedHeader, process.env.CRON_SECRET, 'CRON_SECRET')
+}
+
+// Agent intake routes (/api/agent/*) verify a SEPARATELY-SCOPED secret.
+// The remote weekly agent's environment holds AGENT_API_SECRET only, so
+// a compromise of that environment cannot fire /api/cron/* routes (which
+// send outreach email and post to X immediately). The agent secret's
+// damage ceiling is: queue banned-phrase-checked posts (≥12h lead, so
+// the daily brief surfaces them first) and stage outreach batches that
+// cannot send without the operator's approve click.
+export function verifyAgentSecret(
+  suppliedHeader: string | null,
+): NextResponse | null {
+  return verifySharedSecret(suppliedHeader, process.env.AGENT_API_SECRET, 'AGENT_API_SECRET')
 }
