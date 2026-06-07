@@ -8,15 +8,15 @@ describe('POST /api/agent/stage-outreach', () => {
 
   beforeEach(() => {
     stageMock.mockReset()
-    originalCron = process.env.CRON_SECRET
+    originalCron = process.env.AGENT_API_SECRET
     originalAdmin = process.env.ADMIN_SESSION_SECRET
-    process.env.CRON_SECRET = 'a'.repeat(40)
+    process.env.AGENT_API_SECRET = 'a'.repeat(40)
     process.env.ADMIN_SESSION_SECRET = 'b'.repeat(40)
   })
 
   afterEach(() => {
-    if (originalCron === undefined) delete process.env.CRON_SECRET
-    else process.env.CRON_SECRET = originalCron
+    if (originalCron === undefined) delete process.env.AGENT_API_SECRET
+    else process.env.AGENT_API_SECRET = originalCron
     if (originalAdmin === undefined) delete process.env.ADMIN_SESSION_SECRET
     else process.env.ADMIN_SESSION_SECRET = originalAdmin
   })
@@ -26,7 +26,7 @@ describe('POST /api/agent/stage-outreach', () => {
     vi.doMock('next/headers', () => ({
       headers: async () => ({
         get: (k: string) =>
-          k.toLowerCase() === 'x-cron-secret' ? headerValue : null,
+          k.toLowerCase() === 'x-agent-secret' ? headerValue : null,
       }),
     }))
     vi.doMock('@/lib/outreach/stage-batch', async (importOriginal) => ({
@@ -42,7 +42,7 @@ describe('POST /api/agent/stage-outreach', () => {
     )
   }
 
-  it('returns 403 when X-Cron-Secret is missing', async () => {
+  it('returns 403 when X-Agent-Secret is missing', async () => {
     const res = await post(null, '{"limit":20}')
     expect(res.status).toBe(403)
     expect(stageMock).not.toHaveBeenCalled()

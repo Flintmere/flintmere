@@ -1,22 +1,25 @@
 /**
  * Agent intake: queue X posts — ADR 0026. Called by the remote weekly
- * marketing agent (which has no database access) with the same
- * X-Cron-Secret contract as the cron routes. Validation is shared with
- * the local script via lib/social/queue-posts: 280-char cap,
- * banned-phrase refusal, ISO scheduledAt, ≤10 posts per call.
+ * marketing agent (which has no database access), authenticated by the
+ * separately-scoped X-Agent-Secret header (see lib/cron-auth — the
+ * agent's credential cannot fire /api/cron/* routes). Validation is
+ * shared with the local script via lib/social/queue-posts: 280-char
+ * cap, banned-phrase refusal, ISO scheduledAt, ≤10 posts per call.
+ * Additionally enforces a ≥12h scheduling lead so every agent-queued
+ * post appears in at least one daily brief before it can fire.
  */
 
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
-import { verifyCronSecret } from '@/lib/cron-auth'
-import { queuePosts, queuePostsSchema } from '@/lib/social/queue-posts'
+import { verifyAgentSecret } from '@/lib/cron-auth'
+import { AGENT_MIN_LEAD_MS, queuePosts, queuePostsSchema } from '@/lib/social/queue-posts'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export async function POST(req: Request): Promise<NextResponse> {
   const hdrs = await headers()
-  const authError = verifyCronSecret(hdrs.get('x-cron-secret'))
+  const authError = verifyAgentSecret(hdrs.get('x-agent-secret'))
   if (authError) return authError
 
   let raw: unknown
@@ -36,6 +39,21 @@ export async function POST(req: Request): Promise<NextResponse> {
         event: 'agent-queue-posts-rejected',
         code: 'validation',
         issues: parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`),
+      },
+      { status: 422 },
+    )
+  }
+
+  const minScheduledAt = Date.now() + AGENT_MIN_LEAD_MS
+  const tooSoon = parsed.data.filter((p) => Date.parse(p.scheduledAt) < minScheduledAt)
+  if (tooSoon.length > 0) {
+    return NextResponse.json(
+      {
+        event: 'agent-queue-posts-rejected',
+        code: 'lead-time',
+        issues: tooSoon.map(
+          (p) => `scheduledAt ${p.scheduledAt} is less than 12h out: ${p.body.slice(0, 40)}…`,
+        ),
       },
       { status: 422 },
     )

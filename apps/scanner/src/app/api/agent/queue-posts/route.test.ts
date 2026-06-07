@@ -2,10 +2,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const queuePostsMock = vi.fn()
 
+// Dynamic dates: the route enforces a >=12h scheduling lead against the
+// real clock, so fixtures compute from now() instead of hardcoding.
+const farOut = (hours: number) => new Date(Date.now() + hours * 3_600_000).toISOString()
+
 const VALID_POST = {
   body: 'GTIN coverage is the first thing Google checks. We measured 312 UK food stores.',
   utmCampaign: 'gtin-coverage',
-  scheduledAt: '2026-06-11T10:00:00Z',
+  scheduledAt: farOut(48),
 }
 
 describe('POST /api/agent/queue-posts', () => {
@@ -13,13 +17,13 @@ describe('POST /api/agent/queue-posts', () => {
 
   beforeEach(() => {
     queuePostsMock.mockReset()
-    original = process.env.CRON_SECRET
-    process.env.CRON_SECRET = 'a'.repeat(40)
+    original = process.env.AGENT_API_SECRET
+    process.env.AGENT_API_SECRET = 'a'.repeat(40)
   })
 
   afterEach(() => {
-    if (original === undefined) delete process.env.CRON_SECRET
-    else process.env.CRON_SECRET = original
+    if (original === undefined) delete process.env.AGENT_API_SECRET
+    else process.env.AGENT_API_SECRET = original
   })
 
   async function post(headerValue: string | null, body: string) {
@@ -27,7 +31,7 @@ describe('POST /api/agent/queue-posts', () => {
     vi.doMock('next/headers', () => ({
       headers: async () => ({
         get: (k: string) =>
-          k.toLowerCase() === 'x-cron-secret' ? headerValue : null,
+          k.toLowerCase() === 'x-agent-secret' ? headerValue : null,
       }),
     }))
     vi.doMock('@/lib/social/queue-posts', async (importOriginal) => ({
@@ -43,7 +47,7 @@ describe('POST /api/agent/queue-posts', () => {
     )
   }
 
-  it('returns 403 when X-Cron-Secret is missing', async () => {
+  it('returns 403 when X-Agent-Secret is missing', async () => {
     const res = await post(null, JSON.stringify([VALID_POST]))
     expect(res.status).toBe(403)
     expect(queuePostsMock).not.toHaveBeenCalled()
@@ -67,11 +71,23 @@ describe('POST /api/agent/queue-posts', () => {
     expect(queuePostsMock).not.toHaveBeenCalled()
   })
 
+  it('returns 422 lead-time when a post is scheduled less than 12h out', async () => {
+    const res = await post(
+      'a'.repeat(40),
+      JSON.stringify([VALID_POST, { ...VALID_POST, scheduledAt: farOut(2) }]),
+    )
+    expect(res.status).toBe(422)
+    const body = await res.json()
+    expect(body.code).toBe('lead-time')
+    expect(String(body.issues)).toContain('less than 12h out')
+    expect(queuePostsMock).not.toHaveBeenCalled()
+  })
+
   it('returns 200 + queued count on valid posts', async () => {
     queuePostsMock.mockResolvedValueOnce(2)
     const res = await post(
       'a'.repeat(40),
-      JSON.stringify([VALID_POST, { ...VALID_POST, scheduledAt: '2026-06-13T10:00:00Z' }]),
+      JSON.stringify([VALID_POST, { ...VALID_POST, scheduledAt: farOut(96) }]),
     )
     expect(res.status).toBe(200)
     const body = await res.json()

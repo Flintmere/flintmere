@@ -10,6 +10,14 @@
 import { z } from 'zod';
 import { prisma } from '../db';
 
+/**
+ * Minimum scheduling lead for agent-queued posts (route-enforced, not
+ * schema-enforced — the local operator script may queue sooner). 12h
+ * guarantees every agent-queued post appears in at least one daily
+ * brief before the hourly cron could ever post it.
+ */
+export const AGENT_MIN_LEAD_MS = 12 * 60 * 60 * 1000;
+
 export const BANNED_PHRASES = [
   'leverage', 'unlock', 'transform', 'synergy', 'supercharge', 'world-class',
   'industry-leading', 'ai-powered', 'best-in-class', 'ai-driven', 'game-changing',

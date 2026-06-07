@@ -1,7 +1,9 @@
 /**
  * Agent intake: stage an outreach batch — ADR 0026. Called by the
- * remote weekly marketing agent (no database access) with the same
- * X-Cron-Secret contract as the cron routes. Staging logic is shared
+ * remote weekly marketing agent (no database access), authenticated by
+ * the separately-scoped X-Agent-Secret header (see lib/cron-auth — the
+ * agent's credential cannot fire /api/cron/* routes; staged batches
+ * cannot send without the operator's approve click). Staging logic is shared
  * with the local script via lib/outreach/stage-batch. The response
  * carries the approve URL so the agent can include it in its run
  * summary; the daily brief re-surfaces it until clicked.
@@ -10,7 +12,7 @@
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { verifyCronSecret } from '@/lib/cron-auth'
+import { verifyAgentSecret } from '@/lib/cron-auth'
 import { buildApproveUrl } from '@/lib/outreach/approval'
 import {
   STAGE_LIMIT_MAX,
@@ -27,7 +29,7 @@ const bodySchema = z.object({
 
 export async function POST(req: Request): Promise<NextResponse> {
   const hdrs = await headers()
-  const authError = verifyCronSecret(hdrs.get('x-cron-secret'))
+  const authError = verifyAgentSecret(hdrs.get('x-agent-secret'))
   if (authError) return authError
 
   // Empty body is fine — default limit applies.
