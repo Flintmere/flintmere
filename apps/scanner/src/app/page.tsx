@@ -183,7 +183,7 @@ export default function MarketingHome() {
       <section
         id="hero"
         aria-labelledby="hero-heading"
-        className="relative isolate overflow-hidden bg-[color:var(--color-paper)] grid grid-cols-1 lg:grid-cols-[58fr_42fr] lg:h-screen lg:min-h-[640px] max-lg:h-[100svh] max-lg:min-h-[640px]"
+        className="relative isolate overflow-hidden bg-[color:var(--color-paper)] grid grid-cols-1 lg:grid-cols-[58fr_42fr] lg:min-h-screen max-lg:h-[100svh] max-lg:min-h-[640px]"
       >
         {/* Photo zone — full-bleed wooden-tray AVIF. On mobile, this is
             the entire backdrop (the paper zone overlays via absolute
