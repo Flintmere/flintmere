@@ -21,9 +21,9 @@ describe('resolvePostConnectScan', () => {
     vi.restoreAllMocks();
   });
 
-  it('reuses a recent completed scan rather than firing a fresh one (dedupe collision)', async () => {
-    // The collision case: a scan ran moments before connecting. We must reuse
-    // it, never run a fresh scan that would trip DOMAIN_DEDUPE_MS.
+  it('reuses a recent completed scan that already carries GMC ground truth', async () => {
+    // Cost optimisation: the recent row was run after a connection existed
+    // (it carries ground truth), so reusing it skips a redundant GMC fetch.
     scanFindFirst.mockResolvedValue({
       id: 'scan_recent',
       normalisedDomain: 'acme.com',
@@ -117,19 +117,40 @@ describe('resolvePostConnectScan', () => {
     expect(result).toEqual({ status: 'error', errorCode: 'timeout' });
   });
 
-  it('degrades to null ground truth (never fabricates) when scoreJson has none', async () => {
+  it('runs fresh (not reuse) when the recent row lacks GMC ground truth', async () => {
+    // The primary journey: the merchant scanned from the audit email BEFORE
+    // connecting, so the recent row has `gmcGroundTruth: null`. Reusing it
+    // would render the payoff page without ground truth right after OAuth.
+    // We must fall through to a fresh run that reads GMC via the live
+    // connection — correctness beats the cost optimisation.
     scanFindFirst.mockResolvedValue({
-      id: 'scan_recent',
+      id: 'scan_preconnect',
       normalisedDomain: 'acme.com',
       score: 71,
       grade: 'B',
       scoreJson: { suppressionEstimate: { low: 1, high: 2 } },
     });
-
-    const result = await resolvePostConnectScan('https://acme.com', 'acme.com', {
-      runScan: vi.fn(),
+    const runScan = vi.fn().mockResolvedValue({
+      status: 'complete',
+      scanId: 'scan_fresh',
+      shopDomain: 'acme.com',
+      score: 64,
+      grade: 'C',
+      gmcGroundTruth: { fetchedAt: '2026-06-07T12:00:00.000Z' },
     });
 
-    expect(result.status === 'ok' && result.gmcGroundTruth).toBeNull();
+    const result = await resolvePostConnectScan('https://acme.com', 'acme.com', {
+      runScan,
+    });
+
+    expect(runScan).toHaveBeenCalledOnce();
+    expect(result).toMatchObject({
+      status: 'ok',
+      scanId: 'scan_fresh',
+      reused: false,
+    });
+    expect(result.status === 'ok' && result.gmcGroundTruth).toEqual({
+      fetchedAt: '2026-06-07T12:00:00.000Z',
+    });
   });
 });
