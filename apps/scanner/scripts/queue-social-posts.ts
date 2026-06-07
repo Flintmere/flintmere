@@ -6,60 +6,27 @@
  * JSON shape: [{ "body": "...", "utmCampaign": "kebab-slug",
  *               "scheduledAt": "2026-06-11T10:00:00Z", "altText": null }]
  *
- * Refuses any body containing a banned phrase (memory/VOICE.md — this
- * list mirrors lib/daily-brief/compose.ts) or exceeding 280 chars.
+ * Validation + insert live in src/lib/social/queue-posts (shared with
+ * the /api/agent/queue-posts route): banned-phrase refusal
+ * (memory/VOICE.md), 280-char cap, ISO scheduledAt, ≤10 per call.
  */
 
 import { readFileSync } from 'node:fs';
 import { prisma } from '../src/lib/db';
-
-const BANNED = [
-  'leverage', 'unlock', 'transform', 'synergy', 'supercharge', 'world-class',
-  'industry-leading', 'ai-powered', 'best-in-class', 'ai-driven', 'game-changing',
-  'revolutionary', 'disruptive', 'next-generation', 'guaranteed', 'bulletproof',
-  'trusted by',
-];
-
-interface PostInput {
-  body: string;
-  utmCampaign: string;
-  scheduledAt: string;
-  altText?: string | null;
-}
+import { queuePosts, queuePostsSchema } from '../src/lib/social/queue-posts';
 
 async function main(): Promise<void> {
   const path = process.argv[2];
   if (!path) throw new Error('usage: social:queue -- <posts.json>');
 
-  const posts = JSON.parse(readFileSync(path, 'utf8')) as PostInput[];
-  if (!Array.isArray(posts) || posts.length === 0) {
-    throw new Error('posts.json must be a non-empty array');
+  const parsed = queuePostsSchema.safeParse(JSON.parse(readFileSync(path, 'utf8')));
+  if (!parsed.success) {
+    const issues = parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`);
+    throw new Error(`invalid posts.json — ${issues.join('; ')}`);
   }
 
-  // Validate all posts before touching the DB.
-  for (const p of posts) {
-    if (p.body.length > 280) {
-      throw new Error(`post exceeds 280 chars: ${p.body.slice(0, 60)}…`);
-    }
-    const lower = p.body.toLowerCase();
-    const hit = BANNED.find((b) => lower.includes(b));
-    if (hit) throw new Error(`banned phrase "${hit}" in: ${p.body.slice(0, 60)}…`);
-    if (!/^\d{4}-\d{2}-\d{2}T/.test(p.scheduledAt)) {
-      throw new Error(`scheduledAt must be ISO: ${p.scheduledAt}`);
-    }
-  }
-
-  const { count } = await prisma.socialPost.createMany({
-    data: posts.map((p) => ({
-      channel: 'x',
-      body: p.body,
-      altText: p.altText ?? null,
-      utmCampaign: p.utmCampaign,
-      scheduledAt: new Date(p.scheduledAt),
-    })),
-  });
-
-  for (const p of posts) {
+  const count = await queuePosts(parsed.data);
+  for (const p of parsed.data) {
     console.log(`queued for ${p.scheduledAt}: ${p.body.slice(0, 60)}…`);
   }
   console.log(`done — ${count} queued`);
