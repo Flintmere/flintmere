@@ -8,6 +8,7 @@ import {
 import { prisma } from '@/lib/db';
 import { scannerOrigin } from '@/lib/host-url';
 import { checkOauthFlowRateLimit } from '@/lib/rate-limit';
+import { captureServerEvent } from '@/lib/analytics-server';
 
 // Per ADR 0023 §slice 2 — OAuth start endpoint. Behind FEATURE_GMC_OAUTH.
 // Caller posts an audit id; we look up the audit, validate eligibility,
@@ -60,6 +61,16 @@ export async function GET(request: NextRequest) {
   if (!normalisedDomain) {
     return NextResponse.json({ error: 'invalid-audit-domain' }, { status: 422 });
   }
+
+  // Funnel step 2 (ADR 0023 §measurement, spec 2026-06-07): the merchant
+  // has cleared the eligibility gate and we're about to hand off to Google.
+  // Server-side + anonymous per ADR 0025 — `shop` is merchant commercial
+  // identity, not end-user PII. Awaited (sub-2s capped in the helper) so the
+  // event survives the serverless handler exit before the redirect fires.
+  await captureServerEvent('oauth_started', {
+    shop: normalisedDomain,
+    audit_id: audit.id,
+  });
 
   const state = signState({ normalisedDomain, auditId: audit.id });
   // Built from the public origin, NOT `request.url` — behind Traefik the

@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 
 const auditFindUnique = vi.fn();
+const captureServerEvent = vi.fn();
 
 vi.mock('@/lib/db', () => ({
   prisma: {
@@ -9,6 +10,10 @@ vi.mock('@/lib/db', () => ({
       findUnique: (...args: unknown[]) => auditFindUnique(...args),
     },
   },
+}));
+
+vi.mock('@/lib/analytics-server', () => ({
+  captureServerEvent: (...args: unknown[]) => captureServerEvent(...args),
 }));
 
 import { GET } from './route';
@@ -22,6 +27,7 @@ function makeRequest(qs = ''): NextRequest {
 describe('GET /api/auth/google/start', () => {
   beforeEach(() => {
     auditFindUnique.mockReset();
+    captureServerEvent.mockReset().mockResolvedValue(undefined);
     process.env.FEATURE_GMC_OAUTH = 'true';
     process.env.GMC_STATE_SECRET = 'test-state-secret';
     process.env.GOOGLE_OAUTH_CLIENT_ID = 'test-client-id.apps.googleusercontent.com';
@@ -95,5 +101,29 @@ describe('GET /api/auth/google/start', () => {
     });
     const res = await GET(makeRequest('?audit=aud_d'));
     expect(res.status).toBe(302);
+  });
+
+  it('captures oauth_started before redirecting an eligible audit', async () => {
+    auditFindUnique.mockResolvedValue({
+      id: 'aud_paid',
+      shopUrl: 'https://www.acme.com/',
+      status: 'paid',
+    });
+    await GET(makeRequest('?audit=aud_paid'));
+    expect(captureServerEvent).toHaveBeenCalledOnce();
+    expect(captureServerEvent).toHaveBeenCalledWith('oauth_started', {
+      shop: 'acme.com',
+      audit_id: 'aud_paid',
+    });
+  });
+
+  it('does not capture oauth_started for an ineligible audit', async () => {
+    auditFindUnique.mockResolvedValue({
+      id: 'aud_r',
+      shopUrl: 'https://acme.com',
+      status: 'refunded',
+    });
+    await GET(makeRequest('?audit=aud_r'));
+    expect(captureServerEvent).not.toHaveBeenCalled();
   });
 });
