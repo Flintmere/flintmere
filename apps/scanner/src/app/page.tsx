@@ -30,6 +30,7 @@ import { PillarWheelScrollPin } from '@/components/sections/LazyPillarWheelScrol
 import { FounderStrip } from '@/components/sections/LazyFounderStrip';
 import { ManifestoChord } from '@/components/sections/LazyManifestoChord';
 import { ScanCallout } from '@/components/sections/ScanCallout';
+import { MerchantCenterSection } from '@/components/sections/MerchantCenterSection';
 
 /**
  * Marketing home — Batch B expand-to-five arc 2026-04-29.
@@ -480,6 +481,16 @@ export default function MarketingHome() {
         eyebrow="// your turn"
         headline="Run the seven checks on your store."
       />
+
+      {/* Chapter 2.9 — Ground truth (Merchant Center connection). Added
+          2026-06-09 to satisfy Google OAuth verification homepage
+          requirement #3 (the consent-screen homepage must describe the
+          app's functionality — specifically the Google Merchant Center
+          read-scope integration the verified OAuth app requests). In
+          normal flow on opaque paper, NOT in the curtain-pair, so a
+          reviewer scrolling reaches a plainly-rendered description.
+          Component: components/sections/MerchantCenterSection.tsx. */}
+      <MerchantCenterSection />
 
       {/* Curtain pair — chapters 3 + 4 share a position:relative wrapper
           so chapter 3's sticky-bottom-0 unsticks at the wrapper's bottom
