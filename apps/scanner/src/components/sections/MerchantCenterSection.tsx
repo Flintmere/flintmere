@@ -186,8 +186,8 @@ export function MerchantCenterSection() {
                 ['--reveal-delay' as string]: '200ms',
               }}
             >
-              Flintmere scores your catalog with AI across seven readiness
-              pillars &mdash; from product identifiers to agent checkout.
+              Flintmere scores your catalog across seven readiness pillars
+              &mdash; from product identifiers to agent checkout.
               Connect your Google Merchant Center and we add Google&rsquo;s own
               record on top: the products it disapproved and the exact reasons
               it recorded, read directly from your account. It sharpens the
