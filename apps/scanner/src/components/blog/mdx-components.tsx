@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 import { Bracket } from '@flintmere/ui';
+import { PillarWeightFigure, CatalogRecordFigure } from './figures';
 
 /**
  * MDX component map for blog posts (blog-system). Standard elements (h2, p,
@@ -82,4 +83,6 @@ export const mdxComponents = {
   KeyTakeaways,
   Definition,
   Figure,
+  PillarWeightFigure,
+  CatalogRecordFigure,
 };
