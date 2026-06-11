@@ -5,10 +5,10 @@
  * credibility (#23 regulatory veto). Do NOT add awards/credentials that aren't
  * real.
  *
- * OPERATOR ACTION before first publish: confirm "John Morris" is a real
- * contributor and replace `role`/`bio` with his genuine credential line, or
- * switch the byline to the accountable director. (BUSINESS.md decision-making
- * framework restricts naming individuals — reconcile there too.)
+ * Byline status: "John Morris" confirmed by the operator as a real, truthful
+ * contributor (2026-06-11). The role/bio lines below are genuine — no invented
+ * credentials. If his credential line gains a specific, verifiable detail,
+ * update `role`/`bio` here; do not add awards or titles that aren't real.
  */
 
 export interface Author {
