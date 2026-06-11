@@ -72,6 +72,8 @@ Flintmere expresses readiness as a single composite score from 0 to 100, compute
 
 The scoring itself is rule-based, not a guess. A product either carries a valid GTIN or it does not; a title either leads with a matchable noun or it buries it. The pillars convert hundreds of those per-product checks into one number you can track over time, and into a ranked list of what to fix first.
 
+<PillarWeightFigure />
+
 ## The four pillars a free scan can read
 
 Here is the practical split that matters before you commit to anything. Four of the seven pillars can be read from your public storefront, with no app install and no access to your Shopify admin. Together they account for **55 of the 100 points**:
@@ -96,6 +98,8 @@ A GTIN (Global Trade Item Number) is the standardised number that sits behind a 
 </Definition>
 
 The GTIN is how Google matches your product to its own understanding of that product. When two hundred shops sell the same jar of honey, Google uses the GTIN to know it is the same jar, to attach reviews and price comparisons, and to decide where you sit among those two hundred listings. Supply the GTIN and you join that matched group. Omit it on a product that has one, and Google has to take your word for what the product is — and Google's own product data specification treats the GTIN as a required attribute for products that have been assigned one.
+
+<CatalogRecordFigure />
 
 The result is blunt. A missing GTIN on a GTIN-eligible product is a common cause of a suppressed Google Shopping listing. It does not lower your rank; it removes you from the comparison entirely. That is why Identifiers is weighted at the top of the score, and why it is usually the first thing a readiness scan flags. Brand and MPN matter too, but the GTIN is the field that decides whether the product is in the auction at all. Our [methodology page](https://flintmere.com/methodology) sets out the full pillar weights and the public sources behind each check.
 
