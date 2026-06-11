@@ -5,7 +5,7 @@ description: "Catalog readiness measures how well a product feed survives the ru
 cluster: catalog-readiness-scoring
 author: john-morris
 publishedAt: 2026-06-11
-draft: true
+draft: false
 sources:
   - title: "GTIN — Global Trade Item Number"
     url: "https://www.gs1.org/standards/id-keys/gtin"
@@ -25,12 +25,12 @@ faq:
   - q: "Can you measure readiness without installing an app?"
     a: "Partly. Four of the seven pillars — Identifiers, Titles, Consistency, and Crawlability, worth 55 of the 100 points — are readable from a public storefront, so a free scan reports a partial score. The other three pillars need authenticated Admin-API reads, which require installing the Shopify app."
   - q: "Why do missing GTINs matter so much?"
-    a: "Google matches your products to its catalog using the GTIN. When a product that has an assigned GTIN omits it, Google cannot confirm what the product is, and the listing is more likely to be suppressed. That is why Identifiers carries the heaviest single weight in the score."
+    a: "Google matches your products to its catalog using the GTIN. When a product that has an assigned GTIN omits it, Google cannot confirm what the product is, and the listing is more likely to be suppressed. That is why Identifiers shares the heaviest weight in the score, tied at the top with Attributes."
   - q: "How often should a catalog be re-scored?"
     a: "Re-scan whenever you bulk-edit titles or attributes, add a product range, or change supplier data — and at least monthly. Channel rules also change, so a score that was accurate in spring can drift by autumn without any edit on your side."
 ---
 
-A merchant we scanned last month had 1,800 products live on their Shopify storefront and a Google Merchant Center account that showed 1,140 of them as active. The other 660 were sitting in the account, disapproved or unmatched, invisible to anyone searching Google Shopping. Nothing was broken on the website. The products had photos, prices, and descriptions. They simply failed the rules that decide whether a channel will show them — and no page in the Shopify admin tells you that.
+Picture a Shopify store with 1,800 products live, every one with photos, a price, and a description. Its Google Merchant Center account could still show only two-thirds of them as active, the rest sitting disapproved or unmatched — invisible to anyone searching Google Shopping. Nothing is broken on the website. The products simply fail the rules that decide whether a channel will show them, and no page in the Shopify admin tells you which ones or why. This is not a rare case; it is the default state of a catalog that has never been measured against the channels it feeds.
 
 That gap is what a catalog readiness score measures. This piece explains what the score is, what each part of it checks, and which parts a free scan can read before you install anything.
 
@@ -39,7 +39,7 @@ That gap is what a catalog readiness score measures. This piece explains what th
 - **Catalog readiness** is how well your product data survives the rules of the channels you sell on — Google Merchant Center, Amazon, and AI shopping agents.
 - Flintmere scores it out of 100 across **seven weighted pillars**.
 - **Four pillars (55 points)** are readable from a public storefront, so a free scan returns a partial score with no install.
-- **Identifiers** carries the most weight, because a missing GTIN is the single most common reason a product is suppressed.
+- **Identifiers** carries the most weight, because a missing GTIN is a common reason a product is suppressed.
 - A score is a starting diagnosis, not a verdict: it tells you where the data is costing you reach.
 
 </TLDR>
@@ -97,7 +97,7 @@ A GTIN (Global Trade Item Number) is the standardised number that sits behind a 
 
 The GTIN is how Google matches your product to its own understanding of that product. When two hundred shops sell the same jar of honey, Google uses the GTIN to know it is the same jar, to attach reviews and price comparisons, and to decide where you sit among those two hundred listings. Supply the GTIN and you join that matched group. Omit it on a product that has one, and Google has to take your word for what the product is — and Google's own product data specification treats the GTIN as a required attribute for products that have been assigned one.
 
-The result is blunt. A missing GTIN on a GTIN-eligible product is one of the most common causes of a suppressed Google Shopping listing. It does not lower your rank; it removes you from the comparison entirely. That is why Identifiers is weighted at the top of the score, and why it is usually the first thing a readiness scan flags. Brand and MPN matter too, but the GTIN is the field that decides whether the product is in the auction at all. Our [methodology page](https://flintmere.com/methodology) sets out the full pillar weights and the public sources behind each check.
+The result is blunt. A missing GTIN on a GTIN-eligible product is a common cause of a suppressed Google Shopping listing. It does not lower your rank; it removes you from the comparison entirely. That is why Identifiers is weighted at the top of the score, and why it is usually the first thing a readiness scan flags. Brand and MPN matter too, but the GTIN is the field that decides whether the product is in the auction at all. Our [methodology page](https://flintmere.com/methodology) sets out the full pillar weights and the public sources behind each check.
 
 ## What "good" looks like: titles, attributes, and consistency
 
@@ -129,7 +129,7 @@ This is why the readiness pillars are framed around structured data the channels
 
 A score is only useful if it points at work. In practice the order that returns the most reach for the least effort looks like this:
 
-1. **Fix Identifiers first.** Find every product that has an assigned GTIN and is not exposing it, and populate it. This is the highest-weighted pillar and the most common single cause of suppression, so it usually moves the score and the channel approvals together.
+1. **Fix Identifiers first.** Find every product that has an assigned GTIN and is not exposing it, and populate it. This pillar shares the top weight and a missing GTIN is a leading cause of suppression, so fixing it usually moves the score and the channel approvals together.
 2. **Front-load titles.** Rewrite titles to lead with product type, brand, and the one attribute a shopper searches on. This is bulk-editable and improves both matching and click-through.
 3. **Populate required attributes.** Work category by category, filling the structured fields — often Shopify metafields — that your channels filter on. Start with the categories that carry the most revenue.
 4. **Resolve consistency contradictions.** Reconcile units, currencies, and spellings across variants and fields so the record stops arguing with itself.
@@ -139,7 +139,7 @@ None of these steps requires a platform migration or a feed-management contract.
 
 ## The score is a diagnosis, not a destination
 
-A catalog readiness score will not, by itself, sell anything. What it does is make visible a cost that is otherwise invisible: the products a channel is quietly declining to show because their data does not survive translation. For the merchant with 660 suppressed products, the readiness score was the first artefact that named the problem in a way they could act on, pillar by pillar, instead of staring at an admin that insisted everything was fine.
+A catalog readiness score will not, by itself, sell anything. What it does is make visible a cost that is otherwise invisible: the products a channel is quietly declining to show because their data does not survive translation. For the store imagined at the top of this piece — two-thirds of its catalog active, a third silently held back — the readiness score is the first artefact that names the problem in a way the merchant can act on, pillar by pillar, instead of staring at an admin that insists everything is fine.
 
 That is the honest claim for a score. It is a measurement, sourced from the channels' own rules and from a first-hand read of the catalog, that tells you where your data is leaking reach. The free scan reads the public 55 points in a minute. The rest is there when you want the full picture.
 
