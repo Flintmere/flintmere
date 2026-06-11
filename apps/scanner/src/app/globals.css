@@ -457,6 +457,179 @@
   margin: 0;
 }
 
+/* --- Blog long-form prose (blog-system, 2026-06-10) ---------------------
+   The reading surface for /blog/<slug>. Geist Sans body on warm paper, mono
+   for code, hairline rules, amber link affordance, bracket accents inherited
+   from the .bracket primitive. Measure capped at ~68ch for readability
+   (#37 Consumer Psychologist + #3 editorial). AA contrast throughout:
+   body uses --color-ink-2 (≈15:1), captions --color-mute (≈6.3:1).
+   No motion of its own — inherits the global prefers-reduced-motion block.
+   Scoped under .blog-prose so it can't leak into app chrome. */
+.blog-prose {
+  font-family: var(--font-sans);
+  color: var(--color-ink-2);
+  font-size: clamp(17px, 1.15vw, 19px);
+  line-height: 1.72;
+  max-width: 68ch;
+  font-weight: 400;
+}
+.blog-prose > * + * {
+  margin-top: 1.45em;
+}
+.blog-prose h2 {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  margin-top: 2.4em;
+  scroll-margin-top: 96px;
+}
+.blog-prose h3 {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  font-size: clamp(20px, 2vw, 24px);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  margin-top: 1.9em;
+  scroll-margin-top: 96px;
+}
+.blog-prose a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--duration-instant) ease;
+}
+.blog-prose a:hover {
+  text-decoration-color: var(--color-ink);
+}
+.blog-prose strong {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.blog-prose ul,
+.blog-prose ol {
+  padding-left: 1.4em;
+}
+.blog-prose li + li {
+  margin-top: 0.5em;
+}
+.blog-prose ul {
+  list-style: none;
+  padding-left: 0;
+}
+.blog-prose ul > li {
+  position: relative;
+  padding-left: 1.4em;
+}
+.blog-prose ul > li::before {
+  content: ']';
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--color-accent);
+}
+.blog-prose code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--color-ink-ghost);
+  padding: 0.12em 0.36em;
+  border-radius: 2px;
+}
+.blog-prose pre {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  background: var(--color-ink);
+  color: var(--color-paper-on-ink);
+  padding: 1.1em 1.3em;
+  overflow-x: auto;
+  line-height: 1.6;
+}
+.blog-prose pre code {
+  background: transparent;
+  padding: 0;
+}
+.blog-prose blockquote {
+  border-left: 2px solid var(--color-accent);
+  padding-left: 1.2em;
+  color: var(--color-ink-3);
+  font-style: normal;
+}
+.blog-prose hr {
+  border: 0;
+  border-top: 1px solid var(--color-line-soft);
+  margin: 2.6em 0;
+}
+.blog-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92em;
+}
+.blog-prose th,
+.blog-prose td {
+  text-align: left;
+  padding: 0.7em 0.9em;
+  border-bottom: 1px solid var(--color-line-soft);
+  vertical-align: top;
+}
+.blog-prose th {
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+  border-bottom: 1px solid var(--color-line);
+}
+.blog-prose figure {
+  margin: 2em 0;
+}
+.blog-prose figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--color-line);
+}
+.blog-prose figcaption {
+  font-family: var(--font-mono);
+  font-size: clamp(12px, 0.85vw, 13px);
+  letter-spacing: 0.04em;
+  color: var(--color-mute);
+  margin-top: 0.6em;
+}
+
+/* TL;DR / key-takeaways + definition callouts (AEO answer-first, §D). Slab
+   on paper-2 with a 2px amber edge — the one "ink-slab promoted to surface
+   variant" register (ADR 0021). */
+.blog-callout {
+  background: var(--color-paper-2);
+  border-left: 2px solid var(--color-accent);
+  padding: clamp(20px, 3vw, 28px) clamp(20px, 3vw, 32px);
+  margin-top: 2em;
+}
+.blog-callout__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+  margin: 0 0 0.8em;
+}
+.blog-callout p,
+.blog-callout ul {
+  margin-top: 0.6em;
+}
+.blog-callout > :first-child {
+  margin-top: 0;
+}
+
 /* --- Outlined text (for "invisible" moments — literalises the metaphor) ---
    Council: #6 Yann (signature), #8 Noor (AAA stroke contrast), #12 Motion
    (reveal on viewport entry, static fallback for prefers-reduced-motion),

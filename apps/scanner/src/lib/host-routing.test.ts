@@ -37,6 +37,8 @@ describe('classifyRoute', () => {
     ['/audit/success', 'scanner'],
     ['/score/example-shop', 'scanner'],
     ['/bot', 'scanner'],
+    ['/blog', 'scanner'],
+    ['/blog/catalog-readiness-scoring-explained', 'scanner'],
     ['/unsubscribe', 'scanner'],
     ['/admin', 'scanner'],
     ['/admin/audit-draft', 'scanner'],

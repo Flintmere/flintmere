@@ -33,3 +33,10 @@ jobs:
 
       - name: Lint scanner
         run: pnpm -F scanner lint
+
+      # Blog content gate (blog-system, editorial standard §F). Assistive —
+      # blocks merge on mechanical failures (word floor, banned phrase /
+      # AI-tell, bad frontmatter, missing sources/FAQ, broken JSON-LD). The
+      # human reviewer still reads + merges every post.
+      - name: Validate blog content
+        run: pnpm -F scanner blog:validate

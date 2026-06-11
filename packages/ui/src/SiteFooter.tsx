@@ -7,6 +7,7 @@ import Link from 'next/link';
 const SCANNER_HOST_URL = 'https://audit.flintmere.com';
 const SCAN_URL = `${SCANNER_HOST_URL}/scan`;
 const AUDIT_URL = `${SCANNER_HOST_URL}/audit`;
+const BLOG_URL = `${SCANNER_HOST_URL}/blog`;
 
 /**
  * SiteFooter — closing-chord footer (Batch B, 2026-04-29).
@@ -103,6 +104,13 @@ export function SiteFooter() {
             className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
           >
             Methodology
+          </Link>
+          <span aria-hidden="true" className="hidden sm:inline">,</span>
+          <Link
+            href={BLOG_URL}
+            className="hover:text-[color:var(--color-accent)] transition-colors duration-[var(--duration-instant)]"
+          >
+            Blog
           </Link>
           <span aria-hidden="true" className="hidden sm:inline">,</span>
           <Link

@@ -27,7 +27,8 @@
     "audit:sla-monitor": "tsx scripts/concierge-sla-monitor.ts",
     "scrub:test-shop": "tsx scripts/scrub-test-shop.ts",
     "social:queue": "tsx scripts/queue-social-posts.ts",
-    "outreach:stage": "tsx scripts/stage-outreach-batch.ts"
+    "outreach:stage": "tsx scripts/stage-outreach-batch.ts",
+    "blog:validate": "tsx scripts/validate-blog.ts"
   },
   "dependencies": {
     "@flintmere/llm": "workspace:*",
@@ -39,12 +40,15 @@
     "@stripe/stripe-js": "^5.5.0",
     "geist": "^1.3.1",
     "google-auth-library": "^10.6.2",
+    "gray-matter": "^4.0.3",
     "motion": "^12.38.0",
     "next": "^15.1.0",
+    "next-mdx-remote": "^6.0.0",
     "posthog-js": "^1.381.0",
     "posthog-node": "^5.36.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "reading-time": "^1.5.0",
     "resend": "^4.0.0",
     "stripe": "^17.3.0",
     "zod": "^3.23.0"
