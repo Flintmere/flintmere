@@ -84,6 +84,7 @@ export const SCANNER_ROUTES: readonly string[] = [
   '/score',
   '/scan',
   '/audit',
+  '/blog',
   '/bot',
   '/unsubscribe',
 ];
@@ -273,6 +274,7 @@ export function crossHostHref(
 export const SCAN_URL = `https://${SCANNER_HOST}/scan`;
 export const AUDIT_URL = `https://${SCANNER_HOST}/audit`;
 export const BOT_URL = `https://${SCANNER_HOST}/bot`;
+export const BLOG_URL = `https://${SCANNER_HOST}/blog`;
 
 /**
  * Whether a request on `requestHost` for `pathname` should be rewritten

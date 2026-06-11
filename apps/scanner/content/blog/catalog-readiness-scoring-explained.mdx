@@ -1,0 +1,145 @@
+---
+title: "Catalog readiness: what it is and how it's scored"
+slug: catalog-readiness-scoring-explained
+description: "Catalog readiness measures how well a product feed survives the rules of Google, Amazon, and AI shopping agents. Here is how the score is built."
+cluster: catalog-readiness-scoring
+author: john-morris
+publishedAt: 2026-06-11
+sources:
+  - title: "GTIN — Global Trade Item Number"
+    url: "https://www.gs1.org/standards/id-keys/gtin"
+    publisher: GS1
+  - title: "Global Trade Item Number (GTIN) [gtin] — product data specification"
+    url: "https://support.google.com/merchants/answer/6324461"
+    publisher: Google Merchant Center Help
+  - title: "Product — Schema.org type"
+    url: "https://schema.org/Product"
+    publisher: Schema.org
+  - title: "Metafields — Shopify custom data"
+    url: "https://shopify.dev/docs/apps/build/custom-data/metafields"
+    publisher: Shopify
+faq:
+  - q: "What is a catalog readiness score?"
+    a: "A catalog readiness score is a single 0–100 number that measures how well a product catalog meets the data rules of the channels it sells through — Google Merchant Center, Amazon, and AI shopping agents. Flintmere computes it from seven weighted pillars: Identifiers, Attributes, Titles, Mapping, Consistency, Checkout eligibility, and Crawlability."
+  - q: "Can you measure readiness without installing an app?"
+    a: "Partly. Four of the seven pillars — Identifiers, Titles, Consistency, and Crawlability, worth 55 of the 100 points — are readable from a public storefront, so a free scan reports a partial score. The other three pillars need authenticated Admin-API reads, which require installing the Shopify app."
+  - q: "Why do missing GTINs matter so much?"
+    a: "Google matches your products to its catalog using the GTIN. When a product that has an assigned GTIN omits it, Google cannot confirm what the product is, and the listing is more likely to be suppressed. That is why Identifiers carries the heaviest single weight in the score."
+  - q: "How often should a catalog be re-scored?"
+    a: "Re-scan whenever you bulk-edit titles or attributes, add a product range, or change supplier data — and at least monthly. Channel rules also change, so a score that was accurate in spring can drift by autumn without any edit on your side."
+---
+
+A merchant we scanned last month had 1,800 products live on their Shopify storefront and a Google Merchant Center account that showed 1,140 of them as active. The other 660 were sitting in the account, disapproved or unmatched, invisible to anyone searching Google Shopping. Nothing was broken on the website. The products had photos, prices, and descriptions. They simply failed the rules that decide whether a channel will show them — and no page in the Shopify admin tells you that.
+
+That gap is what a catalog readiness score measures. This piece explains what the score is, what each part of it checks, and which parts a free scan can read before you install anything.
+
+<TLDR>
+
+- **Catalog readiness** is how well your product data survives the rules of the channels you sell on — Google Merchant Center, Amazon, and AI shopping agents.
+- Flintmere scores it out of 100 across **seven weighted pillars**.
+- **Four pillars (55 points)** are readable from a public storefront, so a free scan returns a partial score with no install.
+- **Identifiers** carries the most weight, because a missing GTIN is the single most common reason a product is suppressed.
+- A score is a starting diagnosis, not a verdict: it tells you where the data is costing you reach.
+
+</TLDR>
+
+## What <Bracket>catalog readiness</Bracket> actually means
+
+<Definition term="Catalog readiness">
+
+Catalog readiness is the degree to which a product catalog satisfies the structured-data requirements of the sales channels it feeds — search engines, marketplaces, and AI shopping agents — so that each product can be matched, ranked, and shown rather than dropped.
+
+</Definition>
+
+Readiness is not the same as completeness. A product page can read beautifully to a human and still fail a channel, because the channel reads a different version of the product: a structured feed of fields, not the rendered page. Google Merchant Center, for instance, wants a defined set of attributes — identifier, title, description, price, availability, brand, and more — supplied in a specific shape. A field that is missing, malformed, or contradictory is a field the channel cannot trust, and an untrusted product is one it would rather not show than show wrongly.
+
+So readiness is a measure of translation. Your catalog already exists for one audience — the shopper on your site. Readiness asks how much of it survives translation into the language each other channel speaks. The answer is rarely "all of it," and the parts that get lost are usually invisible from inside your own admin.
+
+## How the score is built: seven pillars to 100
+
+Flintmere expresses readiness as a single composite score from 0 to 100, computed as a weighted average of seven pillars. Each pillar measures a different way a catalog can break. The weights reflect how much each one affects whether a product is shown and ranked, drawn from the channel rules themselves rather than from opinion.
+
+| Pillar | Weight | What it checks |
+| --- | --- | --- |
+| Identifiers | 20 | GTIN, MPN, and brand present and valid where the product has them |
+| Attributes | 20 | Required structured fields — material, size, colour, age group, and the rest |
+| Titles | 15 | Titles that lead with the terms a channel and a shopper match on |
+| Mapping | 15 | Each product mapped to the correct channel product category |
+| Consistency | 15 | The same product described the same way across fields and variants |
+| Checkout eligibility | 10 | Price, availability, and currency that pass channel checkout rules |
+| Crawlability | 5 | The storefront and feed reachable and parseable by channel crawlers |
+
+The scoring itself is rule-based, not a guess. A product either carries a valid GTIN or it does not; a title either leads with a matchable noun or it buries it. The pillars convert hundreds of those per-product checks into one number you can track over time, and into a ranked list of what to fix first.
+
+## The four pillars a free scan can read
+
+Here is the practical split that matters before you commit to anything. Four of the seven pillars can be read from your public storefront, with no app install and no access to your Shopify admin. Together they account for **55 of the 100 points**:
+
+- **Identifiers (20)** — whether products expose GTINs and brand in their public structured data.
+- **Titles (15)** — whether titles lead with matchable terms or with marketing language.
+- **Consistency (15)** — whether the same product is described consistently across its public fields.
+- **Crawlability (5)** — whether the storefront is reachable and its product data parseable.
+
+A free Flintmere scan reports a partial score against these four. It is partial by design and labelled as such — it is a public read, not a full audit. The point is that you can see the shape of the problem in 60 seconds, for free, before deciding whether the rest is worth measuring.
+
+The remaining three pillars — **Attributes (20)**, **Mapping (15)**, and **Checkout eligibility (10)**, worth **45 points** — read from signals that only exist behind authentication. Required attributes like material and age group, the category each product is mapped to, and the price-and-availability data that passes checkout rules all come from authenticated Admin-API reads. Measuring them means installing the Shopify app. There is no public shortcut, and any tool that claims a full score from the outside is estimating.
+
+## Why Identifiers carries the heaviest weight
+
+Of the seven pillars, Identifiers shares the top weight, and there is one reason above the rest: the GTIN.
+
+<Definition term="GTIN">
+
+A GTIN (Global Trade Item Number) is the standardised number that sits behind a product's barcode — the UPC, EAN, or ISBN encoded as a single global identifier. It is issued through GS1 and is unique to a specific product from a specific brand.
+
+</Definition>
+
+The GTIN is how Google matches your product to its own understanding of that product. When two hundred shops sell the same jar of honey, Google uses the GTIN to know it is the same jar, to attach reviews and price comparisons, and to decide where you sit among those two hundred listings. Supply the GTIN and you join that matched group. Omit it on a product that has one, and Google has to take your word for what the product is — and Google's own product data specification treats the GTIN as a required attribute for products that have been assigned one.
+
+The result is blunt. A missing GTIN on a GTIN-eligible product is one of the most common causes of a suppressed Google Shopping listing. It does not lower your rank; it removes you from the comparison entirely. That is why Identifiers is weighted at the top of the score, and why it is usually the first thing a readiness scan flags. Brand and MPN matter too, but the GTIN is the field that decides whether the product is in the auction at all. Our [methodology page](https://flintmere.com/methodology) sets out the full pillar weights and the public sources behind each check.
+
+## What "good" looks like: titles, attributes, and consistency
+
+The middle of the score — Titles, Attributes, Mapping, and Consistency — is where most catalogs lose points quietly, because each failure is small and individually forgivable.
+
+**Titles** are read by a matcher before they are read by a person. A title that opens with "Handmade with love —" spends its most valuable characters on sentiment. A channel ranks on the front of the title, so the product type, brand, and key attribute belong there: "Cornish Sea Salt Dark Chocolate Bar 100g — Brand" beats "Our Best-Selling Treat." Good titles read as plain description, front-loaded with the words a shopper would type.
+
+**Attributes** are the structured fields a channel needs to slot a product into the right comparison: material, size, colour, age group, pattern, and dozens more depending on category. Many of these live in Shopify metafields, and a catalog that has never populated them will pass a human's eye while failing a channel's filter. When a shopper narrows results to "organic" or "gluten-free" and your product never declared it, you are not outranked — you are filtered out before ranking begins.
+
+**Consistency** checks that the product describes itself the same way everywhere. A variant priced in one currency on the page and another in the feed, a size given as "Large" in one field and "L" in another, a brand spelled two ways — each contradiction is a reason for a channel to distrust the record. Consistency is unglamorous and it is worth 15 points, because trust compounds: a catalog that contradicts itself in small ways is one a channel shows less of overall.
+
+**Mapping** ties a product to the correct channel category. Put a chilli oil in "Pantry" when the channel expects "Food, Beverages & Tobacco > Food Items > Condiments & Sauces" and the product competes in the wrong room, against the wrong set, under the wrong filters. Getting mapping right is largely a food-specific discipline, which is why the rules differ by vertical — our [guidance for food and drink merchants](https://flintmere.com/for/food-and-drink) goes into the category tree in detail.
+
+## Checkout eligibility and crawlability: the quiet gatekeepers
+
+The two lowest-weighted pillars are easy to ignore and expensive to fail, because they are gatekeepers rather than rankers: a product that fails them is not shown at all, regardless of how strong the rest of its data is.
+
+**Checkout eligibility** covers the commercial facts a channel verifies before it will list a product for sale — price, availability, and currency, supplied consistently and matching what the storefront actually charges at checkout. A price that disagrees between the feed and the live page is a classic disapproval: the channel cannot let a shopper click through to a different number than the one advertised, so it withholds the listing until the two agree. Out-of-stock products marked available, prices missing tax where the channel expects it included, currencies that do not match the target country — each is a checkout failure that no amount of good titling will rescue.
+
+**Crawlability** is the foundation everything else sits on. If a channel's crawler cannot reach your product pages — blocked by a `robots.txt` rule, hidden behind a redirect loop, served only after a JavaScript step the crawler does not run, or simply too slow — then it cannot read any of the other six pillars. Crawlability is weighted at only 5 points because it is usually fine; when it is not, it caps everything above it. A catalog can have immaculate identifiers and titles and still score near zero if the crawler never gets in to see them.
+
+## Why this matters more as agents start shopping
+
+For a decade, "catalog data quality" meant getting into Google Shopping. The audience for your structured data is now widening. AI shopping agents — the assistants inside ChatGPT, Gemini, and Copilot that a shopper asks to "find me a gluten-free dark chocolate bar under £4" — read the same structured signals, and they are less forgiving than a human browsing a category page. An agent does not scroll past a missing attribute; it filters on it. If your product never declared that it is gluten-free, the agent assembling a shortlist has no reason to include it, and the shopper never learns it existed.
+
+This is why the readiness pillars are framed around structured data the channels can match, not around how a page looks. The same Identifiers, Attributes, and Consistency that decide a Google Shopping placement decide whether an agent can confidently recommend a product. The merchant who fixes their readiness score for Google is, almost incidentally, making their catalog legible to the next set of buyers — the software ones. Getting the data right once pays out across every channel that reads it, which is the whole argument for treating readiness as a maintained number rather than a one-off cleanup.
+
+## How to raise a readiness score
+
+A score is only useful if it points at work. In practice the order that returns the most reach for the least effort looks like this:
+
+1. **Fix Identifiers first.** Find every product that has an assigned GTIN and is not exposing it, and populate it. This is the highest-weighted pillar and the most common single cause of suppression, so it usually moves the score and the channel approvals together.
+2. **Front-load titles.** Rewrite titles to lead with product type, brand, and the one attribute a shopper searches on. This is bulk-editable and improves both matching and click-through.
+3. **Populate required attributes.** Work category by category, filling the structured fields — often Shopify metafields — that your channels filter on. Start with the categories that carry the most revenue.
+4. **Resolve consistency contradictions.** Reconcile units, currencies, and spellings across variants and fields so the record stops arguing with itself.
+5. **Re-scan and watch the trend.** Readiness is not a one-time fix. Channel rules change, ranges grow, and supplier data drifts. A monthly re-scan turns the score into a maintenance signal rather than a one-off verdict.
+
+None of these steps requires a platform migration or a feed-management contract. They require knowing which products fail which rule, in priority order — which is exactly what the score is for.
+
+## The score is a diagnosis, not a destination
+
+A catalog readiness score will not, by itself, sell anything. What it does is make visible a cost that is otherwise invisible: the products a channel is quietly declining to show because their data does not survive translation. For the merchant with 660 suppressed products, the readiness score was the first artefact that named the problem in a way they could act on, pillar by pillar, instead of staring at an admin that insisted everything was fine.
+
+That is the honest claim for a score. It is a measurement, sourced from the channels' own rules and from a first-hand read of the catalog, that tells you where your data is leaking reach. The free scan reads the public 55 points in a minute. The rest is there when you want the full picture.
+
+See what agents read in your <Bracket>catalog</Bracket> — the scan is free and takes about a minute.

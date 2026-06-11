@@ -26,16 +26,38 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
 
   const host = KNOWN_HOSTS.includes(requestHost) ? requestHost : MARKETING_HOST;
 
+  const disallow =
+    host === SCANNER_HOST ? ['/api/', '/score/*/raw'] : ['/api/'];
+
+  // AI / answer-engine crawlers, allowed explicitly (blog AEO standard §D —
+  // "get cited by AI engines"). They inherit the `*` allow, but naming them
+  // is the canonical signal that the blog + standard are fair game for
+  // answer-engine citation. Add new agents here as they emerge.
+  const AI_CRAWLERS = [
+    'GPTBot',
+    'OAI-SearchBot',
+    'ChatGPT-User',
+    'Google-Extended',
+    'PerplexityBot',
+    'ClaudeBot',
+    'Claude-Web',
+    'Applebot-Extended',
+    'CCBot',
+    'cohere-ai',
+  ];
+
   return {
     rules: [
       {
         userAgent: '*',
         allow: '/',
-        disallow:
-          host === SCANNER_HOST
-            ? ['/api/', '/score/*/raw']
-            : ['/api/'],
+        disallow,
       },
+      ...AI_CRAWLERS.map((userAgent) => ({
+        userAgent,
+        allow: '/',
+        disallow,
+      })),
     ],
     sitemap: `https://${host}/sitemap.xml`,
     host: `https://${host}`,

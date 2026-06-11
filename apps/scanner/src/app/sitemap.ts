@@ -6,6 +6,7 @@ import {
   SCANNER_HOST,
   STANDARDS_HOST,
 } from '@/lib/host-routing';
+import { getAllPosts } from '@/lib/blog/posts';
 
 // Per-host sitemap. Reads x-forwarded-host (Coolify/Traefik) before
 // falling back to the host header. Each host emits ONLY the routes that
@@ -47,6 +48,7 @@ const MARKETING_SITEMAP_ROUTES: RouteEntry[] = [
 const SCANNER_SITEMAP_ROUTES: RouteEntry[] = [
   { path: '/scan', changeFrequency: 'monthly', priority: 1.0 },
   { path: '/audit', changeFrequency: 'monthly', priority: 0.9 },
+  { path: '/blog', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/bot', changeFrequency: 'yearly', priority: 0.3 },
 ];
 
@@ -95,6 +97,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       orderBy: { publicPageAt: 'desc' },
     });
 
+    // Blog posts (file-based MDX, non-draft). lastModified = updatedAt ??
+    // publishedAt (YYYY-MM-DD → Date at UTC midnight).
+    const blogPosts = getAllPosts().map((p) => {
+      const iso = p.frontmatter.updatedAt ?? p.frontmatter.publishedAt;
+      return {
+        url: `${base}/blog/${p.frontmatter.slug}`,
+        lastModified: new Date(`${iso}T00:00:00Z`),
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+      };
+    });
+
     return [
       ...SCANNER_SITEMAP_ROUTES.map((r) => ({
         url: `${base}${r.path}`,
@@ -102,6 +116,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: r.changeFrequency,
         priority: r.priority,
       })),
+      ...blogPosts,
       ...publicScores.map((s) => ({
         url: `${base}/score/${s.normalisedDomain}`,
         lastModified: s.publicPageAt ?? s.completedAt ?? now,
