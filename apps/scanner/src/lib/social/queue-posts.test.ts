@@ -54,6 +54,22 @@ describe('queuePostsSchema', () => {
     ]);
     expect(result.success).toBe(false);
   });
+
+  it('defaults channel to x when omitted', () => {
+    const result = queuePostsSchema.safeParse([VALID_POST]);
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data[0]?.channel).toBe('x');
+  });
+
+  it('accepts an explicit bluesky channel', () => {
+    const result = queuePostsSchema.safeParse([{ ...VALID_POST, channel: 'bluesky' }]);
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data[0]?.channel).toBe('bluesky');
+  });
+
+  it('rejects an unknown channel', () => {
+    expect(queuePostsSchema.safeParse([{ ...VALID_POST, channel: 'linkedin' }]).success).toBe(false);
+  });
 });
 
 describe('findBannedPhrase', () => {
@@ -67,14 +83,14 @@ describe('findBannedPhrase', () => {
 });
 
 describe('queuePosts', () => {
-  it('inserts validated posts with channel x and parsed dates', async () => {
+  it('inserts validated posts with their channel and parsed dates', async () => {
     const createMany = vi.fn().mockResolvedValue({ count: 2 });
     const client: QueuePostsPrisma = { socialPost: { createMany } };
 
     const queued = await queuePosts(
       [
-        VALID_POST,
-        { ...VALID_POST, altText: 'score ring at 64', scheduledAt: '2026-06-13T10:00:00Z' },
+        { ...VALID_POST, channel: 'x' },
+        { ...VALID_POST, channel: 'bluesky', altText: 'score ring at 64', scheduledAt: '2026-06-13T10:00:00Z' },
       ],
       client,
     );
@@ -85,7 +101,7 @@ describe('queuePosts', () => {
       data: Array<{ channel: string; altText: string | null; scheduledAt: Date }>;
     };
     expect(data[0]).toMatchObject({ channel: 'x', altText: null });
-    expect(data[1]).toMatchObject({ channel: 'x', altText: 'score ring at 64' });
+    expect(data[1]).toMatchObject({ channel: 'bluesky', altText: 'score ring at 64' });
     expect(data[0]!.scheduledAt).toEqual(new Date('2026-06-11T10:00:00Z'));
   });
 });

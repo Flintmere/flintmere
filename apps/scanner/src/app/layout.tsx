@@ -96,7 +96,12 @@ export default function RootLayout({
                   postalCode: 'WC2H 9JQ',
                   addressCountry: 'GB',
                 },
-                sameAs: ['https://github.com/Flintmere'],
+                sameAs: [
+                  'https://github.com/Flintmere',
+                  'https://x.com/flintmere_',
+                  'https://bsky.app/profile/flintmere.bsky.social',
+                  'https://instagram.com/flintmere.audit',
+                ],
               },
               {
                 '@type': 'WebSite',

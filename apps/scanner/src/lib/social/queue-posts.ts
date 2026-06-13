@@ -1,5 +1,5 @@
 /**
- * Agent-drafted X post intake — ADR 0026. Single validation + insert
+ * Agent-drafted social post intake — ADR 0026. Single validation + insert
  * surface shared by the local script (scripts/queue-social-posts.ts)
  * and the agent API route (/api/agent/queue-posts) so the remote
  * weekly agent and a local operator get identical guarantees:
@@ -50,6 +50,9 @@ const postSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}T/, 'scheduledAt must be ISO 8601')
     .refine((s) => !Number.isNaN(Date.parse(s)), 'scheduledAt must be a valid date'),
   altText: z.string().max(1000).nullish(),
+  // Channel defaults to 'x' so every existing caller stays valid; the 280
+  // cap is the binding length limit for both (Bluesky allows 300).
+  channel: z.enum(['x', 'bluesky']).default('x'),
 });
 
 export const queuePostsSchema = z.array(postSchema).min(1).max(10);
@@ -78,7 +81,7 @@ export async function queuePosts(
 ): Promise<number> {
   const { count } = await client.socialPost.createMany({
     data: posts.map((p) => ({
-      channel: 'x',
+      channel: p.channel,
       body: p.body,
       altText: p.altText ?? null,
       utmCampaign: p.utmCampaign,

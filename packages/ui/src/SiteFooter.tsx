@@ -7,6 +7,28 @@ import Link from 'next/link';
 const SCANNER_HOST_URL = 'https://audit.flintmere.com';
 const SCAN_URL = `${SCANNER_HOST_URL}/scan`;
 const AUDIT_URL = `${SCANNER_HOST_URL}/audit`;
+
+// Social profiles — surfaced as footer icons and mirrored in the
+// Organization JSON-LD `sameAs` (apps/scanner/src/app/layout.tsx). Public
+// handles, hardcoded by design (anti-waste rule 6 — public-by-design URLs,
+// not secrets). Single-path 24-viewport icons, currentColor fill.
+const SOCIAL_LINKS: ReadonlyArray<{ label: string; href: string; path: string }> = [
+  {
+    label: 'Flintmere on X',
+    href: 'https://x.com/flintmere_',
+    path: 'M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z',
+  },
+  {
+    label: 'Flintmere on Bluesky',
+    href: 'https://bsky.app/profile/flintmere.bsky.social',
+    path: 'M5.769 2.524c2.732 2.051 5.671 6.211 6.231 8.443.56-2.232 3.5-6.392 6.231-8.443C20.197 1.045 23 -.094 23 3.104c0 .638-.366 5.366-.581 6.134-.747 2.666-3.464 3.347-5.881 2.935 4.226.719 5.303 3.102 2.981 5.485-4.408 4.525-6.334-1.135-6.829-2.586-.09-.266-.133-.39-.133-.282 0-.108-.043.016-.133.282-.495 1.451-2.421 7.111-6.829 2.586-2.322-2.383-1.245-4.766 2.981-5.485-2.417.412-5.134-.269-5.881-2.935C1.366 8.47 1 3.742 1 3.104 1 -.094 3.803 1.045 5.769 2.524Z',
+  },
+  {
+    label: 'Flintmere on Instagram',
+    href: 'https://instagram.com/flintmere.audit',
+    path: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163C8.741 0 8.332.014 7.052.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z',
+  },
+];
 const BLOG_URL = `${SCANNER_HOST_URL}/blog`;
 
 /**
@@ -177,6 +199,34 @@ export function SiteFooter() {
               © 2026 Flintmere · a trading name of Eazy Access Ltd · England &amp;
               Wales · UK
             </p>
+
+            {/* Social profiles. Inherit caption mute-inv → paper-on-ink on
+                hover (calm, not amber-loud). 18px icon + 6px padding = 30px
+                hit target (≥24px AA 2.5.8); icons are graphical so the
+                mute-inv/ink pairing clears the 3:1 non-text contrast floor
+                (1.4.11). negative margin re-aligns the first glyph left. */}
+            <ul
+              aria-label="Flintmere on social media"
+              className="flex items-center"
+              style={{ marginTop: 'clamp(12px, 1.5vw, 20px)', marginLeft: '-6px', gap: '4px', listStyle: 'none', padding: 0 }}
+            >
+              {SOCIAL_LINKS.map((s) => (
+                <li key={s.href}>
+                  <a
+                    href={s.href}
+                    aria-label={s.label}
+                    target="_blank"
+                    rel="me noopener noreferrer"
+                    className="inline-flex items-center justify-center hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
+                    style={{ padding: '6px' }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d={s.path} />
+                    </svg>
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
