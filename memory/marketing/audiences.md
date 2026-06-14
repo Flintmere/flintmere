@@ -20,7 +20,7 @@ Four primary segments. Each row is a writable prompt: what they feel, what they 
 - **Desired outcome**: central dashboard with score + pillar breakdown + Channel Health across the full catalog, bulk enrichment with dry-run preview, reporting they can show the CMO.
 - **Register**: precise language. Talk about metafield types, Catalog Mapping, JSON-LD, agentic storefronts. Show the architecture + integration points clearly.
 - **Channels**: LinkedIn (founder + ops leads), Shopify Plus Partner directory, ecom-ops newsletters, specialist Slack / Discord communities.
-- **Headline hook**: `Scale catalog readiness. [ Six ] pillars. One score. Every SKU.`
+- **Headline hook**: `Scale catalog readiness. [ Seven ] pillars. One score. Every SKU.`
 
 ## 3. Shopify agency / Plus Partner (managing 5–50 client stores)
 

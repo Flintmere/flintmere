@@ -14,18 +14,19 @@ Canonical definitions of terms used across Flintmere. Extended from `SPEC.md` Ap
 
 **Concierge audit** — £97 one-off manual audit offered in SPEC §2.4 Week 1. Landing page at `flintmere.com/audit` or similar. Stripe-paid one-off, 48-hour delivery.
 
-## Scoring system (six pillars)
+## Scoring system (seven pillars)
 
-**AI-readiness score** — Composite 0–100 score summarising how readable a catalog is by AI shopping agents. Weighted sum of the six pillars.
+**AI-readiness score** — Composite 0–100 score summarising how readable a catalog is by AI shopping agents. Weighted sum of the seven pillars.
 
-**Pillar** — One dimension of the score. Six pillars; each has a weight.
+**Pillar** — One dimension of the score. Seven pillars; each has a weight.
 
 1. **Identifier completeness (20%)** — GTIN, MPN, brand, SKU presence and validity.
-2. **Attribute completeness (25%)** — Metafield population against a vertical-specific template.
+2. **Attribute completeness (20%)** — Metafield population against a vertical-specific template.
 3. **Title & description quality (15%)** — Literal language, length, agent-parseability.
 4. **Catalog mapping coverage (15%)** — Custom fields mapped to Shopify Catalog standard fields.
 5. **Consistency & integrity (15%)** — Price/inventory/status alignment across Admin API, Storefront API, and rendered JSON-LD.
 6. **AI checkout eligibility (10%)** — External URL metafield, store policies, published status.
+7. **Crawlability (5%)** — Agent access: robots.txt rules, render path, and crawl speed that let a channel's crawler reach product pages.
 
 **GTIN-less ceiling** — The maximum score a merchant can reach without investing in GS1 GTINs. Roughly 80/100 per SPEC §4.2.1. Surfaces explicitly in the scorecard ("Your ceiling without GTINs: 82").
 

@@ -82,7 +82,7 @@ export default function PreviewIsland() {
                   color: island.ink2,
                 }}
               >
-                Six pillars scored. Two are strong, four need work. Fix them and
+                Seven pillars scored. Two are strong, five need work. Fix them and
                 your catalog becomes legible to ChatGPT, Gemini, and Google Shopping.
               </p>
             </div>

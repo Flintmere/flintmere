@@ -85,7 +85,7 @@ These clusters drive the "State of AI Readiness in [Vertical]" flagship content 
 
 Every SEO piece must trace its claims through `memory/compliance-risk/claims-register.md`:
 
-- **Pillar count**: 6 (never "multiple", never "four or five" — it's six, precisely).
+- **Pillar count**: 7 (never "multiple", never "four or five" — it's seven, precisely).
 - **AI uplift**: always qualify — "estimated ~34% lift based on comparable stores in your vertical." Never "guaranteed" or "will".
 - **GTIN**: Flintmere does not issue GTINs. GS1 does. Disclaimer appears on any GTIN-adjacent content.
 - **Tier pricing**: Growth £49 / Scale £149 / Agency £399 / Enterprise £499+. Never round up or simplify ("from about £50/mo" is wrong — it's £49).

@@ -20,7 +20,7 @@ Every piece should sit on one of these. If a draft doesn't, question whether it 
 
 1. **The AI shopping shift is here** — 15× YoY growth, 5.6M stores auto-enrolled.
 2. **Your catalog is invisible** — 40% of catalogs ignored by AI agents.
-3. **The six pillars** — what we score, why it matters.
+3. **The seven pillars** — what we score, why it matters.
 4. **Before / after agentic commerce** — the paradigm change.
 5. **Honest GTIN guidance** — we don't sell fake barcodes.
 6. **Channel Health** — measured impact, not faith-based.

@@ -62,7 +62,7 @@ export default function App() {
           color: '#141518',
         }}
       >
-        Score your Shopify catalog for AI-agent readiness across six pillars,
+        Score your Shopify catalog for AI-agent readiness across seven pillars,
         auto-fix what&rsquo;s safe to fix, and see AI-agent traffic land in
         your store. Install from the Shopify App Store or sign in via your shop
         below.

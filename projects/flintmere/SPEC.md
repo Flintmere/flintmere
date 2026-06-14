@@ -20,7 +20,7 @@
 > | §6.4 (scanner architecture as separate app) | Reconciled: scanner + marketing both live in `apps/scanner/`; split deferred per `STATUS.md` §Open decisions |
 > | §9 (week-by-week roadmap) | `STATUS.md` is canonical for what's shipped vs planned |
 >
-> Everything else (the scoring system, the three-tier fix engine, the six pillars, pricing, GTM sequence, the GTIN-less path, Channel Health, risks) still stands.
+> Everything else (the scoring system, the three-tier fix engine, the seven pillars, pricing, GTM sequence, the GTIN-less path, Channel Health, risks) still stands.
 
 *v1.2 updates: domain locked to flintmere.com / audit.flintmere.com, Next-7-days list refreshed to reflect v1.1 changes, risk section updated to cross-reference §11.2 Channel Health.*
 
