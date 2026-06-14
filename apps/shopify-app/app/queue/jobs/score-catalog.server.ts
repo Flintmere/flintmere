@@ -10,7 +10,7 @@ const REVERT_WINDOW_DAYS = 7;
 
 /**
  * Score job — reads products + variants from Postgres, feeds @flintmere/scoring,
- * writes Score + Issue rows. Unlocks all six pillars (app mode) because OAuth
+ * writes Score + Issue rows. Unlocks all seven pillars (app mode) because OAuth
  * data is available.
  */
 export async function handleScoreCatalog(

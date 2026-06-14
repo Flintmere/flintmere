@@ -108,7 +108,7 @@ A **new scoring pillar** that evaluates description text against a curated restr
 
 ### Revenue angle
 
-Plus merchants (xgentech's ICP, our stretch-target) are explicitly flagged as at-risk on this topic. Claim-integrity is a natural Scale-tier (£149) feature and a strong Agency-tier (£399) differentiator. Legal-compliance-themed pillars convert on fear, not on hope — different buying motion from the existing six pillars.
+Plus merchants (xgentech's ICP, our stretch-target) are explicitly flagged as at-risk on this topic. Claim-integrity is a natural Scale-tier (£149) feature and a strong Agency-tier (£399) differentiator. Legal-compliance-themed pillars convert on fear, not on hope — different buying motion from the existing seven pillars.
 
 ### Moat angle
 

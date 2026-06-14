@@ -81,7 +81,7 @@ This is the floor. If a week loses the Wed block to engineering, the §Bandwidth
 
 ### Tue 2026-05-12 — 30 minutes
 6. **Edit operator personal LinkedIn profile** (20 min):
-   - Headline: `Building Flintmere — catalog readiness for AI-shopping. We score Shopify catalogs against six pillars and fix what's broken.`
+   - Headline: `Building Flintmere — catalog readiness for AI-shopping. We score Shopify catalogs against seven pillars and fix what's broken.`
    - About section: 4 sentences. Plain English. British. No banned phrases (see §Banned-claim cheat sheet).
    - Featured: pin `flintmere.com` and `audit.flintmere.com`.
    - Banner: solid ink (`#0A0A0B`) with `[ flintmere ]` in Geist Mono amber centre — generate via the carousel template once built (W2), placeholder neutral until then.
@@ -142,7 +142,7 @@ If any of these slip past Sun: do not start W1. Push everything by one week. The
 
 ### Wed 2026-05-20 — 90 min (drafting block)
 - **Brief the SEO skill** for the first blog post: `/seo` → keyword cluster 2 (catalog readiness & scoring) + cluster 1 (AI shopping awareness). Output: SERP map + outline. (45 min)
-- **Customise X bio + pinned tweet draft** (15 min). Bio: `Catalog readiness for AI-shopping. We score Shopify catalogs against six pillars. audit.flintmere.com`
+- **Customise X bio + pinned tweet draft** (15 min). Bio: `Catalog readiness for AI-shopping. We score Shopify catalogs against seven pillars. audit.flintmere.com`
 - **Set up X follow list** — follow 50 accounts in three buckets (15 min each, 30 min total):
   - Shopify Dev Relations + Plus team (~15 accounts)
   - Indie ecom founders ~£500K–£20M (~20 accounts) — find via "ecom founder" + "shopify" search
@@ -492,7 +492,7 @@ Single-card reminder. Full list in `memory/VOICE.md` §Banned phrases.
 
 **Replace with concrete:**
 - "412 products missing GTINs" ≠ "many products have barcode issues"
-- "We score six pillars" ≠ "We help you optimise visibility"
+- "We score seven pillars" ≠ "We help you optimise visibility"
 - "We saw drift on 38% of catalogs we scanned" ≠ "AI-readiness is a huge issue"
 
 **Gatekeeper:** #11 Founder voice — final approval on every shipped piece.

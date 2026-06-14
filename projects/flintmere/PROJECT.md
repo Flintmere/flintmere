@@ -31,7 +31,7 @@ flintmere/
 │   └── shopify-app/        Remix · app.flintmere.com · embedded Shopify app
 ├── packages/
 │   ├── llm/                LLM provider abstraction (Gemini / Azure / fallback)
-│   └── scoring/            Pure scoring engine (six pillars), framework-free
+│   └── scoring/            Pure scoring engine (seven pillars), framework-free
 ├── memory/                 Claude behaviour rules (PROCESS, VOICE, OUTPUT, TOOLS, CONSTRAINTS + depts)
 ├── projects/flintmere/     This directory — project knowledge + ADRs
 ├── wireframes/             Design reference (React wireframe viewer)

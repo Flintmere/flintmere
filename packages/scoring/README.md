@@ -1,6 +1,6 @@
 # @flintmere/scoring
 
-Flintmere's six-pillar catalog readiness scoring engine. Pure TypeScript. No framework dependencies.
+Flintmere's seven-pillar catalog readiness scoring engine. Pure TypeScript. No framework dependencies.
 
 ## Usage
 
@@ -20,18 +20,19 @@ console.log(result.issues);
 
 ## Pillars
 
-The engine computes six pillars per the Flintmere canon (SPEC §4.1):
+The engine computes seven pillars per the Flintmere canon (SPEC §4.1):
 
 | Pillar | Weight | Public-scannable? |
 |---|---|---|
 | Identifier completeness | 20% | Yes — from `/products.json` |
-| Attribute completeness | 25% | **Locked** — requires OAuth install |
+| Attribute completeness | 20% | **Locked** — requires OAuth install |
 | Title & description quality | 15% | Yes |
 | Catalog mapping coverage | 15% | **Locked** — requires Admin API |
 | Consistency & integrity | 15% | Yes |
 | AI checkout eligibility | 10% | **Locked** — requires Admin API |
+| Crawlability | 5% | Yes — from `robots.txt` + render checks |
 
-Scanner mode (default) returns `locked: true` on the three Admin-API pillars with a `lockedReason`. App mode (post-OAuth) unlocks all six.
+Scanner mode (default) returns `locked: true` on the three Admin-API pillars with a `lockedReason`. App mode (post-OAuth) unlocks all seven.
 
 ## Design
 
