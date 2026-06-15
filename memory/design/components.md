@@ -9,7 +9,7 @@ Component inventory for Flintmere. Canonical source for what exists, where it li
 The legibility-bracket treatment from the canon. Every surface uses this. See `tokens.md` §Signature.
 
 ```tsx
-<Bracket>invisible</Bracket>               // renders [ invisible ] with Geist Mono
+<Bracket>last</Bracket>                     // renders [ last ] with Geist Mono
 <Bracket size="display">64</Bracket>       // giant bracket on score
 <Bracket aria-hidden>01</Bracket>          // decorative variant for pillar numbers
 <Bracket interactive>Scan my store</Bracket>// wraps inside a CTA with aria-label handling

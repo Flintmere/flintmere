@@ -23,7 +23,7 @@ The brand posture: **technical confidence**. We're serious about catalog readine
 
 The signature from `memory/design/tokens.md` is also a copy rule. Every Flintmere headline and major section heading has **one bracketed key word** that names the token the agent would extract:
 
-- `Your product catalog is [ invisible ] to ChatGPT.`
+- `ChatGPT lists every rival. Yours ranks [ last ].`
 - `Missing [ GTIN ] on 412 products.`
 - `Your [ 64 ] / 100 AI-readiness score.`
 
