@@ -14,7 +14,7 @@ Canonical voice lives in `memory/VOICE.md`. Commercial rationale lives in `proje
 
 Every headline and major section carries **one bracketed word** — the key noun you want the reader to remember. See `memory/design/tokens.md` §Signature and `memory/VOICE.md` §The legibility-bracket signature in copy.
 
-- `Your product catalog is [ invisible ] to ChatGPT.`
+- `ChatGPT lists every rival. Yours ranks [ last ].`
 - `Missing [ GTIN ] on 412 products.`
 - `[ Seven ] pillars. One score.`
 
@@ -39,7 +39,7 @@ Gatekeeper for banned-phrase enforcement: **#11 Investor / founder voice.**
 
 ## Preferred phrasing
 
-- "Your product catalog is `[ invisible ]` to ChatGPT."
+- "ChatGPT lists you and every competitor. Yours ranks `[ last ]`."
 - "We score it, fix what's broken, and show you what changed."
 - "Built for Shopify merchants and the agencies who serve them."
 - "Honest GTIN guidance — buy them from GS1, we'll help you import them."

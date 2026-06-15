@@ -64,7 +64,7 @@ You are Flintmere's marketing-surface designer. You compose marketing pages that
 | Section | Role | Bracket moment (example) |
 |---|---|---|
 | Nav | Chrome | `Flint[ mere ]` wordmark on dark nav |
-| Hero | Manifesto | `Your product catalog is [ invisible ] to ChatGPT.` |
+| Hero | Manifesto | `ChatGPT lists every rival. Yours ranks [ last ].` |
 | Before / After | Paradigm contrast | `[ Before ]` / `[ After ]` section titles |
 | Numbers strip | Proof | Each stat bracketed in mono: `[ 15× ]`, `[ 40% ]`, etc. (sparingly — pick one) |
 | The seven pillars | Product definition | Bracketed pillar numbers `[ 01 ]`…`[ 07 ]` (decorative, `aria-hidden`) |
