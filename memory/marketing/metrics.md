@@ -8,7 +8,7 @@ One primary metric per surface. Everything else is secondary observation.
 |---|---|---|
 | Public scanner (`audit.flintmere.com`) | Successful scans per day | The free scanner is top-of-funnel. If merchants aren't scanning, nothing else matters. |
 | Scanner → email capture | Email opt-in rate (% of completed scans that submit email) | The only signal we have for intent before install. |
-| Scanner → concierge audit | Paid £97 audits per week | Week 1 validation metric (SPEC §2). Proves willingness to pay. |
+| Scanner → concierge audit | Paid concierge audits per week | Week 1 validation metric (SPEC §2). Proves willingness to pay. |
 | Marketing site blog | Organic search sessions to `flintmere.com/blog/*` | Content's job is discovery. Social traffic is a bonus. |
 | Pricing page | Growth tier signup rate (pricing visits → installs) | Conversion is the whole point of the page. |
 | Shopify App Store listing | Install rate (listing views → installs) | Platform-own metric; Shopify shows this in Partner Dashboard. |
@@ -17,6 +17,8 @@ One primary metric per surface. Everything else is secondary observation.
 | Agency tier | Agency signups + active client-seats | The economic engine per SPEC §8.2. |
 | Social (LinkedIn, X) | Clicks to scanner or blog | Vanity metrics (likes, impressions) are observations. Traffic is the outcome. |
 | Outreach | Replies + meetings booked | Not opens. Not sends. |
+
+> Concierge-audit pricing is the ADR 0022 band ladder — £197 (≤1,500 SKUs) / £397 (1,501–5,000) / from £597 bespoke (5,001+); the £97 flat floor was retired 2026-05-01. Canonical: `apps/scanner/src/lib/audit-pricing.ts`.
 
 ## The North Star
 
@@ -65,3 +67,4 @@ Target by stage:
 ## Changelog
 
 - 2026-04-19: Rewritten for Flintmere. Replaced Web3 surfaces (homepage scanner with wallet input, Sentinel page, API pages, chain distribution) with Shopify surfaces (public URL scanner, concierge £97, Shopify app listing, first-scorecard, Agency tier). Added the agency-merchant ratio as North Star.
+- 2026-06-19: Pricing reconciliation — surface metric "Paid £97 audits per week" → "Paid concierge audits per week"; added the ADR 0022 band-ladder note (£197/£397/from £597; £97 floor retired 2026-05-01, canonical `audit-pricing.ts`). The 2026-04-19 entry's historical "concierge £97" reference is left intact as a dated record.

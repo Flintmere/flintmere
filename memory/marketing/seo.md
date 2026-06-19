@@ -85,10 +85,11 @@ These clusters drive the "State of AI Readiness in [Vertical]" flagship content 
 
 Every SEO piece must trace its claims through `memory/compliance-risk/claims-register.md`:
 
-- **Pillar count**: 6 (never "multiple", never "four or five" — it's six, precisely).
-- **AI uplift**: always qualify — "estimated ~34% lift based on comparable stores in your vertical." Never "guaranteed" or "will".
+- **Pillar count**: 7 (never "multiple", never "six" — it's seven, precisely, since the 6→7 migration in PR #79). Canonical: `apps/scanner/src/lib/methodology-data.ts` — Identifiers 20 / Attributes 20 / Titles 15 / Mapping 15 / Consistency 15 / Checkout eligibility 10 / Crawlability 5 (= 100; Crawlability is the seventh). Registered: claims-register.md §"Pillar count — 7".
+- **AI uplift**: cite the registered claim — **"3–4× higher AI visibility at 99%+ attribute completion"** (claims-register §"AI visibility uplift"; canonical scope is "at 99%+ attribute completion"). The bare "~34%" is only ever a per-store *example*, not a canonical figure — per-store estimates use the qualifier "estimated ~N% lift based on comparable stores in your vertical." Never a standalone percentage, never "guaranteed" or "will".
 - **GTIN**: Flintmere does not issue GTINs. GS1 does. Disclaimer appears on any GTIN-adjacent content.
-- **Tier pricing**: Growth £49 / Scale £149 / Agency £399 / Enterprise £499+. Never round up or simplify ("from about £50/mo" is wrong — it's £49).
+- **Tier pricing (in transition — ADR 0016/0020; trace to code, do not memorise)**: Subscription pricing is mid-migration from the volume ladder to the food vertical ladder. Canonical source is `apps/scanner/src/lib/pricing.ts` — never cite a subscription price not present there. *Grandfathered* (in-flight subscriptions only; do **not** promote to new sign-ups): Growth £79 / Scale £249 / Agency £499 / Plus from £1,200 on enquiry. *New sign-ups* land on the ADR 0016 food vertical ladder — indicatively Food single £99 / Food agency £349 / Food+Beauty bundle £159 (single) · £499 (agency) / Concierge retainer £349 — but these magnitudes are WTP-pending and currently render as "Pricing finalising — May–June 2026" in `pricing.ts`; treat as indicative and verify there before publishing any forward price. The retired numbers Growth £49 / Scale £149 / Agency £399 / Enterprise £499+ are WRONG — never use them.
+- **Concierge audit pricing (ADR 0022 band ladder)**: £197 (≤1,500 SKUs) / £397 (1,501–5,000) / from £597 bespoke (5,001+). Canonical: `apps/scanner/src/lib/audit-pricing.ts`. The £97 flat floor was retired 2026-05-01 — never cite £97.
 - **Integrations**: Flintmere integrates via Shopify Admin + Storefront APIs. Not a generic "works with everything" tool.
 - **Outcome framing**: "catalog readiness for AI agents", not "be recommended by AI agents".
 
@@ -98,6 +99,7 @@ Do not confuse:
 - **Catalog Mapping** (Shopify feature) vs **generic taxonomy mapping** (PIM feature). Catalog Mapping is Shopify-specific.
 - **ACP** (OpenAI) vs **UCP** (Google/Shopify). Different protocols; we align with both.
 - **GTIN** (GS1 identifier) vs **SKU** (merchant-internal) vs **MPN** (manufacturer part number). All three are different.
+- **Scoring pillars** (the AI-readiness score — **seven**: Identifiers / Attributes / Titles / Mapping / Consistency / Checkout eligibility / Crawlability; `apps/scanner/src/lib/methodology-data.ts`) vs **the food catalog standard's pillars** (**six**: allergen disclosure, ingredient ordering, country-of-origin, GS1 barcode path, storage + use-by, channel readability; `standards.flintmere.com`, `apps/scanner/src/app/standards/page.tsx`). Two distinct constructs — the score is seven, the food standard is six. Never "correct" one to match the other.
 
 ## Internal linking rules
 
@@ -117,3 +119,4 @@ Content gaps, ranking notes, and competitor coverage observations go below. Most
 ## Changelog
 
 - 2026-04-19: Rewritten for Flintmere. Replaced 7 token-approval clusters (Permit2 risk, ERC-20 approval, revoke approvals, etc.) with Flintmere's clusters (AI shopping, catalog readiness, GTIN guidance, metafield, Shopify app discovery, LLM shopping, Plus enterprise). Added vertical-specific long-tail clusters for the moat strategy.
+- 2026-06-19: Fact-guardrail reconciliation to live canon. Pillar count 6→7 (PR #79; `methodology-data.ts`). Tier-pricing guardrail rewritten for the ADR 0016/0020 transition (grandfathered Growth £79 / Scale £249 / Agency £499 / Plus from £1,200; forward food ladder indicative + WTP-pending per `pricing.ts`; retired £49/£149/£399/£499+). Added concierge band-ladder guardrail (£197/£397/from £597; £97 floor retired 2026-05-01, `audit-pricing.ts`). Verified against code. Also added a §Do-not-confuse entry separating the seven AI-readiness scoring pillars from the food catalog standard's six pillars (the `/standards` page's "Six pillars" is a different, correct construct — not drift).
