@@ -50,9 +50,10 @@ const postSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}T/, 'scheduledAt must be ISO 8601')
     .refine((s) => !Number.isNaN(Date.parse(s)), 'scheduledAt must be a valid date'),
   altText: z.string().max(1000).nullish(),
-  // Channel defaults to 'x' so every existing caller stays valid; the 280
-  // cap is the binding length limit for both (Bluesky allows 300).
-  channel: z.enum(['x', 'bluesky']).default('x'),
+  // Channel is optional: omitted ⇒ cross-post to every CROSSPOST_CHANNEL
+  // (resolved in queuePosts), set explicitly to pin one. The 280 cap is the
+  // binding length limit for both (Bluesky allows 300).
+  channel: z.enum(['x', 'bluesky']).optional(),
 });
 
 export const queuePostsSchema = z.array(postSchema).min(1).max(10);
@@ -74,19 +75,29 @@ export interface QueuePostsPrisma {
   };
 }
 
+/**
+ * Channels a post fans out to when it doesn't name one. Cross-posting is the
+ * default so every agent-drafted post (which omits `channel`) reaches both X
+ * and Bluesky — a free Bluesky copy keeps publishing even when X is credit-blocked.
+ */
+export const CROSSPOST_CHANNELS = ['x', 'bluesky'] as const;
+
 /** Insert validated posts into the SocialPost queue. Returns rows queued. */
 export async function queuePosts(
   posts: QueuePostInput[],
   client: QueuePostsPrisma = prisma,
 ): Promise<number> {
   const { count } = await client.socialPost.createMany({
-    data: posts.map((p) => ({
-      channel: p.channel,
-      body: p.body,
-      altText: p.altText ?? null,
-      utmCampaign: p.utmCampaign,
-      scheduledAt: new Date(p.scheduledAt),
-    })),
+    data: posts.flatMap((p) => {
+      const channels = p.channel ? [p.channel] : CROSSPOST_CHANNELS;
+      return channels.map((channel) => ({
+        channel,
+        body: p.body,
+        altText: p.altText ?? null,
+        utmCampaign: p.utmCampaign,
+        scheduledAt: new Date(p.scheduledAt),
+      }));
+    }),
   });
   return count;
 }
