@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useScroll, useMotionValueEvent, useReducedMotion } from 'motion/react';
 import { PillarWheel, type PillarSpec } from './PillarWheel';
+import { PillarAccordion } from './PillarAccordion';
 
 /**
  * PillarWheelScrollPin — Chapter 2 scroll-pin wrapper (2026-04-29).
@@ -84,7 +85,26 @@ export function PillarWheelScrollPin({ pillars }: PillarWheelScrollPinProps) {
   // wrapper's padding so the spotlight panel doesn't bleed to the viewport
   // edge on phones (operator caught 2026-05-02 — pillar prose hugged the
   // left edge with no breathing room).
-  if (reducedMotion || narrowViewport) {
+  // Mobile (<lg): the radial wheel's wedges are poor tap targets and the
+  // deep-dive modal opened off-screen ("hard to read", operator 2026-06-21).
+  // Render the inline accordion instead — native <details>, no modal, nothing
+  // off-screen. Reduced-motion DESKTOP (≥lg) keeps the wheel, unpinned, with
+  // click/keyboard nav (controlled prop undefined → internal state).
+  if (narrowViewport) {
+    return (
+      <div
+        className="mx-auto w-full max-w-[1280px]"
+        style={{
+          paddingLeft: 'clamp(24px, 5vw, 64px)',
+          paddingRight: 'clamp(24px, 5vw, 64px)',
+        }}
+      >
+        <PillarAccordion pillars={pillars} />
+      </div>
+    );
+  }
+
+  if (reducedMotion) {
     return (
       <div
         className="mx-auto w-full max-w-[1280px]"

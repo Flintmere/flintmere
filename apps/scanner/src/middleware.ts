@@ -241,9 +241,20 @@ export function middleware(request: NextRequest): NextResponse {
  * PageSpeed warning when delivered in Report-Only mode.
  */
 function buildCsp(): string {
+  // Next.js dev (react-refresh / HMR) compiles modules through eval(); the
+  // production bundle never does. Grant 'unsafe-eval' in development ONLY —
+  // without it the strict CSP silently kills client hydration on the dev
+  // server (every `useEffect`, incl. the ViewportReveal scroll observers,
+  // stops running, so reveal content stays opacity:0). Production stays exactly
+  // as before: no 'unsafe-eval' is ever emitted off the dev path.
+  const scriptSrc =
+    process.env.NODE_ENV === 'development'
+      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://plausible.io https://challenges.cloudflare.com https://js.stripe.com"
+      : "script-src 'self' 'unsafe-inline' https://plausible.io https://challenges.cloudflare.com https://js.stripe.com";
+
   const directives = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://plausible.io https://challenges.cloudflare.com https://js.stripe.com",
+    scriptSrc,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' blob: data: https:",
     "font-src 'self' data:",

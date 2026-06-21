@@ -262,13 +262,18 @@ export function BottomCta() {
           className="flex flex-col sm:flex-row gap-4"
           style={{ marginTop: 'clamp(28px, 3vw, 40px)' }}
         >
+          {/* whitespace-normal below sm: the long "Book the concierge audit —
+              from £197 →" label's nowrap min-content (~344px) overran the phone
+              column and forced a 5px horizontal page overflow (WCAG 1.4.10) as a
+              flex item. It wraps on phones and stays one line at sm+ where the
+              row has room (design-critique 2026-06-13, mobile-reflow guard). */}
           <Link
             href={`${AUDIT_URL}#checkout`}
-            className="btn btn-accent whitespace-nowrap"
+            className="btn btn-accent whitespace-normal sm:whitespace-nowrap"
           >
             Book the concierge audit &mdash; from &pound;197 &rarr;
           </Link>
-          <Link href={SCAN_URL} className="btn whitespace-nowrap">
+          <Link href={SCAN_URL} className="btn whitespace-normal sm:whitespace-nowrap">
             Run a free scan first &rarr;
           </Link>
         </div>
