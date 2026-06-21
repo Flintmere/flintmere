@@ -133,7 +133,7 @@ export default function StandardsHolding() {
               lineHeight: 1.1,
             }}
           >
-            Six pillars. Each one a hidden multiplier on whether a food SKU
+            Seven pillars. Each one a hidden multiplier on whether a food SKU
             shows up where shoppers and agents look for it.
           </h2>
           <ul
@@ -156,6 +156,7 @@ export default function StandardsHolding() {
               'GS1 barcode path — GTIN allocation, the case for Variable Measure, when prefix-7 is wrong.',
               'Storage + use-by — ambient vs chilled vs frozen, opened-shelf-life vs sealed.',
               'Channel readability — Google Shopping, Amazon Fresh, Ocado, Deliveroo. The schemas that read each pillar.',
+              'Crawlability — robots.txt access for the AI agents that arbitrate discovery (GPTBot, ClaudeBot), sitemap coverage, and the llms.txt signal.',
             ].map((line) => (
               <li
                 key={line}

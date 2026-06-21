@@ -53,10 +53,11 @@ import {
   type ReactNode,
 } from 'react';
 import { useReducedMotion } from 'motion/react';
+import { ManifestoMobileCascade } from './ManifestoMobileCascade';
 
 type Segment = { kind: 'prose'; text: string } | { kind: 'token'; text: string };
 
-type Example = {
+export type Example = {
   numeral: string;
   category: string;
   prose: string;
@@ -127,6 +128,23 @@ const tokenStyle: CSSProperties = {
 // of scroll for its reduction cascade. Total = 400vh for 3 examples.
 const RUNWAY_PER_EXAMPLE_VH = 100;
 const TOTAL_RUNWAY_VH = 100 + EXAMPLES.length * RUNWAY_PER_EXAMPLE_VH;
+
+// Render an example's segments: prose spans (fade via --prose-fade on desktop
+// / the .is-active rule on mobile cards) + amber token <strong>s (always lit).
+// Module-level so the desktop cascade and the mobile carousel share one renderer.
+function renderSegments(ex: Example): ReactNode {
+  return ex.segments.map((s, i) =>
+    s.kind === 'prose' ? (
+      <span key={i} className="manifesto-prose-segment">
+        {s.text}
+      </span>
+    ) : (
+      <strong key={i} style={tokenStyle}>
+        {s.text}
+      </strong>
+    ),
+  );
+}
 
 export function ManifestoChord() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -207,42 +225,51 @@ export function ManifestoChord() {
 
   const example = EXAMPLES[exampleIndex] ?? EXAMPLES[0]!;
 
-  const renderSegments = (ex: Example): ReactNode =>
-    ex.segments.map((s, i) =>
-      s.kind === 'prose' ? (
-        <span key={i} className="manifesto-prose-segment">
-          {s.text}
-        </span>
-      ) : (
-        <strong key={i} style={tokenStyle}>
-          {s.text}
-        </strong>
-      ),
-    );
-
-  // Static-layout fallback. Fires for reduced-motion users AND for any
-  // viewport below `lg` (1024px). Two prose-visibility modes:
-  //   - Mobile (`isSmallViewport`): prose VISIBLE alongside tokens
-  //     (`--prose-fade: 0`). Without scroll-driven build-up, the static
-  //     end-state of tokens-only reads as fragmented amber blocks with no
-  //     context. Mobile users get the full example content.
-  //   - Desktop reduced-motion: prose HIDDEN, tokens only
-  //     (`--prose-fade: 1` — the canon end-state). Preserves the
-  //     "marketing prose is invisible to bots; only structured data
-  //     registers" punchline for users who chose to suppress motion.
+  // Static layout — two distinct surfaces, both off the desktop cascade:
+  //   - Mobile (<lg, isSmallViewport): the swipe-snap carousel. The mobile-
+  //     native translation of the desktop #8 cascade — one example per card,
+  //     swipe is the advance, each card enacts prose-recedes / tokens-stay-lit
+  //     on snap (ManifestoMobileCascade + globals.css §Manifesto mobile
+  //     cascade). Ratified 2026-06-21 to replace the flat three-block wall
+  //     that "lost the design it has on desktop."
+  //   - Reduced-motion DESKTOP (≥lg): the stacked tokens-only end-state
+  //     (--prose-fade: 1) — preserves the "only structured data registers"
+  //     punchline for users who suppress motion, in normal vertical flow.
   if (useStaticLayout) {
-    const proseFade = isSmallViewport ? 0 : 1;
+    if (isSmallViewport) {
+      return (
+        <section
+          id="manifesto"
+          aria-labelledby="manifesto-heading"
+          className="bg-[color:var(--color-paper)] pt-14 pb-14"
+          style={{
+            paddingLeft: 'clamp(24px, 6vw, 96px)',
+            paddingRight: 'clamp(24px, 6vw, 96px)',
+            ['--manifesto-pad-x' as string]: 'clamp(24px, 6vw, 96px)',
+          }}
+        >
+          <div className="mx-auto w-full max-w-[1100px]">
+            <ManifestoHeading />
+            <ManifestoMobileCascade
+              examples={EXAMPLES}
+              renderSegments={renderSegments}
+              reducedMotion={reducedMotion}
+            />
+            <ClosingCaption opacity={1} />
+          </div>
+        </section>
+      );
+    }
+
     return (
       <section
         id="manifesto"
         aria-labelledby="manifesto-heading"
-        className="bg-[color:var(--color-paper)]"
+        className="bg-[color:var(--color-paper)] pt-14 pb-14 lg:pt-[clamp(96px,14vh,200px)] lg:pb-[clamp(96px,14vh,200px)]"
         style={{
           paddingLeft: 'clamp(24px, 6vw, 96px)',
           paddingRight: 'clamp(24px, 6vw, 96px)',
-          paddingTop: 'clamp(96px, 14vh, 200px)',
-          paddingBottom: 'clamp(96px, 14vh, 200px)',
-          ['--prose-fade' as string]: proseFade,
+          ['--prose-fade' as string]: 1,
         }}
       >
         <div className="mx-auto w-full max-w-[1100px]">
@@ -250,13 +277,13 @@ export function ManifestoChord() {
           <ol
             aria-label="Catalog page examples — what AI agents extract"
             className="list-none m-0 p-0"
-            style={{ marginTop: 'clamp(40px, 5vh, 80px)' }}
+            style={{ marginTop: 'clamp(24px, 5vh, 80px)' }}
           >
             {EXAMPLES.map((ex, i) => (
               <li
                 key={i}
                 style={{
-                  marginBottom: 'clamp(40px, 5vh, 80px)',
+                  marginBottom: 'clamp(28px, 5vh, 80px)',
                 }}
               >
                 <p
@@ -277,7 +304,7 @@ export function ManifestoChord() {
                   className="font-sans"
                   aria-hidden="true"
                   style={{
-                    fontSize: 'clamp(20px, 1.8vw, 28px)',
+                    fontSize: 'clamp(17px, 1.8vw, 28px)',
                     lineHeight: 1.55,
                     letterSpacing: '-0.005em',
                     color: 'var(--color-mute)',
@@ -350,6 +377,9 @@ export function ManifestoChord() {
             className="font-sans manifesto-paragraph"
             aria-live="polite"
             style={{
+              // Desktop cascade keeps its original 20px floor — this branch
+              // only ever renders at ≥1024px (isSmallViewport gates mobile to
+              // the static branch above, whose floor is the compact 17px).
               fontSize: 'clamp(20px, 1.8vw, 28px)',
               lineHeight: 1.55,
               letterSpacing: '-0.005em',
@@ -376,7 +406,7 @@ function ManifestoHeading() {
       id="manifesto-heading"
       className="font-sans"
       style={{
-        fontSize: 'clamp(36px, 4.5vw, 72px)',
+        fontSize: 'clamp(30px, 4.5vw, 72px)',
         fontWeight: 700,
         letterSpacing: '-0.025em',
         lineHeight: 1.05,

@@ -1,0 +1,52 @@
+# Mobile-reflow end-to-end guard (design-critique 2026-06-13, Thane P1).
+# Asserts no marketing route scrolls horizontally at 320/360/393px — the WCAG
+# 2.1 AA 1.4.10 Reflow floor. Runs a real browser because horizontal overflow
+# is a layout fact (scrollWidth vs clientWidth) no unit test can see; this is
+# the bug class that recurred 3+ times by hiding in the @flintmere/ui build path.
+
+name: e2e
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  mobile-reflow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Build @flintmere/ui (and other workspace packages) so the dev server
+      # resolves the CURRENT compiled dist, not a stale one — the exact fault
+      # that masked this bug. Mirrors the lint workflow.
+      - name: Build workspace packages
+        run: pnpm -r --filter "@flintmere/*" build
+
+      - name: Generate Prisma client
+        run: pnpm --filter scanner prisma:generate
+
+      - name: Install Playwright browser
+        run: pnpm --filter scanner exec playwright install --with-deps chromium
+
+      - name: Run mobile-reflow e2e
+        run: pnpm --filter scanner test:e2e
+        env:
+          CI: 'true'
+          # Boot-time env validation (src/lib/env.ts) requires DATABASE_URL.
+          # The guarded marketing routes don't query the DB on GET, so a dummy
+          # connection string is enough to start the dev server.
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci

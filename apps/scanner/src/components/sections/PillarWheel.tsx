@@ -70,13 +70,13 @@ interface WedgeGeometry {
   labelAnchor: 'start' | 'middle' | 'end';
 }
 
-const VIEW = 600;
-const CENTER = VIEW / 2;
+export const VIEW = 600;
+export const CENTER = VIEW / 2;
 const OUTER_R = 260;
 const INNER_R = 132;
 const LABEL_OFFSET = 32;
-const SAGE_RING_OUTER = OUTER_R + 10;
-const SAGE_RING_INNER = INNER_R - 10;
+export const SAGE_RING_OUTER = OUTER_R + 10;
+export const SAGE_RING_INNER = INNER_R - 10;
 
 const EASE = [0.4, 0, 0.2, 1] as const;
 const APPLE_EASE = [0.16, 1, 0.3, 1] as const; // Apple's signature cubic
@@ -108,7 +108,7 @@ function annulusWedge(
   ].join(' ');
 }
 
-function buildWedges(pillars: PillarSpec[]): WedgeGeometry[] {
+export function buildWedges(pillars: PillarSpec[]): WedgeGeometry[] {
   let cursor = 0;
   return pillars.map((pillar, idx) => {
     const sweep = pillar.weightPct * 360;

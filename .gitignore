@@ -110,3 +110,10 @@ data/audits/*
 data/discovery/*
 
 .local-secrets
+
+# Playwright e2e artifacts (test runner output + MCP browser captures)
+test-results/
+playwright-report/
+playwright/.cache/
+.playwright-mcp/
+apps/scanner/hero-*.png

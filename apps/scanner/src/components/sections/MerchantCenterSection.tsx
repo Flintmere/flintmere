@@ -26,6 +26,14 @@ import { ScopeCredits } from '@/app/audit/connect/_shared/ScopeCredits';
  * behind FEATURE_GMC_OAUTH); links to /audit/connect + /privacy.
  *
  * Spec: context/design/marketing/2026-06-09-homepage-merchant-center-section.md.
+ *
+ * Mobile pass (2026-06-21): sizing was desktop-first. Vertical padding used
+ * a vh-based clamp at all widths (14vh/10vh ≈ 200px on a tall phone — the
+ * min never bites there), so it's now fixed-compact on mobile (pt-14/pb-12)
+ * and restored to the original clamp at lg:. Heading floor 40→32, eyebrow
+ * mb 40→24, stacked gap 56→40. The lg: layout + clamp preferred/max are
+ * untouched, so desktop renders identically (gap-y is moot on the single-row
+ * lg grid; the heading/eyebrow mins only bite below the lg breakpoint).
  */
 
 // Illustrative rows for the readout card. NOT real merchant data; the
@@ -148,18 +156,14 @@ export function MerchantCenterSection() {
       className="relative bg-[color:var(--color-paper)]"
     >
       <div
-        className="relative mx-auto max-w-[1280px] px-8 lg:px-12"
-        style={{
-          paddingTop: 'clamp(96px, 14vh, 200px)',
-          paddingBottom: 'clamp(72px, 10vh, 144px)',
-        }}
+        className="relative mx-auto max-w-[1280px] px-8 lg:px-12 pt-14 pb-12 lg:pt-[clamp(96px,14vh,200px)] lg:pb-[clamp(72px,10vh,144px)]"
       >
-        <div className="grid grid-cols-1 lg:grid-cols-[7fr_5fr] gap-y-14 lg:gap-x-20 lg:items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-[7fr_5fr] gap-y-10 lg:gap-x-20 lg:items-center">
           {/* LEFT — states it */}
           <div>
             <p
               data-reveal
-              className="eyebrow-hero mb-10 lg:mb-12"
+              className="eyebrow-hero mb-6 lg:mb-12"
               style={{ ['--reveal-delay' as string]: '60ms' }}
             >
               // google&rsquo;s own record
@@ -169,7 +173,7 @@ export function MerchantCenterSection() {
               data-reveal
               className="font-sans font-bold tracking-[-0.04em] leading-[0.95] max-w-[16ch] text-[color:var(--color-ink)]"
               style={{
-                fontSize: 'clamp(40px, 5vw, 80px)',
+                fontSize: 'clamp(32px, 5vw, 80px)',
                 ['--reveal-delay' as string]: '120ms',
               }}
             >

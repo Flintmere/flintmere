@@ -121,7 +121,14 @@ export function PillarTreemap({ pillars }: PillarTreemapProps) {
         />
       </nav>
 
-      <table className="sr-only">
+      {/* sr-only on a WRAPPER div, not the <table>: a table ignores
+          `width:1px` and expands to its cells' min-content (~306px), so
+          `sr-only` applied directly leaves a 306px box that overran the 320px
+          viewport (WCAG 1.4.10, mobile-reflow guard 2026-06-13). A block div
+          honours `width:1px` + `overflow:hidden` and truly clips the table out
+          of layout while leaving the screen-reader content intact. */}
+      <div className="sr-only">
+      <table>
         <caption>The seven pillars and their weights.</caption>
         <thead>
           <tr>
@@ -140,6 +147,7 @@ export function PillarTreemap({ pillars }: PillarTreemapProps) {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
