@@ -23,7 +23,9 @@ import { ScanForm } from '@/components/ScanForm';
 import { BenchmarkOptIn } from '@/components/scan/BenchmarkOptIn';
 import { ErrorBlock } from '@/components/scan/ErrorBlock';
 import { PublicPageOptIn } from '@/components/scan/PublicPageOptIn';
+import { GmcPanel } from '@/components/scan/GmcPanel';
 import { GmcPublicPageOptIn } from '@/components/scan/GmcPublicPageOptIn';
+import { ScanConnectCta } from '@/components/scan/ScanConnectCta';
 import { Results } from '@/components/scan/Results';
 import { ScanningOverlay } from '@/components/scan/ScanningOverlay';
 import type { ScanState } from '@/components/scan/types';
@@ -145,11 +147,30 @@ export default function ScanPage() {
       {state.phase === 'complete' ? (
         <>
           <Results result={state.result} />
+          {/* Connect-friction spec (2026-06-07) fix 2 — render the merchant's
+              own GMC ground truth PRIVATELY in their results, decoupled from
+              the public opt-in below. Publishing is no longer the price of
+              reading your own data. surface="private" so the funnel can tell
+              this render from the public /score page. */}
+          {state.result.gmcGroundTruth ? (
+            <GmcPanel
+              gmcGroundTruth={state.result.gmcGroundTruth}
+              surface="private"
+            />
+          ) : (
+            /* Fix 3 — when this domain owns an eligible concierge audit and
+               isn't connected yet, offer the connect path right here so a lost
+               audit email isn't a dead-end. Self-hides when ineligible or the
+               flag is off. */
+            <ScanConnectCta scanId={state.result.id} />
+          )}
           <BenchmarkOptIn scanId={state.result.id} />
           <PublicPageOptIn
             scanId={state.result.id}
             shopDomain={state.result.shopDomain}
           />
+          {/* Public opt-in — gates PUBLIC visibility only (now decoupled from
+              the private read above). */}
           {state.result.gmcGroundTruth ? (
             <GmcPublicPageOptIn
               scanId={state.result.id}

@@ -138,8 +138,11 @@ export async function GET(request: NextRequest) {
     audit_id: state.auditId,
   });
 
-  const dest = new URL('/audit/connect', origin);
-  dest.searchParams.set('status', 'ok');
+  // Connect-friction spec (2026-06-07) fix 1 — route to the auto-scan payoff
+  // instead of the dead-end Connected card. The payoff page resolves the
+  // merchant's ground-truth scan and renders it. Reverts in one line by
+  // pointing back at `/audit/connect?status=ok`.
+  const dest = new URL('/audit/connect/results', origin);
   dest.searchParams.set('audit', state.auditId);
   return NextResponse.redirect(dest);
 }
