@@ -201,12 +201,21 @@
   font-family: var(--font-mono);
   font-weight: 700;
   font-feature-settings: 'ss01';
-  white-space: nowrap;
+  /* Multi-word bracket content (e.g. `[ Merchant Center ]`) wraps between
+     words on narrow viewports instead of forcing one unbreakable line that
+     overflows the column and scrolls the page sideways (design-critique
+     2026-06-13, Kael/Noor P0 — WCAG 1.4.10 Reflow). Single-token brackets
+     (`[ suppressed ]`, numerals, GTINs) have no internal whitespace, so they
+     never wrap; the `inline` pseudos below keep the `[` / `]` glyphs glued to
+     the adjacent word (no atomic-inline break opportunity — strictly safer
+     than the old `inline-block`, which is what `.bracket-inline` still guards
+     against for numerals in narrow columns). */
+  white-space: normal;
 }
 
 .bracket::before,
 .bracket::after {
-  display: inline-block;
+  display: inline;
   font-weight: inherit;
   color: inherit;
 }
@@ -714,6 +723,37 @@
   100% { background-position: -120% 0; }
 }
 
+/* Saks cover-art bracket — self-constraining geometry (design-critique
+   2026-06-13: Kael P0 "primitive bounds itself" + Noor P0 WCAG 1.4.10 Reflow).
+   The saks bracket is the ONLY `.bracket` that carries
+   `.flintmere-outline-shimmer`, so this compound selector targets the cover-art
+   moment precisely and never touches inline body / heading brackets.
+
+   Root cause this fixes: the saks size is set via Tailwind utility classes in
+   `@flintmere/ui` (`packages/ui/src/Bracket.tsx`), but Tailwind v4 does not scan
+   that package (symlinked under node_modules + gitignored dist, no `@source`),
+   so those classes were never generated. The saks word therefore inherited its
+   parent heading's font-size everywhere. That reads fine on wide surfaces, but
+   on the homepage hero's narrow column the inherited 48px word (~349px) overran
+   its ~272–330px column and was clipped by the hero's `overflow:hidden` — a lost
+   key word + (without the clip) a sideways-scrolling page on phones.
+
+   `inline-block + max-width:100% + overflow-wrap:break-word` binds the word to
+   its container so it can NEVER extend past the page: a word longer than its
+   column breaks as a LAST RESORT instead of being clipped, regardless of future
+   copy. `break-word` (not `anywhere`) is deliberate — `anywhere` adds soft-wrap
+   opportunities that count toward min-content, which made `max-width:100%`
+   eagerly break the cover-art word mid-glyph on wide desktop columns; with
+   `break-word` the whole word stays intact wherever it fits (every current
+   surface) and only breaks when it genuinely cannot. Font-size is left inherited
+   here (correct on every surface — wide covers size it large, the column-layout
+   hero sizes it to the column); per-surface demotion is layered below. */
+.bracket.flintmere-outline-shimmer {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
 /* Hero bracket on mobile — surface-aware override (2026-05-11).
    The outline-shimmer canon (ink stroke + amber sweep through transparent
    letterforms) reads cleanly on a clean-paper backdrop because the ink
@@ -735,6 +775,19 @@
     -webkit-text-stroke: 0;
     background-image: none;
     animation: none;
+  }
+
+  /* Direction A — demote-on-mobile (design-critique 2026-06-13, operator-
+     approved). Below lg the hero runs the mobile-overlay layout where the saks
+     word shares a narrow column with the 48px ambient headline. A 10-char mono
+     word cannot match 48px AND fit one line on a phone (Geist Mono is wide), so
+     the cover-art word is demoted *below* the ambient sentence here: it reads
+     whole on one line from 320px up rather than being held up and then clipped.
+     clamp floor 28px fits "suppressed" (~210px) inside a 320px column's ~272px;
+     the 40px ceiling keeps it under the 48px ambient through the lg boundary.
+     The self-constraint rule above is the safety net for any longer word. */
+  #hero .bracket.flintmere-outline-shimmer {
+    font-size: clamp(28px, 8.5vw, 40px);
   }
 }
 
@@ -1227,7 +1280,13 @@
    content with a soft minimum; on desktop they keep the original
    runway so the LEFT pin has something to scroll past. */
 .flintmere-founder-panel {
-  min-height: clamp(220px, 36vh, 320px);
+  /* Mobile: size to content. The min-height existed only to give the
+     desktop LEFT-column pin something to scroll past; on phones (no pin)
+     it forced ~300px of empty space per card — three stacked cards read
+     as a ~900px void chain. Content-driven height is tighter and calmer
+     (mobile-pass 2026-06-21, frontend-design + Magic-inspired compact
+     ledger). Desktop keeps the runway below. */
+  min-height: 0;
 }
 @media (min-width: 1024px) {
   .flintmere-founder-panel {
@@ -1379,6 +1438,209 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* --- Manifesto mobile cascade — swipe-snap carousel (2026-06-21) ---
+   Mobile-native translation of the desktop #8 cascade, which is desktop-only
+   by canon (a 400vh pin reads as "stuck" on a phone, and the flat fallback
+   was three near-identical text walls). One example per card, horizontal
+   scroll-snap, peek of the next; the snapped card enacts the metaphor — prose
+   recedes, amber tokens stay lit. .is-active is toggled from
+   ManifestoMobileCascade's IntersectionObserver (root = the track). The track
+   bleeds to the section's side padding (--manifesto-pad-x) so card 1 sits
+   flush with the heading and the next card peeks at the screen edge.
+   Refs (council pre-flight, #6 Idris): apple.com/ipad-mini (snap one beat at
+   a time), order-form.shop (grid-as-readout cards), linear.app (peek +
+   counter as the only chrome). */
+.manifesto-carousel {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.manifesto-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Containment backstop — the track's horizontal scroll must not leak page
+   width. The track lives inside .flintmere-curtain-pair's relative/isolate
+   context, where (without this) its scrollable overflow leaks past the
+   section boundary and makes the page scroll sideways. Clip the pair on
+   mobile only: the founder pin is already disabled <lg, so there are no
+   scroll-container side effects, and overflow-x:clip computes overflow-y to
+   clip too (no nested scroll). Desktop (≥lg) keeps visible for the pinned
+   cascade + sticky founder strip. */
+@media (max-width: 1023px) {
+  .flintmere-curtain-pair {
+    overflow-x: clip;
+  }
+}
+
+/* --- Pillars mobile accordion (2026-06-21) ---
+   Mobile (<lg) replaces the radial wheel + off-screen modal with a compact
+   static wheel (weight motif) + a native <details name> accordion that
+   expands inline. See PillarAccordion.tsx. Refs: order-form.shop (ledger
+   rows), Areena index numerals (bracket anchors), linear.app (restraint). */
+.pillar-acc-wheel {
+  display: flex;
+  justify-content: center;
+}
+.pillar-acc-wheel__svg {
+  width: clamp(150px, 46vw, 224px);
+  height: auto;
+}
+.pillar-acc-caption {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+}
+
+.pillar-acc-list {
+  margin-top: clamp(28px, 5vh, 48px);
+  border-top: 1px solid var(--color-line);
+  interpolate-size: allow-keywords;
+}
+.pillar-acc-item {
+  border-bottom: 1px solid var(--color-line);
+}
+.pillar-acc-summary {
+  list-style: none;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 2px;
+}
+.pillar-acc-summary::-webkit-details-marker {
+  display: none;
+}
+.pillar-acc-summary::after {
+  content: '+';
+  font-family: var(--font-mono);
+  font-size: 18px;
+  line-height: 1;
+  color: var(--color-mute);
+  width: 20px;
+  text-align: center;
+}
+.pillar-acc-item[open] .pillar-acc-summary::after {
+  content: '−';
+  color: var(--color-accent-sage);
+}
+.pillar-acc-summary:focus-visible {
+  outline: 2px solid var(--color-accent-sage);
+  outline-offset: 2px;
+}
+.pillar-acc-num {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+.pillar-acc-name {
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: var(--color-ink);
+}
+.pillar-acc-weight {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--color-mute);
+}
+.pillar-acc-detail {
+  padding: 2px 2px 26px;
+}
+.pillar-acc-headline {
+  margin: 0 0 18px;
+  font-size: clamp(20px, 5.5vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  color: var(--color-ink);
+}
+.pillar-acc-dl {
+  margin: 0;
+}
+.pillar-acc-dl dt {
+  margin-top: 16px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--color-accent-sage);
+}
+.pillar-acc-dl dt:first-child {
+  margin-top: 0;
+}
+.pillar-acc-dl dd {
+  margin: 6px 0 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--color-mute);
+}
+
+/* Smooth open where supported (Chrome ::details-content + interpolate-size);
+   iOS Safari / Firefox fall back to instant toggle — still fully functional. */
+.pillar-acc-item::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+    content-visibility 0.32s allow-discrete;
+}
+.pillar-acc-item[open]::details-content {
+  block-size: auto;
+}
+.manifesto-carousel:focus-visible {
+  outline: 2px solid var(--color-accent-sage);
+  outline-offset: 4px;
+}
+
+.manifesto-mobile-card {
+  flex: 0 0 86%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 1px solid var(--color-line);
+  background: var(--color-paper);
+  box-shadow: var(--shadow-paper-1);
+  padding: clamp(20px, 5vw, 28px);
+}
+
+/* Prose recedes on the snapped card; <strong> tokens keep their amber fill.
+   Hold-then-dissolve = the per-card cascade. Scoped here so the desktop
+   scroll-driven 50ms .manifesto-prose-segment fade is left untouched. */
+.manifesto-mobile-card .manifesto-prose-segment {
+  opacity: 1;
+  transition: opacity 700ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.manifesto-mobile-card.is-active .manifesto-prose-segment {
+  opacity: 0.12;
+  transition-delay: 480ms;
+}
+
+.manifesto-carousel-dots {
+  display: flex;
+  align-items: center;
+}
+.manifesto-carousel-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--color-line);
+  transition: background 160ms linear;
+}
+.manifesto-carousel-dot[data-active='true'] {
+  background: var(--color-accent);
+}
+
 /* --- /audit Chapter 2 — band triptych ---
    Spec: context/design/marketing/2026-05-01-audit-band-selector.md
    Critique: context/design/critiques/2026-05-01-audit-band-triptych.md
@@ -1470,3 +1732,295 @@
     font-size: clamp(40px, 14vw, 56px) !important;
   }
 }
+
+/* --- Engine verification UI (baby-step prototype) -----------------------
+   Surface: /verify/[slug]/allergens. Scanner shell + Flintmere island.
+   Per `context/design/app/2026-05-13-engine-verification-ui.md`.
+   Reference traces: Linear (negative space + mono chips), Stripe (mono-
+   restraint + single accent), Order Form (explicit grid as design language).
+*/
+
+.verify-island {
+  border: 1px solid var(--color-ink);
+  background-color: var(--color-paper);
+  padding: clamp(24px, 4vw, 40px);
+  margin-block: clamp(32px, 6vw, 56px);
+}
+
+.verify-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 14rem minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(8px, 2vw, 24px);
+  padding-block: 14px;
+  border-bottom: 1px solid var(--color-line-soft);
+  text-align: left;
+}
+
+.verify-row:last-of-type {
+  border-bottom: none;
+}
+
+/* Flagged-row left-edge amber bar — confidence < threshold. Paired with
+   the "FLAGGED · review" mono caption for the second a11y cue. */
+.verify-row[data-flagged='true']::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 -1px;
+  width: 2px;
+  background-color: var(--color-accent);
+}
+
+.verify-row-trigger {
+  display: contents;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+
+.verify-row-trigger:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: -2px;
+}
+
+.verify-row-label {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+.verify-row-specifier {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-mute);
+}
+
+.verify-row-flag-caption {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+}
+
+.verify-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.verify-chip-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 8px;
+}
+
+.verify-chip-dot[data-variant='solid'] {
+  background-color: var(--color-accent);
+}
+
+.verify-chip-dot[data-variant='outlined'] {
+  background-color: transparent;
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+
+.verify-chip-dot[data-variant='none'] {
+  background-color: transparent;
+}
+
+.verify-chip-label--ink {
+  color: var(--color-ink);
+}
+
+.verify-chip-label--mute {
+  color: var(--color-mute);
+}
+
+/* Row expand container — animates `grid-template-rows: 0fr → 1fr` (a
+   composite-safe technique that achieves the visual height transition
+   without animating `height` itself; complies with motion.md §Bans). */
+.verify-row-expand {
+  display: grid;
+  grid-template-rows: 0fr;
+  grid-column: 1 / -1;
+  transition: grid-template-rows 180ms cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+}
+
+.verify-row[data-expanded='true'] .verify-row-expand {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition:
+    grid-template-rows 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 180ms cubic-bezier(0.4, 0, 0.2, 1) 60ms;
+}
+
+.verify-row-expand-inner {
+  overflow: hidden;
+  padding-block: 16px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.verify-state-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.verify-state-button {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  background-color: var(--color-paper);
+  border: 1px solid var(--color-line);
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.verify-state-button[aria-pressed='true'] {
+  background-color: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.verify-state-button:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.verify-specifier-input {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-ink);
+  background-color: var(--color-paper);
+  border: 1px solid var(--color-line);
+  padding: 10px 12px;
+  max-width: 360px;
+}
+
+.verify-specifier-input:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.verify-provenance {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-mute);
+}
+
+.verify-save-bar {
+  margin-top: clamp(24px, 4vw, 40px);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+}
+
+.verify-cta {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 500;
+  padding: 12px 24px;
+  border: 1px solid var(--color-ink);
+  cursor: pointer;
+}
+
+.verify-cta[data-tone='amber'] {
+  background-color: var(--color-accent);
+  color: var(--color-ink);
+}
+
+.verify-cta[data-tone='saved'] {
+  background-color: var(--color-ink);
+  color: var(--color-paper);
+  cursor: default;
+}
+
+.verify-cta[data-tone='saved']::before {
+  content: '✓';
+  color: var(--color-accent-sage, #5a6b4d);
+  margin-right: 0.4em;
+  font-weight: 700;
+}
+
+.verify-cta[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.verify-cta:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.verify-banner {
+  border: 1px solid var(--color-ink);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--color-ink);
+}
+
+.verify-banner[data-tone='critical'] {
+  background-color: var(--color-paper-2);
+}
+
+.verify-terminal {
+  border: 1px solid var(--color-ink);
+  padding: clamp(32px, 6vw, 64px);
+  background-color: var(--color-paper);
+  margin-block: clamp(32px, 6vw, 56px);
+  text-align: left;
+}
+
+.verify-terminal h2 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.verify-terminal p {
+  font-family: var(--font-sans);
+  color: var(--color-mute);
+  max-width: 56ch;
+}
+
+/* Mobile reflow — row stacks to two lines on narrow viewports. */
+@media (max-width: 640px) {
+  .verify-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .verify-chip,
+  .verify-row-specifier {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Reduced-motion contract — strict per-component (forward-compat with the
+   eventual Polaris-embedded app variant for Built-for-Shopify submission). */
+@media (prefers-reduced-motion: reduce) {
+  .verify-row-expand,
+  .verify-row[data-expanded='true'] .verify-row-expand {
+    transition-duration: 0.01ms;
+  }
+}
+/* --- end engine verification UI ---------------------------------------- */

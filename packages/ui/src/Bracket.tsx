@@ -47,7 +47,15 @@ const SIZE_CLASS: Record<Required<BracketProps>['size'], string> = {
   default: 'text-[inherit]',
   display: 'text-[0.8em]', // display heading already sets the scale
   micro: 'text-[11px] tracking-[0.14em]',
-  saks: 'text-[clamp(36px,12vw,200px)] tracking-[-0.02em] leading-[1]',
+  // Saks geometry (size, self-constraint, mobile demotion) lives in
+  // `apps/scanner/src/app/globals.css` under `.bracket.flintmere-outline-shimmer`,
+  // NOT here: Tailwind v4 does not scan this package (symlinked under
+  // node_modules + gitignored dist, no `@source`), so utility classes set only
+  // in `@flintmere/ui` are never generated and silently no-op. The saks span
+  // already carries the `bracket flintmere-outline-shimmer` marker classes
+  // (see the size === 'saks' branch below), which the globals.css rule targets.
+  // (design-critique 2026-06-13: Kael P0 self-constraint + Direction A demotion.)
+  saks: '',
 };
 
 export function Bracket({

@@ -18,10 +18,22 @@
  *   - Mobile: pin disabled below lg breakpoint via @media in globals.css;
  *     columns stack, content reads top-to-bottom naturally
  *
+ * Mobile pass (2026-06-21, frontend-design skill + Magic-inspired compact
+ * ledger). On phones every size was inherited from the desktop scroll-pin
+ * runway — 56px metric floor, 48px headline, 48–96px panel gaps, 14vh
+ * section padding, plus the .flintmere-founder-panel min-height (fixed in
+ * globals.css) — which stacked into a ~2.4-screen chain. Sizing is now
+ * mobile-compact at the base and restored to the original desktop values
+ * at `lg:`. The pin, the copy, the amber-second-fragment pattern and the
+ * legal disclaimer are unchanged.
+ *
  * Council pre-flight (per binding 2026-04-28):
- *   - References: Apple iPhone product pages (camera capabilities split),
- *     Stripe documentation pages (sticky text + scrollable visuals),
- *     Pentagram Saks editorial spread
+ *   - References: A24 Films (a24films.com — ink-slab "moment of arrival",
+ *     mono credits, controlled colour); Order Form (order-form.shop —
+ *     grid-as-aesthetic for the proof ledger); Linear (linear.app —
+ *     negative-space discipline, one dominant figure per beat). Earlier
+ *     refs (Apple iPhone split, Stripe sticky-docs, Pentagram Saks) still
+ *     inform the desktop pin.
  *   - Yann #6 (signature): bracketed [ Built in London ]-style nouns
  *     could anchor proof captions if needed; signature otherwise lives
  *     on the headline weight-shift
@@ -75,16 +87,9 @@ export function FounderStrip() {
         borderTop: '1px solid var(--color-accent-sage)',
       }}
     >
-      <div
-        className="mx-auto w-full max-w-[1280px] grid grid-cols-1 lg:grid-cols-[1.4fr_1fr]"
-        style={{
-          gap: 'clamp(48px, 6vw, 96px)',
-          paddingLeft: 'clamp(24px, 4vw, 48px)',
-          paddingRight: 'clamp(24px, 4vw, 48px)',
-          paddingTop: 'clamp(96px, 14vh, 200px)',
-          paddingBottom: 'clamp(96px, 14vh, 200px)',
-        }}
-      >
+      {/* Padding + gap are mobile-compact at the base and restored to the
+          original desktop clamps at lg: (mobile pass 2026-06-21). */}
+      <div className="mx-auto w-full max-w-[1280px] grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-12 px-6 py-16 lg:gap-[clamp(48px,6vw,96px)] lg:px-[clamp(24px,4vw,48px)] lg:py-[clamp(96px,14vh,200px)]">
         {/* LEFT — founder voice. Pinned via .flintmere-founder-pinned at
             ≥lg viewports (CSS in globals.css §Founder pinned column). */}
         <div className="flintmere-founder-pinned">
@@ -92,7 +97,7 @@ export function FounderStrip() {
             className="eyebrow"
             style={{
               color: 'var(--color-accent)',
-              marginBottom: 'clamp(24px, 3vw, 40px)',
+              marginBottom: 'clamp(20px, 3vw, 40px)',
             }}
           >
             Who builds Flintmere
@@ -100,10 +105,9 @@ export function FounderStrip() {
 
           <h2
             id="different-heading"
-            className="font-sans tracking-[-0.035em]"
+            className="font-sans tracking-[-0.035em] text-[34px] lg:text-[clamp(48px,7vw,112px)]"
             style={{
-              fontSize: 'clamp(48px, 7vw, 112px)',
-              lineHeight: 0.96,
+              lineHeight: 0.98,
               maxWidth: '22ch',
               color: 'var(--color-paper-on-ink)',
             }}
@@ -120,11 +124,9 @@ export function FounderStrip() {
           </h2>
 
           <p
-            className="font-sans"
+            className="font-sans text-[16px] lg:text-[clamp(17px,1.4vw,22px)] mt-6 lg:mt-[clamp(28px,3vw,48px)]"
             style={{
-              marginTop: 'clamp(28px, 3vw, 48px)',
               maxWidth: '54ch',
-              fontSize: 'clamp(17px, 1.4vw, 22px)',
               lineHeight: 1.55,
               color: 'var(--color-paper-on-ink)',
             }}
@@ -135,28 +137,31 @@ export function FounderStrip() {
           </p>
 
           <p
-            className="font-sans"
+            className="font-sans text-[21px] lg:text-[clamp(28px,3.5vw,52px)] mt-7 lg:mt-[clamp(32px,4vw,56px)]"
             style={{
-              marginTop: 'clamp(32px, 4vw, 56px)',
-              fontSize: 'clamp(28px, 3.5vw, 52px)',
               fontWeight: 700,
               letterSpacing: '-0.02em',
-              lineHeight: 1.05,
+              lineHeight: 1.1,
               color: 'var(--color-paper-on-ink)',
             }}
           >
-            <span className="block" style={{ whiteSpace: 'nowrap' }}>
+            {/* nowrap holds each statement on one line at lg+ where the pinned
+                left column is wide enough. On phones the longest line
+                ("No outsourced support queue." ≈398px at the 28px floor)
+                overflowed the ~330px column and scrolled the page sideways, so
+                below lg it wraps (design-critique 2026-06-13, Kael P1). */}
+            <span className="block whitespace-normal lg:whitespace-nowrap">
               No outsourced support queue.
             </span>
-            <span className="block" style={{ whiteSpace: 'nowrap' }}>
+            <span className="block whitespace-normal lg:whitespace-nowrap">
               No pitch.
             </span>
-            <span className="block" style={{ whiteSpace: 'nowrap' }}>
+            <span className="block whitespace-normal lg:whitespace-nowrap">
               No sales call.
             </span>
           </p>
 
-          <div style={{ marginTop: 'clamp(40px, 5vw, 72px)' }}>
+          <div className="mt-9 lg:mt-[clamp(40px,5vw,72px)]">
             <Link
               href="/audit#checkout"
               className="inline-flex items-center gap-3 px-7 py-3.5 border border-[color:var(--color-paper-on-ink)] text-[color:var(--color-paper-on-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper-on-ink)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)] ease-[cubic-bezier(0.4,0,0.2,1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
@@ -167,15 +172,14 @@ export function FounderStrip() {
           </div>
         </div>
 
-        {/* RIGHT — scrollable proof panels. Three stat cards stacked
-            vertically; each ~80–100vh tall so the LEFT column has scroll
-            runway to be pinned against. */}
+        {/* RIGHT — proof panels. On desktop each is ~80–100vh tall so the
+            LEFT column has scroll runway to be pinned against; on mobile the
+            min-height is released (globals.css) and the gap + metric scale
+            are compressed so the three read as a tight ledger, not a void
+            chain. */}
         <ol
           aria-label="Audit outcomes — representative examples"
-          className="flex flex-col list-none m-0 p-0"
-          style={{
-            gap: 'clamp(48px, 6vh, 96px)',
-          }}
+          className="flex flex-col list-none m-0 p-0 gap-6 lg:gap-[clamp(48px,6vh,96px)]"
         >
           {PROOF_PANELS.map((panel, i) => (
             <li
@@ -183,12 +187,12 @@ export function FounderStrip() {
               className="font-mono flintmere-founder-panel"
               style={{
                 border: '1px solid var(--color-line-dark)',
-                padding: 'clamp(24px, 3.5vw, 48px)',
+                padding: 'clamp(20px, 3.5vw, 48px)',
                 color: 'var(--color-paper-on-ink)',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                gap: 'clamp(16px, 3vw, 36px)',
+                gap: 'clamp(14px, 3vw, 36px)',
               }}
             >
               <p
@@ -204,9 +208,8 @@ export function FounderStrip() {
               </p>
 
               <p
-                className="font-sans"
+                className="font-sans text-[34px] lg:text-[clamp(56px,7.2vw,112px)]"
                 style={{
-                  fontSize: 'clamp(56px, 7.2vw, 112px)',
                   fontWeight: 700,
                   letterSpacing: '-0.035em',
                   lineHeight: 0.94,
@@ -226,13 +229,12 @@ export function FounderStrip() {
 
               <div>
                 <p
-                  className="font-sans"
+                  className="font-sans text-[16px] lg:text-[clamp(17px,1.4vw,22px)]"
                   style={{
-                    fontSize: 'clamp(17px, 1.4vw, 22px)',
                     fontWeight: 500,
                     lineHeight: 1.4,
                     color: 'var(--color-paper-on-ink)',
-                    marginBottom: 'clamp(8px, 1vw, 14px)',
+                    marginBottom: 'clamp(6px, 1vw, 14px)',
                   }}
                 >
                   {panel.label}
@@ -257,7 +259,7 @@ export function FounderStrip() {
               lineHeight: 1.55,
               color: 'var(--color-mute-inv)',
               fontFamily: 'var(--font-mono)',
-              marginTop: 'clamp(16px, 2vh, 32px)',
+              marginTop: 'clamp(8px, 2vh, 32px)',
             }}
           >
             Representative examples. Actual results vary per merchant,
