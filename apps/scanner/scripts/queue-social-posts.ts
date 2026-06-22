@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 /**
- * Insert agent-drafted X posts into the SocialPost queue — ADR 0026.
+ * Insert agent-drafted posts into the SocialPost queue — ADR 0026.
+ * Posts that omit "channel" cross-post to X + Bluesky (see queue-posts.ts).
  *
  * Usage: pnpm -F scanner social:queue -- path/to/posts.json
  * JSON shape: [{ "body": "...", "utmCampaign": "kebab-slug",

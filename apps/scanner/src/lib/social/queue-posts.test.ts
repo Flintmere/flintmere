@@ -55,10 +55,10 @@ describe('queuePostsSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('defaults channel to x when omitted', () => {
+  it('leaves channel undefined when omitted (cross-post resolved at insert)', () => {
     const result = queuePostsSchema.safeParse([VALID_POST]);
     expect(result.success).toBe(true);
-    if (result.success) expect(result.data[0]?.channel).toBe('x');
+    if (result.success) expect(result.data[0]?.channel).toBeUndefined();
   });
 
   it('accepts an explicit bluesky channel', () => {
@@ -103,5 +103,29 @@ describe('queuePosts', () => {
     expect(data[0]).toMatchObject({ channel: 'x', altText: null });
     expect(data[1]).toMatchObject({ channel: 'bluesky', altText: 'score ring at 64' });
     expect(data[0]!.scheduledAt).toEqual(new Date('2026-06-11T10:00:00Z'));
+  });
+
+  it('cross-posts to x and bluesky when channel is omitted', async () => {
+    const createMany = vi.fn().mockResolvedValue({ count: 2 });
+    const client: QueuePostsPrisma = { socialPost: { createMany } };
+
+    const queued = await queuePosts([VALID_POST], client);
+
+    expect(queued).toBe(2);
+    const { data } = createMany.mock.calls[0]![0] as {
+      data: Array<{ channel: string; body: string }>;
+    };
+    expect(data.map((d) => d.channel)).toEqual(['x', 'bluesky']);
+    expect(data[0]!.body).toBe(data[1]!.body);
+  });
+
+  it('queues a single channel when one is set explicitly', async () => {
+    const createMany = vi.fn().mockResolvedValue({ count: 1 });
+    const client: QueuePostsPrisma = { socialPost: { createMany } };
+
+    await queuePosts([{ ...VALID_POST, channel: 'bluesky' }], client);
+
+    const { data } = createMany.mock.calls[0]![0] as { data: Array<{ channel: string }> };
+    expect(data.map((d) => d.channel)).toEqual(['bluesky']);
   });
 });
