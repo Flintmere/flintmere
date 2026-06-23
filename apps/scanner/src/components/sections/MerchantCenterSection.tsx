@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Bracket } from '@flintmere/ui';
+import { crossHostHref } from '@/lib/host-routing';
 import { ScopeCredits } from '@/app/audit/connect/_shared/ScopeCredits';
 
 /**
@@ -206,7 +207,12 @@ export function MerchantCenterSection() {
                 ['--reveal-delay' as string]: '280ms',
               }}
             >
-              <Link href="/audit/connect" className={ARROW_LINK}>
+              {/* Absolute cross-host URL via crossHostHref: /audit/connect is a
+                  scanner route that 301s off flintmere.com → a relative <Link>
+                  triggers a cross-origin RSC prefetch that always fails with
+                  "Failed to fetch RSC payload" (vercel/next.js#53813). Absolute
+                  cross-host hrefs are not RSC-prefetched, so no error. */}
+              <Link href={crossHostHref('/audit/connect')} className={ARROW_LINK}>
                 See how the connection works
                 <span aria-hidden="true">→</span>
               </Link>
