@@ -115,7 +115,13 @@ export function middleware(request: NextRequest): NextResponse {
       });
     }
 
+    // `next-url` is the only RSC signal that survives Next's middleware
+    // adapter (it is not in FLIGHT_HEADERS — see the rsc-noop note below
+    // for the full mechanism). The rsc / next-router-prefetch / `_rsc`
+    // checks are kept as defensive fallbacks for any runtime that does
+    // not strip them, but they never fire in this deployment.
     const isRscPrefetchCrossOrigin =
+      request.headers.get('next-url') !== null ||
       request.headers.get('rsc') === '1' ||
       request.headers.get('next-router-prefetch') === '1' ||
       request.nextUrl.searchParams.has('_rsc');
@@ -141,9 +147,22 @@ export function middleware(request: NextRequest): NextResponse {
     // headers, fails preflight, console fills with errors, and Next.js
     // falls back to full nav anyway. Return 204 No Content so the
     // prefetch silently no-ops — the user-initiated click still gets
-    // the 301 (no RSC headers on real navigations) and lands on the
+    // the 301 (no RSC signals on real navigations) and lands on the
     // correct host. Caught 2026-05-05 via Lighthouse mobile audit.
+    //
+    // Detection signal (corrected 2026-06-23): Next's web middleware
+    // adapter strips every RSC signal BEFORE `middleware()` runs — the
+    // FLIGHT_HEADERS (`rsc`, `next-router-prefetch`, …) are deleted from
+    // the request and `_rsc` is removed by `stripInternalSearchParams`.
+    // So those three checks were always false here and the 204 never
+    // fired (the branch was dead — verified live 2026-06-23). The one
+    // RSC signal that survives is the `next-url` header (not a
+    // FLIGHT_HEADER), present on every App Router RSC fetch and absent
+    // on real top-level navigations — exactly the discriminator we need.
+    // The legacy checks are kept as defensive fallbacks for runtimes
+    // that don't strip them.
     const isRscPrefetch =
+      request.headers.get('next-url') !== null ||
       request.headers.get('rsc') === '1' ||
       request.headers.get('next-router-prefetch') === '1' ||
       request.nextUrl.searchParams.has('_rsc');
