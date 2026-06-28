@@ -63,7 +63,7 @@ export default function RootLayout({
       <body>
         {/* JSON-LD Organization + WebSite schema. AI-shopping crawlers and
             Google rich-result eligibility both consume this; absence is
-            ironic for a catalog-AI-readiness product. Single source — if
+            ironic for a catalog-data product. Single source — if
             entity details change, also update /about + /privacy + /terms. */}
         <Script
           id="ld-organization"
@@ -137,7 +137,7 @@ export default function RootLayout({
                   price: '0',
                   priceCurrency: 'GBP',
                   description:
-                    'Free 60-second AI-readiness audit for any public Shopify store.',
+                    'Free 60-second catalog data audit for any public Shopify store.',
                 },
               },
             ],

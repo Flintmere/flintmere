@@ -11,7 +11,7 @@ export const dynamic = 'force-static';
 export const revalidate = 3600;
 
 const HOST = 'audit.flintmere.com';
-const FEED_TITLE = 'Flintmere — Catalog readiness for AI shopping';
+const FEED_TITLE = 'Flintmere — Catalog data for AI shopping';
 const FEED_DESC =
   'Field notes on catalog data quality, GTINs, metafields, and how AI shopping agents read your products.';
 

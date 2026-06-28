@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { prisma } from '@/lib/db';
 import { validateDomainSegment } from '@/lib/badge-url';
 
-export const alt = 'Flintmere AI-readiness score';
+export const alt = 'Flintmere catalog data score';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -73,7 +73,7 @@ export default async function OG({
         >
           <span>Flintmere</span>
           <span style={{ opacity: 0.45 }}>//</span>
-          <span style={{ opacity: 0.7 }}>AI-readiness score</span>
+          <span style={{ opacity: 0.7 }}>catalog data score</span>
         </div>
 
         <div

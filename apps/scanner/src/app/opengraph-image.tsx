@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 // CSS variables; literal hex is the only option. Keep in sync with
 // globals.css @theme if those tokens change.
 
-export const alt = 'Flintmere — catalog readiness for AI agents';
+export const alt = 'Flintmere — Food catalog data for Shopify';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -55,7 +55,7 @@ export default async function OG() {
         >
           <span>Flintmere</span>
           <span style={{ opacity: 0.55 }}>//</span>
-          <span style={{ opacity: 0.8 }}>Agent-ready commerce</span>
+          <span style={{ opacity: 0.8 }}>Food catalog data</span>
         </div>
 
         {/* display claim */}

@@ -252,7 +252,7 @@ export default function MarketingHome() {
               Paper-on-ink at #F0EFE8 over the photo's dark wooden-base
               region (mean luminance ~0.14) gives ≈7.8:1, AAA at small text. */}
           <p
-            aria-label="Flintmere catalog readiness scan, 2026, takes 60 seconds, no install required"
+            aria-label="Flintmere catalog data scan, 2026, takes 60 seconds, no install required"
             className="absolute font-mono uppercase max-lg:hidden"
             style={{
               bottom: 'clamp(32px, 3vw, 48px)',
@@ -264,7 +264,7 @@ export default function MarketingHome() {
               color: 'var(--color-paper-on-ink)',
             }}
           >
-            Flintmere · Catalog readiness scan · 2026 · 60 seconds, no install
+            Flintmere · Catalog data scan · 2026 · 60 seconds, no install
           </p>
         </div>
 

@@ -6,7 +6,7 @@ import { PostCard } from '@/components/blog/PostCard';
 import { SCAN_URL } from '@/lib/host-routing';
 
 /**
- * /blog — index of catalog-readiness field notes. Lives on
+ * /blog — index of catalog data field notes. Lives on
  * audit.flintmere.com (scanner host). MDX posts in content/blog/, newest
  * first, drafts excluded. Static — rebuilt on deploy (a new post ships by
  * merging its .mdx + redeploying).
@@ -20,12 +20,12 @@ export const dynamic = 'force-static';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Blog — Catalog readiness for AI shopping',
+  title: 'Blog — Catalog data for AI shopping',
   description:
     'Field notes on catalog data quality, GTINs, metafields, and how AI shopping agents read your products. Source-cited, from first-hand scan data.',
   alternates: { canonical: 'https://audit.flintmere.com/blog' },
   openGraph: {
-    title: 'Flintmere Blog — Catalog readiness for AI shopping',
+    title: 'Flintmere Blog — Catalog data for AI shopping',
     description:
       'Field notes on catalog data quality, GTINs, metafields, and how AI shopping agents read your products.',
     url: 'https://audit.flintmere.com/blog',

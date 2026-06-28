@@ -70,7 +70,7 @@ export function ScoreRing({
   return (
     <div
       role="img"
-      aria-label={`AI-readiness score: ${score} out of 100${grade ? `, grade ${grade}` : ''}`}
+      aria-label={`Catalog data score: ${score} out of 100${grade ? `, grade ${grade}` : ''}`}
       className={`relative grid place-items-center ${className}`}
       style={{
         width: size,
