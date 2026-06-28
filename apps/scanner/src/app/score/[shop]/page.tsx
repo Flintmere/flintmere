@@ -66,8 +66,8 @@ export async function generateMetadata({
     };
   }
 
-  const title = `${domain} · ${scan.score}/100 · AI-readiness score`;
-  const description = `${domain} scored ${scan.score}/100 (grade ${scan.grade}) on Flintmere's AI-readiness audit — the seven checks AI shopping agents use before recommending a product.`;
+  const title = `${domain} · ${scan.score}/100 · catalog data score`;
+  const description = `${domain} scored ${scan.score}/100 (grade ${scan.grade}) on Flintmere's catalog data audit — the seven checks AI shopping agents use before recommending a product.`;
   return {
     title,
     description,
@@ -119,7 +119,7 @@ export default async function ScorePage({ params }: PageProps) {
     <main id="main" className="flintmere-main">
       <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-24 md:py-28">
         <p className="eyebrow text-[color:var(--color-ink-2)] mb-8">
-          AI-readiness score · Public by merchant opt-in
+          Catalog data score · Public by merchant opt-in
         </p>
         <h1 className="max-w-[18ch]">
           <Bracket>{domain}</Bracket>

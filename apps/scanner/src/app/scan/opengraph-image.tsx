@@ -67,7 +67,7 @@ export default async function OG() {
         >
           <span>Flintmere</span>
           <span style={{ opacity: 0.55 }}>//</span>
-          <span style={{ opacity: 0.8 }}>Agent-ready commerce</span>
+          <span style={{ opacity: 0.8 }}>Food catalog data</span>
         </div>
 
         {/* display claim — mirrors page hero line-break exactly */}

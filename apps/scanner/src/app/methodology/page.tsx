@@ -62,9 +62,9 @@ export const dynamic = 'force-static';
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Methodology — How we score AI-readiness',
+  title: 'Methodology — How we score catalog data',
   description:
-    'How Flintmere computes the seven-pillar catalog-readiness score — sources, cadence, public change log, conflicts of interest, and what we do not measure.',
+    'How Flintmere computes the seven-pillar catalog data score — sources, cadence, public change log, conflicts of interest, and what we do not measure.',
   alternates: { canonical: 'https://flintmere.com/methodology' },
 };
 

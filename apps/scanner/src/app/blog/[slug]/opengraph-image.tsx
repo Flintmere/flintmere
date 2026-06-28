@@ -11,7 +11,7 @@ import { CLUSTER_LABELS } from '@/components/blog/PostCard';
 //
 // Fonts live at src/app/og-fonts/ — two segments up from this dynamic route.
 
-export const alt = 'Flintmere — catalog readiness for AI agents';
+export const alt = 'Flintmere — Food catalog data for Shopify';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 

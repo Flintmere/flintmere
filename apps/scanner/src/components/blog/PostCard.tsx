@@ -9,7 +9,7 @@ import type { BlogPost } from '@/lib/blog/posts';
  */
 export const CLUSTER_LABELS: Record<BlogCluster, string> = {
   'ai-shopping-agentic-commerce': 'AI shopping',
-  'catalog-readiness-scoring': 'Catalog readiness',
+  'catalog-readiness-scoring': 'Catalog data',
   'gtin-identifier-guidance': 'GTIN & identifiers',
   'catalog-mapping-metafields': 'Catalog mapping',
   'shopify-app-discovery': 'Shopify discovery',

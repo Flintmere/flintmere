@@ -321,7 +321,7 @@ export function BodyTop({ data }: { data: Published }) {
                 <>
                   How the first {data.n.toLocaleString()} Shopify
                   {data.n === 1 ? ' store ' : ' stores '}
-                  {data.n === 1 ? 'lands' : 'land'} against the seven AI-readiness checks.
+                  {data.n === 1 ? 'lands' : 'land'} against the seven catalog checks.
                 </>
               ) : (
                 <>

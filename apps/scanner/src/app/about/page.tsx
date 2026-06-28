@@ -97,7 +97,7 @@ export default function About() {
               lineHeight: 1.55,
             }}
           >
-            Catalog readiness for AI agents — built by a council, not a
+            Food catalog data for Shopify — built by a council, not a
             founder. Here is how that works.
           </p>
         </section>
@@ -131,7 +131,7 @@ export default function About() {
               marginTop: 'clamp(16px, 2vw, 24px)',
             }}
           >
-            Catalog readiness for AI agents.
+            Food catalog data for Shopify.
           </h2>
           <p
             className="text-[color:var(--color-ink-2)] max-w-[64ch]"
