@@ -13,7 +13,7 @@ import { MistakeRow, type Mistake } from '@/components/sections/MistakeRow';
 export const metadata: Metadata = {
   title: 'Flintmere for food & drink — allergens, nutrition',
   description:
-    'Food-and-drink catalog mistakes that make AI shopping agents skip your store — allergens in prose, nutrition as images, provenance claims unstructured.',
+    'Shopify Catalog standardises the data you have. Flintmere supplies what your food catalog is missing — structured allergens, nutrition, provenance, GTINs — before the agent ever sees it.',
   alternates: { canonical: '/for/food-and-drink' },
 };
 
@@ -167,13 +167,14 @@ export default async function FlintmereForFoodAndDrink() {
           className="mt-8 max-w-[58ch] text-[color:var(--color-ink-2)]"
           style={{ fontSize: 18, lineHeight: 1.55 }}
         >
-          AI shopping agents filter food-and-drink on allergens, nutrition,
-          provenance, certifications, shelf life and unit pricing. When those
-          fields live on your back-of-pack imagery and inside description
-          prose instead of structured metafields, the agent skips your store
-          for the brand that published structured data. Eight food-specific
-          mistakes below &mdash; each one concretely observable in a real
-          Shopify catalog.
+          Shopify Catalog standardises the product data you already hold. It
+          can&rsquo;t create the field you never filled. Allergens, nutrition,
+          provenance, certifications, shelf life and unit pricing live on your
+          back-of-pack imagery and inside description prose &mdash; not in the
+          structured metafields a food agent needs to transact. Catalog
+          standardises the format; we fix the facts. Eight food-specific gaps
+          below, each one concretely observable in a real Shopify catalog,
+          each one scored on every scan.
         </p>
         <div className="mt-10 flex flex-wrap gap-3">
           <Link href={SCAN_URL} className="btn btn-accent">

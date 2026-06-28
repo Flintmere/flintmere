@@ -242,7 +242,7 @@ export default function MarketingHome() {
             className="absolute inset-0 lg:hidden pointer-events-none"
             style={{
               background:
-                'linear-gradient(to top, rgba(20, 18, 14, 0.85) 0%, rgba(20, 18, 14, 0.72) 22%, rgba(20, 18, 14, 0.55) 42%, rgba(20, 18, 14, 0.28) 65%, rgba(20, 18, 14, 0.10) 85%, transparent 100%)',
+                'linear-gradient(to top, rgba(20, 18, 14, 0.88) 0%, rgba(20, 18, 14, 0.84) 42%, rgba(20, 18, 14, 0.55) 62%, rgba(20, 18, 14, 0.25) 80%, rgba(20, 18, 14, 0.08) 92%, transparent 100%)',
             }}
           />
 
@@ -298,7 +298,7 @@ export default function MarketingHome() {
               body scale reads as code-block). On paper: mute ≈ 6.3:1 AAA.
               On ink-scrim (mobile): mute-inv ≈ 5.6:1 AA at body scale. */}
           <p
-            className="font-sans text-[color:var(--color-mute)] max-lg:text-[color:var(--color-mute-inv)]"
+            className="font-sans text-[color:var(--color-mute)] max-lg:text-[color:var(--color-paper-on-ink)]"
             style={{
               marginTop: 'clamp(28px, 3vw, 48px)',
               maxWidth: '42ch',
@@ -309,7 +309,11 @@ export default function MarketingHome() {
           >
             Paste your URL. We estimate how much annual demand is routing to
             competitors while these products stay suppressed — and show the
-            catalog data costing you the sale.
+            catalog facts behind it.{' '}
+            <span className="max-lg:hidden">
+              Most fixes are food-specific: a wrong GTIN, a missing allergen, a
+              field no channel can read off your description.
+            </span>
           </p>
 
           {/* Single primary CTA — amber fill, mono uppercase 12px,
@@ -391,14 +395,14 @@ export default function MarketingHome() {
           <h2
             id="pillars-heading"
             className="font-sans tracking-[-0.04em] leading-[0.92] max-w-[26ch] text-[color:var(--color-ink)]"
-            style={{ fontSize: 'clamp(48px, 7vw, 112px)' }}
+            style={{ fontSize: 'clamp(36px, 7vw, 112px)' }}
           >
             <span className="sr-only">
-              An AI agent reads your catalog in seven passes. Fail one, lose the sale.
+              Catalog standardises the format. We fix the facts a food agent needs to transact.
             </span>
             {(() => {
-              const LINE_1 = 'An AI agent reads your catalog in seven passes.'.split(' ');
-              const LINE_2 = 'Fail one, lose the sale.'.split(' ');
+              const LINE_1 = 'Catalog standardises the format.'.split(' ');
+              const LINE_2 = 'We fix the facts a food agent needs to transact.'.split(' ');
               const ENTRY_DELAY = 200;
               const STAGGER_1 = 120;
               const LINE_GAP = 300;
