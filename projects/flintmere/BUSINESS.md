@@ -130,13 +130,16 @@ Every marketing piece should sit on one of these seven:
 
 ## Competitors (quick reference, full in SPEC §11)
 
+The apex commoditisation risk is now the platform itself. Order below is by strategic threat, not alphabetically. (External Spring '26 facts in this section are pending claim-review.)
+
+- **Shopify Catalog (native) — apex commoditisation risk.** Free, auto-enrolled, and as of the Spring '26 edition materially expanded: Shopify Catalog standardises and enriches product data for AI agents (image search, product lookup by ID/URL up to 50 products, richer agentic product data, global catalog). This is the layer most likely to absorb our generic value: anything that reduces to "make the data you already have in Shopify legible to agents" trends toward zero price as Catalog matures. **Our stance is Complementary, not competitive (per ADR 0027).** Catalog standardises the *format* of data a merchant already holds; it does not create missing data, fix a wrong GTIN, extract an allergen from a back-of-pack photo, or map to a food regulatory taxonomy. Flintmere is the input-quality + food-regulatory layer that *feeds* Catalog — we make the fields correct, complete, and food-compliant before Catalog ever standardises them. Where we must not drift: any claim that reduces to "we standardise your catalog data" is now Shopify's claim, free.
+- **UCP / Universal Commerce Protocol — ecosystem context, not a competitor.** Open agent-commerce protocol shipped in the Spring '26 edition, co-built with Google and backed by Amazon, Meta, Microsoft, Stripe, Etsy, and Target. Covers discovery → cart → checkout for AI agents via a public MCP endpoint; developers register an agent profile. We ride the protocol, we do not fight it. UCP aligns with our Checkout-eligibility pillar: that pillar measures whether a product is *regulatorily* eligible to transact (HMRC, alcohol licensing, age-restriction, allergen-disclosure) — the precondition the agent commerce layer assumes. (Alignment, not identity: the pillar predates UCP and measures a regulatory check, not the protocol itself.) Metafields also became more central this edition — which raises, not lowers, the value of writing correct food-regulatory fields to metafields.
 - **Agent IQ / 40rty.ai** — direct competitor, early stage, no Built-for-Shopify yet.
 - **Alhena AI** — adjacent (AI shopping assistant + SEO audit), broader surface.
 - **Stellagent** — consulting-led, not a scalable product.
-- **Shopify Catalog (native)** — free, auto-enrolled; basic, not a diagnostic.
 - **Generic SEO apps** — Schema Plus, JSON-LD for SEO; don't address agent-specific requirements.
 
-Positioning gap: nobody combines agency-grade diagnostic + automated fix engine + honest GTIN guidance + real AI-visibility measurement.
+Positioning gap: nobody supplies the food-regulatory input-quality layer — GTIN-correct (Identifiers), allergen/nutrition/provenance/certification-complete (Attributes), checkout-eligible — that Catalog and UCP assume already exists. Catalog standardises the data you have; Flintmere supplies what you're missing, before the agent ever sees it.
 
 ## ADR pointers
 

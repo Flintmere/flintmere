@@ -7,16 +7,16 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Flintmere — Catalog readiness for AI agents',
+    default: 'Flintmere — Food catalog data for Shopify',
     template: '%s · Flintmere',
   },
   description:
-    'Score your Shopify catalog for AI-agent readiness across seven pillars in 60 seconds. Free scan, no signup. Find what suppresses you on Google.',
+    'We score your food catalog on seven pillars Shopify Catalog leaves to you — GTINs, allergens, checkout eligibility. Free 60-second scan, no signup.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://flintmere.com'),
   openGraph: {
-    title: 'Flintmere — Catalog readiness for AI agents',
+    title: 'Flintmere — Food catalog data for Shopify',
     description:
-      'Score your Shopify catalog for AI-agent readiness across seven pillars in 60 seconds. Free scan, no signup, no credit card.',
+      'We score your food catalog on seven pillars Shopify Catalog leaves to you — GTINs, allergens, checkout eligibility. Free 60-second scan, no signup, no credit card.',
     url: '/',
     siteName: 'Flintmere',
     locale: 'en_GB',
@@ -24,9 +24,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Flintmere — Catalog readiness for AI agents',
+    title: 'Flintmere — Food catalog data for Shopify',
     description:
-      'Score your Shopify catalog for AI-agent readiness across seven pillars in 60 seconds. Free scan, no signup, no credit card.',
+      'We score your food catalog on seven pillars Shopify Catalog leaves to you — GTINs, allergens, checkout eligibility. Free 60-second scan, no signup, no credit card.',
   },
   robots: {
     index: true,
