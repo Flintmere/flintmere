@@ -395,14 +395,21 @@ export default function MarketingHome() {
           <h2
             id="pillars-heading"
             className="font-sans tracking-[-0.04em] leading-[0.92] max-w-[26ch] text-[color:var(--color-ink)]"
-            style={{ fontSize: 'clamp(36px, 7vw, 112px)' }}
+            style={{ fontSize: 'clamp(36px, 6vw, 96px)' }}
           >
             <span className="sr-only">
               Catalog standardises the format. We fix the facts a food agent needs to transact.
             </span>
             {(() => {
               const LINE_1 = 'Catalog standardises the format.'.split(' ');
-              const LINE_2 = 'We fix the facts a food agent needs to transact.'.split(' ');
+              // Bold punchline hard-authored into three sub-lines so wraps
+              // fall on phrase boundaries — deterministic at every width
+              // (no ragged reflow). One continuous cascade via a global index.
+              const LINE_2 = [
+                'We fix the facts'.split(' '),
+                'a food agent'.split(' '),
+                'needs to transact.'.split(' '),
+              ];
               const ENTRY_DELAY = 200;
               const STAGGER_1 = 120;
               const LINE_GAP = 300;
@@ -425,21 +432,33 @@ export default function MarketingHome() {
                       </span>
                     ))}
                   </span>
-                  <span className="block font-bold mt-2">
-                    {LINE_2.map((word, i) => (
-                      <span
-                        key={`l2-${i}`}
-                        data-reveal
-                        style={{
-                          display: 'inline-block',
-                          marginRight: i < LINE_2.length - 1 ? '0.28em' : 0,
-                          ['--reveal-delay' as string]: `${line1Total + LINE_GAP + i * STAGGER_2}ms`,
-                        }}
-                      >
-                        {word}
-                      </span>
-                    ))}
-                  </span>
+                  {(() => {
+                    let g = 0;
+                    return LINE_2.map((line, li) => {
+                      const block = (
+                        <span
+                          key={`l2-${li}`}
+                          className={`block font-bold${li === 0 ? ' mt-2' : ''}`}
+                        >
+                          {line.map((word, i) => (
+                            <span
+                              key={`l2-${li}-${i}`}
+                              data-reveal
+                              style={{
+                                display: 'inline-block',
+                                marginRight: i < line.length - 1 ? '0.28em' : 0,
+                                ['--reveal-delay' as string]: `${line1Total + LINE_GAP + (g + i) * STAGGER_2}ms`,
+                              }}
+                            >
+                              {word}
+                            </span>
+                          ))}
+                        </span>
+                      );
+                      g += line.length;
+                      return block;
+                    });
+                  })()}
                 </span>
               );
             })()}
