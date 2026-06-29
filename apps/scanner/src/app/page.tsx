@@ -410,10 +410,14 @@ export default function MarketingHome() {
                 'a food agent'.split(' '),
                 'needs to transact.'.split(' '),
               ];
-              const ENTRY_DELAY = 200;
-              const STAGGER_1 = 120;
-              const LINE_GAP = 300;
-              const STAGGER_2 = 150;
+              // Motion pass (2026-06-29): cascade tightened ~2.3s → ~1.07s
+              // last-word start, to land near the Apple "well under 1s" felt
+              // cadence (design critique, Idris P1). Footstep stagger + the
+              // medium→bold beat preserved — just snappier.
+              const ENTRY_DELAY = 120;
+              const STAGGER_1 = 70;
+              const LINE_GAP = 130;
+              const STAGGER_2 = 60;
               const line1Total = ENTRY_DELAY + LINE_1.length * STAGGER_1;
               return (
                 <span aria-hidden="true">
@@ -465,7 +469,7 @@ export default function MarketingHome() {
           </h2>
           {/* Decorative sage hairline anchor — structural-decorative use
               per ADR 0021 §Accent §Decorative. Sweeps in AFTER the
-              headline cadence completes (~3000ms after section entry). */}
+              headline cadence completes (~1900ms after section entry). */}
           <div
             aria-hidden="true"
             data-reveal
@@ -475,7 +479,7 @@ export default function MarketingHome() {
               width: 'clamp(160px, 14vw, 280px)',
               background: 'var(--color-accent-sage)',
               opacity: 0.85,
-              ['--reveal-delay' as string]: '3000ms',
+              ['--reveal-delay' as string]: '1900ms',
             }}
           />
         </div>
