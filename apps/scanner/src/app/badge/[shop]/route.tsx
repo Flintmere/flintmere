@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { prisma } from '@/lib/db';
-import { validateDomainSegment } from '@/lib/badge-url';
+import { truncateDomain, validateDomainSegment } from '@/lib/badge-url';
 import { publishedScanQuery } from '@/lib/public-score';
 
 export const runtime = 'nodejs';
@@ -133,7 +133,7 @@ export async function GET(
               opacity: 0.6,
             }}
           >
-            {domain}
+            {truncateDomain(domain)}
           </div>
           <div
             style={{
