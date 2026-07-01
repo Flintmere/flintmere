@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { scoreUrl, validateDomainSegment } from './badge-url';
+import { badgeUrl, scoreUrl, validateDomainSegment } from './badge-url';
 
 describe('validateDomainSegment', () => {
   it.each([
@@ -43,6 +43,14 @@ describe('scoreUrl', () => {
   it('builds canonical marketing-host URL', () => {
     expect(scoreUrl('acme.myshopify.com')).toBe(
       'https://flintmere.com/score/acme.myshopify.com',
+    );
+  });
+});
+
+describe('badgeUrl', () => {
+  it('builds canonical marketing-host badge URL', () => {
+    expect(badgeUrl('acme.myshopify.com')).toBe(
+      'https://flintmere.com/badge/acme.myshopify.com',
     );
   });
 });

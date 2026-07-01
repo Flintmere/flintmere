@@ -23,3 +23,9 @@ export function validateDomainSegment(raw: string): string | null {
 export function scoreUrl(domain: string): string {
   return `https://flintmere.com/score/${domain}`;
 }
+
+// Absolute URL of the embeddable PNG score badge (served by
+// /badge/[shop]). Merchants drop this in an <img src> on their own site.
+export function badgeUrl(domain: string): string {
+  return `https://flintmere.com/badge/${domain}`;
+}
