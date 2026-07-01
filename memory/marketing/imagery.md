@@ -16,7 +16,7 @@ Council gates at `memory/PROCESS.md` — #25 AI image director, #26 Visual brand
 
 1. **Type leads, imagery proves.** (Replaces "type is the image, photography rare.") Display typography still carries hero rhythm; photoreal anchors emotion, screenshots demonstrate proof.
 2. **Adobe Stock photoreal permitted** with operator licence. Source unbranded products only — Adobe Stock licence clause 4.7 excludes trademark clearance, so every visible third-party brand mark is operator legal exposure (#9 Lawyer binding).
-3. **No AI-generated imagery on marketing surfaces.** Photoreal, gradient, illustrative — all banned. Trust risk on a security-adjacent product.
+3. **AI-generated imagery is banned by default on marketing surfaces** (trust risk on a security-adjacent product) — permitted only under an explicit, logged per-surface operator override. Governance ledger + Runware editorial-still-life template: `memory/project_runware_image_workflow.md`; canon: `tokens.md` §AI imagery — per-surface override. Trust-critical surfaces (data-access, auth, payment, audit deliverable) stay type-only.
 4. **Palette is closed.** See tokens in `memory/design/tokens.md`. No new hues without `design-token` proposal.
 5. **Every asset has alt text.** No meaning conveyed by colour alone. **#8 Accessibility veto.**
 6. **Set cohesion beats per-image cleverness.** #29 Art Director rejects any asset that breaks the set's temperature, materiality, lighting direction, or colour grade.
