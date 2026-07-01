@@ -56,7 +56,7 @@ Every source a data-intelligence skill may reference. Skills are read-only again
 - Export cadence: weekly; month-end canonical for MRR
 - Retention (in source): per Stripe terms
 - Retention (in context/): 30 days
-- Lawful basis: contract (paid Agency + Enterprise subscribers; £97 concierge)
+- Lawful basis: contract (paid Agency + Plus subscribers; Concierge audit band ladder)
 - PII present: yes (customer email, customer ID, billing country, payment method last 4)
 - Aggregation required: **YES** — drop email + customer ID + last 4 at import. Use hashed customer ID only as cohort key.
 - Privacy Policy reference: payments + billing section

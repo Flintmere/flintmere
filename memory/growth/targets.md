@@ -45,12 +45,12 @@ Direct-merchant acquisition targets — the Growth tier and Scale tier buyers.
 
 ### 5. Enterprise merchants (Shopify Plus)
 
-Per SPEC §7.1 Enterprise tier: 10,000+ SKU stores on Shopify Plus.
+Per SPEC §7.1 (Plus tier, renamed from Enterprise per ADR 0017): 10,000+ SKU stores on Shopify Plus.
 
 - **Direct outbound via LinkedIn** — Head of Ecom / CMO / CTO at named Plus merchants.
 - **Referrals from Agency tier** — the cleanest path.
-- **ShopTalk / IRCE in-person** — most Enterprise conversations start here.
-- **Post-audit upsell** — merchants who buy the £97 concierge audit and have a >5K SKU catalog are Enterprise candidates.
+- **ShopTalk / IRCE in-person** — most Plus conversations start here.
+- **Post-audit upsell** — merchants who buy the Concierge audit and have a >5K SKU catalog are Plus candidates.
 
 ### 6. Ecommerce press + industry media
 
@@ -65,7 +65,7 @@ See `memory/marketing/outreach.md` for contact protocol.
 
 ### 7. Events + conferences
 
-- **ShopTalk (Las Vegas + Europe)** — primary target for Enterprise + agency prospecting.
+- **ShopTalk (Las Vegas + Europe)** — primary target for Plus + agency prospecting.
 - **IRCE** — secondary.
 - **Shopify Unite** (if / when it resumes) — highest signal-to-noise for ecosystem integrations.
 - **Regional Shopify meetups** (London, NYC, Toronto) — grassroots.

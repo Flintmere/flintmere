@@ -20,7 +20,7 @@ console.log(result.issues);
 
 ## Pillars
 
-The engine computes seven pillars per the Flintmere canon (SPEC §4.1):
+The engine computes seven pillars per the Flintmere canon (`src/types.ts` `PILLAR_WEIGHTS`):
 
 | Pillar | Weight | Public-scannable? |
 |---|---|---|
@@ -30,7 +30,7 @@ The engine computes seven pillars per the Flintmere canon (SPEC §4.1):
 | Catalog mapping coverage | 15% | **Locked** — requires Admin API |
 | Consistency & integrity | 15% | Yes |
 | AI checkout eligibility | 10% | **Locked** — requires Admin API |
-| Crawlability | 5% | Yes — from `robots.txt` + render checks |
+| AI agent access / crawlability | 5% | Yes — from `robots.txt` / `sitemap.xml` / `llms.txt` |
 
 Scanner mode (default) returns `locked: true` on the three Admin-API pillars with a `lockedReason`. App mode (post-OAuth) unlocks all seven.
 

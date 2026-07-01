@@ -6,13 +6,13 @@ Canonical definitions of terms used across Flintmere. Extended from `SPEC.md` Ap
 
 **Flintmere** — The product. Scores Shopify product catalogs for AI-agent readiness and fixes what's broken. The parent brand.
 
-**Public scanner** — The tool at `audit.flintmere.com` that runs a partial (3-pillar) audit on any public Shopify store URL without installation. Public, no-auth.
+**Public scanner** — The tool at `audit.flintmere.com` that runs a partial (4-pillar) audit on any public Shopify store URL without installation. Public, no-auth.
 
-**Shopify app** — The embedded merchant app at `app.flintmere.com`, installed via OAuth from the Shopify App Store. Full 6-pillar scoring + auto-fix engine.
+**Shopify app** — The embedded merchant app at `app.flintmere.com`, installed via OAuth from the Shopify App Store. Full 7-pillar scoring + auto-fix engine.
 
 **Marketing site** — `flintmere.com`. Lives inside the scanner app at launch; may split later.
 
-**Concierge audit** — £97 one-off manual audit offered in SPEC §2.4 Week 1. Landing page at `flintmere.com/audit` or similar. Stripe-paid one-off, 48-hour delivery.
+**Concierge audit** — one-off manual audit on the ADR 0022 band ladder (£197 ≤1,500 SKUs / £397 1,501–5,000 / from £597 bespoke 5,001+; canonical `apps/scanner/src/lib/audit-pricing.ts`). Landing page at `flintmere.com/audit`. Stripe-paid one-off.
 
 ## Scoring system (seven pillars)
 
@@ -26,7 +26,7 @@ Canonical definitions of terms used across Flintmere. Extended from `SPEC.md` Ap
 4. **Catalog mapping coverage (15%)** — Custom fields mapped to Shopify Catalog standard fields.
 5. **Consistency & integrity (15%)** — Price/inventory/status alignment across Admin API, Storefront API, and rendered JSON-LD.
 6. **AI checkout eligibility (10%)** — External URL metafield, store policies, published status.
-7. **Crawlability (5%)** — Agent access: robots.txt rules, render path, and crawl speed that let a channel's crawler reach product pages.
+7. **AI agent access / crawlability (5%)** — robots.txt access for AI crawlers (GPTBot, ClaudeBot), sitemap coverage, llms.txt signal.
 
 **GTIN-less ceiling** — The maximum score a merchant can reach without investing in GS1 GTINs. Roughly 80/100 per SPEC §4.2.1. Surfaces explicitly in the scorecard ("Your ceiling without GTINs: 82").
 
@@ -112,13 +112,13 @@ Canonical definitions of terms used across Flintmere. Extended from `SPEC.md` Ap
 
 ## Commerce + tiers
 
-**Growth tier** — £49/month. SMB, <500 SKUs.
+**Growth tier** — £79/month (legacy; grandfathered — in-flight subscriptions only, not promoted to new sign-ups). SMB, <500 SKUs.
 
-**Scale tier** — £149/month. Mid-market, 500–5,000 SKUs.
+**Scale tier** — £249/month (legacy; grandfathered — in-flight only). Mid-market, 500–5,000 SKUs.
 
-**Agency tier** — £399/month. Shopify agencies, 25 client store seats, white-label reports, API access.
+**Agency tier** — £499/month (legacy; grandfathered — in-flight only). Shopify agencies, 25 client store seats, white-label reports, API access.
 
-**Enterprise tier** — £499+/month. Shopify Plus, 10,000+ SKUs, custom attribute templates, dedicated support.
+**Plus tier** — from £1,200/month on enquiry (private beta per ADR 0017; renamed from "Enterprise"). Shopify Plus, 10,000+ SKUs, custom attribute templates, dedicated support. New sign-ups land on the food vertical ladder (ADR 0016/0020; magnitudes WTP-pending — trace to `apps/scanner/src/lib/pricing.ts`).
 
 **Client store seat** — One merchant store under an Agency tier subscription. Agency tier includes 25.
 

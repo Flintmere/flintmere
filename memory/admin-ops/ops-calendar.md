@@ -55,7 +55,7 @@ Populated from `vendor-register.md`.
 - Owner: operator + #36
 - Notes: negligible spend until primary outage; review on `vendor-review` cadence. Project-scoped key (`sk-proj-…`); rotation cadence inherits the same 90-day rhythm if/when fallback traffic exceeds 5% sustained — see ADR 0010 §Re-open conditions.
 
-### Stripe (direct invoicing for Agency + Enterprise)
+### Stripe (direct invoicing for Agency + Plus)
 - Type: vendor renewal
 - Cadence: per-transaction
 - Owner: operator + #30

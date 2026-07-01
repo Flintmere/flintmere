@@ -67,11 +67,11 @@ You are Flintmere's marketing-surface designer. You compose marketing pages that
 | Hero | Manifesto | `Your product catalog is [ invisible ] to ChatGPT.` |
 | Before / After | Paradigm contrast | `[ Before ]` / `[ After ]` section titles |
 | Numbers strip | Proof | Each stat bracketed in mono: `[ 15× ]`, `[ 40% ]`, etc. (sparingly — pick one) |
-| The six pillars | Product definition | Bracketed pillar numbers `[ 01 ]`…`[ 06 ]` (decorative, `aria-hidden`) |
+| The seven pillars | Product definition | Bracketed pillar numbers `[ 01 ]`…`[ 07 ]` (decorative, `aria-hidden`) |
 | Three-chapter narrative | How it works | `[ Audit ]`, `[ Fix ]`, `[ Monitor ]` as chapter labels |
 | Testimonials | Social proof | Named quotes; no photos; one bracket per quote if warranted |
 | Others / Flintmere way | Competitive framing | `[ Others ]` / `[ The Flintmere way ]` column labels |
-| Pricing | Commercial | Tier prices as giant Geist numerals; `[ Growth ]`, `[ Scale ]`, `[ Agency ]`, `[ Enterprise ]` tier labels |
+| Pricing | Commercial | Tier prices as giant Geist numerals; `[ Growth ]`, `[ Scale ]`, `[ Agency ]`, `[ Plus ]` tier labels |
 | Manifesto ink-invert section | Brand anchor | "Catalogs built for the `[ agentic ]` web™." |
 | Footer | Chrome | — |
 

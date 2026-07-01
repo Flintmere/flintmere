@@ -57,7 +57,7 @@ Canonical definition of every metric Flintmere measures. One row per metric. New
 - Defined: 2026-04-19
 
 ### concierge_audits_paid_weekly
-- Definition: £97 concierge audits paid per week.
+- Definition: Concierge audits paid per week (band ladder per `audit-pricing.ts`).
 - Formula: `count(stripe_payments where product='concierge' and status='succeeded' and created_at in week)`
 - Source: Stripe export
 - Refresh: weekly
@@ -257,7 +257,7 @@ Canonical definition of every metric Flintmere measures. One row per metric. New
 - Source: BullMQ metrics export
 - Refresh: daily
 - Owner: #35 + #17 + #33
-- Target: ≥95% for Scale; ≥99% for Enterprise
+- Target: ≥95% for Scale; ≥99% for Plus
 - Defined: 2026-04-19
 
 ### mttr_p0_90d

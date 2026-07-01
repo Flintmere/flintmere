@@ -97,7 +97,7 @@ Single source of truth for vendor relationships. `vendor-review` reads this; `fi
 ## Payments
 
 ### Stripe
-- Service: Agency + Enterprise direct invoicing + £97 concierge audit one-offs
+- Service: Agency + Plus direct invoicing + Concierge audit band-ladder one-offs
 - Plan: standard
 - Monthly cost: per-transaction (~2.9% + 20p UK, international varies)
 - Lock-in level: **high** — customer IDs, subscription history, payment methods in Stripe

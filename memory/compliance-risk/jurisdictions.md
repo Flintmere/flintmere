@@ -18,7 +18,7 @@ Users (merchants + scanner leads) in these jurisdictions are material to traffic
 
 **OFAC-sanctioned jurisdictions** (US sanctions, HM Treasury sanctions). Users in scope of US or UK sanctions are not served. Includes (at time of writing) Cuba, Iran, North Korea, Syria, Crimea / specified regions of Ukraine, and other designated areas. List changes; source authoritatively from OFAC SDN list + HM Treasury consolidated list.
 
-**Our operational position:** we do not knowingly onboard or serve merchants in sanctioned jurisdictions. Shopify itself screens at store-creation time; Stripe screens at payment time (for Agency + Enterprise direct invoicing); Flintmere inherits these protections rather than running an independent AML scheme.
+**Our operational position:** we do not knowingly onboard or serve merchants in sanctioned jurisdictions. Shopify itself screens at store-creation time; Stripe screens at payment time (for Agency + Plus direct invoicing); Flintmere inherits these protections rather than running an independent AML scheme.
 
 ## Per-surface governing law
 
@@ -64,7 +64,7 @@ All merchant + lead rights flow through a single user-rights pipeline. We operat
 ## Sanctions screening
 
 - **Shopify-level** — Shopify screens stores at creation. We inherit this.
-- **Stripe-level** — Stripe Radar + OFAC lists screen at checkout for Agency + Enterprise direct invoicing.
+- **Stripe-level** — Stripe Radar + OFAC lists screen at checkout for Agency + Plus direct invoicing.
 - **We do not** run an AML scheme. Flintmere is not a VASP / CASP / money transmitter / financial service. Sanctions screening is a commercial-terms measure, not a regulatory AML obligation.
 
 ## When jurisdictional scope changes

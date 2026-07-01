@@ -43,7 +43,7 @@ If a claim isn't in this register, it either needs adding or it shouldn't be shi
 - "Bank-level security" / "Military-grade encryption" → reject. Meaningless marketing phrases with regulatory exposure.
 - "100% safe" / "100% secure" / "100% anything" → reject.
 - "Trusted by thousands" without evidence → reject.
-- "Free forever" as a blanket → reject. Use "Free scanner; paid tiers from £49/mo."
+- "Free forever" as a blanket → reject. Use "Free scanner; paid plans available." (Never cite a specific subscription price here — pricing is in transition; trace to `apps/scanner/src/lib/pricing.ts`.)
 - Any claim that implies GS1 affiliation → reject + disclaimer required.
 - Any claim implying outcomes about Shopify's own ranking / search surfaces → reject + #23 review.
 
@@ -100,7 +100,17 @@ If a claim isn't in this register, it either needs adding or it shouldn't be shi
 - **Classification:** commercial
 - **Last verified:** 2026-04-26 by `claim-review` post-pricing-restructure.
 - **Risk if wrong:** mismatched copy vs checkout → trust loss + ASA/FTC exposure on advertising. Pre-launch state means no grandfathering risk; first paid signup anchors prices.
-- **Status:** active. Stripe + Shopify Managed Pricing dashboard config to be updated by operator before first paid signup. Pricing restructure success metric: month-6 MRR ≥ 1.30× modeled-baseline at same paying-customer count (per requirements spec §3).
+- **Status:** retired (replaced by "Pricing — grandfathered ladder + WTP-pending forward ladder + band-ladder concierge" on 2026-06-19 — `pricing.ts` / `audit-pricing.ts` canon: Plus anchor lowered to "from £1,200 on enquiry" (ADR 0017); £97 flat concierge retired for the £197 / £397 / from-£597 band ladder (ADR 0022); Growth / Scale / Agency / Plus grandfathered — not promoted to new sign-ups, who land on the food vertical ladder per ADR 0016/0020). Original success metric retained: month-6 MRR ≥ 1.30× modeled-baseline at same paying-customer count (requirements spec §3).
+
+### Pricing — grandfathered ladder + WTP-pending forward ladder + band-ladder concierge (2026-06-19)
+
+- **Claim text:** Free £0. *Grandfathered — in-flight subscriptions only, not advertised to new sign-ups:* Growth £79/mo · Scale £249/mo · Agency £499/mo · Plus from £1,200/mo on enquiry (private beta, ADR 0017). *New sign-ups* land on the food vertical ladder (ADR 0016/0020) — magnitudes WTP-pending, rendered "Pricing finalising — May–June 2026", never advertised with a final price. *Concierge audit (one-off):* band ladder £197 (≤1,500 SKUs) / £397 (1,501–5,000) / from £597 bespoke (5,001+), ADR 0022.
+- **Surfaces:** pricing page `/pricing`, `/audit`, scanner CTA, Terms of Service, Privacy Policy, DPA, Support page, Shopify app upgrade flow (when shipped), Shopify Managed Pricing config (grandfathered Growth + Scale), Stripe product configuration.
+- **Source of truth:** `apps/scanner/src/lib/pricing.ts` (subscription ladder — forward magnitudes `null` while WTP-pending); `apps/scanner/src/lib/audit-pricing.ts` (concierge band ladder); ADRs 0016 / 0017 / 0020 / 0022; `BUSINESS.md` §pricing.
+- **Classification:** commercial
+- **Last verified:** 2026-06-19 by `claim-review` (pillar + pricing canon reconciliation).
+- **Risk if wrong:** mismatched copy vs checkout → trust loss + ASA/FTC exposure. Never advertise a forward food-ladder price as final while magnitudes are WTP-pending; never cite the retired Plus £1,500 floor or the £97 concierge flat price.
+- **Status:** active
 
 ### AI visibility uplift — "3–4× at 99%+ attribute completion"
 

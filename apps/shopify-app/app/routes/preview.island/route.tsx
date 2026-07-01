@@ -19,11 +19,12 @@ export const links: LinksFunction = () => [
 
 const PILLARS: Pillar[] = [
   { n: '01', name: 'Identifiers', score: 42, weight: '20%' },
-  { n: '02', name: 'Titles', score: 78, weight: '18%' },
-  { n: '03', name: 'Consistency', score: 61, weight: '16%' },
-  { n: '04', name: 'Schema', score: 84, weight: '16%' },
-  { n: '05', name: 'Attributes', score: 55, weight: '16%' },
-  { n: '06', name: 'Availability', score: 72, weight: '14%' },
+  { n: '02', name: 'Attributes', score: 55, weight: '20%' },
+  { n: '03', name: 'Titles', score: 78, weight: '15%' },
+  { n: '04', name: 'Mapping', score: 84, weight: '15%' },
+  { n: '05', name: 'Consistency', score: 61, weight: '15%' },
+  { n: '06', name: 'Checkout eligibility', score: 72, weight: '10%' },
+  { n: '07', name: 'Crawlability', score: 38, weight: '5%' },
 ];
 
 export default function PreviewIsland() {

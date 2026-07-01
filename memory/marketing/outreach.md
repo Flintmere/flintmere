@@ -70,7 +70,7 @@ Legal Council (#9, #23, #24) gates every outreach draft. **#24 veto** on anythin
 >
 > I'm Abu from Flintmere. We score Shopify catalogs for AI-agent readiness — the data agents like ChatGPT parse when they recommend products. It's the kind of audit that sits nicely under an agency retainer: merchants see a specific score improve over time, and you have a measurable artefact for QBRs.
 >
-> Agency tier (£399/mo, 25 client seats, white-label) might be worth a 15-minute look. Or I can just send you a scan of one of your client stores — no pitch, just data.
+> Agency tier (£499/mo, 25 client seats, white-label) might be worth a 15-minute look. Or I can just send you a scan of one of your client stores — no pitch, just data.
 >
 > Either way, reply and let me know. If this isn't relevant, reply "no thanks" and you won't hear from me again.
 >

@@ -118,7 +118,7 @@ flintmere/
 ### Payments
 
 - Shopify Managed Pricing / AppSubscription API. No custom Stripe flow at launch.
-- Stripe appears only for the £97 concierge audit landing page (separate surface, `apps/scanner` owns it).
+- Stripe appears only for the Concierge audit landing page (band ladder; separate surface, `apps/scanner` owns it).
 - **#30 Payment systems + #4 Security convened** on every billing change.
 
 ## Hard bans
