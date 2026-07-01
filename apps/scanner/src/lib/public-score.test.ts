@@ -17,4 +17,13 @@ describe('publishedScanQuery', () => {
     });
     expect(orderBy).toEqual({ completedAt: 'desc' });
   });
+
+  it('is domain-agnostic — callers own the empty/invalid-domain guard', () => {
+    // Every caller validates the segment before invoking this helper: the
+    // badge route, OG image, and score page all guard on a falsy domain and
+    // 404 / skip the query. The helper itself just threads the domain into
+    // normalisedDomain; an empty string yields a query that matches nothing,
+    // never a broadened gate.
+    expect(publishedScanQuery('').where.normalisedDomain).toBe('');
+  });
 });
