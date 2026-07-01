@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { prisma } from '@/lib/db';
 import { truncateDomain, validateDomainSegment } from '@/lib/badge-url';
+import { publishedScanQuery } from '@/lib/public-score';
 
 export const runtime = 'nodejs';
 
@@ -33,14 +34,7 @@ export async function GET(
 
   const scan = domain
     ? await prisma.scan.findFirst({
-        where: {
-          normalisedDomain: domain,
-          publishPublicPage: true,
-          status: 'complete',
-          score: { not: null },
-          grade: { not: null },
-        },
-        orderBy: { completedAt: 'desc' },
+        ...publishedScanQuery(domain),
         select: { score: true, grade: true },
       })
     : null;
