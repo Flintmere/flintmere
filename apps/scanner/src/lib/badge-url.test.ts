@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { badgeUrl, scoreUrl, validateDomainSegment } from './badge-url';
+import {
+  badgeUrl,
+  scoreUrl,
+  truncateDomain,
+  validateDomainSegment,
+} from './badge-url';
 
 describe('validateDomainSegment', () => {
   it.each([
@@ -52,5 +57,24 @@ describe('badgeUrl', () => {
     expect(badgeUrl('acme.myshopify.com')).toBe(
       'https://flintmere.com/badge/acme.myshopify.com',
     );
+  });
+});
+
+describe('truncateDomain', () => {
+  it('passes a typical domain through untouched', () => {
+    expect(truncateDomain('demo-foods.myshopify.com')).toBe(
+      'demo-foods.myshopify.com',
+    );
+  });
+
+  it('leaves a domain exactly at the 26-char cap untouched', () => {
+    const at = 'a'.repeat(26);
+    expect(truncateDomain(at)).toBe(at);
+  });
+
+  it('truncates an over-long domain to 26 chars with a trailing ellipsis', () => {
+    const out = truncateDomain('x'.repeat(40));
+    expect(out).toBe('x'.repeat(23) + '...');
+    expect(out).toHaveLength(26);
   });
 });

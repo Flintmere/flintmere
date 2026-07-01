@@ -29,3 +29,12 @@ export function scoreUrl(domain: string): string {
 export function badgeUrl(domain: string): string {
   return `https://flintmere.com/badge/${domain}`;
 }
+
+// Display-truncate a domain for the fixed-width 400x120 badge. Satori
+// (next/og) does not wrap or ellipsize, and the badge's domain line has room
+// for ~26 monospace chars before it overflows the canvas — so long custom
+// domains are trimmed with a trailing ellipsis. Typical *.myshopify.com
+// domains are well under the cap and pass through untouched.
+export function truncateDomain(domain: string, max = 26): string {
+  return domain.length > max ? domain.slice(0, max - 3) + '...' : domain;
+}
