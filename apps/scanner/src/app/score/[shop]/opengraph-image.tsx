@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { prisma } from '@/lib/db';
 import { validateDomainSegment } from '@/lib/badge-url';
+import { publishedScanQuery } from '@/lib/public-score';
 
 export const alt = 'Flintmere catalog data score';
 export const size = { width: 1200, height: 630 };
@@ -22,14 +23,7 @@ export default async function OG({
   const domain = validateDomainSegment(params.shop);
   const scan = domain
     ? await prisma.scan.findFirst({
-        where: {
-          normalisedDomain: domain,
-          publishPublicPage: true,
-          status: 'complete',
-          score: { not: null },
-          grade: { not: null },
-        },
-        orderBy: { completedAt: 'desc' },
+        ...publishedScanQuery(domain),
         select: { score: true, grade: true },
       })
     : null;

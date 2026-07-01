@@ -8,6 +8,7 @@ import {
   pillarLabelCustomerFacing,
 } from '@/lib/copy';
 import { badgeUrl, scoreUrl, validateDomainSegment } from '@/lib/badge-url';
+import { publishedScanQuery } from '@/lib/public-score';
 import type { CompositeScore, PillarId } from '@flintmere/scoring';
 import type { GmcGroundTruth } from '@/lib/gmc/types';
 import { GmcPanel } from '@/components/scan/GmcPanel';
@@ -30,14 +31,7 @@ interface PageProps {
 
 async function loadScore(shop: string) {
   const scan = await prisma.scan.findFirst({
-    where: {
-      normalisedDomain: shop,
-      publishPublicPage: true,
-      status: 'complete',
-      score: { not: null },
-      grade: { not: null },
-    },
-    orderBy: { completedAt: 'desc' },
+    ...publishedScanQuery(shop),
     select: {
       score: true,
       grade: true,
