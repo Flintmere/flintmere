@@ -2,7 +2,7 @@
 
 Standard operating procedures for billing actions that aren't (and shouldn't be) automated. Each SOP describes the trigger, the action, and the verification step. The operator runs these; no skill executes them.
 
-Flintmere has two billing surfaces: **Shopify Managed Pricing** (Growth + Scale, Shopify owns billing) and **Stripe direct** (Agency + Enterprise + £97 concierge).
+Flintmere has two billing surfaces: **Shopify Managed Pricing** (Growth + Scale, Shopify owns billing) and **Stripe direct** (Agency + Plus + the Concierge audit band ladder).
 
 ## SOP-01 — Process a refund within 30 days of first payment
 
@@ -24,7 +24,7 @@ Flintmere has two billing surfaces: **Shopify Managed Pricing** (Growth + Scale,
 - Shopify sends refund confirmation to merchant automatically.
 - Our app-side record (`shops.plan_tier`) updates on uninstall webhook; scoring data enters 30-day purge window.
 
-### Stripe-direct tiers (Agency + Enterprise)
+### Stripe-direct tiers (Agency + Plus)
 
 **Action (operator, in Stripe Dashboard)**:
 
@@ -36,15 +36,15 @@ Flintmere has two billing surfaces: **Shopify Managed Pricing** (Growth + Scale,
 **Verification**:
 
 - Stripe webhook `charge.refunded` fires → logged in `webhook_events` table.
-- If also cancelling: `customer.subscription.deleted` fires at period end → triggers seat-release (Agency) or Enterprise-specific cleanup.
+- If also cancelling: `customer.subscription.deleted` fires at period end → triggers seat-release (Agency) or Plus-specific cleanup.
 - Send acknowledgement email from `support@flintmere.com`. One-line personal reply, no template.
 
-### £97 concierge audit
+### Concierge audit (band ladder)
 
 **Action**:
 
 1. Stripe → Payments → find the one-off charge by email.
-2. Refund full £97.
+2. Refund the full audit amount (band-dependent — £197 / £397 / from £597 per `apps/scanner/src/lib/audit-pricing.ts`).
 3. If the audit hasn't been delivered: move the Calendly booking to cancelled, archive the draft.
 4. If the audit has been delivered but merchant unhappy: operator discretion — usually refund anyway per the guarantee posture.
 
@@ -67,7 +67,7 @@ Flintmere has two billing surfaces: **Shopify Managed Pricing** (Growth + Scale,
 **Setup (one-time, in Shopify Partner Dashboard)**:
 
 1. Partner Dashboard → App → Distribution → Managed Pricing.
-2. Configure Growth (£49), Scale (£149) as available plans.
+2. Configure Growth (£79), Scale (£249) as available plans (grandfathered — in-flight subscriptions only).
 3. Verify plan-switching UX in Shopify test store.
 4. Confirm our app handles `app/uninstalled` + plan-change webhooks.
 
@@ -95,7 +95,7 @@ Flintmere has two billing surfaces: **Shopify Managed Pricing** (Growth + Scale,
 2. Partner Dashboard → Installations → merchant → "Uninstall on behalf of merchant" (if Shopify permits; otherwise guide them to Shopify support).
 3. Our `app/uninstalled` webhook fires → tokens scrubbed in 60s.
 
-### Stripe-direct (Agency / Enterprise)
+### Stripe-direct (Agency / Plus)
 
 1. Verify identity (email match + Shopify store domain).
 2. Stripe → Customers → open → Subscriptions → Cancel → **"At end of billing period"** (default).
@@ -140,9 +140,9 @@ await cleanupAfterPlanChange(shopDomain, 'free');
 
 ---
 
-## SOP-05 — Apply concierge £97 audit
+## SOP-05 — Apply Concierge audit (band ladder)
 
-**When**: paid £97 concierge audit booking comes in via Stripe + Calendly.
+**When**: paid Concierge audit booking comes in via Stripe + Calendly (band ladder — £197 / £397 / from £597 per `audit-pricing.ts`).
 
 **Action**:
 
@@ -156,7 +156,7 @@ await cleanupAfterPlanChange(shopDomain, 'free');
 **Council**:
 
 - #22 Conversion: concierge is a conversion funnel into Growth/Scale. Follow-up matters.
-- #1 Editor-in-chief: report quality sets brand perception for enterprise prospects.
+- #1 Editor-in-chief: report quality sets brand perception for Plus prospects.
 
 ---
 

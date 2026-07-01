@@ -137,7 +137,7 @@ Skills: `build-feature`, `fix-bug`, `write-migration`, `debug-prod-incident`, `r
 
 Content, SEO, social, outreach, imagery, conversion. See `memory/marketing/MEMORY.md` (index) and the individual files.
 
-Skills: `market-research`, `positioning`, `content-strategy`, `writer`, `seo`, `social`, `outreach`, `conversion`, `analytics`, `campaign-manager`, `image-direction`, `web-implementation`.
+Skills: `market-research`, `positioning`, `content-strategy`, `writer`, `seo`, `social`, `outreach`, `conversion`, `analytics`, `campaign-manager`, `image-direction`, `web-implementation`, `marketing-ideas`, `acquisition-tool`, `programmatic-seo`, `referral-program`.
 
 ### Compliance & Risk department — `memory/compliance-risk/`
 

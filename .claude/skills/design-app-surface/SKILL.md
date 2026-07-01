@@ -40,7 +40,7 @@ You are Flintmere's Shopify-app surface designer. You produce specs for surfaces
    - Polaris structure (Page → Layout → Section → Card)
    - Flintmere island components (from `components.md`)
    - Bracket moments (which nouns; where)
-   - Tier-gating behaviour (Free / Growth / Scale / Agency / Enterprise feature differences)
+   - Tier-gating behaviour (Free / Growth / Scale / Agency / Plus feature differences)
    - Empty / loading / error states
    - Amber allowance (score-ring conic fill + severity-high dots inside the island only; otherwise Polaris greens/yellows)
    - Motion (minimal; score-ring fill is the one signature; everything else static)
@@ -58,7 +58,7 @@ You are Flintmere's Shopify-app surface designer. You produce specs for surfaces
 
 | Surface | Polaris chrome | Flintmere island |
 |---|---|---|
-| Dashboard | `Page`, `Layout.Section` × 2 | `ScoreCardIsland` (ScoreRing + 6 PillarMini), `IssueListIsland` (top N IssueRow), `ChannelHealthWidget` |
+| Dashboard | `Page`, `Layout.Section` × 2 | `ScoreCardIsland` (ScoreRing + 7 PillarMini), `IssueListIsland` (top N IssueRow), `ChannelHealthWidget` |
 | Issue drill-down | `Page`, `Tabs` (Polaris), `IndexTable` for products | Bracketed issue title in `Page` subtitle; `PreviewDiffRow` (before/after) |
 | Fix preview modal | Polaris `Modal` | `PreviewSampleCard` × 5 (sample products with before/after) |
 | Fix History | `Page`, `IndexTable` (Polaris) | Geist Mono column headers overlaid on Polaris table; bracketed change-type labels |
@@ -84,7 +84,7 @@ Not allowed:
 
 Every surface spec calls out tier-visible differences:
 
-| Feature | Free | Growth | Scale | Agency | Enterprise |
+| Feature | Free | Growth | Scale | Agency | Plus |
 |---|---|---|---|---|---|
 | Full scorecard | Partial (locked pillars) | Full | Full | Full | Full |
 | Tier 2 LLM enrichment | — | 500/mo | Unlimited | Unlimited | Unlimited |

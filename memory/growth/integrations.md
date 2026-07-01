@@ -8,7 +8,7 @@ Flintmere can be integrated **outbound** (partner embeds Flintmere scores / insi
 
 ### Outbound integration surfaces
 
-- **REST API** — `projects/flintmere/ARCHITECTURE.md` documents the canonical API (Agency + Enterprise tiers). Rate-limited; tier-appropriate.
+- **REST API** — `projects/flintmere/ARCHITECTURE.md` documents the canonical API (Agency + Plus tiers). Rate-limited; tier-appropriate.
 - **Shareable scorecards** — `flintmere.com/score/<shop-slug>` public badge widget for merchants to embed in their site footer.
 - **Webhooks** — partners can subscribe to score-drift events for their client merchants.
 - **White-label reports** — Agency tier: PDF + HTML reports with agency branding.
@@ -43,7 +43,7 @@ Flintmere can be integrated **outbound** (partner embeds Flintmere scores / insi
 
 ### Stripe
 - **Shape:** inbound payment infrastructure.
-- **Surface:** Agency + Enterprise direct invoicing + £97 concierge audit one-offs.
+- **Surface:** Agency + Plus direct invoicing + Concierge audit band-ladder one-offs.
 - **Agreement:** Stripe standard ToS.
 
 ### Resend

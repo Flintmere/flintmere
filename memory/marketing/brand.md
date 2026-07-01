@@ -63,8 +63,8 @@ Technical-confidence register. Not growth-hack register. Not academic register.
 ## Proof standards
 
 - **Pillar count**: 7 (Identifiers, Attributes, Titles, Mapping, Consistency, Checkout eligibility, Crawlability). Source: `https://flintmere.com/methodology` (2026-05-02) + `memory/canon-source-register.md` §A9. Never "multiple pillars" when the number is known; never paraphrase pillar names.
-- **Pricing**: in transition per ADR 0016 — grandfathered Growth £79 / Scale £249 / Agency £499; new sign-ups on the vertical ladder. Code canon: `apps/scanner/src/lib/pricing.ts` (subscriptions) + `apps/scanner/src/lib/audit-pricing.ts` (audit bands per ADR 0022). Never hardcode prices in copy without checking those two files.
-- **SKU bands**: Growth <500, Scale 500–5,000, Enterprise 10,000+. Source: `BUSINESS.md`.
+- **Pricing**: in transition per ADR 0016 — grandfathered Growth £79 / Scale £249 / Agency £499 / Plus from £1,200 on enquiry (private beta, ADR 0017); new sign-ups on the food vertical ladder (magnitudes WTP-pending). Code canon: `apps/scanner/src/lib/pricing.ts` (subscriptions) + `apps/scanner/src/lib/audit-pricing.ts` (audit bands per ADR 0022). Never hardcode prices in copy without checking those two files.
+- **SKU bands**: Growth <500, Scale 500–5,000, Plus 10,000+. Source: `BUSINESS.md`.
 - **Agency seats**: 25. Source: `BUSINESS.md`.
 - **AI uplift numbers**: 15× YoY / 40% invisible / 5.6M stores / 3–4× at 99% attr completion. Source: `SPEC.md` Appendix A. Cite the year (2025). Never "at least" without anchor.
 - **Fix reversibility**: 7 days. Source: `SPEC.md` §5.1.

@@ -4,7 +4,7 @@ Entry-point doc. Every skill reads this on tasks that need repo layout, stack, e
 
 ## TL;DR
 
-**Flintmere is a Shopify app that scores product catalogs for AI-agent readiness and fixes what's broken.** Built for Shopify merchants (£500K–£20M revenue, 100–5,000 SKUs) and the agencies that serve them. Free public scanner at `audit.flintmere.com`, paid app from £49/month. Full business case in `BUSINESS.md` and `SPEC.md`.
+**Flintmere is a Shopify app that scores product catalogs for AI-agent readiness and fixes what's broken.** Built for Shopify merchants (£500K–£20M revenue, 100–5,000 SKUs) and the agencies that serve them. Free public scanner at `audit.flintmere.com`; paid app subscriptions in transition (ADR 0016 — grandfathered ladder + WTP-pending forward tiers; never cite a fixed figure, trace to `apps/scanner/src/lib/pricing.ts`). Full business case in `BUSINESS.md` and `SPEC.md`.
 
 ## Stack
 
@@ -16,7 +16,7 @@ Entry-point doc. Every skill reads this on tasks that need repo layout, stack, e
 - **Queue:** BullMQ on Redis
 - **LLM:** Gemini 2.5 Flash (primary bulk) + Gemini 2.5 Pro (hard cases) via Vertex AI EU; GPT-4o-mini on Azure OpenAI EU as fallback. See `decisions/0005-llm-provider-strategy.md` + `0006-hardcase-llm-lock-gemini-pro.md`.
 - **Hosting:** Coolify on DigitalOcean droplet. See `decisions/0002-coolify-on-do.md`.
-- **Payments:** Shopify Managed Pricing for Growth + Scale tiers; Stripe direct for Agency + Enterprise + £97 concierge audit.
+- **Payments:** Shopify Managed Pricing for Growth + Scale tiers; Stripe direct for Agency + Plus + the Concierge audit band ladder.
 - **Auth (app only):** Shopify OAuth via the official Remix helper. Access tokens encrypted at rest.
 - **Email:** Resend (scanner full-report delivery, app alerts).
 - **Error tracking:** Sentry.

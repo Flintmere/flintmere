@@ -57,7 +57,7 @@ Don't ship anything that breaks free-tier, bypasses consent, exposes secrets, or
 
 ## Billing
 
-- Do not charge a merchant without a valid Shopify Managed Pricing subscription or signed Stripe invoice (Agency + Enterprise).
+- Do not charge a merchant without a valid Shopify Managed Pricing subscription or signed Stripe invoice (Agency + Plus).
 - Do not extend the 30-day no-questions refund window beyond 30 days without operator sign-off.
 - Do not hide pricing, tier limits, or the GS1-fee-separation disclaimer from the public pricing page.
 - Do not surprise-upgrade a merchant. Tier changes are merchant-initiated.

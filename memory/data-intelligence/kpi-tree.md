@@ -13,7 +13,7 @@ North-star
 
 ## North-star
 
-**Paying merchant count (PMC)** — count of Shopify shops with an active paid subscription (Growth + Scale + Agency seats + Enterprise) at snapshot.
+**Paying merchant count (PMC)** — count of Shopify shops with an active paid subscription (Growth + Scale + Agency seats + Plus) at snapshot.
 
 - **Why**: Flintmere's core thesis is that merchants will pay for catalog readiness. PMC is the closest proxy to "we have a product people pay for." Revenue variants (MRR) are derivatives of PMC + tier mix; retention is a derivative of PMC over time. PMC is the cleanest single indicator of product-market fit at this stage.
 - **Owner**: #35 Product analyst + #11 Investor voice.
@@ -77,7 +77,7 @@ North-star
 |---|---|---|
 | `scan_success_rate_24h` | Scanner reliability; droplet CPU variability signal | #35 + #34 |
 | `webhook_delivery_success_rate` | Shopify deregisters slow webhooks — protecting platform relationship | #35 + #33 + #4 |
-| `bulk_sync_sla_adherence` | SLA compliance per tier; Scale + Enterprise promises | #35 + #17 + #33 |
+| `bulk_sync_sla_adherence` | SLA compliance per tier; Scale + Plus promises | #35 + #17 + #33 |
 | `mttr_p0_90d` | On-call / runbook quality | #35 + #10 |
 
 ### Channel Health (measured-impact layer — SPEC §11.2)
@@ -95,7 +95,7 @@ These exist so we notice when something breaks. They are not optimisation target
 - **Growth tier churn** → alert when >8% in any 30-day window.
 - **Agency tier churn** → alert when >5% in any 30-day window.
 - **Webhook HMAC verification failure rate** → alert on any spike (>3/hr).
-- **Bulk sync SLA miss rate** → alert when >5% in 7 days (Scale) or any miss in 7 days (Enterprise).
+- **Bulk sync SLA miss rate** → alert when >5% in 7 days (Scale) or any miss in 7 days (Plus).
 - **LLM spend / active merchant ratio** → alert when >£4 per merchant per month sustained (suggests prompt bloat or rate-limit escape).
 - **Cookie-consent rejection rate** → observe; never optimise. Any proposal to "improve" it is a P0 — escalate to #24.
 

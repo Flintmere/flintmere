@@ -12,7 +12,7 @@ External platform policy constraints. These rules belong to the platforms we dep
 | **Shopify Partner Program** | Our commercial relationship with Shopify | Revenue share (0% first $1M, then 15%), incident reporting, GDPR webhook mandatory set |
 | **Google Cloud / Vertex AI** | Primary LLM provider | Acceptable Use Policy, content policies on prompt inputs/outputs, data processing terms |
 | **Azure OpenAI** | Fallback LLM provider | Content filtering posture, responsible AI requirements, region pinning obligations |
-| **Stripe** | Agency + Enterprise direct invoicing + £97 concierge audit | Restricted Businesses list, Terms of Service |
+| **Stripe** | Agency + Plus direct invoicing + Concierge audit band ladder | Restricted Businesses list, Terms of Service |
 | **Google Ads** | Possible paid acquisition (not day-one) | B2B SaaS advertising policies, editorial quality |
 | **LinkedIn Ads** | Possible B2B acquisition channel | Professional content standards |
 | **DigitalOcean + Coolify** | Hosting | AUP — prohibited content, abuse handling, uptime terms |

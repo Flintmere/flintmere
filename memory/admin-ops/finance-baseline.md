@@ -12,7 +12,7 @@ Pointers and formulae for Flintmere finance. Actual numbers live in operator-mai
 | Burn rate | Computed: rolling 3-month average of (vendor spend + people cost + other) | Monthly |
 | Vendor spend | `vendor-register.md` monthly costs + invoices in `context/admin-ops/finance/invoices/` | Monthly |
 | Shopify Managed Pricing revenue share | Shopify Partner Dashboard export | Weekly |
-| Stripe Agency + Enterprise + concierge revenue | Stripe export in `context/data-intelligence/stripe/` | Weekly |
+| Stripe Agency + Plus + concierge revenue | Stripe export in `context/data-intelligence/stripe/` | Weekly |
 | LLM spend (Vertex AI + Azure) | Google Cloud Billing export + Azure cost export | Weekly |
 
 `finance-snapshot` does not derive any of these independently. If a number is needed but no canonical source exists, escalate to operator + #35 to define it (route through `define-metric` if it's a metric).
@@ -22,7 +22,7 @@ Pointers and formulae for Flintmere finance. Actual numbers live in operator-mai
 Flintmere has two revenue streams that feed MRR differently:
 
 1. **Shopify Managed Pricing** (Growth + Scale) — Shopify handles billing. We get 85% of gross after $1M lifetime; 100% before. Settlement via Shopify's regular payout schedule.
-2. **Stripe direct invoicing** (Agency + Enterprise + £97 concierge one-offs) — we bill directly. Standard Stripe 2.9% + 20p UK (varies internationally).
+2. **Stripe direct invoicing** (Agency + Plus + Concierge audit band-ladder one-offs) — we bill directly. Standard Stripe 2.9% + 20p UK (varies internationally).
 
 ### Shopify revenue share — tracking
 
@@ -66,7 +66,7 @@ Notes:
 3. **Revenue** — MRR, ARR, NRR latest closed quarter, trend. Split by Shopify Managed Pricing vs Stripe direct.
 4. **Spend** — vendor spend by category (hosting, LLM, email, monitoring), payment processor fees, people cost, other.
 5. **LLM-specific** — spend per merchant (Vertex AI + Azure fallback), trend vs active merchant count.
-6. **Pipeline** — Enterprise deals in flight, Agency-tier prospects with high likelihood.
+6. **Pipeline** — Plus deals in flight, Agency-tier prospects with high likelihood.
 7. **Movements** — what changed since prior snapshot.
 8. **Watchlist** — vendors approaching renewal, contracts up for negotiation, runway dipping below threshold, LLM spend anomalies.
 9. **Action items** — operator decisions needed.
@@ -82,7 +82,7 @@ Notes:
 - All revenue numbers aggregated. No merchant named in a snapshot.
 - Vendor cost aggregated by vendor, not by invoice line.
 - LLM spend aggregated; never per-merchant cost in a shared snapshot.
-- If a notable merchant must be referenced (Enterprise pilot, Agency showcase), anonymise ("an Enterprise pilot in beauty") unless explicit authorisation to name.
+- If a notable merchant must be referenced (Plus pilot, Agency showcase), anonymise ("a Plus pilot in beauty") unless explicit authorisation to name.
 
 ## Watchlist thresholds
 
@@ -97,7 +97,7 @@ Notes:
 ## Anti-patterns
 
 - Reporting MRR as ARR / 12 when ARR was derived from MRR (circular).
-- Counting Enterprise pipeline as booked revenue.
+- Counting Plus pipeline as booked revenue.
 - Reporting net burn without gross burn alongside.
 - Single-month spike treated as the new burn rate.
 - Snapshot that doesn't end with a list of operator decisions.
