@@ -186,7 +186,7 @@ The line-art-only imagery mandate is **retired** (carried over from AllowanceGua
 
 ### Sourcing
 
-- **Photoreal**: Adobe Stock (operator licence) is the default. No Unsplash free tier (over-used by every SaaS). No AI-generated imagery on marketing surfaces — trust-risk on a security-adjacent product.
+- **Photoreal**: Adobe Stock (operator licence) is the default. No Unsplash free tier (over-used by every SaaS). AI-generated imagery is banned **by default** on marketing surfaces (trust-risk on a security-adjacent product) — permitted only under an explicit, logged per-surface operator override (see §AI imagery — per-surface override, below, and `memory/project_runware_image_workflow.md`).
 - **Screenshots**: real Shopify admin captures (anonymised — no real merchant names without permission) or Figma mocks rendered to PNG.
 - **Identifiable humans**: prohibited until model releases secured. Objects, environments, product surfaces, hands-only shots are fine.
 
@@ -217,7 +217,7 @@ Every photoreal moment **must** carry the bracket signature within the same view
 
 - **Stock-photo SaaS tropes** — the genre includes: team-in-glass-office, abstract-handshake-over-contract, hands-typing-laptop-with-blurred-phone, three-monitor-golden-hour-desk, dashboard-mocked-onto-MacBook-on-white-desk, hex-grid-with-neon-data-flow, skyline-with-network-node-overlay, finger-touching-glowing-AR-icon, robot-hand-meets-human-hand, sticky-note-wall-as-agility-signal, coffee-cup-laptop-plant-flat-lay, server-room-with-blue-LED-glow, headshot-grid-of-fake-testimonials, post-purchase-shopper-with-paper-bag-smiling, box-on-doorstep-with-cute-dog. If an Adobe Stock candidate fits any of these descriptions, reject without further review. Pattern saturation across SaaS marketing makes them invisible.
 - **Emojis as decoration** — anywhere. UI labels, headings, status indicators, marketing copy, social posts, blog headers, error states, button labels. Zero exceptions. Abstract typographic dots (`●`, `◆`, `▸`) are not emojis and remain permitted per existing token rules.
-- **AI-generated imagery on marketing surfaces** — photoreal, gradient, illustrative, all banned. Trust-risk on a security-adjacent product; pattern-stale within months of model release; defensibility-zero in a copyright dispute.
+- **AI-generated imagery on marketing surfaces** — banned **by default** (trust-risk on a security-adjacent product; pattern-stale within months of model release; defensibility-zero in a copyright dispute). This is the **one** banned-imagery rule with a governed exception path — see §AI imagery — per-surface override below. The other bans in this list have no exceptions.
 - **Decorative imagery without product purpose** — if a section can lose its image without losing comprehension, the image was decoration, not proof. Type carries the moment instead.
 - **Autoplay video** — banned in §Motion §Bans, repeated here for sourcing clarity.
 
@@ -226,6 +226,16 @@ If an image is challenged at review and cannot answer "what specific product tru
 ### Migration note
 
 Pre-2026-04-26 surfaces shipped under the line-art-only mandate. They remain valid — line-art is now one option, not the only one. New surfaces designed after this date may use any of the three modes per the rotation rule. No retroactive purge required.
+
+### AI imagery — per-surface override (2026-06-13 correction)
+
+The default is no AI-generated imagery (above). But the absolute "no exceptions" reading was **drift** — AI imagery has shipped on a marketing surface since 2026-04-30 under an undocumented operator override, while this file still read as a blanket ban. Corrected:
+
+**AI-generated imagery ships only under an explicit, logged per-surface operator override.** The governance ledger + the canonical Runware editorial-still-life template + anti-prompt live in **`memory/project_runware_image_workflow.md`** (reconstructed 2026-06-13 — it was referenced by shipping code but never written, which is what caused the drift).
+
+- **Trust-critical surfaces never override** — data-access, auth, payment, and the audit deliverable stay type-only. (`/audit/connect` rejected the override 2026-05-06: *"type only, we stick to it."*)
+- **Overrides live to date:** `/research` vertical cards (Flux Dev editorial still-lifes, 2026-04-30); Instagram carousels via the `maters` engine (2026-06-13).
+- **Bans that persist under any override:** no faces/people, no SaaS-stock tropes, no readable text/logos, no AI-stylized/illustration look (must read photoreal-editorial), and the bracket co-occurrence rule still binds.
 
 ## Decoration earns its keep when beautiful (ratified 2026-04-28)
 
