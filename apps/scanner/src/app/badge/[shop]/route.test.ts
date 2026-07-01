@@ -69,6 +69,11 @@ describe('badge [shop] route', () => {
 
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toBe('image/png');
-    expect(res.headers.get('cache-control')).toContain('max-age=3600');
+    const cacheControl = res.headers.get('cache-control');
+    expect(cacheControl).toContain('max-age=300');
+    // No long stale-while-revalidate: a revoked badge must not linger in
+    // caches for hours after consent withdrawal (#24).
+    expect(cacheControl).toContain('stale-while-revalidate=0');
+    expect(cacheControl).not.toContain('86400');
   });
 });

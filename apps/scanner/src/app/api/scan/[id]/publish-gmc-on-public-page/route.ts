@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { checkScanActionRateLimit } from '@/lib/rate-limit';
+import { revalidatePublicScore } from '@/lib/public-score';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -137,6 +138,11 @@ export async function POST(
     },
   });
 
+  // The GMC panel renders on the public score page + OG image, so purge
+  // both now — the added panel shows on the next request, not after the
+  // 1h ISR window (#24).
+  revalidatePublicScore(scan.normalisedDomain);
+
   return NextResponse.json({
     ok: true,
     alreadyPublished: false,
@@ -161,7 +167,7 @@ export async function DELETE(
 
   const scan = await prisma.scan.findUnique({
     where: { id },
-    select: { id: true, publishGmcOnPublicPage: true },
+    select: { id: true, publishGmcOnPublicPage: true, normalisedDomain: true },
   });
 
   if (!scan) {
@@ -182,6 +188,10 @@ export async function DELETE(
       publishGmcOnPublicPageAt: null,
     },
   });
+
+  // Purge the score page + OG image so the GMC panel disappears on the next
+  // request, not after the 1h ISR window (#24).
+  revalidatePublicScore(scan.normalisedDomain);
 
   return NextResponse.json({ ok: true, alreadyOff: false });
 }
