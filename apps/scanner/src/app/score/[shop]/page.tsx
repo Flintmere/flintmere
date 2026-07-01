@@ -7,7 +7,7 @@ import {
   pillarExplanationCustomerFacing,
   pillarLabelCustomerFacing,
 } from '@/lib/copy';
-import { scoreUrl, validateDomainSegment } from '@/lib/badge-url';
+import { badgeUrl, scoreUrl, validateDomainSegment } from '@/lib/badge-url';
 import type { CompositeScore, PillarId } from '@flintmere/scoring';
 import type { GmcGroundTruth } from '@/lib/gmc/types';
 import { GmcPanel } from '@/components/scan/GmcPanel';
@@ -114,6 +114,13 @@ export default async function ScorePage({ params }: PageProps) {
       : null;
 
   const scannedOn = formatScanned(scan.completedAt);
+
+  const badgeAlt = `Flintmere catalog data score: ${scan.score}/100, grade ${scan.grade} — ${domain}`;
+  const embedSnippet = `<a href="${scoreUrl(domain)}">
+  <img src="${badgeUrl(domain)}"
+       alt="${badgeAlt}"
+       width="400" height="120">
+</a>`;
 
   return (
     <main id="main" className="flintmere-main">
@@ -229,6 +236,49 @@ export default async function ScorePage({ params }: PageProps) {
           </ol>
         </section>
       ) : null}
+
+      <section
+        aria-label="Embed this badge"
+        className="bg-[color:var(--color-paper-2)] border-t border-[color:var(--color-line)]"
+      >
+        <div className="mx-auto max-w-[1280px] px-8 py-24">
+          <p className="eyebrow mb-6">Embed this badge</p>
+          <h2 className="max-w-[22ch] mb-10">
+            Show your <Bracket>score</Bracket> on your own site.
+          </h2>
+          <div className="grid md:grid-cols-[auto_1fr] gap-10 items-start">
+            {/* eslint-disable-next-line @next/next/no-img-element -- shows the raster PNG badge exactly as an external site embeds it; next/image would proxy + rewrite the canonical URL */}
+            <img
+              src={`/badge/${domain}`}
+              alt={badgeAlt}
+              width={400}
+              height={120}
+              className="border border-[color:var(--color-line)]"
+              style={{ maxWidth: '100%', height: 'auto' }}
+            />
+            <div>
+              <p
+                className="text-[color:var(--color-mute)] mb-4 max-w-[52ch]"
+                style={{ fontSize: 15, lineHeight: 1.5 }}
+              >
+                Paste this where you show your trust marks. It reflects your
+                latest published scan.
+              </p>
+              <pre
+                tabIndex={0}
+                className="overflow-x-auto border border-[color:var(--color-line)] bg-[color:var(--color-paper)] p-5 m-0"
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 13,
+                  lineHeight: 1.6,
+                }}
+              >
+                <code>{embedSnippet}</code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-12 border-t border-[color:var(--color-line)]">
         <p
