@@ -57,6 +57,11 @@ export function ConciergeBands() {
           deliverable + offer detail on the{' '}
           <Link
             href="/audit#checkout"
+            // Cross-host (marketing → audit.flintmere.com): Next prefetches this
+            // relative Link, middleware 301s it cross-origin, and the CORS-mode
+            // RSC fetch can't follow → "Failed to fetch RSC payload" console noise.
+            // Suppress the doomed prefetch; the click still full-navigates.
+            prefetch={false}
             className="underline"
             style={{ textDecorationColor: 'var(--color-accent)', textUnderlineOffset: 4 }}
           >

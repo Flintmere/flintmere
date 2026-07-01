@@ -164,6 +164,11 @@ export function FounderStrip() {
           <div className="mt-9 lg:mt-[clamp(40px,5vw,72px)]">
             <Link
               href="/audit#checkout"
+              // Cross-host (marketing → audit.flintmere.com): Next prefetches this
+              // relative Link, middleware 301s it cross-origin, and the CORS-mode
+              // RSC fetch can't follow → "Failed to fetch RSC payload" console noise.
+              // Suppress the doomed prefetch; the click still full-navigates.
+              prefetch={false}
               className="inline-flex items-center gap-3 px-7 py-3.5 border border-[color:var(--color-paper-on-ink)] text-[color:var(--color-paper-on-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper-on-ink)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)] ease-[cubic-bezier(0.4,0,0.2,1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
             >
               Book the concierge audit (from £197)
