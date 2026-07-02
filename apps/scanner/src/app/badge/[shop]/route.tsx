@@ -153,8 +153,13 @@ export async function GET(
     {
       ...SIZE,
       headers: {
-        'Cache-Control':
-          'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
+        // Short TTL, no stale-serve: the badge is a manual-Cache-Control
+        // route handler that revalidatePath cannot purge, so the header is
+        // the only lever on consent withdrawal. The prior 24h
+        // stale-while-revalidate let a revoked (score-revealing) badge live
+        // in caches for a day; max-age=300 + swr=0 keeps worst-case
+        // staleness to ~5 min, well inside the consent-withdrawal SLA (#24).
+        'Cache-Control': 'public, max-age=300, s-maxage=300, stale-while-revalidate=0',
       },
       fonts: [
         { name: 'Geist', data: geistMedium, weight: 500, style: 'normal' },

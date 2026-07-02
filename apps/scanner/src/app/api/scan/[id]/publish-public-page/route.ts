@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { checkScanActionRateLimit } from '@/lib/rate-limit';
+import { revalidatePublicScore } from '@/lib/public-score';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -101,6 +102,10 @@ export async function POST(
     },
   });
 
+  // Regenerate the public score page + OG image now so the newly-published
+  // score appears on the next request instead of a cold ISR miss (#24).
+  revalidatePublicScore(scan.normalisedDomain);
+
   return NextResponse.json({
     ok: true,
     alreadyPublished: false,
@@ -125,7 +130,7 @@ export async function DELETE(
 
   const scan = await prisma.scan.findUnique({
     where: { id },
-    select: { id: true, publishPublicPage: true },
+    select: { id: true, publishPublicPage: true, normalisedDomain: true },
   });
 
   if (!scan) {
@@ -146,6 +151,11 @@ export async function DELETE(
       publicPageAt: null,
     },
   });
+
+  // Purge the cached score page + OG image immediately so the merchant's
+  // score stops being served on the next request, not after the 1h ISR
+  // window (#24 — consent withdrawal without undue delay).
+  revalidatePublicScore(scan.normalisedDomain);
 
   return NextResponse.json({ ok: true, alreadyOff: false });
 }
