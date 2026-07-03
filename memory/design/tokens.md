@@ -113,7 +113,7 @@ Every Flintmere surface carries at least one moment where a key word is set insi
 ### Examples across surfaces
 
 ```
-Marketing hero    Your product catalog is [ invisible ] to ChatGPT.
+Marketing hero    ChatGPT lists every rival. Yours ranks [ last ].
 
 Marketing pillars [ 01 ] Identifier completeness
                   [ 02 ] Attribute completeness

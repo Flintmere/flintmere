@@ -10,7 +10,7 @@ Four primary segments. Each row is a writable prompt: what they feel, what they 
 - **Desired outcome**: run a free scan, see a score, understand the top three issues, install the app if it looks legit, apply safe fixes with preview + revert.
 - **Register**: plain English. Define terms first time (metafield, GTIN, Catalog Mapping). Show, don't tell. Screenshot-heavy in marketing.
 - **Channels**: Google ("AI shopping Shopify", "ChatGPT Shopify visibility"), Reddit (r/shopify, r/ecommerce), Shopify Community forum, Twitter (Shopify dev relations).
-- **Headline hook**: `Your product catalog is [ invisible ] to ChatGPT.`
+- **Headline hook**: `ChatGPT lists every rival. Yours ranks [ last ].`
 
 ## 2. Mid-market Shopify merchant (500–5,000 SKUs, £2M–£20M revenue)
 
