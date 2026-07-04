@@ -132,6 +132,7 @@ async function snapshotOutreach(now: Date): Promise<OutreachSnapshot> {
 
 async function snapshotSocial(now: Date): Promise<SocialSnapshot> {
   const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
   const week = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
   const [posted, queued, failed, newest] = await Promise.all([
     prisma.socialPost.findMany({
@@ -144,7 +145,12 @@ async function snapshotSocial(now: Date): Promise<SocialSnapshot> {
       select: { body: true, scheduledAt: true },
     }),
     prisma.socialPost.findMany({
-      where: { status: 'failed' },
+      // Failures are terminal (never auto-retried), so only nag while the
+      // failure is fresh: a post that failed >48h ago has already appeared
+      // in two briefs. Listing it forever buries the actionable items and
+      // trains the operator to skip the email (June 2026: 11 CreditsDepleted
+      // rows nagged 21 consecutive briefs into wallpaper).
+      where: { status: 'failed', scheduledAt: { gte: twoDaysAgo } },
       select: { body: true, errorMessage: true },
     }),
     prisma.socialPost.findFirst({ orderBy: { createdAt: 'desc' }, select: { createdAt: true } }),
