@@ -9,6 +9,7 @@
 
 import { z } from 'zod';
 import { prisma } from '../db';
+import { isPng } from './png';
 
 /**
  * Minimum scheduling lead for agent-queued posts (route-enforced, not
@@ -29,6 +30,26 @@ export function findBannedPhrase(body: string): string | null {
   const lower = body.toLowerCase();
   return BANNED_PHRASES.find((b) => lower.includes(b)) ?? null;
 }
+
+/** X and Bluesky both cap a post at 4 images. */
+export const MAX_SLIDES = 4;
+
+/**
+ * Per-slide decoded ceiling. Bluesky's app.bsky.embed.images blob limit
+ * (1,000,000 bytes) binds — X allows 5MB — and one cap keeps a cross-posted
+ * slide valid on both channels. Oversize renders are a Maters-side export
+ * concern (recompress there); the queue refuses them loudly at intake.
+ */
+export const MAX_SLIDE_BYTES = 950_000;
+
+/** Base64 expansion of MAX_SLIDE_BYTES (×4/3) plus slack — bounds decode cost. */
+const MAX_SLIDE_BASE64_CHARS = 1_300_000;
+
+const slideSchema = z.object({
+  imageBase64: z.string().min(1).max(MAX_SLIDE_BASE64_CHARS),
+  // Alt per slide is an accessibility floor (Noor #8): required, never empty.
+  alt: z.string().min(1).max(1000),
+});
 
 const postSchema = z.object({
   body: z
@@ -54,6 +75,26 @@ const postSchema = z.object({
   // (resolved in queuePosts), set explicitly to pin one. The 280 cap is the
   // binding length limit for both (Bluesky allows 300).
   channel: z.enum(['x', 'bluesky']).optional(),
+  // The carousel IS the post: 1–4 ordered Maters slides, array index =
+  // display order on both channels. Omit for a text-only post.
+  images: z.array(slideSchema).min(1).max(MAX_SLIDES).optional(),
+}).superRefine((post, ctx) => {
+  for (const [i, slide] of (post.images ?? []).entries()) {
+    const bytes = Buffer.from(slide.imageBase64, 'base64');
+    if (!isPng(bytes)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['images', i, 'imageBase64'],
+        message: 'slide is not a PNG',
+      });
+    } else if (bytes.byteLength > MAX_SLIDE_BYTES) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['images', i, 'imageBase64'],
+        message: `slide exceeds ${MAX_SLIDE_BYTES} decoded bytes (Bluesky blob limit binds) — recompress the Maters export`,
+      });
+    }
+  }
 });
 
 export const queuePostsSchema = z.array(postSchema).min(1).max(10);
@@ -70,6 +111,10 @@ export interface QueuePostsPrisma {
         altText: string | null;
         utmCampaign: string;
         scheduledAt: Date;
+        // Buffer, not Uint8Array: this Prisma version's Bytes input is Buffer[]
+        // (queuePosts decodes with Buffer.from, so this is what we build anyway).
+        images: Buffer[];
+        imageAlts: string[];
       }>;
     }): Promise<{ count: number }>;
   };
@@ -90,12 +135,18 @@ export async function queuePosts(
   const { count } = await client.socialPost.createMany({
     data: posts.flatMap((p) => {
       const channels = p.channel ? [p.channel] : CROSSPOST_CHANNELS;
+      // Cross-posted rows each carry the full slide set — megabytes/week at
+      // our cadence, and the DB is the one store that survives redeploys.
+      const images = (p.images ?? []).map((s) => Buffer.from(s.imageBase64, 'base64'));
+      const imageAlts = (p.images ?? []).map((s) => s.alt);
       return channels.map((channel) => ({
         channel,
         body: p.body,
         altText: p.altText ?? null,
         utmCampaign: p.utmCampaign,
         scheduledAt: new Date(p.scheduledAt),
+        images,
+        imageAlts,
       }));
     }),
   });

@@ -442,9 +442,9 @@ model AuditDraft {
 /// the daily brief flags them and the weekly agent re-queues or rewrites.
 model SocialPost {
   id           String    @id @default(cuid())
-  channel      String    // 'x' only for now
+  channel      String    // 'x' | 'bluesky'
   body         String    @db.Text
-  altText      String?   @map("alt_text") @db.Text
+  altText      String?   @map("alt_text") @db.Text // deprecated — per-slide alts in imageAlts; publishing never reads this
   utmCampaign  String    @map("utm_campaign")
   status       String    @default("queued")
   scheduledAt  DateTime  @map("scheduled_at")
@@ -452,6 +452,11 @@ model SocialPost {
   externalId   String?   @map("external_id")
   errorMessage String?   @map("error_message") @db.Text
   createdAt    DateTime  @default(now()) @map("created_at")
+  // Ordered Maters slides (array index = display order) + alt per slide.
+  // Lengths kept equal and ≤4 by a DB CHECK constraint (Prisma can't express it)
+  // and by intake validation in lib/social/queue-posts.
+  images       Bytes[]   @default([])
+  imageAlts    String[]  @default([]) @map("image_alts")
 
   @@index([status, scheduledAt])
   @@map("scanner_social_posts")

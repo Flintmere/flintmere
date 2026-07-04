@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest';
-import { runSocialPostBatch, type SocialQueuePrisma, type Poster } from './queue';
+import { describe, it, expect, vi } from 'vitest';
+import { runSocialPostBatch, type SocialQueuePrisma, type Poster, type PostImage } from './queue';
 
 interface Row {
   id: string; channel: string; body: string; status: string;
   scheduledAt: Date; postedAt: Date | null; externalId: string | null; errorMessage: string | null;
+  images: Uint8Array[]; imageAlts: string[];
 }
 
 function makeFakePrisma(rows: Row[]): SocialQueuePrisma {
@@ -31,7 +32,7 @@ function makeFakePrisma(rows: Row[]): SocialQueuePrisma {
 const NOW = new Date('2026-06-10T10:00:00Z');
 
 function row(id: string, scheduledAt: Date, status = 'queued', channel = 'x'): Row {
-  return { id, channel, body: `post ${id}`, status, scheduledAt, postedAt: null, externalId: null, errorMessage: null };
+  return { id, channel, body: `post ${id}`, status, scheduledAt, postedAt: null, externalId: null, errorMessage: null, images: [], imageAlts: [] };
 }
 
 describe('runSocialPostBatch', () => {
@@ -89,5 +90,39 @@ describe('runSocialPostBatch', () => {
   it('does nothing when queue is empty', async () => {
     const result = await runSocialPostBatch(makeFakePrisma([]), async () => ({ ok: true, id: 'x' }), NOW);
     expect(result).toEqual({ attempted: 0, posted: 0, failed: 0 });
+  });
+
+  it('passes the ordered slide set with alts to the poster', async () => {
+    const rows = [
+      {
+        ...row('a', new Date('2026-06-09T09:00:00Z')),
+        images: [new Uint8Array([1]), new Uint8Array([2])],
+        imageAlts: ['first', 'second'],
+      },
+    ];
+    const seen: PostImage[][] = [];
+    const poster: Poster = async (_channel, _text, images) => {
+      seen.push(images);
+      return { ok: true, id: 'x-1' };
+    };
+    const result = await runSocialPostBatch(makeFakePrisma(rows), poster, NOW);
+    expect(result).toEqual({ attempted: 1, posted: 1, failed: 0 });
+    expect(seen[0]).toEqual([
+      { bytes: new Uint8Array([1]), alt: 'first' },
+      { bytes: new Uint8Array([2]), alt: 'second' },
+    ]);
+    expect(rows[0]!.status).toBe('posted');
+  });
+
+  it('fails a slide/alt mismatch row without posting it', async () => {
+    const rows = [
+      { ...row('a', new Date('2026-06-09T09:00:00Z')), images: [new Uint8Array([1])], imageAlts: [] },
+    ];
+    const poster = vi.fn(async () => ({ ok: true as const, id: 'x-1' }));
+    const result = await runSocialPostBatch(makeFakePrisma(rows), poster, NOW);
+    expect(poster).not.toHaveBeenCalled();
+    expect(rows[0]!.status).toBe('failed');
+    expect(rows[0]!.errorMessage).toContain('slide/alt mismatch');
+    expect(result).toEqual({ attempted: 1, posted: 0, failed: 1 });
   });
 });

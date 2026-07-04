@@ -5,7 +5,13 @@
  *
  * Usage: pnpm -F scanner social:queue -- path/to/posts.json
  * JSON shape: [{ "body": "...", "utmCampaign": "kebab-slug",
- *               "scheduledAt": "2026-06-11T10:00:00Z", "altText": null }]
+ *               "scheduledAt": "2026-06-11T10:00:00Z",
+ *               "images": [{ "path": "/abs/path/slide1.png", "alt": "..." }] }]
+ *
+ * Local sugar: a slide may name a local PNG `path` (Maters output —
+ * outputs/<campaign>/slideN.png) instead of inline `imageBase64`; the
+ * script inlines the file before validation. Order = display order, ≤4,
+ * alt required per slide.
  *
  * Validation + insert live in src/lib/social/queue-posts (shared with
  * the /api/agent/queue-posts route): banned-phrase refusal
@@ -20,7 +26,22 @@ async function main(): Promise<void> {
   const path = process.argv[2];
   if (!path) throw new Error('usage: social:queue -- <posts.json>');
 
-  const parsed = queuePostsSchema.safeParse(JSON.parse(readFileSync(path, 'utf8')));
+  const raw = JSON.parse(readFileSync(path, 'utf8')) as unknown;
+  // Inline local slide files (`path` → `imageBase64`) before validation.
+  if (Array.isArray(raw)) {
+    for (const post of raw) {
+      const images = (post as { images?: unknown }).images;
+      if (!Array.isArray(images)) continue;
+      for (const slide of images) {
+        const s = slide as { path?: string; imageBase64?: string };
+        if (s.path && !s.imageBase64) {
+          s.imageBase64 = readFileSync(s.path).toString('base64');
+          delete s.path;
+        }
+      }
+    }
+  }
+  const parsed = queuePostsSchema.safeParse(raw);
   if (!parsed.success) {
     const issues = parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`);
     throw new Error(`invalid posts.json — ${issues.join('; ')}`);
@@ -28,7 +49,8 @@ async function main(): Promise<void> {
 
   const count = await queuePosts(parsed.data);
   for (const p of parsed.data) {
-    console.log(`queued for ${p.scheduledAt}: ${p.body.slice(0, 60)}…`);
+    const slides = p.images?.length ? ` [${p.images.length} slide(s)]` : '';
+    console.log(`queued for ${p.scheduledAt}${slides}: ${p.body.slice(0, 60)}…`);
   }
   console.log(`done — ${count} queued`);
   await prisma.$disconnect();
