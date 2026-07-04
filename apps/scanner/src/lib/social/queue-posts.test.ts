@@ -2,12 +2,18 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { findBannedPhrase, queuePosts, queuePostsSchema } from './queue-posts';
 import type { QueuePostsPrisma } from './queue-posts';
+import { pngHeader } from './png.fixture';
 
 const VALID_POST = {
   body: 'GTIN coverage is the first thing Google checks. We measured 312 UK food stores.',
   utmCampaign: 'gtin-coverage',
   scheduledAt: '2026-06-11T10:00:00Z',
 };
+
+const slide = (alt = 'Slide alt', width = 1080, height = 1350) => ({
+  imageBase64: Buffer.from(pngHeader(width, height)).toString('base64'),
+  alt,
+});
 
 describe('queuePostsSchema', () => {
   it('accepts a valid post array', () => {
@@ -70,6 +76,47 @@ describe('queuePostsSchema', () => {
   it('rejects an unknown channel', () => {
     expect(queuePostsSchema.safeParse([{ ...VALID_POST, channel: 'linkedin' }]).success).toBe(false);
   });
+
+  it('accepts one to four PNG slides with alt each', () => {
+    expect(queuePostsSchema.safeParse([{ ...VALID_POST, images: [slide('Slide 1')] }]).success).toBe(true);
+    const four = Array.from({ length: 4 }, (_, i) => slide(`Slide ${i + 1}`));
+    expect(queuePostsSchema.safeParse([{ ...VALID_POST, images: four }]).success).toBe(true);
+  });
+
+  it('rejects five slides (X and Bluesky cap at 4)', () => {
+    const five = Array.from({ length: 5 }, (_, i) => slide(`Slide ${i + 1}`));
+    expect(queuePostsSchema.safeParse([{ ...VALID_POST, images: five }]).success).toBe(false);
+  });
+
+  it('rejects a slide without alt text', () => {
+    const result = queuePostsSchema.safeParse([
+      { ...VALID_POST, images: [{ imageBase64: slide().imageBase64, alt: '' }] },
+    ]);
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects a slide that is not a PNG', () => {
+    const notPng = Buffer.from('definitely not a png, just text bytes').toString('base64');
+    const result = queuePostsSchema.safeParse([
+      { ...VALID_POST, images: [{ imageBase64: notPng, alt: 'nope' }] },
+    ]);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toContain('not a PNG');
+    }
+  });
+
+  it('rejects a slide over the decoded byte cap', () => {
+    const oversize = new Uint8Array(950_001);
+    oversize.set(pngHeader(1080, 1350), 0);
+    const result = queuePostsSchema.safeParse([
+      { ...VALID_POST, images: [{ imageBase64: Buffer.from(oversize).toString('base64'), alt: 'too big' }] },
+    ]);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0]?.message).toContain('exceeds');
+    }
+  });
 });
 
 describe('findBannedPhrase', () => {
@@ -127,5 +174,38 @@ describe('queuePosts', () => {
 
     const { data } = createMany.mock.calls[0]![0] as { data: Array<{ channel: string }> };
     expect(data.map((d) => d.channel)).toEqual(['bluesky']);
+  });
+
+  it('copies the ordered slide set to every fanned-out channel row', async () => {
+    const createMany = vi.fn().mockResolvedValue({ count: 2 });
+    const client: QueuePostsPrisma = { socialPost: { createMany } };
+
+    await queuePosts(
+      [{ ...VALID_POST, images: [slide('first'), slide('second', 1200, 1200)] }],
+      client,
+    );
+
+    const { data } = createMany.mock.calls[0]![0] as {
+      data: Array<{ channel: string; images: Uint8Array[]; imageAlts: string[] }>;
+    };
+    expect(data.map((d) => d.channel)).toEqual(['x', 'bluesky']);
+    for (const rowData of data) {
+      expect(rowData.imageAlts).toEqual(['first', 'second']);
+      expect(rowData.images).toHaveLength(2);
+      expect(Buffer.from(rowData.images[0]!)).toEqual(Buffer.from(pngHeader(1080, 1350)));
+      expect(Buffer.from(rowData.images[1]!)).toEqual(Buffer.from(pngHeader(1200, 1200)));
+    }
+  });
+
+  it('queues text-only posts with empty slide arrays', async () => {
+    const createMany = vi.fn().mockResolvedValue({ count: 2 });
+    const client: QueuePostsPrisma = { socialPost: { createMany } };
+
+    await queuePosts([VALID_POST], client);
+
+    const { data } = createMany.mock.calls[0]![0] as {
+      data: Array<{ images: Uint8Array[]; imageAlts: string[] }>;
+    };
+    expect(data[0]).toMatchObject({ images: [], imageAlts: [] });
   });
 });

@@ -37,9 +37,9 @@ export async function POST(): Promise<NextResponse> {
         { status: 200 },
       )
     }
-    const poster: Poster = (channel, text) => {
-      if (channel === 'bluesky' && blueskyCreds) return postSkeet(text, blueskyCreds)
-      if (channel === 'x' && xCreds) return postTweet(text, xCreds)
+    const poster: Poster = (channel, text, images) => {
+      if (channel === 'bluesky' && blueskyCreds) return postSkeet(text, blueskyCreds, fetch, images)
+      if (channel === 'x' && xCreds) return postTweet(text, xCreds, fetch, images)
       return Promise.resolve({ ok: false, status: 0, error: `no credentials for channel ${channel}` })
     }
     const result = await runSocialPostBatch(undefined, poster, new Date(), channels)

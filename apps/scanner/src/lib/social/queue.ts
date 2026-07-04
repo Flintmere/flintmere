@@ -20,7 +20,14 @@ export type PostResult =
   | { ok: true; id: string }
   | { ok: false; status: number; error: string };
 
-export type Poster = (channel: string, text: string) => Promise<PostResult>;
+/** One carousel slide handed to the poster — structurally matches the
+ *  clients' TweetImage / SkeetImage without importing from them. */
+export interface PostImage {
+  bytes: Uint8Array;
+  alt: string;
+}
+
+export type Poster = (channel: string, text: string, images: PostImage[]) => Promise<PostResult>;
 
 export interface SocialQueuePrisma {
   socialPost: {
@@ -28,7 +35,15 @@ export interface SocialQueuePrisma {
       where: { status: string; scheduledAt: { lte: Date }; channel: { in: string[] } };
       orderBy: { scheduledAt: 'asc' };
       take: number;
-    }): Promise<Array<{ id: string; body: string; channel: string }>>;
+    }): Promise<
+      Array<{
+        id: string;
+        body: string;
+        channel: string;
+        images: Uint8Array[];
+        imageAlts: string[];
+      }>
+    >;
     update(args: {
       where: { id: string };
       data:
@@ -58,7 +73,22 @@ export async function runSocialPostBatch(
   let posted = 0;
   let failed = 0;
   for (const post of due) {
-    const result = await poster(post.channel, post.body);
+    if (post.images.length !== post.imageAlts.length) {
+      // Unreachable via intake validation + the DB CHECK constraint; if it
+      // ever happens, fail loudly rather than publish an image without its
+      // alt (accessibility floor) or a mis-ordered carousel.
+      await client.socialPost.update({
+        where: { id: post.id },
+        data: {
+          status: 'failed',
+          errorMessage: `slide/alt mismatch: ${post.images.length} images, ${post.imageAlts.length} alts`,
+        },
+      });
+      failed++;
+      continue;
+    }
+    const images = post.images.map((bytes, i) => ({ bytes, alt: post.imageAlts[i] as string }));
+    const result = await poster(post.channel, post.body, images);
     if (result.ok) {
       await client.socialPost.update({
         where: { id: post.id },

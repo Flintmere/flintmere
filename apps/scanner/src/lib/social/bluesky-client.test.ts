@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { postSkeet, readBlueskyCredentials, type BlueskyCredentials } from './bluesky-client';
+import { pngHeader } from './png.fixture';
 
 const CREDS: BlueskyCredentials = {
   handle: 'flintmere.bsky.social',
@@ -59,6 +60,68 @@ describe('postSkeet', () => {
     ]);
     const result = await postSkeet('hello', CREDS, fn);
     expect(result).toEqual({ ok: false, status: 400, error: '{"error":"InvalidRequest"}' });
+  });
+});
+
+describe('postSkeet with a carousel', () => {
+  const sessionOk = () =>
+    new Response(JSON.stringify({ did: 'did:plc:abc', accessJwt: 'jwt-123' }), { status: 200 });
+  const blob = (link: string) => ({
+    $type: 'blob',
+    ref: { $link: link },
+    mimeType: 'image/png',
+    size: 33,
+  });
+
+  it('uploads each slide then embeds ordered images with alt and aspectRatio', async () => {
+    const { fn, calls } = sequenceFetch([
+      sessionOk(),
+      new Response(JSON.stringify({ blob: blob('l1') }), { status: 200 }),
+      new Response(JSON.stringify({ blob: blob('l2') }), { status: 200 }),
+      new Response(JSON.stringify({ uri: 'at://did:plc:abc/app.bsky.feed.post/img' }), { status: 200 }),
+    ]);
+    const images = [
+      { bytes: pngHeader(1080, 1350), alt: 'Slide 1' },
+      { bytes: pngHeader(1200, 1200), alt: 'Slide 2' },
+    ];
+
+    const result = await postSkeet('caption', CREDS, fn, images);
+
+    expect(result).toEqual({ ok: true, id: 'at://did:plc:abc/app.bsky.feed.post/img' });
+    expect(calls[1]!.url).toBe('https://bsky.social/xrpc/com.atproto.repo.uploadBlob');
+    expect((calls[1]!.init.headers as Record<string, string>)['Content-Type']).toBe('image/png');
+    expect((calls[1]!.init.headers as Record<string, string>)['Authorization']).toBe('Bearer jwt-123');
+    const { record } = JSON.parse(calls[3]!.init.body as string) as {
+      record: { text: string; embed: unknown };
+    };
+    expect(record.text).toBe('caption');
+    expect(record.embed).toEqual({
+      $type: 'app.bsky.embed.images',
+      images: [
+        { image: blob('l1'), alt: 'Slide 1', aspectRatio: { width: 1080, height: 1350 } },
+        { image: blob('l2'), alt: 'Slide 2', aspectRatio: { width: 1200, height: 1200 } },
+      ],
+    });
+  });
+
+  it('aborts before createRecord when a blob upload fails', async () => {
+    const { fn, calls } = sequenceFetch([
+      sessionOk(),
+      new Response(JSON.stringify({ error: 'BlobTooLarge' }), { status: 413 }),
+    ]);
+    const result = await postSkeet('caption', CREDS, fn, [{ bytes: pngHeader(1, 1), alt: 'a' }]);
+    expect(result).toEqual({ ok: false, status: 413, error: '{"error":"BlobTooLarge"}' });
+    expect(calls).toHaveLength(2); // session + failed blob; record never attempted
+  });
+
+  it('omits the embed entirely for a text-only post', async () => {
+    const { fn, calls } = sequenceFetch([
+      sessionOk(),
+      new Response(JSON.stringify({ uri: 'at://did:plc:abc/app.bsky.feed.post/txt' }), { status: 200 }),
+    ]);
+    await postSkeet('plain', CREDS, fn, []);
+    const { record } = JSON.parse(calls[1]!.init.body as string) as { record: Record<string, unknown> };
+    expect(record.embed).toBeUndefined();
   });
 });
 
