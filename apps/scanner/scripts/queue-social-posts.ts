@@ -3,7 +3,10 @@
  * Insert agent-drafted posts into the SocialPost queue — ADR 0026.
  * Posts that omit "channel" cross-post to X + Bluesky (see queue-posts.ts).
  *
- * Usage: pnpm -F scanner social:queue -- path/to/posts.json
+ * Usage: pnpm -F scanner social:queue path/to/posts.json
+ * (no `--` separator — pnpm forwards it literally as argv and the script
+ *  then tries to open a file named `--`; verified during the 2026-07-04
+ *  carousel test drive)
  * JSON shape: [{ "body": "...", "utmCampaign": "kebab-slug",
  *               "scheduledAt": "2026-06-11T10:00:00Z",
  *               "images": [{ "path": "/abs/path/slide1.png", "alt": "..." }] }]
