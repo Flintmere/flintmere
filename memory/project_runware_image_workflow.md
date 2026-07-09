@@ -26,7 +26,7 @@ deliverable — never override; they stay type-only.
 |---|---|---|---|---|
 | 2026-04-30 | `/research` vertical cards (food / beauty / apparel) | **ALLOWED** | Flux Dev | LIVE — `public/marketing/research/*.webp` (commit `3971dcf`) |
 | 2026-05-06 | `/audit/connect` hero | **REJECTED** — *"type only, we stick to it"* | — | type-only |
-| 2026-06-13 | Instagram carousels (via the `maters` carousel engine) | **ALLOWED** | Flux Dev | in build |
+| 2026-06-13 | Instagram carousels (via the `maters` carousel engine) | **ALLOWED** | Flux Dev | **wired 2026-07-04** — `editorial-still-life` move in the Flintmere rubric now carries the generate-mechanism + this doc's prompt/anti-prompt; engine pins Flux Dev per-brand (`BRANDS.flintmere.scene_model`) |
 
 ## Model + dimensions
 

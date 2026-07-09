@@ -74,6 +74,30 @@ Each becomes a log entry when shipped.
 - Result: produced, QA-green (zero style warnings); queued — **not yet posted** as of 2026-06-19.
 - Related claims: §"Pillar count — 7", §"60-second scan promise". ("~40% excluded" = positioning, not a registered claim.)
 
+### 2026-07-04 — "The GTIN truth" (`gtin_truth`)
+
+- Channel: instagram · x · bluesky
+- Angle: Anchor #5 (honest GTIN guidance — licensed from GS1, never from us; the cheap-barcode trap). First carousel on this anchor. Blueprint: botanical-specimen-plate; winner `amber_register`; runners-up `plate_manifesto`, `specimen_plate` (QA-green, swappable).
+- Surface(s): IG carousel @flintmere.audit (5 slides, `maters/outputs/flintmere/gtin_truth/`); X + Bluesky single posts (4 images, slides 1–4, slide 5 dropped for inline-link CTA). Draft: `context/drafts/2026-07-04-social-gtin-truth-x-bluesky.md`.
+- Result: **ALL THREE POSTED 2026-07-04** (IG + X + Bluesky, operator-posted manually) — first confirmed cross-channel publication on this log. Pipeline media support in flight; future carousels queue automatically.
+- Related claims: §"Flintmere does not issue GTINs", §"60-second scan promise", GS1 non-affiliation disclaimer (slide 4, verbatim).
+
+### 2026-07-04 — "Still listed. Just not shown." (`still_listed`)
+
+- Channel: x (debut; IG + Bluesky pending)
+- Angle: Dead-inventory suppression wedge (v2 report §7) — first carousel on this anchor. Copy bound to `apps/scanner/src/lib/copy.ts` §Suppression-estimate: "likely-suppressed range" (never point, never "are suppressed"), three auditable signals, count-lives-in-Merchant-Center honesty. Blueprint: museum-didactic-wall dealt; judge's pick `absent_exhibit` (muji emptiness) **operator-vetoed** → promoted runner-up `catalogue_of_absence` (dark accession index). All QA gates green.
+- Surface(s): X `@flintmere_` — 4 images (slides 1–4, slide 5 dropped for inline-link CTA), per-slide alt text. Slides: `Maters/outputs/still_listed/`. Draft: `context/drafts/2026-07-04-social-still-listed-x-debut.md`.
+- Result: **POSTED 2026-07-04** — tweet `2073410893656756386` — **first post ever published by the PR #103 carousel pipeline** (queue → cron → v2 media upload ×4 + alt metadata ×4 → tweet), via the local live-test rig with real X credentials. Not present in prod's DB (scratch rig); prod pipeline takes over post-merge.
+- Related claims: §"60-second scan promise"; suppression-lede constraints per `copy.ts` (hedged range, three signals).
+
+### 2026-07-06 — "The agentic shift" weekly set (`week-agentic-shift`)
+
+- Channel: x · bluesky (cross-post, `channel` omitted → both)
+- Angle: mixed — #4 before/after agentic commerce (Tue + Sun recap), #7 agency-friendly / one-scan-per-client (Wed), #6 measured impact + 7-day reversibility (Thu), Titles-pillar deep-dive (Fri), #1 the shift is here (Sat). Deliberately avoids the spent gtin_truth anchor and the just-posted still_listed wedge.
+- Surface(s): X `@flintmere_` + Bluesky — 6 text posts, Tue–Sun 2026-07-07…12 at 10:00 BST. Draft: `context/drafts/2026-07-06-social-week-agentic-shift.md`. Sunday carousel **converted to text-only** — Maters repo (`/Users/abuaa/Projects/Maters`) absent from disk this run, so no new visual set produced; text pipeline unblocked per task rule.
+- Result: **QUEUED 2026-07-06** via agent API (`/api/agent/queue-posts` → 200, `queued: 12` = 6 posts × 2 channels). Not yet posted — cron fires each at 10:00 BST. Outreach: 0 staged (no enriched targets).
+- Related claims: §"60-second scan promise", §"Pillar count — 7" (Titles named as one of seven), §"Reversible fix window — 7 days". ("Agents pick products by reading catalog data" = anchor-#1/#4 positioning, not a registered outcome claim — no ranking promise made.)
+
 ## Changelog
 
 - 2026-04-19: Adapted for Flintmere. Added seven narrative anchors from BUSINESS.md and cornerstone content queue from SPEC §8.3.
