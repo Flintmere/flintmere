@@ -1,0 +1,137 @@
+---
+title: "Shopify GTINs: how to get them, add them, and skip the fakes"
+slug: shopify-gtin-guide
+description: "A GTIN is the barcode number channels match your product against. Where to buy one from GS1, how to add it to a Shopify variant, and why cheap barcodes fail."
+cluster: gtin-identifier-guidance
+author: john-morris
+publishedAt: 2026-07-09
+sources:
+  - title: "GTIN — Global Trade Item Number"
+    url: "https://www.gs1.org/standards/id-keys/gtin"
+    publisher: GS1
+  - title: "How much does GS1 UK membership cost?"
+    url: "https://www.gs1uk.org/knowledge-hub/membership/how-much-does-gs1-uk-membership-cost"
+    publisher: GS1 UK
+  - title: "Barcode estimator — how many barcodes do you need?"
+    url: "https://www.gs1us.org/tools/barcode-estimator"
+    publisher: GS1 US
+  - title: "Global Trade Item Number (GTIN) [gtin] — product data specification"
+    url: "https://support.google.com/merchants/answer/6324461"
+    publisher: Google Merchant Center Help
+  - title: "Understanding barcodes"
+    url: "https://help.shopify.com/en/manual/fulfillment/setup/packaging/barcodes"
+    publisher: Shopify
+  - title: "Optimizing your products for AI platforms"
+    url: "https://help.shopify.com/en/manual/shopify-catalog/optimizing-products"
+    publisher: Shopify
+  - title: "GEPIR — look up the company behind a barcode"
+    url: "https://gepir.gs1.org/"
+    publisher: GS1
+faq:
+  - q: "Do I need a GTIN for every product on Shopify?"
+    a: "No. A GTIN exists only for a product its manufacturer has registered with GS1, so custom, handmade, own-brand, and one-off items often have none — and that is fine. Where a product does have an assigned GTIN, add it: Google and Amazon treat it as required for those items, and a missing one is a common reason a listing is held back."
+  - q: "How much does a GTIN cost?"
+    a: "You licence GTINs from GS1, and the price depends on your country. GS1 UK membership starts at £50 a year excluding VAT on a turnover-based scale, with the numbers renewed annually. GS1 US licenses a single GTIN for a one-time $30 with no renewal, or a Company Prefix from $250 for a block of them. Check the current figure on your national GS1 site before you buy. Flintmere is not affiliated with GS1."
+  - q: "Can I use the cheap barcodes I find online?"
+    a: "No. Numbers resold outside GS1 — the '1,000 barcodes for $5' listings — were mostly split off company prefixes issued before 2002. Amazon and Google now check identifiers against GS1's own records, so a recycled number fails verification and the listing is rejected. The saving is not worth the rejection."
+  - q: "Where does the GTIN go in Shopify?"
+    a: "In the variant's Barcode field. Shopify stores the UPC, EAN, or ISBN there — all of which are GTINs — and passes it to sales channels through the barcode field on the product variant. For a large catalog, fill it in bulk with the bulk editor or a CSV import rather than one product at a time."
+  - q: "Can I improve my catalog score without buying GTINs?"
+    a: "Yes, most of it. Titles, attributes, category mapping, and consistency carry the majority of a readiness score and cost nothing but effort. GTINs sit inside the Identifiers pillar, worth 20 of 100 points, so they are the part you cannot fix for free — but you can climb most of the way first and treat GS1 as the last step."
+---
+
+Two Shopify stores sell the same jar of honey. One shows up in Google Shopping with a photo, a price, and a row of competing offers. The other does not show up at all — not further down, not on page two, just absent. The products are identical. The difference is a single field: a thirteen-digit number one shop filled in and the other left blank.
+
+That number is the GTIN, and it pulls more weight than any other field in a product record. This guide is the practical version: what a GTIN is, where you actually get one — there is only one honest source — how to put it on a Shopify product, and how to tell a real GTIN from the cheap ones that get listings pulled.
+
+<TLDR>
+
+- A **GTIN** is the global number behind a product's barcode — the UPC or EAN. Channels use it to work out which product you are selling.
+- You licence GTINs from **GS1**, and nobody else. GS1 UK starts at £50 a year; GS1 US sells a single GTIN for a one-time $30.
+- The cheap "bulk barcodes" sold elsewhere were split off pre-2002 prefixes. Amazon and Google check against GS1, so they fail.
+- In Shopify, the GTIN belongs in the variant's **Barcode** field.
+- A missing GTIN on a product that has one is a leading cause of a suppressed Google listing — and the heaviest single check in a catalog readiness score.
+
+</TLDR>
+
+## What a <Bracket>GTIN</Bracket> actually is
+
+<Definition term="GTIN">
+
+A GTIN (Global Trade Item Number) is the standardised number encoded in a product's barcode. The 12-digit UPC used across North America and the 13-digit EAN used in the UK and Europe are both GTINs — the same identifier at different lengths. GS1 issues them, and each one points to one product from one brand.
+
+</Definition>
+
+The barcode a till scans is just a picture of the GTIN. The digits carry the meaning; the stripes are there so a laser can read them. The last digit is a check digit, calculated from the ones before it, which is why a mistyped GTIN can be caught before it ever reaches a channel — the arithmetic simply will not add up.
+
+GTINs come in a few lengths, and the length tells you the job. GTIN-8 goes on packaging too small for a full barcode, like a single-serve sachet. GTIN-12 is the North American UPC. GTIN-13 is the European EAN, the one on almost everything sold in a UK shop. GTIN-14 identifies a case or outer carton rather than the unit a shopper buys. For a Shopify merchant selling retail units, the number on the pack is almost always a GTIN-12 or GTIN-13, and that is the one your listing needs.
+
+One point clears up most of the confusion: UPC, EAN, and ISBN are not alternatives to a GTIN. They are GTINs. A book's ISBN is a GTIN. The UPC on a bag of coffee is a GTIN. Shopify says as much in its own barcode documentation — the Barcode field holds "the barcode, UPC, or ISBN number for the product," all of which resolve to the same global identifier underneath.
+
+## Why the channels care so much
+
+A GTIN is how a sales channel knows what you are selling without taking your word for it. When two hundred shops list the same jar of honey, Google uses the GTIN to recognise that it is one jar with two hundred offers, attach the reviews and the price history, and decide where each seller sits in the comparison. Supply the GTIN and you join that group. Leave it off a product that has one, and Google has only your title and your photo to go on — and Google's product data specification lists the GTIN as a required attribute for any product that has been assigned one.
+
+The consequence is not a lower ranking. It is removal. A product a channel cannot confidently identify is a product it would rather not show than show wrongly, so the listing is disapproved or quietly suppressed. You are not beaten in the auction; you are left out of it. This is why, in a catalog readiness score, the Identifiers pillar carries the joint-heaviest weight of the seven — 20 points of 100 — and why a missing GTIN is usually the first thing a scan flags.
+
+Amazon is blunter still. For most branded categories it will not create a listing without a valid, GS1-registered GTIN, and it checks the number rather than trusting it. The same discipline that gets you into Google Shopping is the discipline that gets you onto Amazon, so fixing identifiers once pays across both channels rather than one — an argument for treating them as shared plumbing, not a per-channel chore.
+
+The audience for that number is also widening. The AI shopping assistants now built into ChatGPT, Gemini, and Copilot read the same structured product data a feed exposes, and Shopify has begun publishing its own guidance on optimising products for AI platforms. An assistant asked to "find a gluten-free dark chocolate bar under £4" is matching on identifiers and attributes, not browsing a category page. Getting the GTIN right does not make a product *appear* in any assistant's answer — nobody can promise that — but it makes the product legible to the software deciding what to shortlist. A record a machine cannot identify is a record it cannot recommend.
+
+## Where GTINs come from: GS1, and only GS1
+
+Here is the part the internet muddies on purpose. There is one legitimate source for a new GTIN, and it is GS1 — the global non-profit that administers the standard. You do not buy a GTIN outright; GS1 licences it to you, and the licence is what makes the number verifiably yours.
+
+> Flintmere is not affiliated with GS1. Identifier requirements vary by marketplace and jurisdiction.
+
+Where you go depends on where your business is, because pricing and membership are run by each national GS1 office.
+
+**In the UK**, you licence GTINs through GS1 UK. Membership starts at £50 a year, excluding VAT, on a scale set by your company turnover, and the numbers are licensed to you annually — you keep them as long as the membership is current. GS1 UK changed its pricing for additional numbers on 10 May 2026, so if you are working from an older figure, check the live one before you budget.
+
+**In the US**, GS1 US licenses a single GTIN for a one-time $30 with no renewal fee, which suits a merchant who needs a handful. If you need more, a GS1 Company Prefix lets you create a block of your own — pricing starts around $250 for up to ten numbers and climbs by capacity from there. GS1 US publishes a barcode estimator to size it before you commit.
+
+**Everywhere else**, go to your national GS1 office through the country selector on gs1.org. The structure — a membership or a licence, priced by how many numbers you need — is the same; the currency and the exact figures are not. Whichever office you use, treat the numbers you print on a British price list as indicative and confirm the current cost on the GS1 site before you pay.
+
+The reason to route through GS1 rather than the first search result is simple. A GS1-issued number is registered to you in GS1's own database, which is exactly what Amazon and Google check against. A number from anywhere else may scan fine at a till and still fail the one test that decides whether your listing runs.
+
+## The cheap-barcode trap
+
+Search "buy barcodes" and the first results are not GS1. They are resellers offering a thousand barcodes for the price of a coffee, "valid worldwide, no annual fees." The numbers usually scan. They are also, for online retail, close to worthless — and worse than doing nothing if you were counting on them.
+
+Almost all of these come from company prefixes GS1 issued before 2002, back when a prefix was sold once with no ongoing licence. A handful of firms bought large prefixes then and have been splitting and reselling the individual numbers ever since. The numbers are real in the sense that they exist. They are not registered to *you*, and that is the problem.
+
+You can check this yourself. GS1 runs a free public lookup called GEPIR, and searching a reseller's number there returns the company that first registered the prefix — a firm you have never heard of — rather than your brand. A marketplace runs the same check automatically and reaches the same answer. Before a large import it is worth spot-checking a few of your own numbers in GEPIR too, to confirm they resolve to your company and catch a supplier's data-entry slip before a channel does.
+
+Amazon and Google both verify identifiers against GS1's records now. When they look up a reseller's number, the registered owner is the original 1990s prefix holder, not your brand — so the identifier does not match your product, and the listing is rejected or suppressed. Amazon has removed listings and, in some cases, suspended accounts over exactly this mismatch. The £5 you saved buys you a catalog full of numbers you then have to strip out and replace with real ones.
+
+If a supplier or a marketplace tells you a GTIN is optional, that can be true — plenty of products legitimately have none. But "you don't need one" and "here is a cheap one" are different claims, and the second one is the trap. When a product genuinely has no GTIN, the honest move is to leave the field empty and tell the channel so, not to paper over it with a recycled number.
+
+## How to add a GTIN to a Shopify product
+
+Once you hold a real GTIN, Shopify makes the mechanics easy — the field is just not where new merchants expect it.
+
+The GTIN goes in the **Barcode** field on the *variant*, not on the product. Open a product, scroll to the variant (or the default variant if the product has only one), and you will find **Barcode (ISBN, UPC, GPC, etc.)** alongside SKU. Type or scan the number in. Each variant needs its own unique barcode — Shopify will not let two variants share one, which is correct, because a 500g jar and a 1kg jar are two different products with two different GTINs.
+
+Doing that by hand is fine for ten products and miserable for a thousand. For a real catalog, work in bulk:
+
+1. **Bulk editor.** From the Products list, select the products, choose **Edit products**, and add the **Barcode** column. You can paste a column of numbers straight in from a spreadsheet.
+2. **CSV import.** Shopify's product CSV has a `Variant Barcode` column. Export what you have, fill the column against each SKU, and re-import. This is the fastest route when your GTINs already live in a supplier sheet.
+3. **A migration app** such as Matrixify, if you are matching thousands of GTINs to variants and want validation and a dry run before anything is written.
+
+Two habits save pain later. Match on SKU, not on product title — titles change and repeat, SKUs should not. And sanity-check the number before you import: a GTIN-13 is thirteen digits, a GTIN-12 is twelve, and that trailing check digit means a good validator can catch a transposed pair before Google does.
+
+Where do the numbers come from if you *resell* rather than manufacture? From the brand owner. A product made by someone else already carries their GTIN — it is printed on the pack, above or below the barcode — and you use that number, not one of your own. You only licence GTINs from GS1 for products you own: your own label, your own bundles, your own manufactured goods.
+
+## How far you get without buying a single GTIN
+
+None of this means you need to open a GS1 account before you can make progress. It is worth being honest about how much of a catalog's readiness is free to fix, because the barcode line item is often what stalls merchants who could be improving today.
+
+A readiness score is built from seven weighted pillars, and four of them — Titles, Consistency, Crawlability, and the non-GTIN parts of Identifiers such as brand — are readable and fixable from your public storefront, no purchase required. Front-loading your titles with the product type and brand, making your attributes agree with each other across variants, declaring the brand cleanly: that is roughly four-fifths of the score, and it costs effort, not money. Our companion piece on [how a catalog readiness score is built](/blog/catalog-readiness-scoring-explained) walks through each pillar and what it checks.
+
+GTINs are the last stretch. They live inside the Identifiers pillar, worth 20 points, and they are the one input you cannot supply for free — which is precisely why the honest order of work is to fix everything else first, watch the score climb, and let the case for a GS1 licence make itself once you can see how much reach the missing numbers are costing. A merchant on a £0 barcode budget still has most of the score in reach today. The [methodology page](https://flintmere.com/methodology) sets out the full pillar weights and the public sources behind each check.
+
+## The number that decides whether you are in the room
+
+Go back to the two honey sellers. Nothing separates their products, their prices, or their photos. One is in the Google Shopping comparison and one is not, and the only difference is whether a thirteen-digit number made it into a single field. That is the whole case for taking GTINs seriously: they are cheap relative to what they buy you in reach, they come from exactly one honest place, and the fake shortcut costs more than the real thing once a channel checks.
+
+Get the number from GS1, put it in the Barcode field, and skip anything that promises a barcode without a licence behind it. Then measure what is left, because the GTIN is the headline and the rest of the <Bracket>catalog</Bracket> is the story.
