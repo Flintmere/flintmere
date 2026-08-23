@@ -36,7 +36,7 @@ import { describe, expect, it } from 'vitest';
  * STANDARDS-CHANGELOG.md entry. See the header for the procedure.
  */
 const REFERENCE_SHA256 =
-  '89f2499df9529b07fc18029a1d43d5df57bd83ffce156ad1a6a7bb8e5d123cb5';
+  '015d196b902c8162810badb32a27edbcd0621bc09bc666f5a1d7890bac6c191f';
 
 const SOURCE_OF_TRUTH = new URL('../food-v1-fields.ts', import.meta.url);
 

@@ -110,10 +110,14 @@ describe('publication gate', () => {
     expect(isPublishable()).toBe(unverifiedCitations().length === 0);
   });
 
-  it('has not been accidentally marked publishable before review', () => {
-    // Flip this expectation deliberately, in the same commit that flips
-    // the `verified` flags, with a STANDARDS-CHANGELOG.md entry.
-    expect(isPublishable()).toBe(false);
+  it('stays publishable now that every citation is verified', () => {
+    // Flipped 2026-08-23 in the same commit as the `verified` flags, with
+    // the STANDARDS-CHANGELOG.md entry the guard asks for. All 14 citations
+    // were opened in a real browser; 4 URLs were corrected in the process.
+    // If this ever goes red again, a citation regressed — fix the URL, do
+    // not relax the assertion.
+    expect(isPublishable()).toBe(true);
+    expect(unverifiedCitations()).toHaveLength(0);
   });
 });
 

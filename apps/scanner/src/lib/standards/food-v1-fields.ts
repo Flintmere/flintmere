@@ -39,8 +39,8 @@ export const STANDARD_VERTICAL = 'food' as const;
  * date with a STANDARDS-CHANGELOG.md entry.
  */
 export const STANDARD_STATUS = 'rc' as const;
-export const PUBLISHED_AT = '2026-07-28' as const;
-export const FREEZES_AT = '2026-08-27' as const;
+export const PUBLISHED_AT = '2026-08-23' as const;
+export const FREEZES_AT = '2026-09-22' as const;
 
 export const CANONICAL_URL =
   'https://standards.flintmere.com/food/v1.0/' as const;
@@ -121,7 +121,7 @@ export const FOOD_V1_FIELDS: readonly FieldDescriptor[] = [
       {
         label: 'GS1 General Specifications',
         url: 'https://www.gs1.org/standards/barcodes-epcrfid-id-keys/gs1-general-specifications',
-        verified: false,
+        verified: true,
       },
     ],
     flintmereAdds:
@@ -138,14 +138,14 @@ export const FOOD_V1_FIELDS: readonly FieldDescriptor[] = [
       'Declared allergens present in the product, drawn from the FSA Big-14.',
     sources: [
       {
-        label: 'FSA food allergy and intolerance guidance (Big-14)',
-        url: 'https://www.food.gov.uk/safety-hygiene/food-allergy-and-intolerance',
-        verified: false,
+        label: 'FSA allergen labelling guidance for food manufacturers (Big-14)',
+        url: 'https://www.gov.uk/government/publications/allergen-labelling-for-food-manufacturers/allergen-labelling-for-food-manufacturers',
+        verified: true,
       },
       {
         label: 'EU Regulation 1169/2011, Annex II',
         url: 'https://eur-lex.europa.eu/eli/reg/2011/1169/oj',
-        verified: false,
+        verified: true,
       },
     ],
     flintmereAdds:
@@ -165,7 +165,7 @@ export const FOOD_V1_FIELDS: readonly FieldDescriptor[] = [
       {
         label: 'EU Regulation 1169/2011, Article 18 and Annex VII',
         url: 'https://eur-lex.europa.eu/eli/reg/2011/1169/oj',
-        verified: false,
+        verified: true,
       },
     ],
     flintmereAdds:
@@ -184,12 +184,12 @@ export const FOOD_V1_FIELDS: readonly FieldDescriptor[] = [
       {
         label: 'ISO 3166-1 country codes',
         url: 'https://www.iso.org/iso-3166-country-codes.html',
-        verified: false,
+        verified: true,
       },
       {
         label: 'DEFRA protected food and drink names register',
         url: 'https://www.gov.uk/protected-food-drink-names',
-        verified: false,
+        verified: true,
       },
     ],
     flintmereAdds:
@@ -207,12 +207,12 @@ export const FOOD_V1_FIELDS: readonly FieldDescriptor[] = [
       {
         label: 'UCUM — Unified Code for Units of Measure',
         url: 'https://ucum.org/',
-        verified: false,
+        verified: true,
       },
       {
         label: 'Weights and Measures Act 1985, section 47',
         url: 'https://www.legislation.gov.uk/ukpga/1985/72/section/47',
-        verified: false,
+        verified: true,
       },
     ],
     flintmereAdds:
@@ -230,12 +230,12 @@ export const FOOD_V1_FIELDS: readonly FieldDescriptor[] = [
       {
         label: 'EU Regulation 1169/2011, Annex X',
         url: 'https://eur-lex.europa.eu/eli/reg/2011/1169/oj',
-        verified: false,
+        verified: true,
       },
       {
         label: 'FSA best before and use-by date guidance',
-        url: 'https://www.food.gov.uk/safety-hygiene/best-before-and-use-by-dates',
-        verified: false,
+        url: 'https://www.gov.uk/understanding-food-labelling/best-before-and-use-by-dates',
+        verified: true,
       },
     ],
     flintmereAdds:
@@ -253,23 +253,23 @@ export const FOOD_V1_FIELDS: readonly FieldDescriptor[] = [
     sources: [
       {
         label: 'The Vegan Society trademark register',
-        url: 'https://www.vegansociety.com/your-business/vegan-trademark',
-        verified: false,
+        url: 'https://www.vegansociety.com/vegan-trademark',
+        verified: true,
       },
       {
         label: 'Soil Association organic certification',
         url: 'https://www.soilassociation.org/certification/',
-        verified: false,
+        verified: true,
       },
       {
-        label: 'Coeliac UK crossed grain symbol',
-        url: 'https://www.coeliac.org.uk/information-and-support/your-business/',
-        verified: false,
+        label: 'Coeliac UK Crossed Grain Trademark register',
+        url: 'https://www.coeliac.org.uk/food-industry-professionals/crossed-grain-trademark/',
+        verified: true,
       },
       {
         label: 'Red Tractor assurance',
         url: 'https://redtractor.org.uk/',
-        verified: false,
+        verified: true,
       },
     ],
     flintmereAdds:
