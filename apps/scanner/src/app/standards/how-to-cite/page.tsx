@@ -174,8 +174,8 @@ export default function HowToCite() {
           style={{ marginTop: 32, fontSize: '16px', lineHeight: 1.6, maxWidth: '62ch' }}
         >
           Change-log entries cite the same way, with the entry permalink as
-          the URL and the entry's own publication date. Every page on this
-          site carries a "Cite this page" control that fills these five
+          the URL and the entry’s own publication date. Every page on this
+          site carries a “Cite this page” control that fills these five
           forms in for whatever you are reading.
         </p>
       </section>
@@ -196,7 +196,7 @@ export default function HowToCite() {
           className="font-medium text-[color:var(--color-ink)] max-w-[24ch]"
           style={{ fontSize: 'clamp(26px, 3.4vw, 40px)', letterSpacing: '-0.025em', lineHeight: 1.1 }}
         >
-          There isn't one yet.
+          There isn’t one yet.
         </h2>
         <p
           className="text-[color:var(--color-ink-2)]"
