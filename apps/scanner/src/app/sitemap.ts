@@ -55,8 +55,19 @@ const SCANNER_SITEMAP_ROUTES: RouteEntry[] = [
 // Phase 1: only the holding page. Phase 2 (post-ingestion-engine) lands
 // the actual taxonomy under /food, /food/allergens, /food/origin etc. —
 // added here when the routes go live.
+// Pinned versions are the citation targets and carry the highest
+// priority. The rolling alias `/food/v1/` is deliberately EXCLUDED per
+// the binding IA §Routes table — listing both it and the pinned URL
+// would hand crawlers two URLs with identical content and invite a
+// duplicate-content split across exactly the pages we want ranking.
 const STANDARDS_SITEMAP_ROUTES: RouteEntry[] = [
   { path: '/', changeFrequency: 'monthly', priority: 1.0 },
+  { path: '/food/', changeFrequency: 'monthly', priority: 0.9 },
+  { path: '/food/v1.0/', changeFrequency: 'yearly', priority: 1.0 },
+  { path: '/food/v1.0/spec', changeFrequency: 'yearly', priority: 0.7 },
+  { path: '/food/diff-log', changeFrequency: 'weekly', priority: 0.6 },
+  { path: '/how-to-cite', changeFrequency: 'yearly', priority: 0.6 },
+  { path: '/about', changeFrequency: 'monthly', priority: 0.5 },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
