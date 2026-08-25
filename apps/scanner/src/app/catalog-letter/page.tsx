@@ -352,7 +352,71 @@ export default function Audit() {
           </div>
         </section>
 
-        {/* Chapter 5 — Disclaimer band. Single quiet fade-up. */}
+        {/* Chapter 5 (FAQ) — retains the head search term (see ADR 0028
+            Amendment 1: the product is now The Catalog Letter at
+            /catalog-letter; "read" survives only as a verb). */}
+        <section
+          aria-labelledby="faq-heading"
+          className="relative bg-[color:var(--color-paper)]"
+        >
+          <div
+            className="mx-auto w-full max-w-[1280px]"
+            style={{
+              paddingLeft: 'clamp(24px, 5vw, 64px)',
+              paddingRight: 'clamp(24px, 5vw, 64px)',
+              paddingTop: 'clamp(72px, 10vh, 128px)',
+              paddingBottom: 'clamp(56px, 8vh, 96px)',
+            }}
+          >
+            <p
+              data-reveal
+              className="eyebrow-hero"
+              style={{
+                marginBottom: 'clamp(28px, 3vw, 48px)',
+                ['--reveal-delay' as string]: `${D_EYEBROW}ms`,
+              }}
+            >
+              <span aria-hidden="true">// </span>the question we get asked
+            </p>
+
+            <h2
+              id="faq-heading"
+              data-reveal
+              className="font-sans"
+              style={{
+                fontSize: 'clamp(28px, 3.4vw, 44px)',
+                lineHeight: 1.12,
+                letterSpacing: '-0.02em',
+                color: 'var(--color-ink)',
+                maxWidth: '20ch',
+                ['--reveal-delay' as string]: `${D_HEADLINE}ms`,
+              }}
+            >
+              Is this a catalog audit?
+            </h2>
+
+            <p
+              data-reveal
+              className="font-sans"
+              style={{
+                marginTop: 'clamp(20px, 2.4vw, 32px)',
+                fontSize: 'clamp(15px, 1.2vw, 18px)',
+                lineHeight: 1.65,
+                color: 'var(--color-mute)',
+                maxWidth: '62ch',
+                ['--reveal-delay' as string]: `${D_SUPPORT}ms`,
+              }}
+            >
+              Yes, in substance. We stopped calling it that because an audit
+              is something done <em>to</em> you. The catalog letter is
+              something you <Bracket>commission</Bracket> — we read your
+              catalog product by product and hand you the replacement text,
+              ready to paste into Shopify.
+            </p>
+          </div>
+        </section>
+
+        {/* Chapter 6 — Disclaimer band. Single quiet fade-up. */}
         <section
           aria-labelledby="legal-heading"
           className="relative bg-[color:var(--color-paper)]"
