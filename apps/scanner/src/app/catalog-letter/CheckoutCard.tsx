@@ -440,7 +440,8 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
       >
         30-day refund if we miss the three-working-day deadline. Card details
         stay with Stripe — never on our servers. Charge appears on your bank
-        statement as <strong>FLINTMERE AUDIT</strong>.
+        statement as{' '}
+        <strong>FLINT B{bandSlug === 'band-1' ? '1' : '2'}</strong>.
       </div>
     </CardShell>
   );

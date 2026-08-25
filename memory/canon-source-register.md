@@ -85,7 +85,7 @@ alignment review):
   `/catalog-letter` conversion page; renders `CONCIERGE_DELIVERABLE_LIST`
   (5 items the merchant is promised before they pay).
 - **`apps/scanner/src/app/catalog-letter/success/page.tsx`** — post-purchase
-  confirmation; promises "audit letter, per-product CSV, and 30-day fix
+  confirmation; promises "catalog letter, per-product CSV, and 30-day fix
   sequence within three working days."
 - **`apps/scanner/src/lib/concierge-email.ts`** — Resend body fired
   on `payment_intent.succeeded`; renders

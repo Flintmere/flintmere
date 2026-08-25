@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
       amount: band.pricePence,
       currency: 'gbp',
       receipt_email: email,
-      description: `Flintmere concierge audit (${band.label}) — written deliverable in three working days`,
+      description: `Flintmere Catalog Letter (${band.label}) — written deliverable in three working days`,
       statement_descriptor_suffix: `FLINT B${bandSlug === 'band-1' ? '1' : '2'}`,
       automatic_payment_methods: { enabled: true },
       // Force 3D Secure where the issuer supports it. Stripe's default

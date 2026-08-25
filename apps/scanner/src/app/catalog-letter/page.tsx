@@ -408,10 +408,10 @@ export default function Audit() {
               }}
             >
               Yes, in substance. We stopped calling it that because an audit
-              is something done <em>to</em> you. The catalog letter is
-              something you <Bracket>commission</Bracket> — we read your
-              catalog product by product and hand you the replacement text,
-              ready to paste into Shopify.
+              is something done <em>to</em> you. A catalog letter is a{' '}
+              <Bracket>commission</Bracket> — we read your catalog product by
+              product and hand you the replacement text, ready to paste into
+              Shopify.
             </p>
           </div>
         </section>

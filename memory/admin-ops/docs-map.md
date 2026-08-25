@@ -23,8 +23,8 @@ The map `docs-coherence-audit` reads. One row per doc. New docs appended on crea
 |---|---|---|---|---|---|
 | `apps/scanner/src/app/page.tsx` (marketing home) | marketing | #5 + #20 | BUSINESS.md, scanner UX | TBD | Hero + pillars + pricing peek |
 | `apps/scanner/src/app/pricing/page.tsx` | marketing | #5 + #22 | BUSINESS.md §Tiers | TBD | Tier + pricing canonical |
-| `apps/scanner/src/app/audit/page.tsx` (Concierge audit landing — band ladder) | marketing | #5 + #22 | BUSINESS.md, ADR 0022 | 2026-04-20 | Stripe checkout form + Calendly fallback |
-| `apps/scanner/src/app/audit/success/page.tsx` (post-payment) | marketing | #5 + #22 | Stripe session metadata | 2026-04-20 | Calendly kickoff prompt |
+| `apps/scanner/src/app/catalog-letter/page.tsx` (Concierge Catalog Letter landing — band ladder) | marketing | #5 + #22 | BUSINESS.md, ADR 0022, ADR 0028 | 2026-04-20 | Stripe checkout form + Calendly fallback |
+| `apps/scanner/src/app/catalog-letter/success/page.tsx` (post-payment) | marketing | #5 + #22 | Stripe session metadata | 2026-04-20 | Calendly kickoff prompt |
 | `apps/scanner/src/app/research/**` (State-of-AI-Readiness reports) | marketing | #1 + #20 | per-report data | rolling | `memory/marketing/content-history.md` is canonical log |
 | `apps/scanner/src/app/blog/**` (when exists) | marketing | #1 + #20 | per-post topic | rolling | Not yet scaffolded |
 

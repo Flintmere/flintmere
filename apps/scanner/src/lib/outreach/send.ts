@@ -76,7 +76,7 @@ function templateInputFromTarget(
   // rescanUrl: use the persisted column if set, else build from the canonical /scan path.
   const baseRescan =
     target.rescanUrl ?? `${baseUrl.replace(/\/+$/, '')}/scan?url=${encodeURIComponent(target.shopDomain)}`;
-  const baseAudit = `${baseUrl.replace(/\/+$/, '')}/audit`;
+  const baseAudit = `${baseUrl.replace(/\/+$/, '')}/catalog-letter`;
   return {
     shopDomain: target.shopDomain,
     shopName: target.shopDomain,

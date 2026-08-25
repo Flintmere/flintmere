@@ -13,6 +13,13 @@ binding: CLAUDE.md §Binding 2026-05-09 (canon protection)
 status: draft — awaiting operator approval
 ---
 
+> **AMENDED 2026-08-25 (ADR 0028 Amendment 1).** The product noun is
+> **The Catalog Letter**, route `/catalog-letter` — not "Concierge read" /
+> `/read` as this spec originally described. "Read" survives as the VERB
+> only and must never appear as a bare noun. See ADR 0028 Amendment 1 for
+> the collision evidence. The lexicon tables below (§§49-50, 96-105) are
+> superseded and kept for historical record only.
+
 # Retiring "audit" — the `read` lexicon + `catalog.` host migration
 
 > 2026-08-25. Operator direction: "audit" is customer-averse and must

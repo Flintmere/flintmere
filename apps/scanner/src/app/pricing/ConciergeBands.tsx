@@ -92,7 +92,7 @@ function BandCard({ band, revealDelay }: { band: AuditBand; revealDelay: number 
   // form already configured for their chosen band — no extra click.
   // Bespoke (band-3) routes through the same anchor; CheckoutCard
   // renders the bespoke-quote variant when the band is band-3.
-  const ctaHref = `/audit?band=${band.slug}#checkout`;
+  const ctaHref = `/catalog-letter?band=${band.slug}#checkout`;
   const ctaLabel = band.isBespoke ? 'Request a quote →' : 'Book your catalog letter →';
 
   return (

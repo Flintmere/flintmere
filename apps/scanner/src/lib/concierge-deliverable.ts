@@ -117,7 +117,7 @@ export function conciergeDeliverableSummary(slug: AuditBandSlug): string {
 
 /**
  * The GS1 UK barcode-path section, rendered as markdown for the
- * operator audit-letter export. UK default for Flintmere's launch
+ * operator catalog-letter export. UK default for Flintmere's launch
  * cohort (UK food merchants); non-UK merchants get an
  * `[OPERATOR_VERIFY]` placeholder so the operator pivots manually.
  *

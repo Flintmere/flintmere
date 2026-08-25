@@ -126,7 +126,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
           >
             Want the full fix plan instead of the summary?{' '}
             <Link
-              href={`/audit?shop=${encodeURIComponent(shopDomain)}#checkout`}
+              href={`/catalog-letter?shop=${encodeURIComponent(shopDomain)}#checkout`}
               onClick={() => {
                 writeHandoff({ email: email.trim(), scanId });
                 track('audit_cta_from_scan', {
@@ -223,7 +223,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
             scope bespoke from £597.
           </p>
           <Link
-            href={`/audit?shop=${encodeURIComponent(shopDomain)}#checkout`}
+            href={`/catalog-letter?shop=${encodeURIComponent(shopDomain)}#checkout`}
             onClick={() => {
               writeHandoff({ email: email.trim(), scanId });
               track('audit_cta_from_scan', {

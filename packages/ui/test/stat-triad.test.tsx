@@ -120,7 +120,7 @@ describe('StatTriad — render shape', () => {
     expect(html).toContain(
       'aria-label="60 seconds — Time the free scan takes on a 5,000-product store."',
     );
-    // Stat 2: numeralAriaLabel "ninety-seven pounds".
+    // Stat 2: numeralAriaLabel "one hundred and ninety-seven pounds".
     expect(html).toContain(
       'aria-label="one hundred and ninety-seven pounds — One-off catalog letter. Fix CSV + 30-day re-scan."',
     );
