@@ -2,25 +2,26 @@ import { bandPriceLine } from '@/lib/audit-pricing';
 import type { OgCardContent } from './og-card';
 
 // Per-route OG card content. Copy is canon-traced (flintmere.com/methodology +
-// /audit page + memory/VOICE.md). Bracket tokens are extractable nouns/numbers
-// only — never verbs or articles (Noor #8 / VOICE bracket rule). The /audit price
-// is pulled from audit-pricing (bandPriceLine), never hardcoded, so it can never
-// drift from the source of truth. /pricing bakes NO number — the subscription
-// ladder is WTP-pending (ADR 0016).
+// /catalog-letter page + memory/VOICE.md). Bracket tokens are extractable
+// nouns/numbers only — never verbs or articles (Noor #8 / VOICE bracket
+// rule). The Catalog Letter price is pulled from audit-pricing
+// (bandPriceLine), never hardcoded, so it can never drift from the source
+// of truth. /pricing bakes NO number — the subscription ladder is
+// WTP-pending (ADR 0016).
 
-/** £197 audit — amber product register, share-series continuity with /scan. */
-export function auditCard(): OgCardContent {
+/** £197 Catalog Letter — amber product register, share-series continuity with /scan. */
+export function letterCard(): OgCardContent {
   const price = bandPriceLine('band-1'); // '£197'
   return {
     variant: 'amber',
-    eyebrowSuffix: 'Concierge audit',
+    eyebrowSuffix: 'The Catalog Letter',
     fontSize: 88,
     lines: [
-      [{ text: 'A human audits' }],
+      [{ text: 'A human reads' }],
       [{ text: 'the catalog. From ' }, { bracket: price }, { text: '.' }],
     ],
-    footerUrl: 'audit.flintmere.com/audit',
-    alt: `Flintmere concierge catalog audit — a human-led audit from ${price}.`,
+    footerUrl: 'audit.flintmere.com/catalog-letter',
+    alt: `Flintmere Catalog Letter — a human-read catalog letter from ${price}.`,
   };
 }
 
@@ -71,4 +72,4 @@ export function methodologyCard(): OgCardContent {
 }
 
 /** All nav-route cards — used by the content test suite. */
-export const OG_CARDS = [auditCard, standardsCard, pricingCard, methodologyCard];
+export const OG_CARDS = [letterCard, standardsCard, pricingCard, methodologyCard];

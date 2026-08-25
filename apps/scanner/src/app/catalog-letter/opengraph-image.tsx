@@ -1,9 +1,9 @@
 import { ImageResponse } from 'next/og';
 import { loadOgFonts } from '@/lib/og/og-fonts';
 import { renderOgCard, OG_SIZE, OG_CONTENT_TYPE } from '@/lib/og/og-card';
-import { auditCard } from '@/lib/og/og-content';
+import { letterCard } from '@/lib/og/og-content';
 
-const content = auditCard();
+const content = letterCard();
 
 export const alt = content.alt;
 export const size = OG_SIZE;

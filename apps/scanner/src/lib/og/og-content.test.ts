@@ -1,14 +1,22 @@
 import { describe, it, expect } from 'vitest';
 import { bandPriceLine } from '@/lib/audit-pricing';
-import { auditCard, pricingCard, OG_CARDS } from './og-content';
+import { letterCard, pricingCard, OG_CARDS } from './og-content';
 import type { ClaimSegment } from './og-card';
 
 const isBracket = (s: ClaimSegment): s is { bracket: string } => 'bracket' in s;
 
 describe('og card content', () => {
-  it('audit card pulls its price from the audit-pricing source of truth', () => {
-    const brackets = auditCard().lines.flat().filter(isBracket);
+  it('letter card pulls its price from the audit-pricing source of truth', () => {
+    const card = letterCard();
+    const brackets = card.lines.flat().filter(isBracket);
     expect(brackets.some((b) => b.bracket === bandPriceLine('band-1'))).toBe(true);
+    expect(card.eyebrowSuffix).toBe('The Catalog Letter');
+    const textSegments = card.lines
+      .flat()
+      .filter((s): s is { text: string } => 'text' in s)
+      .map((s) => s.text);
+    expect(textSegments).toEqual(['A human reads', 'the catalog. From ', '.']);
+    expect(card.footerUrl).toBe('audit.flintmere.com/catalog-letter');
   });
 
   it('every card carries at least one non-empty bracket token', () => {
