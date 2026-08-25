@@ -85,7 +85,7 @@ export default function Privacy() {
             While Google&rsquo;s Trust &amp; Safety review of our integration
             is still in flight, the connect surface offers a request-access
             form instead of starting the OAuth flow. If you submit, we store
-            your email, the audit ID that brought you to the page, your shop
+            your email, the read reference that brought you to the page, your shop
             URL, and any optional message you leave. We use this only to
             email you when access opens. Full treatment in clause 11.
           </li>
@@ -180,7 +180,7 @@ export default function Privacy() {
             days.
           </li>
           <li>
-            <strong>Stripe concierge audit records:</strong> kept for 7 years
+            <strong>Stripe concierge read records:</strong> kept for 7 years
             (HMRC requirement for invoices).
           </li>
           <li>
@@ -222,9 +222,9 @@ export default function Privacy() {
           </li>
           <li>
             <strong>Stripe</strong> (UK/Ireland) — payment processing for
-            concierge audits, Agency, and Plus tiers. Stripe receives the
+            concierge reads, Agency, and Plus tiers. Stripe receives the
             billing email, the shop URL (so it appears on the invoice), the
-            audit band purchased, and an internal payment-intent reference.
+            read band purchased, and an internal payment-intent reference.
             We do not pass Shopify access tokens, GMC tokens, catalog data,
             or scan results to Stripe. Card data is collected in the Stripe
             Payment Element iframe and never touches our servers.
@@ -331,7 +331,7 @@ export default function Privacy() {
           <code>flintmere.com/secret</code> for transferring sensitive
           values from sender to recipient through a single-use URL. We
           built it originally for handing read-only Shopify Admin API
-          tokens to the audit team during concierge fulfilment, and it
+          tokens to the read team during concierge fulfilment, and it
           stayed nice enough to publish — anyone can use it for any
           one-shot secret transfer between consenting parties. The flow
           is <strong>zero-knowledge by design</strong>:
@@ -382,7 +382,7 @@ export default function Privacy() {
           verification of our integration completes and the connect flow
           opens, the connect surface captures expressions of interest
           instead of starting the OAuth flow. If you submit your details there, we
-          store your email, the audit ID that brought you to the page, your
+          store your email, the read reference that brought you to the page, your
           shop URL, and any optional message you leave. We use this only to
           write to you the day access opens — at most a single email, after
           which the row&rsquo;s purpose is fulfilled. You can ask us to
@@ -408,7 +408,7 @@ export default function Privacy() {
           financial reports, or any data Google holds about your buyers.
         </p>
         <p className="mt-4">
-          <strong>How we use it.</strong> Strictly to produce your audit
+          <strong>How we use it.</strong> Strictly to produce your read
           deliverable — the report we hand back to you with the issues we
           found and the fixes we recommend. Google&rsquo;s ground-truth
           replaces our modelled estimates where we have it, so you get a
@@ -437,7 +437,7 @@ export default function Privacy() {
           </li>
           <li>
             We do not transfer GMC data to others except as necessary to
-            provide or improve the audit, and only under written contract
+            provide or improve the read, and only under written contract
             with the same Limited Use commitments.
           </li>
           <li>
@@ -451,7 +451,7 @@ export default function Privacy() {
         </ul>
         <p className="mt-4">
           <strong>Your control.</strong> You can disconnect at any time —
-          either from your Flintmere audit dashboard or directly from your
+          either from your Flintmere dashboard or directly from your
           Google Account at{' '}
           <a
             href="https://myaccount.google.com/permissions"
