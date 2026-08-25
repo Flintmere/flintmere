@@ -2,9 +2,18 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Remove "audit" as Flintmere's product noun from every customer-facing surface, replacing it with "read", and move `/audit` to `/read` behind permanent redirects — without touching the host, the legal register, or any code identifier.
 
-**Architecture:** Three mechanical layers applied in dependency order. (1) Routing: register `/read` in `host-routing.ts` and add `next.config.ts` redirects, so the new path resolves before any file moves. (2) Filesystem: move `app/audit/**` → `app/read/**`. (3) Copy: sweep the product noun across components, emails, metadata and canon docs, gated by an explicit frozen-string list.
+> **AMENDED 2026-08-25 (ADR 0028 Amendment 1).** The product noun is
+> **The Catalog Letter**, route `/catalog-letter`. "Read" survives as the
+> VERB only ("we read your catalog product by product") and must never
+> appear as a bare noun — Wave 0 produced six noun/verb collisions, all of
+> them noun uses. Deliverable item 1 is `A 1,500-word letter`, differentiated
+> from the product name. Tasks 1, 3, 6, 9 were implemented against the
+> superseded noun and are re-swept by Task 0.5.
+
+**Goal:** Remove "audit" as Flintmere's product noun from every customer-facing surface, replacing it with "read", and move `/audit` to `/catalog-letter` behind permanent redirects — without touching the host, the legal register, or any code identifier.
+
+**Architecture:** Three mechanical layers applied in dependency order. (1) Routing: register `/catalog-letter` in `host-routing.ts` and add `next.config.ts` redirects, so the new path resolves before any file moves. (2) Filesystem: move `app/audit/**` → `app/catalog-letter/**`. (3) Copy: sweep the product noun across components, emails, metadata and canon docs, gated by an explicit frozen-string list.
 
 **Tech Stack:** Next.js 15 App Router, TypeScript, Vitest (`pnpm --filter scanner test`), Playwright (`e2e/`), Prisma (untouched — schema is frozen).
 
@@ -23,7 +32,7 @@ Copied verbatim from `projects/flintmere/plans/2026-08-25-read-lexicon-migration
 - **Never run a bare `find | xargs sed s/audit/read/`.** Every task names its exact strings.
 - **Redirects are 308, not 301.** Next.js `permanent: true` emits 308. Verified against Next.js docs 2026-08-25. Both are permanent; assert 308 in tests.
 - **British English.** No banned adjectives (leverage, optimise, seamless, robust, scalable, premium, world-class…). No exclamation marks. No emoji.
-- **Trust-load-bearing surfaces** — `/read/connect` (OAuth) and `/read/success` (post-purchase) ship type-only. No marketing register, no decorative imagery.
+- **Trust-load-bearing surfaces** — `/catalog-letter/connect` (OAuth) and `/catalog-letter/success` (post-purchase) ship type-only. No marketing register, no decorative imagery.
 
 ---
 
@@ -31,10 +40,10 @@ Copied verbatim from `projects/flintmere/plans/2026-08-25-read-lexicon-migration
 
 | File | Responsibility | Task |
 |---|---|---|
-| `apps/scanner/src/lib/host-routing.ts` | Route→host classification. Add `/read`, `/read/success`; retain `/audit` entries so in-flight requests classify before the redirect fires. | 1 |
+| `apps/scanner/src/lib/host-routing.ts` | Route→host classification. Add `/catalog-letter`, `/catalog-letter/success`; retain `/audit` entries so in-flight requests classify before the redirect fires. | 1 |
 | `apps/scanner/src/lib/host-routing.test.ts` | Classification matrix. | 1 |
 | `apps/scanner/next.config.ts` | Same-host permanent redirects `/audit/*` → `/read/*`. New `redirects()` block — none exists today. | 1 |
-| `apps/scanner/src/app/read/**` | Moved from `app/audit/**`. `audit-motion.tsx` → `read-motion.tsx`. | 2 |
+| `apps/scanner/src/app/catalog-letter/**` | Moved from `app/audit/**`. `audit-motion.tsx` → `letter-motion.tsx`. | 2 |
 | `apps/scanner/src/lib/concierge-deliverable.ts` | Deliverable SSOT. Item 1 title only. | 3 |
 | `apps/scanner/src/lib/copy.ts` | Re-exports + CTA strings. | 3 |
 | Email modules (`concierge-email`, `concierge-delivery-email`, `concierge-refund-email`, `report-email`, `rescan-email`, `rescan-30-day`) | Transactional bodies. | 5 |
@@ -44,9 +53,9 @@ Copied verbatim from `projects/flintmere/plans/2026-08-25-read-lexicon-migration
 
 ---
 
-### Task 1: Register `/read` and add permanent redirects
+### Task 1: Register `/catalog-letter` and add permanent redirects
 
-Routing first, so `/read` resolves before any file moves and the redirect is testable in isolation.
+Routing first, so `/catalog-letter` resolves before any file moves and the redirect is testable in isolation.
 
 **Files:**
 - Modify: `apps/scanner/src/lib/host-routing.ts:82-90` (`SCANNER_ROUTES`)
@@ -55,7 +64,7 @@ Routing first, so `/read` resolves before any file moves and the redirect is tes
 
 **Interfaces:**
 - Consumes: `classifyRoute(pathname: string): HostAssignment` — existing, unchanged signature.
-- Produces: `/read` and `/read/success` classify as `'scanner'`. `/audit*` continues to classify as `'scanner'` (do not delete those entries — a request arriving mid-flight must classify correctly).
+- Produces: `/catalog-letter` and `/catalog-letter/success` classify as `'scanner'`. `/audit*` continues to classify as `'scanner'` (do not delete those entries — a request arriving mid-flight must classify correctly).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -64,10 +73,10 @@ Append to the scanner block in `apps/scanner/src/lib/host-routing.test.ts`:
 ```typescript
 describe('read routes (ADR 0028)', () => {
   it.each([
-    ['/read', 'scanner'],
-    ['/read/success', 'scanner'],
-    ['/read/connect', 'scanner'],
-    ['/read/connect/results', 'scanner'],
+    ['/catalog-letter', 'scanner'],
+    ['/catalog-letter/success', 'scanner'],
+    ['/catalog-letter/connect', 'scanner'],
+    ['/catalog-letter/connect/results', 'scanner'],
   ])('classifies %s as scanner', (path, expected) => {
     expect(classifyRoute(path)).toBe(expected);
   });
@@ -84,20 +93,20 @@ describe('read routes (ADR 0028)', () => {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `pnpm --filter scanner test host-routing`
-Expected: FAIL — `/read` returns `'marketing'` (it falls through to the unknown-marketing default).
+Expected: FAIL — `/catalog-letter` returns `'marketing'` (it falls through to the unknown-marketing default).
 
 - [ ] **Step 3: Register the routes**
 
-In `apps/scanner/src/lib/host-routing.ts`, `SCANNER_ROUTES`. Order matters — the list is matched longest-first, so `/read/success` precedes `/read`:
+In `apps/scanner/src/lib/host-routing.ts`, `SCANNER_ROUTES`. Order matters — the list is matched longest-first, so `/catalog-letter/success` precedes `/catalog-letter`:
 
 ```typescript
 export const SCANNER_ROUTES: readonly string[] = [
-  '/read/success',
+  '/catalog-letter/success',
   '/audit/success',
   '/admin',
   '/score',
   '/scan',
-  '/read',
+  '/catalog-letter',
   '/audit',
   '/blog',
   '/bot',
@@ -105,12 +114,12 @@ export const SCANNER_ROUTES: readonly string[] = [
 ];
 ```
 
-Update the doc comment above it to name `/read` as canonical and `/audit` as the retained legacy prefix.
+Update the doc comment above it to name `/catalog-letter` as canonical and `/audit` as the retained legacy prefix.
 
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `pnpm --filter scanner test host-routing`
-Expected: PASS, and all 32 pre-existing tests still pass.
+Expected: PASS, and all 76 pre-existing tests still pass.
 
 - [ ] **Step 5: Add the redirects**
 
@@ -123,7 +132,7 @@ Expected: PASS, and all 32 pre-existing tests still pass.
       // never to be removed: delivery emails already sent build
       // /audit/connect?audit=<id> links (concierge-delivery-email.ts),
       // and inbound links from outreach and shared score pages persist.
-      { source: '/audit', destination: '/read', permanent: true },
+      { source: '/audit', destination: '/catalog-letter', permanent: true },
       { source: '/audit/:path*', destination: '/read/:path*', permanent: true },
     ];
   },
@@ -135,7 +144,7 @@ Expected: PASS, and all 32 pre-existing tests still pass.
 
 Run: `pnpm --filter scanner build && pnpm --filter scanner start`
 Then: `curl -sI localhost:3000/audit/connect/results | head -3`
-Expected: `HTTP/1.1 308 Permanent Redirect` and `location: /read/connect/results`.
+Expected: `HTTP/1.1 308 Permanent Redirect` and `location: /catalog-letter/connect/results`.
 
 Note 308, not 301 — `permanent: true` emits 308. Both are permanent redirects and Google treats them equivalently.
 
@@ -151,29 +160,29 @@ git commit -m "feat(scanner): register /read routes + permanent /audit redirects
 ### Task 2: Move the route tree
 
 **Files:**
-- Move: `apps/scanner/src/app/audit/` → `apps/scanner/src/app/read/`
-- Rename: `apps/scanner/src/app/read/audit-motion.tsx` → `read-motion.tsx`
+- Move: `apps/scanner/src/app/audit/` → `apps/scanner/src/app/catalog-letter/`
+- Rename: `apps/scanner/src/app/catalog-letter/audit-motion.tsx` → `letter-motion.tsx`
 
 **Interfaces:**
-- Consumes: `/read` classification from Task 1.
-- Produces: `app/read/page.tsx`, `app/read/success/page.tsx`, `app/read/connect/page.tsx`, `app/read/connect/results/page.tsx`, `app/read/opengraph-image.tsx`. Component export names (`BandTriptych`, `CheckoutCard`, `DeliverableLift`) are unchanged.
+- Consumes: `/catalog-letter` classification from Task 1.
+- Produces: `app/catalog-letter/page.tsx`, `app/catalog-letter/success/page.tsx`, `app/catalog-letter/connect/page.tsx`, `app/catalog-letter/connect/results/page.tsx`, `app/catalog-letter/opengraph-image.tsx`. Component export names (`BandTriptych`, `CheckoutCard`, `DeliverableLift`) are unchanged.
 
 - [ ] **Step 1: Move the tree with git**
 
 ```bash
 cd /Users/abuaa/Projects/Flintmere
-git mv apps/scanner/src/app/audit apps/scanner/src/app/read
-git mv apps/scanner/src/app/read/audit-motion.tsx apps/scanner/src/app/read/read-motion.tsx
+git mv apps/scanner/src/app/audit apps/scanner/src/app/catalog-letter
+git mv apps/scanner/src/app/catalog-letter/audit-motion.tsx apps/scanner/src/app/catalog-letter/letter-motion.tsx
 ```
 
 `git mv` preserves history — do not delete-and-recreate.
 
 - [ ] **Step 2: Fix the motion-module import**
 
-`apps/scanner/src/app/read/page.tsx` imports `DeliverableLift`:
+`apps/scanner/src/app/catalog-letter/page.tsx` imports `DeliverableLift`:
 
 ```typescript
-import { DeliverableLift } from './read-motion';
+import { DeliverableLift } from './letter-motion';
 ```
 
 - [ ] **Step 3: Find every remaining internal link to the old path**
@@ -195,7 +204,7 @@ Expected: PASS. A failure here is almost certainly a stale relative import insid
 
 ```bash
 git add -A apps/scanner/src
-git commit -m "refactor(scanner): move app/audit tree to app/read (ADR 0028)"
+git commit -m "refactor(scanner): move app/audit tree to app/catalog-letter (ADR 0028)"
 ```
 
 ---
@@ -224,7 +233,7 @@ describe('deliverable parity (ADR 0028)', () => {
     'keeps five items in canonical order for %s',
     (slug) => {
       expect(conciergeDeliverableItems(slug).map((i) => i.title)).toEqual([
-        'A written catalog letter',
+        'A 1,500-word letter',
         'A per-product fix CSV',
         'A 30-day fix sequence',
         'A GS1 UK barcode path',
@@ -255,10 +264,10 @@ Expected: FAIL — received `'A written audit letter'`.
 `apps/scanner/src/lib/concierge-deliverable.ts:62`:
 
 ```typescript
-      title: 'A written catalog letter',
+      title: 'A 1,500-word letter',
 ```
 
-Do not touch lines 66, 70, 75, 80. Update the module doc-comment's references to "the concierge audit deliverable" → "the concierge read deliverable", and the `/audit` path references → `/read`.
+Do not touch lines 66, 70, 75, 80. Update the module doc-comment's references to "the concierge audit deliverable" → "the concierge read deliverable", and the `/audit` path references → `/catalog-letter`.
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -267,7 +276,7 @@ Expected: PASS, both tests.
 
 - [ ] **Step 5: Update `copy.ts`**
 
-In `apps/scanner/src/lib/copy.ts`, lines 45–50 and 71 are comments describing the deliverable and the `/audit` redesign. Rewrite "audit" → "read" in the prose, and `/audit` → `/read` in the path reference. Line 2–3 imports from `./audit-pricing` are frozen — leave them.
+In `apps/scanner/src/lib/copy.ts`, lines 45–50 and 71 are comments describing the deliverable and the `/audit` redesign. Rewrite "audit" → "read" in the prose, and `/audit` → `/catalog-letter` in the path reference. Line 2–3 imports from `./audit-pricing` are frozen — leave them.
 
 - [ ] **Step 6: Commit**
 
@@ -281,9 +290,9 @@ git commit -m "feat(scanner): deliverable item 1 becomes 'A written catalog lett
 ### Task 4: Product-noun sweep across conversion + marketing surfaces
 
 **Files (ADR 0022's `Affects:` list, minus frozen entries):**
-- `apps/scanner/src/app/read/{page,BandTriptych,CheckoutCard}.tsx`
-- `apps/scanner/src/app/read/success/page.tsx`
-- `apps/scanner/src/app/read/connect/**`
+- `apps/scanner/src/app/catalog-letter/{page,BandTriptych,CheckoutCard}.tsx`
+- `apps/scanner/src/app/catalog-letter/success/page.tsx`
+- `apps/scanner/src/app/catalog-letter/connect/**`
 - `apps/scanner/src/app/pricing/{page.tsx,ConciergeBands.tsx,PricingTiersGrid.tsx}`
 - `apps/scanner/src/app/for/{food-and-drink,beauty,apparel,plus}/page.tsx`
 - `apps/scanner/src/app/research/components/CTA.tsx`
@@ -317,13 +326,13 @@ Per spec §1, in every line the worklist returns:
 
 | From | To |
 |---|---|
-| Concierge audit | Concierge read |
-| the audit / an audit / your audit | the read / a read / your read |
-| catalog data audit | catalog read |
-| Book the audit · £197 | Book the read · £197 |
-| the audit team | the read team |
-| Audit booked | Your read is booked |
-| audits (plural, product) | reads |
+| Concierge audit | **The Catalog Letter** (ADR 0028 Amendment 1) |
+| the audit / an audit / your audit | the letter / your catalog letter — NEVER "the read" as a noun |
+| catalog data audit | catalog letter |
+| Book the audit · £197 | Book your catalog letter · £197 |
+| the audit team | the Flintmere team |
+| Audit booked | Your catalog letter is booked |
+| audits (plural, product) | catalog letters |
 
 Do NOT change: any line containing `audit.flintmere.com`; the frozen legal lines; identifier tokens.
 
@@ -335,40 +344,40 @@ change together. Sweeping one without the other leaves the hero section
 with no accessible name — a WCAG 4.1.2 failure that no test in this repo
 catches, because the id still *parses*, it just points at nothing.
 
-`app/read/BandTriptych.tsx:104`:
+`app/catalog-letter/BandTriptych.tsx:104`:
 
 ```tsx
-        id="read-hero"
+        id="letter-hero"
 ```
 
-`app/read/page.tsx:83`:
+`app/catalog-letter/page.tsx:83`:
 
 ```tsx
-          aria-labelledby="read-hero"
+          aria-labelledby="letter-hero"
 ```
 
 Verify the pair resolves:
 
 ```bash
-cd /Users/abuaa/Projects/Flintmere/apps/scanner/src/app/read
-grep -rn "read-hero" . | wc -l   # expect 2
+cd /Users/abuaa/Projects/Flintmere/apps/scanner/src/app/catalog-letter
+grep -rn "letter-hero" . | wc -l   # expect 2
 grep -rn "audit-hero" . | wc -l  # expect 0
 ```
 
 - [ ] **Step 4: Metadata titles**
 
-`app/read/page.tsx` metadata:
+`app/catalog-letter/page.tsx` metadata:
 
 ```typescript
 export const metadata: Metadata = {
   title: 'Concierge read — from £197',
   description:
     'We read your Shopify store product by product and send a written catalog letter plus a per-product fix CSV within three working days. Three SKU bands — £197 / £397 / from £597. 30-day re-scan included.',
-  alternates: { canonical: '/read' },
+  alternates: { canonical: '/catalog-letter' },
 };
 ```
 
-`app/read/success/page.tsx` metadata `title: 'Your read is booked'`.
+`app/catalog-letter/success/page.tsx` metadata `title: 'Your read is booked'`.
 
 - [ ] **Step 5: Verify no product-noun survives**
 
@@ -409,7 +418,7 @@ Separate task: these are already-sent artefacts' successors and a reviewer may w
 `concierge-delivery-email.ts:77` — the path moves, the query-param name does not (`audit=` is tied to the frozen `auditId`):
 
 ```typescript
-    ? `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://audit.flintmere.com'}/read/connect?audit=${encodeURIComponent(auditId)}`
+    ? `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://audit.flintmere.com'}/catalog-letter/connect?audit=${encodeURIComponent(auditId)}`
 ```
 
 The `audit.flintmere.com` fallback host stays — that is Shipment 2.
@@ -494,17 +503,17 @@ git commit -m "feat(scanner): legal-page copy says 'read'; GDPR/SOC-2 audit term
 - `apps/scanner/src/app/sitemap.ts:50`
 - `apps/scanner/src/app/sitemap/page.tsx:61,265`
 - `apps/scanner/src/app/layout.tsx:103,140`
-- `apps/scanner/src/app/read/opengraph-image.tsx`, `apps/scanner/src/lib/og/og-content.ts`
+- `apps/scanner/src/app/catalog-letter/opengraph-image.tsx`, `apps/scanner/src/lib/og/og-content.ts`
 
 **Interfaces:**
-- Produces: `/read` appears in `sitemap.xml`; `/audit` is removed from it (a sitemap must list canonical URLs, never redirects).
+- Produces: `/catalog-letter` appears in `sitemap.xml`; `/audit` is removed from it (a sitemap must list canonical URLs, never redirects).
 
 - [ ] **Step 1: Sitemap**
 
 `app/sitemap.ts:50` — replace the path, keep priority:
 
 ```typescript
-  { path: '/read', changeFrequency: 'monthly', priority: 0.9 },
+  { path: '/catalog-letter', changeFrequency: 'monthly', priority: 0.9 },
 ```
 
 - [ ] **Step 2: llms.txt**
@@ -536,9 +545,9 @@ Line 103 — the Instagram `sameAs`. **Leave unchanged for now.** The handle mov
 
 - [ ] **Step 4: Sitemap page + OG**
 
-`sitemap/page.tsx:61` — label `'Concierge audit'` → `'Concierge read'`, href `/audit` → `/read`. Line 265 — "The public catalog-readiness audit." → "The public catalog-readiness scan." (it describes the scanner host, not the paid product). Leave lines 89, 90, 239 — those are host strings.
+`sitemap/page.tsx:61` — label `'Concierge audit'` → `'Concierge read'`, href `/audit` → `/catalog-letter`. Line 265 — "The public catalog-readiness audit." → "The public catalog-readiness scan." (it describes the scanner host, not the paid product). Leave lines 89, 90, 239 — those are host strings.
 
-`lib/og/og-content.ts` — rename the `auditCard()` export's *copy strings* only; the function name is internal, rename it to `readCard()` and update `app/read/opengraph-image.tsx:6`.
+`lib/og/og-content.ts` — rename the `auditCard()` export's *copy strings* only; the function name is internal, rename it to `readCard()` and update `app/catalog-letter/opengraph-image.tsx:6`.
 
 - [ ] **Step 5: Verify sitemap output**
 
@@ -560,7 +569,7 @@ git commit -m "feat(scanner): metadata, sitemap + llms.txt point at /read (ADR 0
 Spec §3.1. One block that holds the head term and does the positioning work at once.
 
 **Files:**
-- Modify: `apps/scanner/src/app/read/page.tsx` (FAQ section)
+- Modify: `apps/scanner/src/app/catalog-letter/page.tsx` (FAQ section)
 
 **There is no FAQ section on this page.** The page has four sections —
 checkout, deliverables, how-it-works, legal (`aria-labelledby` ids at
@@ -645,7 +654,7 @@ constants are already imported and defined at the top of the file
 - [ ] **Step 2: Verify the head term is present exactly once**
 
 ```bash
-grep -c "catalog audit" apps/scanner/src/app/read/page.tsx
+grep -c "catalog audit" apps/scanner/src/app/catalog-letter/page.tsx
 ```
 
 Expected: `1`.
@@ -653,7 +662,7 @@ Expected: `1`.
 - [ ] **Step 3: Commit**
 
 ```bash
-git add apps/scanner/src/app/read/page.tsx
+git add apps/scanner/src/app/catalog-letter/page.tsx
 git commit -m "feat(scanner): FAQ entry retains 'catalog audit' search term on /read (ADR 0028)"
 ```
 
@@ -698,7 +707,7 @@ git commit -m "fix(scanner): homepage advice copy uses 'check', not 'audit' (ADR
 - `memory/marketing/seo.md` — keep `shopify catalog audit` as a target term; add a one-line annotation that it is search-surface-only, never product-name
 - `memory/marketing/metrics.md:11` — "Paid concierge audits per week" → "Paid concierge reads per week"
 - `memory/marketing/audiences.md:42` — "post-audit upsell" → "post-read upsell"
-- `memory/canon-source-register.md` §A1/§A2 — `/audit` paths → `/read`
+- `memory/canon-source-register.md` §A1/§A2 — `/audit` paths → `/catalog-letter`
 - `projects/flintmere/BUSINESS.md` — §audits heading. **Keep** "one-time consulting audits" at line 8 — that describes competitors, correctly.
 - `CLAUDE.md` — Product snapshot; add a Canon-hygiene entry
 
@@ -711,7 +720,7 @@ The two lines that must NOT change are `BUSINESS.md:8` (competitor description) 
 Under `## Canon hygiene`, add:
 
 ```markdown
-- "Concierge audit" / "the audit" as the paid product's name (retired 2026-08-25, ADR 0028 — the product is the **Concierge read**; `/audit` → `/read`). "Audit" survives only in the GDPR/SOC-2 legal register, as an SEO target term, and in code identifiers.
+- "Concierge audit" / "the audit" as the paid product's name (retired 2026-08-25, ADR 0028 — the product is the **Concierge read**; `/audit` → `/catalog-letter`). "Audit" survives only in the GDPR/SOC-2 legal register, as an SEO target term, and in code identifiers.
 ```
 
 - [ ] **Step 3: Commit**
@@ -725,17 +734,17 @@ git commit -m "docs(canon): lexicon files adopt 'read' (ADR 0028)"
 
 ### Task 11: E2E coverage + conversion floor
 
-`/read` is the paid conversion page and currently has zero E2E coverage — `e2e/mobile-reflow.spec.ts` covers only `/`, `/bot`, `/methodology`, `/pricing`, `/scan`.
+`/catalog-letter` is the paid conversion page and currently has zero E2E coverage — `e2e/mobile-reflow.spec.ts` covers only `/`, `/bot`, `/methodology`, `/pricing`, `/scan`.
 
 **Files:**
 - Modify: `apps/scanner/e2e/mobile-reflow.spec.ts`
 
-- [ ] **Step 1: Add `/read` to the route list**
+- [ ] **Step 1: Add `/catalog-letter` to the route list**
 
 `apps/scanner/e2e/mobile-reflow.spec.ts:25`:
 
 ```typescript
-const ROUTES = ['/', '/bot', '/pricing', '/methodology', '/scan', '/read'] as const;
+const ROUTES = ['/', '/bot', '/pricing', '/methodology', '/scan', '/catalog-letter'] as const;
 ```
 
 The suite iterates `ROUTES × WIDTHS` (320, 360, 393), so this adds three

@@ -98,3 +98,58 @@ Three monosyllables, escalating human involvement. Every surface that names the 
 - **#11 Founder voice** — no banned phrases introduced; no marketing register on trust-load-bearing surfaces.
 - **#15 GTM / #18 Sales** — agency channel keeps "audit" where it is the reseller's own vocabulary; search demand retained on-page.
 - **#34 Brand / #36 Conversion / #37 Consumer psychology** — the inflicted/commissioned flip is the whole point; `/read` conversion floor re-measured at 375×812 before ship.
+
+---
+
+## Amendment 1 — 2026-08-25: the noun is **The Catalog Letter**; "read" stays a verb
+
+**Status:** Accepted (operator, 2026-08-25, same day as the parent decision)
+**Trigger:** Shipment 1 Wave 0 implementation. Not a change of mind — evidence the original decision could not have had.
+
+### What implementation showed
+
+Wave 0 touched five files and produced **six** sites where the product noun collided with the ordinary verb:
+
+| Site | As written |
+|---|---|
+| `concierge-deliverable.ts` | "The audit **reads** a representative sample" |
+| `terms:62` | "grant us **read**-only access so **the read** uses ground-truth" |
+| `privacy:454` | "your Flintmere **read** dashboard" |
+| `privacy:432` / `:440` | "humans to **read** GMC data" beside "improve **the read**" — adjacent bullets inside Google's Limited Use clause |
+| `privacy:411` | "your **read** deliverable" |
+| `privacy:334`, `terms:154` | "the **read** team" |
+
+Three different agents, working independently and unaware of each other, each reached for the same repair: qualify the noun or rephrase around it.
+
+### The pattern
+
+**All six collisions are the noun. Not one is the verb.** "We read your catalog product by product" never caused a problem anywhere. The collision appears only when *the read* as a thing stands near *read* as an action — and Flintmere is a data-access product, so that vocabulary saturates exactly the surfaces still ahead: transactional email, the OAuth connect flow, GMC integration copy, `read-only access` as a term of art.
+
+That is a structural property of the word in this domain, not a run of bad sentences.
+
+### Decision
+
+Split the register the evidence splits:
+
+- **The verb stays `read`.** "We read your store product by product." Every reason from the parent decision holds — it is the product's own prose (`concierge-deliverable.ts:56`), ADR 0022's own prose (`0022:16`), and the doctor's-report register in `VOICE.md` where a radiologist reads a scan.
+- **The product noun becomes `The Catalog Letter`.** Route `/catalog-letter`. This eliminates 100% of the observed collisions, because every one of them was a noun use.
+
+The parent decision's §0.2 host/product split is unaffected: the host still becomes `catalog.flintmere.com`, the routes are still verbs and artefacts.
+
+### Consequence for the deliverable list
+
+The product name would otherwise sit almost on top of deliverable item 1, `A written catalog letter` — one of five things the price buys. Naming the whole after one part risks the buyer reading the other four as absent. Item 1 is therefore differentiated:
+
+| # | Title |
+|---|---|
+| 1 | **A 1,500-word letter** (was `A written catalog letter`) |
+| 2 | A per-product fix CSV |
+| 3 | A 30-day fix sequence |
+| 4 | A GS1 UK barcode path |
+| 5 | A 30-day re-scan |
+
+The product carries "catalog"; the component carries its specification. The body copy already states 1,500 words, so this adds precision rather than a new claim. Items 2-5 remain frozen. Prices are untouched: £197 / £397 / `From £597 — bespoke quote`.
+
+### Why this was not knowable at ratification
+
+The parent decision rejected "The Letter" on the grounds that it names one of five items and under-promises. That objection is real and is answered above by differentiating item 1 — a move that only became obvious once item 1's title had actually been rewritten. The collision evidence, likewise, only existed once the noun had been applied to real legal prose. Ratifying, implementing one wave, and reading the result is what produced both.
