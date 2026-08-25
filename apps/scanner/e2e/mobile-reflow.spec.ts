@@ -21,7 +21,7 @@ import { test, expect } from '@playwright/test';
  * `/bot` cover is one such case, tracked separately.
  */
 
-const ROUTES = ['/', '/bot', '/pricing', '/methodology', '/scan'] as const;
+const ROUTES = ['/', '/bot', '/pricing', '/methodology', '/scan', '/catalog-letter'] as const;
 
 // 320 is the WCAG floor; 360 + 393 are the most common Android/iPhone widths.
 const WIDTHS = [320, 360, 393] as const;
