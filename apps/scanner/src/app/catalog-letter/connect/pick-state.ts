@@ -1,4 +1,4 @@
-// Pure dispatch fn for /audit/connect. Extracted so the three-state
+// Pure dispatch fn for /catalog-letter/connect. Extracted so the three-state
 // decision is testable in node (vitest env is node-only — see
 // apps/scanner/vitest.config.ts; component rendering is not tested).
 

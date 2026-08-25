@@ -69,7 +69,7 @@ export function PostConnectRetry({ auditId, errorCode }: PostConnectRetryProps) 
           {retrying ? 'Retrying…' : 'Try the scan again →'}
         </button>
         <a
-          href={`/audit/connect?audit=${encodeURIComponent(auditId)}`}
+          href={`/catalog-letter/connect?audit=${encodeURIComponent(auditId)}`}
           className="btn"
         >
           Back to connection

@@ -61,7 +61,7 @@ describe('sendConciergeDeliveryEmail', () => {
     const { send } = await loadWithCaptureSendEmail();
     const email = await send({ auditId: 'aud_123' });
     const expectedUrl =
-      'https://audit.flintmere.com/audit/connect?audit=aud_123';
+      'https://audit.flintmere.com/catalog-letter/connect?audit=aud_123';
     expect(email.html).toContain(expectedUrl);
     expect(email.text).toContain(expectedUrl);
     expect(email.html).toContain('Connect Google Merchant Center');
@@ -71,8 +71,8 @@ describe('sendConciergeDeliveryEmail', () => {
   it('omits GMC connect link when auditId is absent', async () => {
     const { send } = await loadWithCaptureSendEmail();
     const email = await send({});
-    expect(email.html).not.toContain('/audit/connect');
-    expect(email.text).not.toContain('/audit/connect');
+    expect(email.html).not.toContain('/catalog-letter/connect');
+    expect(email.text).not.toContain('/catalog-letter/connect');
     expect(email.html).not.toContain('Connect Google Merchant Center');
   });
 

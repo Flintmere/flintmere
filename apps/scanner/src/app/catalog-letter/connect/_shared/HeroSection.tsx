@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Bracket } from '@flintmere/ui';
 
-// Shared hero scaffold for the three /audit/connect states.
+// Shared hero scaffold for the three /catalog-letter/connect states.
 // Each state supplies eyebrow + heading + body; padding, type scale,
 // and bracket-shimmer wrapping are centralised here so visual canon
 // stays consistent across pre-verification, connect, and connected.

@@ -5,11 +5,11 @@ import { join } from 'node:path';
 // Regression guard for the cross-host RSC-prefetch error family.
 //
 // MerchantCenterSection renders on flintmere.com (marketing host) and links to
-// /audit/connect, which is a SCANNER route — on the marketing host it 301s
+// /catalog-letter/connect, which is a SCANNER route — on the marketing host it 301s
 // cross-origin to audit.flintmere.com. A same-origin-relative
-// `<Link href="/audit/connect">` makes Next attempt an RSC prefetch when the
+// `<Link href="/catalog-letter/connect">` makes Next attempt an RSC prefetch when the
 // section scrolls into view; the cross-origin 301 cannot be consumed as a flight
-// payload, so Next logs "Failed to fetch RSC payload for .../audit/connect.
+// payload, so Next logs "Failed to fetch RSC payload for .../catalog-letter/connect.
 // Falling back to browser navigation." on EVERY homepage load
 // (vercel/next.js#53813 — this is NOT deployment skew; it does not self-heal).
 //
@@ -30,11 +30,11 @@ describe('MerchantCenterSection cross-host links (RSC prefetch regression)', () 
 
   it('uses no relative <Link href> to a cross-host scanner route', () => {
     // A relative href to a scanner route 301s cross-origin -> failed RSC prefetch.
-    expect(source).not.toMatch(/href="\/audit/);
+    expect(source).not.toMatch(/href="\/catalog-letter/);
     expect(source).not.toMatch(/href="\/scan/);
   });
 
   it('emits the connect link as an absolute cross-host URL via crossHostHref', () => {
-    expect(source).toMatch(/crossHostHref\(['"]\/audit\/connect['"]\)/);
+    expect(source).toMatch(/crossHostHref\(['"]\/catalog-letter\/connect['"]\)/);
   });
 });

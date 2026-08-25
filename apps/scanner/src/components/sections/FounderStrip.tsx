@@ -163,7 +163,7 @@ export function FounderStrip() {
 
           <div className="mt-9 lg:mt-[clamp(40px,5vw,72px)]">
             <Link
-              href="/audit#checkout"
+              href="/catalog-letter#checkout"
               // Cross-host (marketing → audit.flintmere.com): Next prefetches this
               // relative Link, middleware 301s it cross-origin, and the CORS-mode
               // RSC fetch can't follow → "Failed to fetch RSC payload" console noise.

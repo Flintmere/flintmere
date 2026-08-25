@@ -16,7 +16,7 @@
  * Band 3 swaps the form for a mailto enquiry — bespoke quotes go via
  * email, never Stripe.
  *
- * On Stripe success: redirect to /audit/success?payment_intent=…
+ * On Stripe success: redirect to /catalog-letter/success?payment_intent=…
  * The webhook at /api/webhooks/stripe is the source of truth for
  * fulfilment and reads the `audit_band` metadata key set by the
  * checkout API.
@@ -287,8 +287,8 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
   if (state.kind === 'pay') {
     const returnUrl =
       typeof window !== 'undefined'
-        ? `${window.location.origin}/audit/success`
-        : 'https://audit.flintmere.com/audit/success';
+        ? `${window.location.origin}/catalog-letter/success`
+        : 'https://audit.flintmere.com/catalog-letter/success';
     const options: StripeElementsOptions = {
       clientSecret: state.clientSecret,
       appearance: APPEARANCE,

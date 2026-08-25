@@ -89,7 +89,7 @@ export default async function AuditSuccess({ searchParams }: Props) {
             </p>
             <p style={{ marginTop: 16 }}>
               <a
-                href={`/audit/connect?audit=${encodeURIComponent(connectAuditId)}`}
+                href={`/catalog-letter/connect?audit=${encodeURIComponent(connectAuditId)}`}
                 className="text-[color:var(--color-ink)] underline"
                 style={{ textUnderlineOffset: 3 }}
               >

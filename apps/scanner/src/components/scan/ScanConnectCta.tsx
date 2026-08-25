@@ -46,7 +46,7 @@ export function ScanConnectCta({ scanId }: ScanConnectCtaProps) {
 
   if (!auditId) return null;
 
-  const href = `/audit/connect?audit=${encodeURIComponent(auditId)}`;
+  const href = `/catalog-letter/connect?audit=${encodeURIComponent(auditId)}`;
 
   return (
     <section

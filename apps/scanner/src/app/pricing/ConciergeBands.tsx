@@ -56,7 +56,7 @@ export function ConciergeBands() {
           One-off audit; you self-attest your band at checkout. Full
           deliverable + offer detail on the{' '}
           <Link
-            href="/audit#checkout"
+            href="/catalog-letter#checkout"
             // Cross-host (marketing → audit.flintmere.com): Next prefetches this
             // relative Link, middleware 301s it cross-origin, and the CORS-mode
             // RSC fetch can't follow → "Failed to fetch RSC payload" console noise.

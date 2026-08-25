@@ -41,8 +41,8 @@ export interface ConciergeDeliveryInput {
   csvBuffer: Buffer;
   /**
    * ConciergeAudit row id. When present, the email includes the GMC
-   * connect link `${NEXT_PUBLIC_APP_URL}/audit/connect?audit=${auditId}`
-   * per ADR 0023 §slice 2b. The /audit/connect page renders either the
+   * connect link `${NEXT_PUBLIC_APP_URL}/catalog-letter/connect?audit=${auditId}`
+   * per ADR 0023 §slice 2b. The /catalog-letter/connect page renders either the
    * pre-verification request-access form (FEATURE_GMC_OAUTH=false) or
    * the live OAuth start (flag flipped post Google T&S verification);
    * the email link is identical across both states.
@@ -74,7 +74,7 @@ export async function sendConciergeDeliveryEmail(
   const safeNotesText = notes ? `\n${notes}\n` : '';
 
   const connectUrl = auditId
-    ? `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://audit.flintmere.com'}/audit/connect?audit=${encodeURIComponent(auditId)}`
+    ? `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://audit.flintmere.com'}/catalog-letter/connect?audit=${encodeURIComponent(auditId)}`
     : null;
   const connectHtml = connectUrl
     ? `

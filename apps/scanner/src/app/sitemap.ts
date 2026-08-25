@@ -47,7 +47,7 @@ const MARKETING_SITEMAP_ROUTES: RouteEntry[] = [
 
 const SCANNER_SITEMAP_ROUTES: RouteEntry[] = [
   { path: '/scan', changeFrequency: 'monthly', priority: 1.0 },
-  { path: '/audit', changeFrequency: 'monthly', priority: 0.9 },
+  { path: '/catalog-letter', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/blog', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/bot', changeFrequency: 'yearly', priority: 0.3 },
 ];
