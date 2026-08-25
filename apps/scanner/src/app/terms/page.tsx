@@ -7,7 +7,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = {
   title: 'Terms of Service — Your agreement with Flintmere',
   description:
-    'The agreement between you and Flintmere (Eazy Access Ltd) for the scanner, Shopify app, and concierge reads — 30-day refund window, English law, liability capped at 12 months of fees.',
+    'The agreement between you and Flintmere (Eazy Access Ltd) for the scanner, Shopify app, and catalog letters — 30-day refund window, English law, liability capped at 12 months of fees.',
   alternates: { canonical: '/terms' },
 };
 
@@ -49,7 +49,7 @@ export default function Terms() {
             and not offered to new sign-ups.
           </li>
           <li>
-            <strong>Concierge reads</strong>: a one-off written read
+            <strong>Catalog Letter</strong>: a one-off written catalog letter
             delivered within three working days, purchased directly via Stripe.
             Three SKU bands &mdash; £197 (up to 1,500 SKUs), £397
             (1,501&ndash;5,000), or bespoke from £597 (5,001+, contracted by
@@ -94,7 +94,7 @@ export default function Terms() {
             Stripe under a separate order form.
           </li>
           <li>
-            <strong>Concierge reads</strong> are one-off payments via Stripe.
+            <strong>Catalog Letter</strong> purchases are one-off payments via Stripe.
           </li>
           <li>
             <strong>30-day refund.</strong> If you pay Flintmere directly and
@@ -192,7 +192,7 @@ export default function Terms() {
           GMC, never write back, never share GMC data with third parties
           beyond the sub-processors listed in the Privacy Policy, and never
           use GMC data for advertising or resale. You may revoke at any time
-          from your read dashboard or directly at{' '}
+          from your catalog letter dashboard or directly at{' '}
           <a
             href="https://myaccount.google.com/permissions"
             className="underline"

@@ -502,7 +502,7 @@ export default function MarketingHome() {
       {/* Chapter 2.5 — Post-Pillars scan re-invite. Operator caught
           2026-05-11 that the page had no free-scan CTA between the hero
           and the footer; the FounderStrip CTA points at the paid £197
-          read, not the free scan. This callout sits on opaque paper at
+          catalog letter, not the free scan. This callout sits on opaque paper at
           z:1 (matching the curtain-pair). */}
       <ScanCallout
         eyebrow="// your turn"

@@ -72,8 +72,9 @@ export const MARKETING_ROUTES: readonly string[] = [
  * Routes that live on `audit.flintmere.com`. Hitting one of these on
  * `flintmere.com` or `standards.flintmere.com` → 301 to audit.flintmere.com.
  *
- * `/read` is the canonical product noun (ADR 0028 — "audit" retired as
- * lexicon). `/audit` is retained as a legacy prefix: it must keep
+ * `/catalog-letter` is the canonical product route (ADR 0028 Amendment 1 —
+ * the product noun is "The Catalog Letter"; "read" survives only as the
+ * verb). `/audit` is retained as a legacy prefix: it must keep
  * classifying as scanner (not be deleted) because `classifyRoute` also
  * backs `canonicalHost()`, which `host-url.ts` calls directly (not over
  * HTTP) to build absolute URLs for stale or legacy `/audit` paths — that
@@ -87,12 +88,12 @@ export const MARKETING_ROUTES: readonly string[] = [
  * fall through unknown.
  */
 export const SCANNER_ROUTES: readonly string[] = [
-  '/read/success',
+  '/catalog-letter/success',
   '/audit/success',
   '/admin',
   '/score',
   '/scan',
-  '/read',
+  '/catalog-letter',
   '/audit',
   '/blog',
   '/bot',

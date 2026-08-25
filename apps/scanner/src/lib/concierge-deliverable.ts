@@ -1,15 +1,15 @@
 /**
- * Single source of truth for the concierge read deliverable copy.
+ * Single source of truth for the concierge catalog letter deliverable copy.
  *
- * Every customer-facing surface that describes what the read ships
- * MUST render from this module. The three reference surfaces:
- *   - apps/scanner/src/app/read/page.tsx — deliverables list (rendered
- *     via CONCIERGE_DELIVERABLE_LIST in copy.ts, which re-exports from
- *     here)
+ * Every customer-facing surface that describes what the catalog letter
+ * ships MUST render from this module. The three reference surfaces:
+ *   - apps/scanner/src/app/catalog-letter/page.tsx — deliverables list
+ *     (rendered via CONCIERGE_DELIVERABLE_LIST in copy.ts, which re-exports
+ *     from here)
  *   - apps/scanner/src/lib/concierge-email.ts — post-purchase Resend
  *     body (renders the email-deliverable line from here)
  *   - apps/scanner/src/lib/audit-draft/markdown-export.ts — operator
- *     read-letter markdown (30-day plan + GS1 path sections render
+ *     catalog-letter markdown (30-day plan + GS1 path sections render
  *     from here)
  *
  * History: this module was introduced 2026-05-09 after the
@@ -39,7 +39,7 @@ export interface ConciergeDeliverableItem {
  * preserved across all bands — sequenced for objection handling
  * (letter, CSV, plan, GS1, re-scan).
  *
- * The CSV row carries the band-specific worst-N count. Read-letter
+ * The CSV row carries the band-specific worst-N count. Catalog-letter
  * scope branches Band 3 → representative-sample wording.
  */
 export function conciergeDeliverableItems(
@@ -50,8 +50,8 @@ export function conciergeDeliverableItems(
   const isSample = band?.deliverable.auditScope === 'representative-sample'
 
   const letterBody = isSample
-    ? 'We read a representative sample across your catalog variant patterns and the structural data model, then write a 1,500-word letter pointing at specific products by name with annotated screenshots. Not a generic template — a read of your store.'
-    : 'We read your store product by product, then write a 1,500-word letter pointing at specific products by name with annotated screenshots. Not a generic template — a read of your store.'
+    ? 'We read a representative sample across your catalog variant patterns and the structural data model, then write a 1,500-word letter pointing at specific products by name with annotated screenshots. Not a generic template — a catalog letter about your store.'
+    : 'We read your store product by product, then write a 1,500-word letter pointing at specific products by name with annotated screenshots. Not a generic template — a catalog letter about your store.'
 
   const csvBody = isSample
     ? `Every sampled product that has a problem, which problem, and the fix. For the worst ${worstN} offenders, we draft the full replacement text — title, description, metafield values — ready to paste into Shopify.`
@@ -59,7 +59,7 @@ export function conciergeDeliverableItems(
 
   return [
     {
-      title: 'A written catalog letter',
+      title: 'A 1,500-word letter',
       body: letterBody,
     },
     {
@@ -88,14 +88,14 @@ export function conciergeDeliverableItems(
  * The post-purchase Resend body's deliverable line. Renders the
  * canonical five items as a single prose sentence so the email reads
  * as a confirmation, not a checklist. Branches on band scope (sample
- * vs full) per the read-letter rule.
+ * vs full) per the catalog-letter rule.
  */
 export function conciergeEmailDeliverableLine(slug: AuditBandSlug): string {
   const band = bandBySlug(slug)
   const worstN = band?.deliverable.fullyDraftedFixCount ?? 10
   const isSample = band?.deliverable.auditScope === 'representative-sample'
   if (isSample) {
-    return `you get a written catalog letter, a per-product fix CSV (with the worst ${worstN} products drafted for you), a 30-day fix sequence, and the right GS1 UK barcode path. The read covers a representative sample across your catalog patterns plus the structural data model. No video, no call — just the data.`
+    return `you get a written catalog letter, a per-product fix CSV (with the worst ${worstN} products drafted for you), a 30-day fix sequence, and the right GS1 UK barcode path. We read a representative sample across your catalog patterns plus the structural data model. No video, no call — just the data.`
   }
   return `you get a written catalog letter, a per-product fix CSV (with the worst ${worstN} products drafted for you), a 30-day fix sequence, and the right GS1 UK barcode path. No video, no call — just the data.`
 }

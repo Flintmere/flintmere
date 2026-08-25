@@ -19,7 +19,7 @@ describe('deliverable parity (ADR 0028)', () => {
     'keeps five items in canonical order for %s',
     (slug) => {
       expect(conciergeDeliverableItems(slug).map((i) => i.title)).toEqual([
-        'A written catalog letter',
+        'A 1,500-word letter',
         'A per-product fix CSV',
         'A 30-day fix sequence',
         'A GS1 UK barcode path',
@@ -42,7 +42,7 @@ describe('conciergeDeliverableItems', () => {
     for (const band of AUDIT_BANDS) {
       const items = conciergeDeliverableItems(band.slug)
       expect(items).toHaveLength(5)
-      expect(items[0]?.title).toBe('A written catalog letter')
+      expect(items[0]?.title).toBe('A 1,500-word letter')
       expect(items[1]?.title).toBe('A per-product fix CSV')
       expect(items[2]?.title).toBe('A 30-day fix sequence')
       expect(items[3]?.title).toBe('A GS1 UK barcode path')

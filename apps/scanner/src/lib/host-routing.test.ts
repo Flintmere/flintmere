@@ -99,12 +99,12 @@ describe('classifyRoute', () => {
   });
 });
 
-describe('read routes (ADR 0028)', () => {
+describe('catalog-letter routes (ADR 0028 Amendment 1)', () => {
   it.each([
-    ['/read', 'scanner'],
-    ['/read/success', 'scanner'],
-    ['/read/connect', 'scanner'],
-    ['/read/connect/results', 'scanner'],
+    ['/catalog-letter', 'scanner'],
+    ['/catalog-letter/success', 'scanner'],
+    ['/catalog-letter/connect', 'scanner'],
+    ['/catalog-letter/connect/results', 'scanner'],
   ])('classifies %s as scanner', (path, expected) => {
     expect(classifyRoute(path)).toBe(expected);
   });
