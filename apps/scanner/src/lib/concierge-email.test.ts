@@ -143,7 +143,7 @@ describe('sendConciergeOpsEmail', () => {
     expect(c.text).toContain('Band 2');
     expect(c.text).toContain('1,501–5,000 SKUs');
     expect(c.text).toContain('£397');
-    expect(c.text).toContain('Full per-product audit');
+    expect(c.text).toContain('Full per-product —');
     expect(c.text).toContain('worst 25 fully drafted');
   });
 
@@ -151,7 +151,7 @@ describe('sendConciergeOpsEmail', () => {
     const { sendOps } = await loadWithCaptureSendEmail();
     const c = await sendOps({ bandSlug: 'band-3' });
 
-    expect(c.text).toContain('Representative-sample audit');
+    expect(c.text).toContain('Representative-sample —');
     expect(c.text).toContain('5,001+ SKUs');
   });
 });

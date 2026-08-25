@@ -1,7 +1,7 @@
 /**
- * Concierge delivery email — sent at audit completion with the letter
- * PDF + per-product CSV attached. Fired from the `audit:deliver` script
- * after the team has finished writing.
+ * Concierge delivery email — sent when the catalog letter is complete,
+ * with the letter PDF + per-product CSV attached. Fired from the
+ * `audit:deliver` script after the team has finished writing.
  *
  * Voice: same neutral-bold register as the confirmation email. "We" /
  * "the team" in body copy per BUSINESS.md:19; named-director sign-off
@@ -104,9 +104,9 @@ export async function sendConciergeDeliveryEmail(
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background:#FFFFFF;border:1px solid #0A0A0B;">
           <tr>
             <td style="padding:28px 32px 8px 32px;border-bottom:1px solid #0A0A0B;">
-              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;">Flintmere concierge audit · ${esc(bandLabel)} · ${safeShop}</div>
+              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;">Flintmere Catalog Letter · ${esc(bandLabel)} · ${safeShop}</div>
               <div style="margin-top:12px;font-size:26px;font-weight:500;letter-spacing:-0.02em;color:#0A0A0B;">
-                Your audit&rsquo;s <span style="font-family:ui-monospace,Menlo,monospace;font-weight:700;">[&nbsp;in&nbsp;]</span>.
+                Your catalog letter&rsquo;s <span style="font-family:ui-monospace,Menlo,monospace;font-weight:700;">[&nbsp;in&nbsp;]</span>.
               </div>
             </td>
           </tr>
@@ -144,7 +144,7 @@ export async function sendConciergeDeliveryEmail(
   </body>
 </html>`;
 
-  const text = `Your Flintmere concierge audit — ${bandLabel} (${priceLine}) for ${shopUrl}.
+  const text = `Your Flintmere catalog letter — ${bandLabel} (${priceLine}) for ${shopUrl}.
 
 Two attachments on this email: the letter and the per-product CSV.
 
@@ -168,7 +168,7 @@ Flintmere is a trading name of Eazy Access Ltd · flintmere.com`;
 
   return sendEmail({
     to,
-    subject: `Your Flintmere audit — ${shopUrl}`,
+    subject: `Your Flintmere catalog letter — ${shopUrl}`,
     html,
     text,
     attachments: [

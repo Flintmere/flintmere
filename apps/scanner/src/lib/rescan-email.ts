@@ -1,7 +1,7 @@
 /**
  * Day-30 re-scan email — composed after `runDay30Rescans()` has run a
- * fresh scan against a delivered audit's shop and persisted the result
- * onto the ConciergeAudit row. Compares the baseline (captured at
+ * fresh scan against a delivered catalog letter's shop and persisted
+ * the result onto the ConciergeAudit row. Compares the baseline (captured at
  * delivery time per Slice A) against the fresh scan and tells the
  * merchant whether the fixes moved the score.
  *
@@ -172,7 +172,7 @@ export async function sendDay30RescanEmail(
     <div style="max-width:560px;margin:0 auto;padding:32px 24px;background:#FFFFFF;border:1px solid #0A0A0B;">
       <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;">Day-30 re-scan</div>
       <h1 style="margin:8px 0 16px 0;font-size:22px;font-weight:500;line-height:1.3;">${esc(scoreChangeText)}</h1>
-      <p style="margin:0 0 8px 0;font-size:15px;line-height:1.6;color:#141518;">We re-ran the scanner on ${safeShop} 30 days after delivering your audit. Here's what shifted.</p>
+      <p style="margin:0 0 8px 0;font-size:15px;line-height:1.6;color:#141518;">We re-ran the scanner on ${safeShop} 30 days after delivering your catalog letter. Here's what shifted.</p>
       ${movementsHtml}
       <p style="margin:24px 0 0 0;font-size:15px;line-height:1.6;color:#141518;">The fresh dashboard with every product-level finding lives at:</p>
       <p style="margin:8px 0 0 0;"><a href="${dashboardUrl}" style="color:#0A0A0B;text-decoration:underline;font-family:ui-monospace,Menlo,monospace;font-size:13px;">${esc(dashboardUrl)}</a></p>
@@ -182,7 +182,7 @@ export async function sendDay30RescanEmail(
   </body>
 </html>`;
 
-  const text = `${scoreChangeText}\n\nWe re-ran the scanner on ${shopUrl} 30 days after delivering your audit. Here's what shifted.${movementsText}\n\nThe fresh dashboard with every product-level finding:\n${dashboardUrl}\n\n${FOUNDER_SIGNATURE_REPLY_INVITE}\n\n${FOUNDER_SIGNATURE_NAME}\n${FOUNDER_SIGNATURE_TEAM_LINE}`;
+  const text = `${scoreChangeText}\n\nWe re-ran the scanner on ${shopUrl} 30 days after delivering your catalog letter. Here's what shifted.${movementsText}\n\nThe fresh dashboard with every product-level finding:\n${dashboardUrl}\n\n${FOUNDER_SIGNATURE_REPLY_INVITE}\n\n${FOUNDER_SIGNATURE_NAME}\n${FOUNDER_SIGNATURE_TEAM_LINE}`;
 
   return sendEmail({
     to,

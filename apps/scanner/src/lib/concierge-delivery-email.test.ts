@@ -76,7 +76,7 @@ describe('sendConciergeDeliveryEmail', () => {
     expect(email.html).not.toContain('Connect Google Merchant Center');
   });
 
-  it('keeps the audit-letter narrative even when connect is included', async () => {
+  it('keeps the catalog-letter narrative even when connect is included', async () => {
     const { send } = await loadWithCaptureSendEmail();
     const email = await send({ auditId: 'aud_456' });
     expect(email.text).toContain('Read the letter first');

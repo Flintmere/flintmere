@@ -37,13 +37,13 @@ function esc(s: string): string {
 }
 
 /**
- * Branches the audit-step wording on band scope. Used inside both the
- * HTML and plaintext customer email so the two stay in lockstep.
+ * Branches the deliverable-step wording on band scope. Used inside both
+ * the HTML and plaintext customer email so the two stay in lockstep.
  *
  * Renders from `concierge-deliverable.ts` — single source of truth for
  * what the operator delivers. Drift between the email line and the
- * /audit deliverables list was the failure mode caught 2026-05-09;
- * this indirection enforces parity.
+ * /catalog-letter deliverables list was the failure mode caught
+ * 2026-05-09; this indirection enforces parity.
  */
 function deliverableLineForBand(slug: AuditBandSlug): string {
   return conciergeEmailDeliverableLine(slug);
@@ -117,7 +117,7 @@ export async function sendConciergeCustomerEmail(
             <td style="padding:32px 32px 12px 32px;border-bottom:1px solid #0A0A0B;">
               <div style="font-family:ui-monospace,Menlo,monospace;font-size:14px;letter-spacing:-0.01em;color:#0A0A0B;font-weight:500;">Flintmere&nbsp;]</div>
               <div style="margin-top:6px;margin-bottom:18px;width:48px;height:2px;background:#F8BF24;font-size:0;line-height:0;">&nbsp;</div>
-              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;">Concierge audit · ${esc(bandLabel)} · ${esc(shopUrl)}</div>
+              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;">Catalog Letter · ${esc(bandLabel)} · ${esc(shopUrl)}</div>
               <div style="margin-top:12px;font-size:26px;font-weight:500;letter-spacing:-0.02em;color:#0A0A0B;">
                 You&rsquo;re <span style="font-family:ui-monospace,Menlo,monospace;font-weight:700;">[&nbsp;in&nbsp;]</span>. Payment confirmed.
               </div>
@@ -140,7 +140,7 @@ export async function sendConciergeCustomerEmail(
               <p style="margin:0;font-size:14px;line-height:1.55;color:#5A5C64;">If the shop URL above is wrong, just reply to this email and we&rsquo;ll fix it before the team starts. Stripe has sent a separate receipt for your records.</p>
               <div style="margin-top:24px;padding:18px;border:1px solid #D5D2C8;">
                 <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;margin-bottom:6px;">Optional · ~4 minutes</div>
-                <p style="margin:0 0 8px 0;font-size:14px;line-height:1.55;color:#141518;">Want the full <strong>seven-pillar</strong> read instead of four? A read-only Shopify Admin token lets us measure your structured attributes, Google category mapping, and checkout readiness directly. Without it, those three pillars stay directional, not measured.</p>
+                <p style="margin:0 0 8px 0;font-size:14px;line-height:1.55;color:#141518;">Want us to read all <strong>seven pillars</strong> instead of four? A read-only Shopify Admin token lets us measure your structured attributes, Google category mapping, and checkout readiness directly. Without it, those three pillars stay directional, not measured.</p>
                 <p style="margin:0 0 8px 0;font-size:14px;line-height:1.55;color:#141518;">Create a private app in your Shopify admin (Settings → Apps and sales channels → Develop apps → Create app), tick the <code>read_products</code> + <code>read_product_listings</code> + <code>read_metafields</code> scopes, install it, copy the <code>shpat_</code> token. Paste at <a href="https://flintmere.com/secret" style="color:#0A0A0B;text-decoration:underline;">flintmere.com/secret</a> &mdash; encrypted in your browser, key never reaches us &mdash; and reply to this email with the URL it gives you. We click it once, the link burns, the token never sits in any inbox or log in plaintext.</p>
                 <p style="margin:0;font-size:13px;line-height:1.55;color:#5A5C64;">Step-by-step with screenshots: <a href="https://help.shopify.com/en/manual/apps/app-types/custom-apps" style="color:#0A0A0B;text-decoration:underline;">Shopify Help Centre — create a custom app →</a></p>
               </div>
@@ -170,7 +170,7 @@ export async function sendConciergeCustomerEmail(
   </body>
 </html>`;
 
-  const text = `Flintmere concierge audit — you're in. Payment confirmed.
+  const text = `Flintmere catalog letter — you're in. Payment confirmed.
 
 Thanks for trusting us with this. Your ${priceLine} ${bandLabel} booking is confirmed.
 
@@ -190,7 +190,7 @@ If the shop URL above is wrong, just reply to this email and we'll fix
 it before the team starts. Stripe has sent a separate receipt for your
 records.${invoiceBlockText}
 
-Optional (~4 minutes): for the full seven-pillar read instead of four,
+Optional (~4 minutes): for us to read all seven pillars instead of four,
 create a read-only Shopify Admin token (Settings → Apps and sales
 channels → Develop apps → Create app; scopes: read_products,
 read_product_listings, read_metafields), paste it at
@@ -210,7 +210,7 @@ Flintmere is a trading name of Eazy Access Ltd · flintmere.com`;
 
   return sendEmail({
     to,
-    subject: `You're in — Flintmere concierge audit (${bandLabel}) for ${shopUrl}`,
+    subject: `You're in — your Flintmere catalog letter (${bandLabel}) for ${shopUrl}`,
     html,
     text,
     tags: [
@@ -240,7 +240,7 @@ export async function sendConciergeOpsEmail(
   const worstN = band?.deliverable.fullyDraftedFixCount ?? 10;
   const isSample = band?.deliverable.auditScope === 'representative-sample';
   const scopeLabel = isSample ? 'Representative-sample' : 'Full per-product';
-  const deliverableLine = `${scopeLabel} audit + 1,500-word letter + per-product CSV (worst ${worstN} fully drafted) + 30-day plan + GS1 UK path. 30-day re-scan included.`;
+  const deliverableLine = `${scopeLabel} — a 1,500-word letter + per-product CSV (worst ${worstN} fully drafted) + 30-day plan + GS1 UK path. 30-day re-scan included.`;
 
   const html = `<!doctype html>
 <html><body style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#F7F7F4;padding:24px;">

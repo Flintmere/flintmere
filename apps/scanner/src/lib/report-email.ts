@@ -33,11 +33,11 @@ import type { GmcGroundTruth } from './gmc/types';
  * Copy rules (Copy Council #20 #21 #22 #37):
  *   - No banned jargon (see BANNED_JARGON in lib/copy).
  *   - Every issue translated via issueCodeToFounderSpeak.
- *   - Two-door close: concierge audit / reply. The earlier "install app"
+ *   - Two-door close: catalog letter / reply. The earlier "install app"
  *     door pitched a Shopify embedded app that is post-launch per the
  *     2026-05-05 launch decision — selling it from the inbox set up a
- *     dead link to /for/plus. Audit + reply are the only paths that
- *     resolve to a shipped product right now.
+ *     dead link to /for/plus. Catalog letter + reply are the only paths
+ *     that resolve to a shipped product right now.
  */
 
 export interface ReportEmailInput {
@@ -200,7 +200,7 @@ function renderHtml(input: ReportEmailInput): string {
                 lockedPillars.length > 0
                   ? `<p style="margin:16px 0 0 0;font-size:13px;color:#8B8D95;line-height:1.5;">
                       <span style="font-family:ui-monospace,Menlo,monospace;font-weight:700;">[&nbsp;${lockedPillars.length}&nbsp;]</span>
-                      more checks — ${lockedListText} — read merchant-side data the free scan can&rsquo;t see. The £197 audit covers them.
+                      more checks — ${lockedListText} — read merchant-side data the free scan can&rsquo;t see. The £197 catalog letter covers them.
                     </p>`
                   : ''
               }
@@ -220,9 +220,9 @@ function renderHtml(input: ReportEmailInput): string {
                 <div style="font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#F8BF24;">Recommended · from £197 one-off · three working days</div>
                 <div style="margin-top:8px;font-size:17px;font-weight:500;color:#F7F7F4;line-height:1.3;">Have us read your store for you.</div>
                 <p style="margin:8px 0 0 0;font-size:14px;color:#A8AAB2;line-height:1.5;">
-                  We read your store product by product, write a detailed audit letter pointing at exactly what to fix, and send a per-product CSV with the worst 10 (£197, up to 1,500 SKUs) or worst 25 (£397, 1,501–5,000 SKUs) products already drafted. A 30-day re-scan is included. No video, no call — just the data. Larger catalogs scope bespoke from £597.
+                  We read your store product by product, write a detailed catalog letter pointing at exactly what to fix, and send a per-product CSV with the worst 10 (£197, up to 1,500 SKUs) or worst 25 (£397, 1,501–5,000 SKUs) products already drafted. A 30-day re-scan is included. No video, no call — just the data. Larger catalogs scope bespoke from £597.
                 </p>
-                <a href="${esc(auditUrl)}" style="display:inline-block;margin-top:14px;background:#F8BF24;color:#0A0A0B;padding:12px 20px;font-family:ui-monospace,Menlo,monospace;font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;text-decoration:none;">Book the audit →</a>
+                <a href="${esc(auditUrl)}" style="display:inline-block;margin-top:14px;background:#F8BF24;color:#0A0A0B;padding:12px 20px;font-family:ui-monospace,Menlo,monospace;font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;text-decoration:none;">Book your catalog letter →</a>
               </div>
 
               <!-- Door 2: reply -->
@@ -409,7 +409,7 @@ function renderText(input: ReportEmailInput): string {
           .map((p) => pillarLabelFor(p.pillar))
           .join(
             ', ',
-          )} — read merchant-side data the free scan can't see. The £197 audit covers them.`
+          )} — read merchant-side data the free scan can't see. The £197 catalog letter covers them.`
       : '';
 
   return `Flintmere Report — ${score.shopDomain}
@@ -433,7 +433,7 @@ What next — two ways to fix what we found
 
 1. Recommended · from £197 one-off · three working days
    Have us read your store for you. We read every product, write a
-   detailed audit letter pointing at exactly what to fix, and send a
+   detailed catalog letter pointing at exactly what to fix, and send a
    per-product CSV with the worst 10 (£197, up to 1,500 SKUs) or worst
    25 (£397, 1,501–5,000 SKUs) products already drafted. A 30-day re-scan
    is included. No video, no call — just the data. Larger catalogs scope
