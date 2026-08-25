@@ -40,6 +40,16 @@ const config: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      // ADR 0028 — /audit retired in favour of /read. Permanent, and
+      // never to be removed: delivery emails already sent build
+      // /audit/connect?audit=<id> links (concierge-delivery-email.ts),
+      // and inbound links from outreach and shared score pages persist.
+      { source: '/audit', destination: '/read', permanent: true },
+      { source: '/audit/:path*', destination: '/read/:path*', permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

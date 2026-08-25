@@ -99,6 +99,24 @@ describe('classifyRoute', () => {
   });
 });
 
+describe('read routes (ADR 0028)', () => {
+  it.each([
+    ['/read', 'scanner'],
+    ['/read/success', 'scanner'],
+    ['/read/connect', 'scanner'],
+    ['/read/connect/results', 'scanner'],
+  ])('classifies %s as scanner', (path, expected) => {
+    expect(classifyRoute(path)).toBe(expected);
+  });
+
+  it.each([
+    ['/audit', 'scanner'],
+    ['/audit/success', 'scanner'],
+  ])('still classifies legacy %s as scanner', (path, expected) => {
+    expect(classifyRoute(path)).toBe(expected);
+  });
+});
+
 describe('canonicalHost', () => {
   it('returns scanner host for scanner routes', () => {
     expect(canonicalHost('/scan')).toBe(SCANNER_HOST);
