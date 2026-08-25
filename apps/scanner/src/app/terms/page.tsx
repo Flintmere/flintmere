@@ -151,7 +151,7 @@ export default function Terms() {
             one-shot transfer of sensitive values between consenting
             parties — credentials, configuration values, API keys,
             short-lived secrets. Acceptable: handing a read-only Shopify
-            Admin token to the Flintmere read team, sharing a recovery
+            Admin token to the Flintmere team, sharing a recovery
             phrase with a colleague who&rsquo;s expecting it, sending a
             CI deploy key to a teammate. Not acceptable: anonymous
             paste-hosting, distribution to recipients who haven&rsquo;t

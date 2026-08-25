@@ -331,7 +331,7 @@ export default function Privacy() {
           <code>flintmere.com/secret</code> for transferring sensitive
           values from sender to recipient through a single-use URL. We
           built it originally for handing read-only Shopify Admin API
-          tokens to the read team during concierge fulfilment, and it
+          tokens to the Flintmere team during concierge fulfilment, and it
           stayed nice enough to publish — anyone can use it for any
           one-shot secret transfer between consenting parties. The flow
           is <strong>zero-knowledge by design</strong>:
@@ -408,8 +408,8 @@ export default function Privacy() {
           financial reports, or any data Google holds about your buyers.
         </p>
         <p className="mt-4">
-          <strong>How we use it.</strong> Strictly to produce your read
-          deliverable — the report we hand back to you with the issues we
+          <strong>How we use it.</strong> Strictly to produce your concierge
+          read — the report we hand back to you with the issues we
           found and the fixes we recommend. Google&rsquo;s ground-truth
           replaces our modelled estimates where we have it, so you get a
           sharper diagnostic.
@@ -437,7 +437,7 @@ export default function Privacy() {
           </li>
           <li>
             We do not transfer GMC data to others except as necessary to
-            provide or improve the read, and only under written contract
+            provide or improve the concierge read, and only under written contract
             with the same Limited Use commitments.
           </li>
           <li>
