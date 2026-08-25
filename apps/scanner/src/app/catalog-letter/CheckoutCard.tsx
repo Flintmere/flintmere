@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Apple-style checkout for the Flintmere concierge audit.
+ * Apple-style checkout for the Flintmere Catalog Letter.
  *
  * Three-step shape on one card:
  *
@@ -329,8 +329,8 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
             className="text-[color:var(--color-ink)]"
             style={{ fontSize: 16, lineHeight: 1.55, marginBottom: 12 }}
           >
-            For catalogs above 5,000 SKUs, the audit reads a representative
-            sample plus the structural data model. We scope and quote per
+            For catalogs above 5,000 SKUs, the catalog letter reads a
+            representative sample plus the structural data model. We scope and quote per
             store — typically £597+, contracted before any work starts.
           </p>
           <p
@@ -499,7 +499,7 @@ function OrderSummary({
       >
         <div style={{ minWidth: 0 }}>
           <p className="eyebrow" style={{ marginBottom: 6 }}>
-            {band.label} · Concierge audit
+            {band.label} · The Catalog Letter
           </p>
           <p
             style={{

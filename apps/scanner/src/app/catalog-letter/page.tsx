@@ -9,14 +9,14 @@ import { DeliverableLift } from './letter-motion';
 import { CONCIERGE_DELIVERABLE_LIST } from '@/lib/copy';
 
 export const metadata: Metadata = {
-  title: 'Concierge audit — from £197',
+  title: 'The Catalog Letter — from £197',
   description:
-    'We read your Shopify store product by product and send a written audit letter plus a per-product fix CSV within three working days. Three SKU bands — £197 / £397 / from £597. 30-day re-scan included.',
+    'We read your Shopify store product by product and send a 1,500-word letter plus a per-product fix CSV within three working days. Three SKU bands — £197 / £397 / from £597. 30-day re-scan included.',
   alternates: { canonical: '/catalog-letter' },
 };
 
 /**
- * /audit — Concierge audit conversion surface.
+ * /catalog-letter — The Catalog Letter conversion surface.
  *
  * This page is a sales page first. Restrained motion: one section-level
  * fade-up per chapter (not word-by-word). Brackets render immediately,
@@ -63,7 +63,7 @@ export default function Audit() {
       <a href="#checkout" className="skip-link">
         Skip to content
       </a>
-      <MarketingStickyCta href="#checkout" label="Book the audit · £197" glyph="↑" />
+      <MarketingStickyCta href="#checkout" label="Book your catalog letter · £197" glyph="↑" />
       <ViewportReveal>
         {/* Hero IS the checkout. Council 2026-05-04 (8-0):
             Apple One / Stripe Atlas / Linear / Notion / Vercel / Shop
@@ -80,7 +80,7 @@ export default function Audit() {
             `[ £197 ]` (h1) + value-prop line + CheckoutCard. */}
         <section
           id="checkout"
-          aria-labelledby="audit-hero"
+          aria-labelledby="letter-hero"
           className="relative bg-[color:var(--color-paper)]"
         >
           <div
@@ -95,13 +95,13 @@ export default function Audit() {
             <p
               data-reveal
               className="eyebrow-hero"
-              aria-label="Flintmere concierge audit, three working days"
+              aria-label="Flintmere catalog letter, three working days"
               style={{
                 marginBottom: 'clamp(20px, 2.5vw, 32px)',
                 ['--reveal-delay' as string]: `${D_EYEBROW}ms`,
               }}
             >
-              Flintmere · Concierge audit · 3 working days
+              Flintmere · The Catalog Letter · 3 working days
             </p>
 
             <BandTriptych />
@@ -179,7 +179,7 @@ export default function Audit() {
               >
                 <Image
                   src="/marketing/audit/deliverables.webp"
-                  alt="A still-life: a single blank cream paper sheet (the audit letter) layered over a faintly grid-ruled cream paper (the per-product fix CSV), a black-barrelled fountain pen resting at the bottom-right, and a closed brown leather-bound pocket notebook (the 30-day plan) at the top-right, on a warm cream backdrop in soft afternoon daylight from the upper-left."
+                  alt="A still-life: a single blank cream paper sheet (the catalog letter) layered over a faintly grid-ruled cream paper (the per-product fix CSV), a black-barrelled fountain pen resting at the bottom-right, and a closed brown leather-bound pocket notebook (the 30-day plan) at the top-right, on a warm cream backdrop in soft afternoon daylight from the upper-left."
                   width={1344}
                   height={576}
                   sizes="(min-width: 1280px) 1216px, 100vw"
@@ -210,9 +210,10 @@ export default function Audit() {
               }}
             >
               <span aria-hidden="true">// </span>The list below shows the
-              Band 1 deliverable. Band 2 audits draft the worst 25 products
-              (not 10); Band 3 audits read a representative sample plus the
-              structural data model, and draft the worst 25.
+              Band 1 deliverable. The Band 2 catalog letter drafts the worst
+              25 products (not 10); the Band 3 catalog letter reads a
+              representative sample plus the structural data model, and
+              drafts the worst 25.
             </p>
 
             <ol
@@ -309,7 +310,7 @@ export default function Audit() {
             >
               {[
                 'Pick your band and pay. A confirmation email lands within a minute.',
-                'We read your catalog and write the audit. The URL is all we need — no call, no screen-share.',
+                'We read your catalog and write your catalog letter. The URL is all we need — no call, no screen-share.',
                 'Within three working days, the letter, CSV, and 30-day plan land in your inbox.',
                 'Day 30: the scanner re-runs and emails you a progress report.',
               ].map((step, idx) => (
@@ -384,8 +385,8 @@ export default function Audit() {
               Eazy Access Ltd is not VAT-registered, so the band price you select
               (£197 / £397 / from £597) is the full price — no VAT is added.
               Flintmere is not affiliated with GS1. Identifier requirements vary
-              by marketplace and jurisdiction. The audit is informational; the
-              checks map to Shopify product data requirements, GS1 UK identifier
+              by marketplace and jurisdiction. The catalog letter is informational;
+              the checks map to Shopify product data requirements, GS1 UK identifier
               rules, and Google Merchant Center specifications.
             </p>
           </div>

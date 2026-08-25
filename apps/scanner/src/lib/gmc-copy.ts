@@ -1,6 +1,6 @@
 /**
- * Copy + helpers for the GMC ground-truth render in the audit email
- * and the public score page.
+ * Copy + helpers for the GMC ground-truth render in the catalog letter
+ * email and the public score page.
  *
  * Per ADR 0023, GMC ground-truth is rendered with Google's own language
  * for issue descriptions — no founder-speak translation. The deliverable

@@ -47,7 +47,7 @@ export default async function NotFound() {
   const otherHost = onScanner ? MARKETING_HOST : SCANNER_HOST;
   const otherSurface = onScanner
     ? 'pricing, the methodology, or the research benchmark'
-    : 'the scanner, the concierge audit, or the bot policy';
+    : 'the scanner, the catalog letter, or the bot policy';
 
   const year = new Date().getUTCFullYear();
 

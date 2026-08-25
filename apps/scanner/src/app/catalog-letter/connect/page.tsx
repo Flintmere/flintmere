@@ -29,7 +29,7 @@ export const runtime = 'nodejs';
 export const metadata: Metadata = {
   title: 'Connect Google Merchant Center',
   description:
-    'Connect your Google Merchant Center so future Flintmere audits read directly from your account — Google’s real disapproval reasons, not our model.',
+    'Connect your Google Merchant Center so your future Flintmere catalog letters read directly from your account — Google’s real disapproval reasons, not our model.',
   robots: { index: false, follow: false },
 };
 

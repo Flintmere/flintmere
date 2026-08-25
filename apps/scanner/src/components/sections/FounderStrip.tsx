@@ -61,7 +61,7 @@ const PROOF_PANELS: ProofPanel[] = [
     metric: '47 →',
     metricAccent: '89',
     label: 'Catalog readiness score',
-    sub: 'Three-working-day audit window · representative example',
+    sub: 'Three-working-day turnaround · representative example',
   },
   {
     metric: '£3,240',
@@ -119,7 +119,7 @@ export function FounderStrip() {
               className="block"
               style={{ fontWeight: 700, marginTop: 'clamp(4px, 0.6vw, 12px)' }}
             >
-              We write every audit.
+              We write every letter.
             </span>
           </h2>
 
@@ -131,7 +131,7 @@ export function FounderStrip() {
               color: 'var(--color-paper-on-ink)',
             }}
           >
-            If you book the audit (from £197), the team writes the letter
+            If you book your catalog letter (from £197), the team writes it
             and the per-product CSV. If you email hello@flintmere.com, we
             reply — usually within two working days.
           </p>
@@ -171,7 +171,7 @@ export function FounderStrip() {
               prefetch={false}
               className="inline-flex items-center gap-3 px-7 py-3.5 border border-[color:var(--color-paper-on-ink)] text-[color:var(--color-paper-on-ink)] font-mono text-[12px] font-medium tracking-[0.14em] uppercase hover:bg-[color:var(--color-paper-on-ink)] hover:text-[color:var(--color-ink)] transition-colors duration-[var(--duration-instant)] ease-[cubic-bezier(0.4,0,0.2,1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-accent-sage)]"
             >
-              Book the concierge audit (from £197)
+              Book your catalog letter (from £197)
               <span aria-hidden="true">→</span>
             </Link>
           </div>
@@ -183,7 +183,7 @@ export function FounderStrip() {
             are compressed so the three read as a tight ledger, not a void
             chain. */}
         <ol
-          aria-label="Audit outcomes — representative examples"
+          aria-label="Catalog letter outcomes — representative examples"
           className="flex flex-col list-none m-0 p-0 gap-6 lg:gap-[clamp(48px,6vh,96px)]"
         >
           {PROOF_PANELS.map((panel, i) => (

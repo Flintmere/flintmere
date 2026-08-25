@@ -20,8 +20,8 @@ export function PreVerificationHero() {
         <>
           We&rsquo;re in Google&rsquo;s Trust &amp; Safety review &mdash;
           typical wait is four to six weeks. Leave your details below and
-          we&rsquo;ll write the day access opens. Your audit doesn&rsquo;t
-          change in the meantime.
+          we&rsquo;ll write the day access opens. Your catalog letter
+          doesn&rsquo;t change in the meantime.
         </>
       }
     />

@@ -47,7 +47,7 @@ const TOPIC_LABELS: Record<ContactTopic, string> = {
   billing: 'Billing',
   legal: 'Legal / contracts',
   plus: 'Plus tier enquiry',
-  concierge: 'Concierge audit',
+  concierge: 'Catalog letter',
   partnership: 'Partnership / press',
 };
 

@@ -59,7 +59,7 @@ export function RequestAccessForm({ auditId, defaultEmail, shopUrl }: Props) {
         setState({
           phase: 'error',
           message:
-            body?.message ?? 'Could not save. Please reply to your audit email.',
+            body?.message ?? 'Could not save. Please reply to your catalog letter email.',
         });
         return;
       }
@@ -110,8 +110,8 @@ export function RequestAccessForm({ auditId, defaultEmail, shopUrl }: Props) {
             color: 'var(--color-mute)',
           }}
         >
-          Typical wait is 4&ndash;6 weeks. Reply to your audit email anytime
-          if anything changes &mdash; we read every reply.
+          Typical wait is 4&ndash;6 weeks. Reply to your catalog letter email
+          anytime if anything changes &mdash; we read every reply.
         </p>
       </div>
     );

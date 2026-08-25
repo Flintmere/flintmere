@@ -112,7 +112,7 @@ export default function FlintmereForPlus() {
             Scan my Plus store →
           </Link>
           <Link href={`${AUDIT_URL}#checkout`} className="btn">
-            Book a bespoke concierge audit
+            Book a bespoke catalog letter
           </Link>
         </div>
       </section>
@@ -193,7 +193,7 @@ export default function FlintmereForPlus() {
             className="eyebrow"
             style={{ color: 'var(--color-accent)' }}
           >
-            Plus-tier concierge
+            Plus-tier catalog letter
           </p>
           <h2
             id="plus-cta-heading"
@@ -201,13 +201,13 @@ export default function FlintmereForPlus() {
             style={{ color: 'var(--color-paper)' }}
           >
             Send your store URL. Three working days later, a written{' '}
-            <Bracket>audit</Bracket> lands in your inbox.
+            <Bracket>catalog letter</Bracket> lands in your inbox.
           </h2>
           <p
             className="mt-8 max-w-[56ch]"
             style={{ color: 'var(--color-mute-inv)', fontSize: 16, lineHeight: 1.55 }}
           >
-            For Plus-scale catalogs (5,001+ SKUs) the audit is contracted bespoke —
+            For Plus-scale catalogs (5,001+ SKUs) the catalog letter is contracted bespoke —
             from £597 — and reads a representative sample across your catalog patterns
             plus the structural data model. You get a 1,500-word letter pointing at
             specific SKUs by name, a per-product fix CSV with the worst twenty-five

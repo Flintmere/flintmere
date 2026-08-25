@@ -13,7 +13,7 @@ import { SCAN_URL } from '@/lib/host-routing';
  *
  * Added 2026-05-11 — operator caught the CTA-distribution gap: between
  * the hero free-scan CTA and the footer wordmark, the only conversion
- * affordance was the FounderStrip's £197 audit CTA, which is a
+ * affordance was the FounderStrip's £197 catalog letter CTA, which is a
  * different product. Two free-scan re-invites close that gap.
  *
  * References (council pre-flight):

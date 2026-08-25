@@ -17,7 +17,7 @@ export function StatusBanner({
   if (status === 'ok') {
     tone = 'ok';
     title = 'Connected';
-    body = 'We read your Merchant Center the next time your audit is regenerated.';
+    body = 'We read your Merchant Center the next time your catalog letter is regenerated.';
   } else if (status === 'denied') {
     tone = 'warn';
     title = 'Consent declined';
@@ -29,7 +29,7 @@ export function StatusBanner({
     tone = 'error';
     title = 'Connection failed';
     body =
-      'Google accepted consent but rejected the token exchange. This usually means the OAuth client is misconfigured. Please reply to your audit email and we’ll resolve.';
+      'Google accepted consent but rejected the token exchange. This usually means the OAuth client is misconfigured. Please reply to your catalog letter email and we’ll resolve.';
   } else {
     return null;
   }

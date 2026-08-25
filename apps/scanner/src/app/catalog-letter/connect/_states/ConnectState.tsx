@@ -16,7 +16,7 @@ export function ConnectHero() {
       }
       body={
         <>
-          Your audit shipped from public signals. Connect Google Merchant
+          Your catalog letter shipped from public signals. Connect Google Merchant
           Center and every future scan re-reads your real account &mdash;
           disapprovals, account state, the reasons Google itself stated.
           Read-only. Disconnect anytime.

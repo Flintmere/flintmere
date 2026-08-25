@@ -18,7 +18,7 @@ import type { ContactTopic } from '@/generated/prisma';
 export const metadata: Metadata = {
   title: 'Contact — Flintmere',
   description:
-    'Talk to Flintmere about a privacy or security question, billing, a Plus enquiry, a concierge audit, partnership, or anything else. We reply within two working days.',
+    'Talk to Flintmere about a privacy or security question, billing, a Plus enquiry, a catalog letter, partnership, or anything else. We reply within two working days.',
   alternates: { canonical: 'https://flintmere.com/contact' },
 };
 

@@ -1,14 +1,15 @@
 'use client';
 
 /**
- * Connect-CTA on scan results for a domain that owns an eligible concierge
- * audit (connect-friction spec 2026-06-07, fix 3).
+ * Connect-CTA on scan results for a domain that owns an eligible catalog
+ * letter (connect-friction spec 2026-06-07, fix 3).
  *
  * Renders nothing until it confirms eligibility via the possession-gated
  * /api/scan/[id]/connect-eligibility endpoint (scan id = capability token).
- * When the merchant has a paid/delivered audit for this domain, we offer a
- * direct path to connect Google Merchant Center — recovering the journey for
- * merchants who lost the audit-delivery email. Gated behind FEATURE_GMC_OAUTH
+ * When the merchant has a paid/delivered catalog letter for this domain, we
+ * offer a direct path to connect Google Merchant Center — recovering the
+ * journey for merchants who lost the catalog-letter delivery email. Gated
+ * behind FEATURE_GMC_OAUTH
  * server-side (the endpoint 404s when off), so this stays dark until the flag
  * flips.
  *
@@ -55,7 +56,7 @@ export function ScanConnectCta({ scanId }: ScanConnectCtaProps) {
     >
       <div className="grid md:grid-cols-[1fr_auto] gap-8 items-end">
         <div>
-          <p className="eyebrow mb-3">Your concierge audit</p>
+          <p className="eyebrow mb-3">Your catalog letter</p>
           <h3 className="max-w-[30ch]">
             Connect Google Merchant Center to read your real disapprovals.
           </h3>

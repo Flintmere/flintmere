@@ -8,8 +8,8 @@ import type { GmcGroundTruth } from '@/lib/gmc/types';
 
 // Post-connect payoff body (connect-friction spec 2026-06-07, fix 1 + 2).
 // Server component. Renders the merchant's score then their private GMC
-// ground truth via the shared GmcPanel (surface="private"). When the read
-// returned nothing, we show an honest "connected, no data yet" state — never
+// ground truth via the shared GmcPanel (surface="private"). When the GMC
+// read returned nothing, we show an honest "connected, no data yet" state — never
 // a blank. The degraded "modelled, not read" state is handled upstream when
 // the modelled estimate is the only thing available.
 

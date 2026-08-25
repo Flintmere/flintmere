@@ -48,7 +48,7 @@ import { AUDIT_URL, SCAN_URL } from '@/lib/host-routing';
  *    prefers-reduced-motion: no-preference, but the structural pattern is
  *    legible without it.
  *
- * Items ordered for first-time-visitor primacy: Audit (the wedge),
+ * Items ordered for first-time-visitor primacy: Catalog Letter (the wedge),
  * Standards (the moat), Pricing (universal expectation), Sign in
  * (returning-user idiom at the close).
  *
@@ -72,13 +72,13 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  // Audit is on the audit.flintmere.com host — emit absolute URL so the
-  // marketing-host link doesn't 301-hop through flintmere.com/audit.
+  // Catalog Letter is served from host audit.flintmere.com — emit absolute
+  // URL so the marketing-host link doesn't 301-hop through flintmere.com/audit.
   // (audit.flintmere.com renderings of the header pay a disabled-prefetch
   // cost in exchange — acceptable since the header sits at the top of
   // every page and the nav-item destination is reached on click, not
   // prefetched in 99% of cases.)
-  { label: 'Audit', href: AUDIT_URL },
+  { label: 'Catalog Letter', href: AUDIT_URL },
   // Standards routes to the canonical subdomain — DNS provisioned 2026-05-02
   // (operator-confirmed). Methodology body still references
   // standards.flintmere.com/food/v1 as the eventual artefact home.

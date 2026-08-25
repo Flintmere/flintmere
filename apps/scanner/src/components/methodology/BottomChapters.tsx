@@ -116,7 +116,7 @@ export function ConflictsChapter() {
         </h2>
         <ul className="methodology-list" style={{ marginTop: 'clamp(28px, 4vw, 48px)' }}>
           <DashLi>Flintmere is <strong style={{ fontWeight: 500, color: 'var(--color-ink)' }}>not affiliated with GS1</strong>. We do not sell GTINs. We route merchants to their local GS1 office (GS1 UK for UK-based merchants).</DashLi>
-          <DashLi>Flintmere does <strong style={{ fontWeight: 500, color: 'var(--color-ink)' }}>not take affiliate commissions</strong> from certification bodies, regulatory consultants, GS1 offices, or platform integrations. We monetise via subscriptions, audits, and embedded apps only.</DashLi>
+          <DashLi>Flintmere does <strong style={{ fontWeight: 500, color: 'var(--color-ink)' }}>not take affiliate commissions</strong> from certification bodies, regulatory consultants, GS1 offices, or platform integrations. We monetise via subscriptions, catalog letters, and embedded apps only.</DashLi>
           <DashLi>Flintmere is a trading name of <strong style={{ fontWeight: 500, color: 'var(--color-ink)' }}>Eazy Access Ltd</strong>, Companies House 13205428, registered office 71&ndash;75 Shelton Street, Covent Garden, London, WC2H 9JQ. Accountable director: Abdur-Rahman Morris. Eazy Access Ltd is not VAT-registered, so prices shown are the full price.</DashLi>
           <DashLi>The standard is published openly. Anyone may cite it without permission; anyone may build a competing scoring tool against the same regulatory sources. We do not own the regulations; we curate the structure.</DashLi>
         </ul>
@@ -253,7 +253,7 @@ export function BottomCta() {
             lineHeight: 1.6,
           }}
         >
-          You read how we measure. The concierge audit walks the seven pillars
+          You read how we measure. The Catalog Letter walks the seven pillars
           across your catalog product by product and lands a per-product fix
           plan in three working days &mdash; from &pound;197. Or run a free
           scan first and see the four public-source pillars in 60 seconds.
@@ -262,7 +262,7 @@ export function BottomCta() {
           className="flex flex-col sm:flex-row gap-4"
           style={{ marginTop: 'clamp(28px, 3vw, 40px)' }}
         >
-          {/* whitespace-normal below sm: the long "Book the concierge audit —
+          {/* whitespace-normal below sm: the long "Book your catalog letter —
               from £197 →" label's nowrap min-content (~344px) overran the phone
               column and forced a 5px horizontal page overflow (WCAG 1.4.10) as a
               flex item. It wraps on phones and stays one line at sm+ where the
@@ -271,7 +271,7 @@ export function BottomCta() {
             href={`${AUDIT_URL}#checkout`}
             className="btn btn-accent whitespace-normal sm:whitespace-nowrap"
           >
-            Book the concierge audit &mdash; from &pound;197 &rarr;
+            Book your catalog letter &mdash; from &pound;197 &rarr;
           </Link>
           <Link href={SCAN_URL} className="btn whitespace-normal sm:whitespace-nowrap">
             Run a free scan first &rarr;

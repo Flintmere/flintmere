@@ -174,7 +174,7 @@ function FoodCohortInvitation() {
         >
           Existing Growth, Scale, Agency, and Plus subscribers from
           before 2026-04-26 stay at their original prices indefinitely.
-          Plus is on the anchor above; band-laddered concierge audits
+          Plus is on the anchor above; band-laddered catalog letters
           are the available-now action.
         </p>
       </div>
