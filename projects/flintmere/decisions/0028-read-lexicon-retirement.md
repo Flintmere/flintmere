@@ -153,3 +153,29 @@ The product carries "catalog"; the component carries its specification. The body
 ### Why this was not knowable at ratification
 
 The parent decision rejected "The Letter" on the grounds that it names one of five items and under-promises. That objection is real and is answered above by differentiating item 1 — a move that only became obvious once item 1's title had actually been rewritten. The collision evidence, likewise, only existed once the noun had been applied to real legal prose. Ratifying, implementing one wave, and reading the result is what produced both.
+
+
+---
+
+## Amendment 2 — 2026-08-25: `concierge-audit` is permanently frozen in Stripe metadata
+
+Surfaced during Shipment 1 Wave 2. Recorded so nobody "finishes the rename" later and takes payments down.
+
+The Stripe metadata value `kind: 'concierge-audit'` **must never be renamed**, notwithstanding anything else in this ADR.
+
+**Why it is load-bearing, not cosmetic.** Two webhook handlers gate on it exactly:
+
+```
+apps/scanner/src/app/api/webhooks/stripe/route.ts:156
+  if (intent.metadata?.kind !== 'concierge-audit') return;
+apps/scanner/src/app/api/webhooks/stripe/route.ts:181
+  if (session.metadata?.kind !== 'concierge-audit') return;
+```
+
+Rename the value emitted at `api/concierge/checkout/route.ts:164` or `lib/stripe-invoice.ts:80` without changing both handlers, and every subsequent payment is silently *ignored*: the merchant is charged, the webhook returns early, and fulfilment never fires. Silent, because an early return is not an error.
+
+**Why it cannot be fixed by changing both sides either.** Every Stripe PaymentIntent and Checkout Session already created carries `concierge-audit`. Refunds, disputes and replays against historical records would stop matching. Any future rename needs a dual-match window — accept both values — held open longer than the dispute window, which Stripe puts at up to 21 days for evidence submission.
+
+**Verdict:** not worth it. The value is invisible to merchants; it appears only in the Stripe dashboard and in our own logs. It costs nothing to leave and cannot be changed cheaply. Treat it as a historical identifier, exactly like `AuditDraft`, `auditId` and `scanner_concierge_audits`.
+
+Related and also confirmed safe: the card statement descriptor is `FLINT B1` / `FLINT B2` (`api/concierge/checkout/route.ts:147`). The string `FLINTMERE AUDIT B1` survives only in a comment recording a superseded value, so no buyer sees the retired word on a bank statement.
