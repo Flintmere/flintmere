@@ -1,15 +1,15 @@
 /**
- * Single source of truth for the concierge audit deliverable copy.
+ * Single source of truth for the concierge read deliverable copy.
  *
- * Every customer-facing surface that describes what the audit ships
+ * Every customer-facing surface that describes what the read ships
  * MUST render from this module. The three reference surfaces:
- *   - apps/scanner/src/app/audit/page.tsx — deliverables list (rendered
+ *   - apps/scanner/src/app/read/page.tsx — deliverables list (rendered
  *     via CONCIERGE_DELIVERABLE_LIST in copy.ts, which re-exports from
  *     here)
  *   - apps/scanner/src/lib/concierge-email.ts — post-purchase Resend
  *     body (renders the email-deliverable line from here)
  *   - apps/scanner/src/lib/audit-draft/markdown-export.ts — operator
- *     audit-letter markdown (30-day plan + GS1 path sections render
+ *     read-letter markdown (30-day plan + GS1 path sections render
  *     from here)
  *
  * History: this module was introduced 2026-05-09 after the
@@ -39,7 +39,7 @@ export interface ConciergeDeliverableItem {
  * preserved across all bands — sequenced for objection handling
  * (letter, CSV, plan, GS1, re-scan).
  *
- * The CSV row carries the band-specific worst-N count. Audit-letter
+ * The CSV row carries the band-specific worst-N count. Read-letter
  * scope branches Band 3 → representative-sample wording.
  */
 export function conciergeDeliverableItems(
@@ -59,7 +59,7 @@ export function conciergeDeliverableItems(
 
   return [
     {
-      title: 'A written audit letter',
+      title: 'A written catalog letter',
       body: letterBody,
     },
     {
@@ -88,16 +88,16 @@ export function conciergeDeliverableItems(
  * The post-purchase Resend body's deliverable line. Renders the
  * canonical five items as a single prose sentence so the email reads
  * as a confirmation, not a checklist. Branches on band scope (sample
- * vs full) per the audit-letter rule.
+ * vs full) per the read-letter rule.
  */
 export function conciergeEmailDeliverableLine(slug: AuditBandSlug): string {
   const band = bandBySlug(slug)
   const worstN = band?.deliverable.fullyDraftedFixCount ?? 10
   const isSample = band?.deliverable.auditScope === 'representative-sample'
   if (isSample) {
-    return `you get a written audit letter, a per-product fix CSV (with the worst ${worstN} products drafted for you), a 30-day fix sequence, and the right GS1 UK barcode path. The audit reads a representative sample across your catalog patterns plus the structural data model. No video, no call — just the data.`
+    return `you get a written catalog letter, a per-product fix CSV (with the worst ${worstN} products drafted for you), a 30-day fix sequence, and the right GS1 UK barcode path. The read covers a representative sample across your catalog patterns plus the structural data model. No video, no call — just the data.`
   }
-  return `you get a written audit letter, a per-product fix CSV (with the worst ${worstN} products drafted for you), a 30-day fix sequence, and the right GS1 UK barcode path. No video, no call — just the data.`
+  return `you get a written catalog letter, a per-product fix CSV (with the worst ${worstN} products drafted for you), a 30-day fix sequence, and the right GS1 UK barcode path. No video, no call — just the data.`
 }
 
 /**
@@ -112,7 +112,7 @@ export function conciergeDeliverableSummary(slug: AuditBandSlug): string {
   const scopeLine = isSample
     ? 'We read a representative sample across your catalog'
     : 'We read every product'
-  return `${scopeLine}, write a detailed audit letter pointing at exactly what to fix, and send a per-product CSV with the worst ${worstN} products already drafted for you. A 30-day re-scan is included. Delivered within three working days.`
+  return `${scopeLine}, write a detailed catalog letter pointing at exactly what to fix, and send a per-product CSV with the worst ${worstN} products already drafted for you. A 30-day re-scan is included. Delivered within three working days.`
 }
 
 /**

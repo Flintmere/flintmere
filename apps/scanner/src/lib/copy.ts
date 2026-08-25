@@ -42,12 +42,12 @@ export const FOUNDER_SIGNATURE_TEAM_LINE = 'For the Flintmere team'
 export const FOUNDER_SIGNATURE_REPLY_INVITE = 'Reply direct. We read every one.'
 export const FOUNDER_SIGNATURE_IMAGE_URL: string | null = null
 
-// The concierge deliverable. Written audit — no video, no call —
+// The concierge deliverable. Written read — no video, no call —
 // delivered by the Flintmere team. Every customer-facing surface that
-// describes what the audit buys must use this wording (or the per-band
+// describes what the read buys must use this wording (or the per-band
 // list below). Per ADR 0022 the deliverable depth scales with band:
-// Band 1 = full audit + worst 10 drafted; Band 2 = full audit + worst
-// 25 drafted; Band 3 = representative-sample audit + worst 25 drafted.
+// Band 1 = full read + worst 10 drafted; Band 2 = full read + worst
+// 25 drafted; Band 3 = representative-sample read + worst 25 drafted.
 //
 // Single source of truth for deliverable copy is `concierge-deliverable.ts`
 // (introduced 2026-05-09 to prevent the spec/page drift caught in the
@@ -68,7 +68,7 @@ export const conciergeDeliverableSummaryForBand = conciergeDeliverableSummary
 
 /**
  * Default deliverable list — Band 1 wording — kept as a const export
- * for the marketing page surface. Phase 2's `/audit` redesign wires
+ * for the marketing page surface. Phase 2's `/read` redesign wires
  * per-band rendering; until then this surface shows the Band 1 list
  * with an inline note that Bands 2 + 3 deliver the worst 25.
  */
