@@ -154,7 +154,12 @@ describe('targetHostForRedirect', () => {
 
   it('redirects marketing-route hits on standards host to marketing host', () => {
     expect(targetHostForRedirect(STANDARDS_HOST, '/pricing')).toBe(MARKETING_HOST);
-    expect(targetHostForRedirect(STANDARDS_HOST, '/about')).toBe(MARKETING_HOST);
+    expect(targetHostForRedirect(STANDARDS_HOST, '/methodology')).toBe(
+      MARKETING_HOST,
+    );
+    // `/about` was here until 2026-07-28. It is now a STANDARDS_OWNED_PREFIX
+    // — the standards host serves its own /about — so it no longer
+    // redirects. See the dedicated case in the rewritePathForHost block.
   });
 
   it('does not redirect the standards-host root (handled by middleware rewrite)', () => {
@@ -217,10 +222,57 @@ describe('rewritePathForHost', () => {
     );
   });
 
-  it('does not rewrite non-root paths on standards host', () => {
+  it('does not double-prefix paths already inside /standards', () => {
     expect(rewritePathForHost(STANDARDS_HOST, '/standards')).toBeNull();
     expect(rewritePathForHost(STANDARDS_HOST, '/standards/food')).toBeNull();
-    expect(rewritePathForHost(STANDARDS_HOST, '/about')).toBeNull();
+  });
+
+  // Added 2026-07-28 with the v0.1 standard. Before this, only the root
+  // rewrote and every sub-path 404'd — including the citation-grade URL
+  // ADR 0024 §Gate 2 asks external parties to cite.
+  it('rewrites standards-owned sub-paths into the /standards tree', () => {
+    expect(rewritePathForHost(STANDARDS_HOST, '/food/v1.0/')).toBe(
+      '/standards/food/v1.0/',
+    );
+    expect(rewritePathForHost(STANDARDS_HOST, '/food/v1.0/spec.json')).toBe(
+      '/standards/food/v1.0/spec.json',
+    );
+    expect(rewritePathForHost(STANDARDS_HOST, '/food/diff-log')).toBe(
+      '/standards/food/diff-log',
+    );
+    expect(rewritePathForHost(STANDARDS_HOST, '/how-to-cite')).toBe(
+      '/standards/how-to-cite',
+    );
+  });
+
+  it('rewrites /about on the standards host rather than 301-ing it away', () => {
+    // `/about` is also a MARKETING_ROUTE. The standards /about is a
+    // separate page academics cite, so the redirect must be suppressed
+    // and the rewrite must fire.
+    expect(targetHostForRedirect(STANDARDS_HOST, '/about')).toBeNull();
+    expect(rewritePathForHost(STANDARDS_HOST, '/about')).toBe(
+      '/standards/about',
+    );
+    // ...but /about on the scanner host still belongs to marketing.
+    expect(targetHostForRedirect(SCANNER_HOST, '/about')).toBe(MARKETING_HOST);
+  });
+
+  it('leaves host-agnostic paths alone on the standards host', () => {
+    expect(
+      rewritePathForHost(STANDARDS_HOST, '/_next/static/chunk.js'),
+    ).toBeNull();
+    expect(rewritePathForHost(STANDARDS_HOST, '/api/healthz')).toBeNull();
+    expect(rewritePathForHost(STANDARDS_HOST, '/ingest/e')).toBeNull();
+    expect(rewritePathForHost(STANDARDS_HOST, '/robots.txt')).toBeNull();
+    expect(rewritePathForHost(STANDARDS_HOST, '/sitemap.xml')).toBeNull();
+    expect(rewritePathForHost(STANDARDS_HOST, '/favicon.ico')).toBeNull();
+  });
+
+  it('does not rewrite paths the standards host does not own', () => {
+    // Cross-host paths are 301'd before the rewrite runs; anything still
+    // here is unknown and should fall through to the app 404.
+    expect(rewritePathForHost(STANDARDS_HOST, '/nonsense')).toBeNull();
+    expect(rewritePathForHost(STANDARDS_HOST, '/beauty/v1')).toBeNull();
   });
 
   it('does not rewrite anything on marketing or scanner hosts', () => {

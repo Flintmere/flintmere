@@ -97,6 +97,33 @@ export const SCANNER_ROUTES: readonly string[] = [
  */
 export const STANDARDS_ROUTES: readonly string[] = ['/standards'];
 
+/**
+ * Public path prefixes the standards host owns, as they appear in the URL
+ * bar (i.e. WITHOUT the internal `/standards` prefix middleware adds).
+ *
+ * Two functions consult this list and they must agree:
+ *   - `targetHostForRedirect` — suppresses the cross-host 301 for these,
+ *     otherwise `standards.flintmere.com/about` would redirect away to
+ *     `flintmere.com/about`, because `/about` is a MARKETING_ROUTE.
+ *   - `rewritePathForHost` — rewrites these into the `/standards/*` tree.
+ *
+ * Adding a public standards route means adding its prefix here. The test
+ * matrix in `host-routing.test.ts` covers the collision cases.
+ */
+export const STANDARDS_OWNED_PREFIXES: readonly string[] = [
+  '/food',
+  '/how-to-cite',
+  '/about',
+];
+
+/** Whether a public path on the standards host belongs to the standard. */
+function isStandardsOwnedPath(pathname: string): boolean {
+  const path = pathname === '/' ? '/' : pathname.replace(/\/+$/, '');
+  return STANDARDS_OWNED_PREFIXES.some(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
+  );
+}
+
 /** Path prefixes that are allowed on every host (APIs, assets, metadata). */
 export const HOST_AGNOSTIC_PREFIXES: readonly string[] = [
   '/api/',
@@ -214,6 +241,14 @@ export function targetHostForRedirect(
     return null;
   }
 
+  // Standards-owned paths stay on the standards host and are rewritten
+  // rather than redirected. Without this, `/about` would 301 away to
+  // flintmere.com because it is also a MARKETING_ROUTE — the standards
+  // /about is a distinct page that academics cite.
+  if (normalisedRequest === STANDARDS_HOST && isStandardsOwnedPath(pathname)) {
+    return null;
+  }
+
   const klass = classifyRoute(pathname);
   if (klass === 'both' || klass === 'unknown') return null;
 
@@ -282,10 +317,29 @@ export const BLOG_URL = `https://${SCANNER_HOST}/blog`;
  * than served directly. Returns the rewrite target path if so, null
  * otherwise.
  *
- * The only rewrite today: `standards.flintmere.com/` → `/standards`.
- * This lets the standards holding page live at
- * `apps/scanner/src/app/standards/page.tsx` while the user-facing URL
- * remains the clean root.
+ * Two rewrites, both on the standards host:
+ *   `standards.flintmere.com/`            → `/standards`
+ *   `standards.flintmere.com/food/v1.0/`  → `/standards/food/v1.0/`
+ *
+ * This lets the standards pages live under
+ * `apps/scanner/src/app/standards/` while the user-facing URLs stay clean.
+ * The citation-grade URL `standards.flintmere.com/food/v1.0/` is the one
+ * external parties are asked to cite (ADR 0024 §Gate 2), so it must
+ * resolve without a `/standards` segment leaking into the address bar.
+ *
+ * Subpath rewriting was added 2026-07-28 alongside the v0.1 standard.
+ * Before that only the root rewrote, so every sub-path fell through to
+ * the scanner app and 404'd.
+ *
+ * Three exclusions, in order:
+ *   1. Host-agnostic prefixes (`/_next/`, `/api/`, `/ingest/`, metadata
+ *      files) serve directly on every host. Rewriting them would break
+ *      chunk loading and the shared `/api/healthz` the uptime monitor polls.
+ *   2. Paths already inside `/standards` — no double prefix.
+ *   3. Paths the standards host does not own. Cross-host paths are already
+ *      301'd by `targetHostForRedirect` before middleware reaches the
+ *      rewrite, so anything left here is genuinely unknown and should fall
+ *      through to the app's 404 rather than be rewritten into a second one.
  */
 export function rewritePathForHost(
   requestHost: string,
@@ -293,6 +347,23 @@ export function rewritePathForHost(
 ): string | null {
   const normalisedRequest = requestHost.split(':')[0]?.toLowerCase() ?? '';
   if (normalisedRequest !== STANDARDS_HOST) return null;
+
   if (pathname === '/' || pathname === '') return '/standards';
-  return null;
+
+  for (const prefix of HOST_AGNOSTIC_PREFIXES) {
+    if (
+      pathname.startsWith(prefix) ||
+      pathname === prefix.replace(/\/$/, '')
+    ) {
+      return null;
+    }
+  }
+
+  if (pathname === '/standards' || pathname.startsWith('/standards/')) {
+    return null;
+  }
+
+  if (!isStandardsOwnedPath(pathname)) return null;
+
+  return `/standards${pathname}`;
 }

@@ -74,6 +74,30 @@ Each becomes a log entry when shipped.
 - Result: produced, QA-green (zero style warnings); queued — **not yet posted** as of 2026-06-19.
 - Related claims: §"Pillar count — 7", §"60-second scan promise". ("~40% excluded" = positioning, not a registered claim.)
 
+### 2026-07-27 — Week of 28 Jul: five text posts, no carousel (`consistency-pillar` · `silent-drop` · `free-four-pillars` · `food-fields` · `bestseller-worst-data`)
+
+- Channel: x · bluesky (cross-post — `channel` omitted, 5 posts → 10 rows queued)
+- Angle: five distinct anchors, all fresh vs the spent set (ranks_last, one_feed, the_number, gtin_truth, still_listed, agentic-shift week of 07-07, stocked_early). Tue #3 Consistency pillar deep-dive · Wed #6 silent channel rejection (no feedback loop) · Thu #3 honesty about scan scope (four public pillars vs three install-gated) · Fri #3 food-vertical fields (net weight, unit price, allergens, storage — no regulatory claim asserted) · Sat #2 the bestseller carries the worst data.
+- Surface(s): prod social queue via `POST /api/agent/queue-posts` (HTTP 200, `queued: 10`). Fire times 10:00 BST Tue 28 Jul → Sat 1 Aug. Payload lived in the session scratchpad only, not committed.
+- Result: queued — **not yet posted** as of 2026-07-27. **No carousel this week**: `/Users/abuaa/Projects/Maters` does not exist on this machine, so the imagine/art-director flow could not run and no visual set was produced. Text pipeline unblocked per the standing rule.
+- Related claims: §"Pillar count — 7" + canon-source-register §A9 (public four = Identifiers/Titles/Consistency/Crawlability = 55%; install-gated three = Attributes/Mapping/Checkout eligibility = 45% — the Thu post states this split verbatim), §"60-second scan promise", §"free scan needs no install". No GTIN claim used (angle spent 2026-07-04); no AI-ranking outcome claimed on any post.
+
+### 2026-08-10 — Week of 11 Aug: five text posts, no carousel (`titles-parse` · `variant-consistency` · `record-the-before` · `crawlability-gate` · `agency-scorecard`)
+
+- Channel: x · bluesky (cross-post — `channel` omitted, 5 posts → 10 rows queued)
+- Angle: five fresh anchors, GTIN deliberately avoided (spent 2026-07-04 and re-used by the 2026-08-04 run, whose two GS1/GTIN posts fire 10 Aug). Tue #3 Titles pillar — the storefront title vs the title a channel can parse · Wed #2 the product passes but the variants don't (Consistency) · Thu #6 record the before, because channels re-read on their own schedule · Fri #3 Crawlability is 5% and gates the other six · Sat #7 agency angle, first use on social (audiences.md §3 hook).
+- Surface(s): prod social queue via `POST /api/agent/queue-posts` (HTTP 200, `queued: 10`). Fire times 10:00 BST Tue 11 Aug → Sat 15 Aug. Draft: `context/drafts/2026-08-10-social-week-titles-variants-crawlability.md`; payload scratchpad-only, not committed.
+- Result: queued — **not yet posted** as of 2026-08-10. **No carousel again**: `/Users/abuaa/Projects/Maters` is still absent on this machine (same as 2026-07-27), so no visual set and no IG hand-off. Text pipeline unblocked per the standing rule.
+- Related claims: canon-source-register §A9 + `flintmere.com/methodology` — Titles 15% public, Consistency 15% public, Crawlability 5% public, four public pillars = 55% (Tue/Wed/Fri/Sat state these verbatim), §"60-second scan promise", §"free scan needs no install". No GTIN claim; no AI-ranking or sales outcome claimed on any post.
+
+### 2026-08-17 — Week of 18 Aug: five text posts, no carousel (`attributes-structured-fields` · `mapping-wrong-shelf` · `checkout-eligibility-gate` · `parser-reads-fields` · `new-lines-thinnest-data`)
+
+- Channel: x · bluesky (cross-post — `channel` omitted, 5 posts → 10 rows queued)
+- Angle: the three install-gated pillars, none of which had ever carried a social post, plus two catalog-reality cuts. Tue #3 Attributes 20% — allergens as structured fields vs description prose, and honest that the free scan can't read it without the app · Wed #3 Mapping 15% — the category is the shelf ("Beverages > Coffee" vs "Pantry > Coffee") · Thu #3 + #6 Checkout eligibility 10% — found ≠ bought (shipping origin, tax registration, age restriction, alcohol licensing) · Fri #4 first social use of the before/after anchor — the first reader is a parser, not a person · Sat #2 new lines ship with the thinnest data, seasonal fit for autumn-range loading.
+- Surface(s): prod social queue via `POST /api/agent/queue-posts` (HTTP 200, `queued: 10`). Fire times 10:00 BST Tue 18 Aug → Sat 22 Aug. Draft: `context/drafts/2026-08-17-social-week-install-gated-pillars.md`; payload scratchpad-only, not committed.
+- Result: queued — **not yet posted** as of 2026-08-17. **No carousel for the third consecutive week**: `/Users/abuaa/Projects/Maters` is still absent on this machine (same as 2026-07-27 and 2026-08-10), so no visual set and no IG hand-off. Text pipeline unblocked per the standing rule.
+- Related claims: canon-source-register §A9 + `apps/scanner/src/lib/methodology-data.ts` — Attributes 20% install-gated, Mapping 15% install-gated, Checkout eligibility 10% install-gated (Tue/Wed/Thu state these verbatim; the Mapping category example and the Checkout blocker list are lifted from the pillars' own `why` / `measures` text), §"60-second scan promise", §"free scan needs no install" (Fri). No GTIN claim (angle spent, and re-used by the 2026-08-04 run whose GS1 posts fired 10 + 17 Aug); no AI-ranking or sales outcome claimed on any post.
+
 ## Changelog
 
 - 2026-04-19: Adapted for Flintmere. Added seven narrative anchors from BUSINESS.md and cornerstone content queue from SPEC §8.3.

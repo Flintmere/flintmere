@@ -1,231 +1,247 @@
 import type { Metadata } from 'next';
-import { Bracket, SiteFooter } from '@flintmere/ui';
-import { ContactForm } from '@/components/ContactForm';
+import { Bracket } from '@flintmere/ui';
+import { StandardsShell } from '@/components/standards/StandardsShell';
+import {
+  FOOD_V1_FIELDS,
+  FREEZES_AT,
+  PUBLISHED_AT,
+  STANDARD_STATUS,
+} from '@/lib/standards/food-v1-fields';
 
 /**
- * Standards root — the food regulatory standard, holding page.
+ * `standards.flintmere.com/` — index of published standards.
  *
- * Per the C1 three-host extension (council 2026-05-03), this page lives
- * at `apps/scanner/src/app/standards/` and is reached two ways:
- *   1. `standards.flintmere.com/` — middleware rewrites to `/standards`
- *      so the user-facing URL stays the clean root. Canonical.
- *   2. `flintmere.com/standards` — middleware 301 to standards host.
+ * Replaces the holding page that lived here from 2026-05-03 until food
+ * v1.0 published. ADR 0024 supersedes that page's rationale explicitly;
+ * the waitlist capture it carried has no purpose now that the thing
+ * people were waiting for is one click away.
  *
- * Phase 1 (this commit): holding page + email capture via the contact
- * form (topic=partnership, source=/standards-holding so triage can
- * grep on it). Phase 2 (post-ingestion-engine, June 2026+) replaces
- * this content with the actual taxonomy.
+ * Reached two ways: `standards.flintmere.com/` (middleware rewrites to
+ * `/standards`, so the user-facing URL stays the clean root — canonical),
+ * and `flintmere.com/standards` (middleware 301s to this host).
  *
- * `force-static` — content surface, no DB or LLM dependencies. A
- * scanner-side runtime failure (DB error, LLM timeout) leaves this page
- * serving from the static cache so the authority surface stays up
- * independent of product code health.
+ * `force-static` — content surface, no DB and no LLM. A scanner-side
+ * runtime failure leaves the authority surface serving from cache.
  */
-
 export const dynamic = 'force-static';
 
+const ROOT_URL = 'https://standards.flintmere.com/';
+
 export const metadata: Metadata = {
-  title: 'Flintmere Standards — the food regulatory standard',
+  title: 'Flintmere Standards — open standards for catalog readiness',
   description:
-    'A reference standard for how food merchants should describe their catalog so AI agents and shopping channels can read it correctly. Allergens, ingredients, country-of-origin, GS1 paths. Publishing in the second half of 2026.',
-  alternates: { canonical: 'https://standards.flintmere.com/' },
+    'Published, citable standards for how a catalog should describe itself so shopping channels and AI agents can read it. Food v1.0 is live. Free to read, free to cite.',
+  alternates: { canonical: ROOT_URL },
   openGraph: {
-    title: 'Flintmere Standards — the food regulatory standard',
+    title: 'Flintmere Standards — open standards for catalog readiness',
     description:
-      'A reference standard for how food merchants should describe their catalog so AI agents and shopping channels can read it correctly. Publishing in the second half of 2026.',
-    url: 'https://standards.flintmere.com/',
+      'Published, citable standards for how a catalog should describe itself. Food v1.0 is live.',
+    url: ROOT_URL,
     type: 'website',
   },
 };
 
-export default function StandardsHolding() {
+const PAD = {
+  paddingLeft: 'clamp(24px, 4vw, 48px)',
+  paddingRight: 'clamp(24px, 4vw, 48px)',
+} as const;
+
+const PUBLISHED = [
+  {
+    vertical: 'Food',
+    href: '/food/',
+    current: '/food/v1.0/',
+    status:
+      STANDARD_STATUS === 'rc'
+        ? `v1.0 release candidate — freezes ${FREEZES_AT}`
+        : 'v1.0 — current',
+    summary: `${FOOD_V1_FIELDS.length} fields covering identifiers, allergens, ingredients, origin, net content, shelf life and certification. Each cites a primary regulator.`,
+  },
+] as const;
+
+const FORTHCOMING = [
+  { vertical: 'Beauty', note: 'INCI encoding. No published date.' },
+  { vertical: 'Apparel', note: 'Materials and care. No published date.' },
+] as const;
+
+export default function StandardsIndex() {
   return (
-    <>
-      <main
-        id="main"
-        className="flintmere-main bg-[color:var(--color-paper)]"
+    <StandardsShell reviewedOn={PUBLISHED_AT}>
+      <section
+        aria-labelledby="standards-heading"
+        className="mx-auto max-w-[1080px]"
+        style={{ ...PAD, paddingTop: 'clamp(56px, 7vw, 112px)', paddingBottom: 'clamp(40px, 5vw, 72px)' }}
       >
-        <section
-          aria-labelledby="standards-heading"
-          className="mx-auto max-w-[1080px]"
-          style={{
-            paddingLeft: 'clamp(24px, 4vw, 48px)',
-            paddingRight: 'clamp(24px, 4vw, 48px)',
-            paddingTop: 'clamp(80px, 10vw, 160px)',
-            paddingBottom: 'clamp(48px, 6vw, 96px)',
-          }}
+        <p
+          className="font-mono uppercase text-[color:var(--color-mute)]"
+          style={{ fontSize: '11px', letterSpacing: '0.16em', marginBottom: 'clamp(24px, 3vw, 40px)' }}
         >
-          <p
-            className="font-mono uppercase text-[color:var(--color-mute)]"
-            style={{
-              fontSize: '11px',
-              letterSpacing: '0.16em',
-              marginBottom: 'clamp(28px, 4vw, 56px)',
-            }}
-          >
-            Standards.
-          </p>
-          <h1
-            id="standards-heading"
-            className="font-medium text-[color:var(--color-ink)] max-w-[18ch]"
-            style={{
-              fontSize: 'var(--scale-h1-anchor)',
-              letterSpacing: '-0.04em',
-              lineHeight: 0.98,
-            }}
-          >
-            The food <Bracket size="display">regulatory</Bracket> standard.
-          </h1>
-          <p
-            className="text-[color:var(--color-ink-2)] max-w-[56ch]"
-            style={{
-              marginTop: 'clamp(28px, 4vw, 48px)',
-              fontSize: '20px',
-              lineHeight: 1.5,
-            }}
-          >
-            A reference for how food merchants should describe their catalog
-            so AI agents and shopping channels can read it correctly.
-            Allergens, ingredients, country-of-origin, GS1 paths. Citation
-            authority, not a product paywall.
-          </p>
-          <p
-            className="text-[color:var(--color-ink-2)] max-w-[56ch]"
-            style={{
-              marginTop: '20px',
-              fontSize: '17px',
-              lineHeight: 1.55,
-            }}
-          >
-            Publishing in the second half of 2026, after the ingestion
-            engine ships and the first cohort of merchant catalogs has been
-            verified against it. Free to read. Free to cite.
-          </p>
-        </section>
+          Standards.
+        </p>
+        <h1
+          id="standards-heading"
+          className="font-medium text-[color:var(--color-ink)] max-w-[18ch]"
+          style={{ fontSize: 'var(--scale-h1-anchor)', letterSpacing: '-0.04em', lineHeight: 0.98 }}
+        >
+          How a catalog should <Bracket size="display">describe</Bracket>{' '}
+          itself.
+        </h1>
+        <p
+          className="text-[color:var(--color-ink-2)] max-w-[56ch]"
+          style={{ marginTop: 'clamp(28px, 4vw, 48px)', fontSize: '20px', lineHeight: 1.5 }}
+        >
+          A shopping channel reads a product listing before any person
+          does. These documents specify what it needs to find there —
+          field by field, each one grounded in the regulation that governs
+          it.
+        </p>
+        <p
+          className="text-[color:var(--color-ink-2)] max-w-[56ch]"
+          style={{ marginTop: 20, fontSize: '17px', lineHeight: 1.55 }}
+        >
+          Free to read. Free to cite. Spec text under CC-BY 4.0, machine
+          artefacts under CC0.
+        </p>
+      </section>
 
-        <section
-          aria-labelledby="standards-what-heading"
-          className="mx-auto max-w-[1080px]"
-          style={{
-            paddingLeft: 'clamp(24px, 4vw, 48px)',
-            paddingRight: 'clamp(24px, 4vw, 48px)',
-            paddingTop: 'clamp(40px, 6vw, 96px)',
-            paddingBottom: 'clamp(40px, 6vw, 96px)',
-            borderTop: '1px solid var(--color-line)',
-          }}
+      <section
+        aria-labelledby="published-heading"
+        className="mx-auto max-w-[1080px]"
+        style={{ ...PAD, paddingTop: 'clamp(40px, 5vw, 72px)', paddingBottom: 'clamp(40px, 5vw, 72px)', borderTop: '1px solid var(--color-line)' }}
+      >
+        <p
+          className="font-mono uppercase text-[color:var(--color-mute)]"
+          style={{ fontSize: '11px', letterSpacing: '0.16em', marginBottom: 20 }}
         >
-          <p
-            className="font-mono uppercase text-[color:var(--color-mute)]"
-            style={{
-              fontSize: '11px',
-              letterSpacing: '0.16em',
-              marginBottom: '20px',
-            }}
-          >
-            What it covers.
-          </p>
-          <h2
-            id="standards-what-heading"
-            className="font-medium text-[color:var(--color-ink)] max-w-[28ch]"
-            style={{
-              fontSize: 'clamp(28px, 4vw, 44px)',
-              letterSpacing: '-0.025em',
-              lineHeight: 1.1,
-            }}
-          >
-            Seven pillars. Each one a hidden multiplier on whether a food SKU
-            shows up where shoppers and agents look for it.
-          </h2>
-          <ul
-            className="text-[color:var(--color-ink-2)]"
-            style={{
-              marginTop: 'clamp(28px, 4vw, 48px)',
-              listStyle: 'none',
-              padding: 0,
-              display: 'grid',
-              gap: 14,
-              fontSize: '17px',
-              lineHeight: 1.55,
-              maxWidth: '64ch',
-            }}
-          >
-            {[
-              'Allergen disclosure — the 14 declarable allergens, plus crops without protected status.',
-              'Ingredient ordering — descending by weight, with sub-ingredient parentheticals where required.',
-              'Country-of-origin — primary plus QUID where the marketing claim depends on it.',
-              'GS1 barcode path — GTIN allocation, the case for Variable Measure, when prefix-7 is wrong.',
-              'Storage + use-by — ambient vs chilled vs frozen, opened-shelf-life vs sealed.',
-              'Channel readability — Google Shopping, Amazon Fresh, Ocado, Deliveroo. The schemas that read each pillar.',
-              'Crawlability — robots.txt access for the AI agents that arbitrate discovery (GPTBot, ClaudeBot), sitemap coverage, and the llms.txt signal.',
-            ].map((line) => (
-              <li
-                key={line}
-                style={{
-                  paddingLeft: 0,
-                  borderLeft: '1px solid var(--color-line)',
-                  paddingInlineStart: 16,
-                }}
+          Published.
+        </p>
+        <h2
+          id="published-heading"
+          className="font-medium text-[color:var(--color-ink)] max-w-[24ch]"
+          style={{ fontSize: 'clamp(26px, 3.4vw, 40px)', letterSpacing: '-0.025em', lineHeight: 1.1 }}
+        >
+          Live now.
+        </h2>
+
+        <ul style={{ marginTop: 32, listStyle: 'none', padding: 0, display: 'grid', gap: 0 }}>
+          {PUBLISHED.map((entry) => (
+            <li
+              key={entry.vertical}
+              style={{ borderTop: '1px solid var(--color-line)', paddingTop: 24, paddingBottom: 24 }}
+            >
+              <a
+                href={entry.current}
+                className="text-[color:var(--color-ink)] no-underline"
+                style={{ display: 'block', minHeight: 44 }}
               >
-                {line}
-              </li>
-            ))}
-          </ul>
-        </section>
+                <span
+                  className="font-medium text-[color:var(--color-ink)]"
+                  style={{ fontSize: '24px', letterSpacing: '-0.02em' }}
+                >
+                  {entry.vertical}
+                </span>
+                <span
+                  className="font-mono uppercase text-[color:var(--color-mute)]"
+                  style={{ fontSize: '11px', letterSpacing: '0.16em', marginLeft: 16 }}
+                >
+                  {entry.status}
+                </span>
+                <span
+                  className="text-[color:var(--color-ink-2)]"
+                  style={{ display: 'block', marginTop: 12, fontSize: '16px', lineHeight: 1.55, maxWidth: '60ch' }}
+                >
+                  {entry.summary}
+                </span>
+              </a>
+              <p
+                className="font-mono text-[color:var(--color-ink-2)]"
+                style={{ marginTop: 14, fontSize: '13px', lineHeight: 1.8 }}
+              >
+                <a href={entry.href} className="text-[color:var(--color-ink)] underline underline-offset-4">
+                  All versions
+                </a>
+                {'  ·  '}
+                <a href="/food/diff-log" className="text-[color:var(--color-ink)] underline underline-offset-4">
+                  Change log
+                </a>
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-        <section
-          aria-labelledby="standards-waitlist-heading"
-          className="mx-auto max-w-[1080px]"
-          style={{
-            paddingLeft: 'clamp(24px, 4vw, 48px)',
-            paddingRight: 'clamp(24px, 4vw, 48px)',
-            paddingTop: 'clamp(40px, 6vw, 96px)',
-            paddingBottom: 'clamp(80px, 10vw, 160px)',
-            borderTop: '1px solid var(--color-line)',
-          }}
+      <section
+        aria-labelledby="forthcoming-heading"
+        className="mx-auto max-w-[1080px]"
+        style={{ ...PAD, paddingTop: 'clamp(40px, 5vw, 72px)', paddingBottom: 'clamp(40px, 5vw, 72px)', borderTop: '1px solid var(--color-line)' }}
+      >
+        <p
+          className="font-mono uppercase text-[color:var(--color-mute)]"
+          style={{ fontSize: '11px', letterSpacing: '0.16em', marginBottom: 20 }}
         >
-          <p
-            className="font-mono uppercase text-[color:var(--color-mute)]"
-            style={{
-              fontSize: '11px',
-              letterSpacing: '0.16em',
-              marginBottom: '20px',
-            }}
-          >
-            Tell us when.
-          </p>
-          <h2
-            id="standards-waitlist-heading"
-            className="font-medium text-[color:var(--color-ink)] max-w-[24ch]"
-            style={{
-              fontSize: 'clamp(28px, 4vw, 44px)',
-              letterSpacing: '-0.025em',
-              lineHeight: 1.1,
-              marginBottom: 'clamp(20px, 3vw, 32px)',
-            }}
-          >
-            Get a note when the first version of the standard publishes.
-          </h2>
-          <p
-            className="text-[color:var(--color-ink-2)] max-w-[56ch]"
-            style={{
-              fontSize: '17px',
-              lineHeight: 1.55,
-              marginBottom: 'clamp(28px, 4vw, 40px)',
-            }}
-          >
-            One email when v1 lands. No newsletter, no drip, no sales
-            sequence. Tell us a bit about your catalog and which pillars
-            matter most to you so the first version covers what you need.
-          </p>
-          <ContactForm
-            defaultTopic="partnership"
-            lockTopic
-            source="/standards-holding"
-            embedded
-          />
-        </section>
-      </main>
-      <SiteFooter />
-    </>
+          Not yet written.
+        </p>
+        <h2
+          id="forthcoming-heading"
+          className="font-medium text-[color:var(--color-ink)] max-w-[24ch]"
+          style={{ fontSize: 'clamp(26px, 3.4vw, 40px)', letterSpacing: '-0.025em', lineHeight: 1.1 }}
+        >
+          Other verticals.
+        </h2>
+        <p
+          className="text-[color:var(--color-ink-2)]"
+          style={{ marginTop: 24, fontSize: '16px', lineHeight: 1.6, maxWidth: '62ch' }}
+        >
+          Food is the vertical we work in most closely, so it is the one we
+          can specify honestly. The others are listed for completeness, not
+          as a commitment to a date.
+        </p>
+        <ul
+          className="text-[color:var(--color-ink-2)]"
+          style={{ marginTop: 24, listStyle: 'none', padding: 0, display: 'grid', gap: 12, fontSize: '16px', lineHeight: 1.55, maxWidth: '62ch' }}
+        >
+          {FORTHCOMING.map((entry) => (
+            <li key={entry.vertical} style={{ borderLeft: '1px solid var(--color-line)', paddingInlineStart: 16 }}>
+              <span className="text-[color:var(--color-ink)]">{entry.vertical}</span> — {entry.note}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section
+        aria-labelledby="citing-heading"
+        className="mx-auto max-w-[1080px]"
+        style={{ ...PAD, paddingTop: 'clamp(40px, 5vw, 72px)', paddingBottom: 'clamp(40px, 5vw, 72px)', borderTop: '1px solid var(--color-line)' }}
+      >
+        <p
+          className="font-mono uppercase text-[color:var(--color-mute)]"
+          style={{ fontSize: '11px', letterSpacing: '0.16em', marginBottom: 20 }}
+        >
+          Using this work.
+        </p>
+        <h2
+          id="citing-heading"
+          className="font-medium text-[color:var(--color-ink)] max-w-[24ch]"
+          style={{ fontSize: 'clamp(26px, 3.4vw, 40px)', letterSpacing: '-0.025em', lineHeight: 1.1 }}
+        >
+          Quote it, cite it, build on it.
+        </h2>
+        <p
+          className="text-[color:var(--color-ink-2)]"
+          style={{ marginTop: 24, fontSize: '16px', lineHeight: 1.6, maxWidth: '62ch' }}
+        >
+          <a href="/how-to-cite" className="text-[color:var(--color-ink)] underline underline-offset-4">
+            How to cite
+          </a>{' '}
+          carries worked examples in five formats and explains which URL
+          form to use.{' '}
+          <a href="/about" className="text-[color:var(--color-ink)] underline underline-offset-4">
+            About
+          </a>{' '}
+          covers who reviews this, on what cadence, and what the URL
+          stability guarantee actually promises.
+        </p>
+      </section>
+    </StandardsShell>
   );
 }
