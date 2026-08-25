@@ -39,7 +39,7 @@ Four primary segments. Each row is a writable prompt: what they feel, what they 
 - **Objection**: "Data residency? SLA? SOC 2? DPA? Will you sign a custom MSA? Can we scope to one brand for pilot?"
 - **Desired outcome**: Plus tier (private beta, ADR 0017; renamed from Enterprise) with custom attribute templates, dedicated Slack support, monthly strategy call, per-contract SLA, EU data residency, compliance evidence for their procurement team.
 - **Register**: enterprise procurement language. Evidence-heavy, low-ego, operational. Links to security posture, DPA, uptime history. No marketing fluff.
-- **Channels**: direct sales via LinkedIn + ShopTalk, Shopify Plus merchant success referrals, post-audit upsell from concierge engagements.
+- **Channels**: direct sales via LinkedIn + ShopTalk, Shopify Plus merchant success referrals, post-Catalog Letter upsell from concierge engagements.
 - **Headline hook**: `Catalog readiness at Plus scale. Custom templates, dedicated support.`
 
 ## Mapping table (segment → primary surface → primary metric)

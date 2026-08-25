@@ -2,6 +2,8 @@
 
 Seven priority clusters for Flintmere. All clusters centre on education about AI-agent readiness, catalog scoring, and the specific technical vocabulary Shopify merchants and agencies search for.
 
+> **Search-surface note (ADR 0028).** The `audit`-bearing rows below (`shopify catalog audit`, `ai audit app shopify`, `enterprise shopify catalog audit`) are retained deliberately as live search-demand terms — never rename or delete them. They are search-surface-only: the paid product's name is **The Catalog Letter**, not "audit."
+
 ## Cluster 1 — AI shopping & agentic commerce (awareness)
 
 - `ai shopping agents`
@@ -89,7 +91,7 @@ Every SEO piece must trace its claims through `memory/compliance-risk/claims-reg
 - **AI uplift**: cite the registered claim — **"3–4× higher AI visibility at 99%+ attribute completion"** (claims-register §"AI visibility uplift"; canonical scope is "at 99%+ attribute completion"). The bare "~34%" is only ever a per-store *example*, not a canonical figure — per-store estimates use the qualifier "estimated ~N% lift based on comparable stores in your vertical." Never a standalone percentage, never "guaranteed" or "will".
 - **GTIN**: Flintmere does not issue GTINs. GS1 does. Disclaimer appears on any GTIN-adjacent content.
 - **Tier pricing (in transition — ADR 0016/0020; trace to code, do not memorise)**: Subscription pricing is mid-migration from the volume ladder to the food vertical ladder. Canonical source is `apps/scanner/src/lib/pricing.ts` — never cite a subscription price not present there. *Grandfathered* (in-flight subscriptions only; do **not** promote to new sign-ups): Growth £79 / Scale £249 / Agency £499 / Plus from £1,200 on enquiry. *New sign-ups* land on the ADR 0016 food vertical ladder — indicatively Food single £99 / Food agency £349 / Food+Beauty bundle £159 (single) · £499 (agency) / Concierge retainer £349 — but these magnitudes are WTP-pending and currently render as "Pricing finalising — May–June 2026" in `pricing.ts`; treat as indicative and verify there before publishing any forward price. The retired numbers Growth £49 / Scale £149 / Agency £399 / Enterprise £499+ are WRONG — never use them.
-- **Concierge audit pricing (ADR 0022 band ladder)**: £197 (≤1,500 SKUs) / £397 (1,501–5,000) / from £597 bespoke (5,001+). Canonical: `apps/scanner/src/lib/audit-pricing.ts`. The £97 flat floor was retired 2026-05-01 — never cite £97.
+- **Catalog Letter pricing (ADR 0022 band ladder)**: £197 (≤1,500 SKUs) / £397 (1,501–5,000) / from £597 bespoke (5,001+). Canonical: `apps/scanner/src/lib/audit-pricing.ts`. The £97 flat floor was retired 2026-05-01 — never cite £97.
 - **Integrations**: Flintmere integrates via Shopify Admin + Storefront APIs. Not a generic "works with everything" tool.
 - **Outcome framing**: "catalog readiness for AI agents", not "be recommended by AI agents".
 

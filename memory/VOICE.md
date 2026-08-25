@@ -15,7 +15,7 @@ The brand posture: **technical confidence**. We're serious about catalog readine
 - **Specific over abstract.** "40% of catalogs are ignored by AI agents" beats "many catalogs have visibility issues."
 - **Concrete numbers.** If you can count it, count it. "412 products missing GTINs" not "many products missing barcodes".
 - **One idea per paragraph.** If you find yourself using "and also" or "additionally", split the paragraph.
-- **Active voice.** "We audit your catalog" not "Your catalog is audited by us".
+- **Active voice.** "We read your catalog" not "Your catalog is read by us".
 - **No qualifiers that aren't load-bearing.** Kill "very", "really", "quite", "just". If "literally" isn't load-bearing, kill it.
 - **Name the thing.** If it's a GTIN, call it a GTIN. If it's a metafield, call it a metafield. The Shopify merchant audience understands technical vocabulary; condescending simplifications break trust.
 
@@ -84,7 +84,7 @@ Hard bans on consumer copy, marketing pages, docs, emails, social:
 - "AI agents will prefer your store" (same)
 - Quantitative outcome promises without "estimated" + benchmark source
 
-Use instead: "improves catalog readability for AI agents", "raises AI-readiness score from X to Y", "estimated visibility lift of ~N% based on comparable stores in your vertical (source: our concierge audits)."
+Use instead: "improves catalog readability for AI agents", "raises AI-readiness score from X to Y", "estimated visibility lift of ~N% based on comparable stores in your vertical (source: our catalog letters)."
 
 ## Preferred positioning language
 

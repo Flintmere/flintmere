@@ -8,7 +8,7 @@ One primary metric per surface. Everything else is secondary observation.
 |---|---|---|
 | Public scanner (`audit.flintmere.com`) | Successful scans per day | The free scanner is top-of-funnel. If merchants aren't scanning, nothing else matters. |
 | Scanner → email capture | Email opt-in rate (% of completed scans that submit email) | The only signal we have for intent before install. |
-| Scanner → concierge audit | Paid concierge audits per week | Week 1 validation metric (SPEC §2). Proves willingness to pay. |
+| Scanner → catalog letter | Paid catalog letters per week | Week 1 validation metric (SPEC §2). Proves willingness to pay. |
 | Marketing site blog | Organic search sessions to `flintmere.com/blog/*` | Content's job is discovery. Social traffic is a bonus. |
 | Pricing page | Growth tier signup rate (pricing visits → installs) | Conversion is the whole point of the page. |
 | Shopify App Store listing | Install rate (listing views → installs) | Platform-own metric; Shopify shows this in Partner Dashboard. |
@@ -18,7 +18,7 @@ One primary metric per surface. Everything else is secondary observation.
 | Social (LinkedIn, X) | Clicks to scanner or blog | Vanity metrics (likes, impressions) are observations. Traffic is the outcome. |
 | Outreach | Replies + meetings booked | Not opens. Not sends. |
 
-> Concierge-audit pricing is the ADR 0022 band ladder — £197 (≤1,500 SKUs) / £397 (1,501–5,000) / from £597 bespoke (5,001+); the £97 flat floor was retired 2026-05-01. Canonical: `apps/scanner/src/lib/audit-pricing.ts`.
+> Catalog Letter pricing is the ADR 0022 band ladder — £197 (≤1,500 SKUs) / £397 (1,501–5,000) / from £597 bespoke (5,001+); the £97 flat floor was retired 2026-05-01. Canonical: `apps/scanner/src/lib/audit-pricing.ts`.
 
 ## The North Star
 

@@ -55,7 +55,7 @@ Gatekeeper for banned-phrase enforcement: **#11 Investor / founder voice.**
 | AI agent, agentic storefront, ChatGPT / Gemini / Copilot | "bots", "AI robots", "the algorithm" |
 | readiness, visibility, parseability, machine-readable | "SEO", "rankings", "ranking signal" (we're not an SEO tool) |
 | score, pillar, ceiling, percentile | "rating", "grade" (grade is OK as a secondary label only) |
-| scan, audit, fix, revert, enrich | "optimise", "improve" (too vague) |
+| scan, read, fix, revert, enrich | "optimise", "improve" (too vague) |
 | install, merchant, agency, store | "users", "customers" (merchants are the buyer) |
 
 Technical-confidence register. Not growth-hack register. Not academic register.
