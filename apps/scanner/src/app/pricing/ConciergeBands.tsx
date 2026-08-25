@@ -3,7 +3,7 @@ import { AUDIT_BANDS, type AuditBand } from '@/lib/audit-pricing';
 import { ViewportReveal } from '@/components/ViewportReveal';
 
 /**
- * Concierge audit band ladder — primary pricing-comparison surface on
+ * Catalog Letter band ladder — primary pricing-comparison surface on
  * /pricing per the Standing Council's Option B verdict on the
  * 2026-05-03 re-scope.
  *
@@ -36,7 +36,7 @@ export function ConciergeBands() {
           paddingBottom: 'clamp(64px, 8vw, 112px)',
         }}
       >
-        <p className="eyebrow mb-6">Concierge audit · Available now · One-off</p>
+        <p className="eyebrow mb-6">The Catalog Letter · Available now · One-off</p>
         <h2
           id="concierge-bands-heading"
           className="font-medium tracking-[-0.03em] leading-[1.05] text-[color:var(--color-ink)] max-w-[24ch]"
@@ -53,10 +53,10 @@ export function ConciergeBands() {
             lineHeight: 1.55,
           }}
         >
-          One-off audit; you self-attest your band at checkout. Full
+          One-off catalog letter; you self-attest your band at checkout. Full
           deliverable + offer detail on the{' '}
           <Link
-            href="/audit#checkout"
+            href="/catalog-letter#checkout"
             // Cross-host (marketing → audit.flintmere.com): Next prefetches this
             // relative Link, middleware 301s it cross-origin, and the CORS-mode
             // RSC fetch can't follow → "Failed to fetch RSC payload" console noise.
@@ -65,7 +65,7 @@ export function ConciergeBands() {
             className="underline"
             style={{ textDecorationColor: 'var(--color-accent)', textUnderlineOffset: 4 }}
           >
-            audit page
+            catalog letter page
           </Link>
           .
         </p>
@@ -92,8 +92,8 @@ function BandCard({ band, revealDelay }: { band: AuditBand; revealDelay: number 
   // form already configured for their chosen band — no extra click.
   // Bespoke (band-3) routes through the same anchor; CheckoutCard
   // renders the bespoke-quote variant when the band is band-3.
-  const ctaHref = `/audit?band=${band.slug}#checkout`;
-  const ctaLabel = band.isBespoke ? 'Request a quote →' : 'Book the audit →';
+  const ctaHref = `/catalog-letter?band=${band.slug}#checkout`;
+  const ctaLabel = band.isBespoke ? 'Request a quote →' : 'Book your catalog letter →';
 
   return (
     <article
@@ -139,8 +139,8 @@ function BandCard({ band, revealDelay }: { band: AuditBand; revealDelay: number 
           </span>
           <span>
             {band.deliverable.auditScope === 'full'
-              ? 'Full-catalog audit'
-              : 'Representative-sample audit'}
+              ? 'Full-catalog letter'
+              : 'Representative-sample letter'}
           </span>
         </li>
         <li className="flex gap-3">

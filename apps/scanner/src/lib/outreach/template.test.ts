@@ -131,7 +131,7 @@ describe('renderInitialEmail', () => {
     // below covers that), but visible link text is human-readable.
     const out = renderInitialEmail(baseInput);
     expect(out.bodyHtml).toContain('run the free scan');
-    expect(out.bodyHtml).toContain('see audit + retainer details');
+    expect(out.bodyHtml).toContain('see catalog letter + retainer details');
   });
 });
 

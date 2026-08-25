@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
   if (errorParam) {
     // Allowlist Google's documented OAuth error codes. Anything off-list
     // becomes 'unknown' so a hostile or buggy IdP can't smuggle arbitrary
-    // text into the merchant-visible /audit/connect?reason= surface.
+    // text into the merchant-visible /catalog-letter/connect?reason= surface.
     // Allowlist sourced from RFC 6749 §4.1.2.1 + Google's docs.
     const safeReason = isAllowedOauthError(errorParam) ? errorParam : 'unknown';
     // Funnel step (ADR 0023 §measurement, spec 2026-06-07): consent declined
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     // raw param — so the same redaction that protects the merchant-visible
     // surface protects the analytics property.
     await captureServerEvent('oauth_callback_denied', { reason: safeReason });
-    const dest = new URL('/audit/connect', origin);
+    const dest = new URL('/catalog-letter/connect', origin);
     dest.searchParams.set('status', 'denied');
     dest.searchParams.set('reason', safeReason);
     return NextResponse.redirect(dest);
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
     await captureServerEvent('oauth_callback_denied', {
       reason: 'exchange_failed',
     });
-    const dest = new URL('/audit/connect', origin);
+    const dest = new URL('/catalog-letter/connect', origin);
     dest.searchParams.set('status', 'exchange-failed');
     return NextResponse.redirect(dest);
   }
@@ -141,8 +141,8 @@ export async function GET(request: NextRequest) {
   // Connect-friction spec (2026-06-07) fix 1 — route to the auto-scan payoff
   // instead of the dead-end Connected card. The payoff page resolves the
   // merchant's ground-truth scan and renders it. Reverts in one line by
-  // pointing back at `/audit/connect?status=ok`.
-  const dest = new URL('/audit/connect/results', origin);
+  // pointing back at `/catalog-letter/connect?status=ok`.
+  const dest = new URL('/catalog-letter/connect/results', origin);
   dest.searchParams.set('audit', state.auditId);
   return NextResponse.redirect(dest);
 }

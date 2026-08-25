@@ -1,5 +1,5 @@
 /**
- * Concierge-audit invoice generation.
+ * Catalog Letter invoice generation.
  *
  * After a PaymentIntent succeeds (Path C — see Standing Council 2026-05-04
  * verdict on receipts/invoices), create a paid Stripe Invoice as the
@@ -67,10 +67,10 @@ export async function createConciergeInvoice(
       customer: customer.id,
       collection_method: 'send_invoice',
       days_until_due: 0,
-      description: `Concierge AI-readiness audit (${band.label}) for ${shopUrl}`,
+      description: `The Catalog Letter (${band.label}) for ${shopUrl}`,
       custom_fields: [
         { name: 'Shop', value: shopUrl.slice(0, 30) },
-        { name: 'Audit band', value: `${band.label} (${band.skuRangeLabel})` },
+        { name: 'Catalog letter band', value: `${band.label} (${band.skuRangeLabel})` },
         { name: 'Delivery', value: 'Three working days' },
       ],
       footer:
@@ -101,8 +101,8 @@ export async function createConciergeInvoice(
       amount: band.pricePence,
       currency: 'gbp',
       description:
-        `Flintmere concierge AI-readiness audit — ${band.label} ` +
-        `(${band.skuRangeLabel}). Full written audit + per-product fix CSV ` +
+        `Flintmere Catalog Letter — ${band.label} ` +
+        `(${band.skuRangeLabel}). Full written catalog letter + per-product fix CSV ` +
         `(worst ${band.deliverable.fullyDraftedFixCount} products fully drafted). ` +
         `Delivery: three working days from booking. ` +
         `Day-30 re-scan included.`,

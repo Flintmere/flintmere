@@ -7,7 +7,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = {
   title: 'Support — Help, status, response times for Flintmere',
   description:
-    'How to get help with Flintmere — scanner, Shopify app, concierge audits. Response times by plan, security reporting, status page.',
+    'How to get help with Flintmere — scanner, Shopify app, catalog letters. Response times by plan, security reporting, status page.',
   alternates: { canonical: '/support' },
 };
 

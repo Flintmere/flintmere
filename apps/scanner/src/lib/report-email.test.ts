@@ -109,26 +109,26 @@ describe('buildReportEmail', () => {
     expect(email.text).toContain('not affiliated with GS1');
   });
 
-  it('shows the locked-check count and routes the merchant to the audit', () => {
+  it('shows the locked-check count and routes the merchant to the catalog letter', () => {
     const email = buildReportEmail({ score: makeScore(), ...baseInput });
     expect(email.html).toContain('[&nbsp;3&nbsp;]');
-    expect(email.html).toContain('£197 audit covers them');
+    expect(email.html).toContain('£197 catalog letter covers them');
   });
 
   it('does not pitch the embedded app — it is post-launch', () => {
     // 2026-05-06: removed the "Install Flintmere" door from the email
     // close. The Shopify embedded app is post-launch per the launch
-    // decision; the audit + reply are the only paths that resolve to a
-    // shipped product right now.
+    // decision; the catalog letter + reply are the only paths that
+    // resolve to a shipped product right now.
     const email = buildReportEmail({ score: makeScore(), ...baseInput });
     expect(email.html).not.toContain('Install Flintmere');
     expect(email.text).not.toContain('Install Flintmere');
   });
 
-  it('links Door 1 to the concierge audit page', () => {
+  it('links Door 1 to the catalog letter page', () => {
     const email = buildReportEmail({ score: makeScore(), ...baseInput });
     expect(email.html).toContain('https://audit.flintmere.com/audit');
-    expect(email.html).toContain('Book the audit');
+    expect(email.html).toContain('Book your catalog letter');
     expect(email.html).toContain('from £197');
   });
 
@@ -217,7 +217,7 @@ describe('buildReportEmail — GMC ground truth section (ADR 0023 slice 3)', () 
     expect(email.text).toContain('Single-origin Ethiopian — 250g');
   });
 
-  it('surfaces a truncation note when the read budget exhausted', () => {
+  it('surfaces a truncation note when the GMC API read budget is exhausted', () => {
     const email = buildReportEmail({
       score: makeScore(),
       ...baseInput,

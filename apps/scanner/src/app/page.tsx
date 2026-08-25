@@ -71,7 +71,7 @@ const PILLARS: PillarSpec[] = [
     commonMiss:
       'Specs live inside the description HTML. Agents cannot filter or compare your product against a query.',
     whatToDo:
-      'Move every filterable attribute (size, colour, material, dimensions) out of free-text and into named metafields. Then audit your description for fields you can extract back into structured data.',
+      'Move every filterable attribute (size, colour, material, dimensions) out of free-text and into named metafields. Then check your description for fields you can extract back into structured data.',
     image: '/marketing/pillars/02-structured-attributes.webp',
     imageAlt:
       'A stack of four small cream-coloured woven garment care labels, fanned slightly, soft daylight, warm cream backdrop.',
@@ -116,7 +116,7 @@ const PILLARS: PillarSpec[] = [
     commonMiss:
       '404 image URLs, ghost variants left active, or price drift between PDP and the feed. Agents read inconsistency as low quality.',
     whatToDo:
-      'Run a weekly catalog audit: dead images, stale variants, price drift, missing alt text. Five minutes a week prevents being filtered out as low-quality data.',
+      'Run a weekly catalog check: dead images, stale variants, price drift, missing alt text. Five minutes a week prevents being filtered out as low-quality data.',
     image: '/marketing/pillars/05-data-consistency.webp',
     imageAlt:
       'Three identical small cream ceramic jars in a neat horizontal row, the middle one with a tiny chip at the rim, on a wooden surface.',
@@ -131,7 +131,7 @@ const PILLARS: PillarSpec[] = [
     commonMiss:
       'Default robots.txt blocking AI user-agents you did not mean to block. The agent never reaches your catalog.',
     whatToDo:
-      'Audit your robots.txt for accidental AI user-agent blocks. Publish llms.txt at the root with the catalog scope and rate-limit guidance. Submit your sitemap to Google Merchant.',
+      'Check your robots.txt for accidental AI user-agent blocks. Publish llms.txt at the root with the catalog scope and rate-limit guidance. Submit your sitemap to Google Merchant.',
     image: '/marketing/pillars/06-agent-access.webp',
     imageAlt:
       'An antique tarnished brass key resting beside an open vintage iron padlock on a wooden surface.',
@@ -146,7 +146,7 @@ const PILLARS: PillarSpec[] = [
     commonMiss:
       'SMS verification or human captcha at checkout. Agents reach the purchase step, then bounce off the wall.',
     whatToDo:
-      'Audit your checkout for human-only steps. SMS verification, captchas, and required account creation all kill agent purchases. Use Shop Pay or guest checkout as the agent-accessible path.',
+      'Check your checkout for human-only steps. SMS verification, captchas, and required account creation all kill agent purchases. Use Shop Pay or guest checkout as the agent-accessible path.',
     image: '/marketing/pillars/07-checkout-readiness.webp',
     imageAlt:
       'A small empty woven wicker shopping basket with a worn leather handle, sitting on a wooden floor in soft daylight.',
@@ -502,7 +502,7 @@ export default function MarketingHome() {
       {/* Chapter 2.5 — Post-Pillars scan re-invite. Operator caught
           2026-05-11 that the page had no free-scan CTA between the hero
           and the footer; the FounderStrip CTA points at the paid £197
-          audit, not the free scan. This callout sits on opaque paper at
+          catalog letter, not the free scan. This callout sits on opaque paper at
           z:1 (matching the curtain-pair). */}
       <ScanCallout
         eyebrow="// your turn"

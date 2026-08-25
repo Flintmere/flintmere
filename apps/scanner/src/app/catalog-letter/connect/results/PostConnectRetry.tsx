@@ -56,7 +56,7 @@ export function PostConnectRetry({ auditId, errorCode }: PostConnectRetryProps) 
         style={{ fontSize: 18, lineHeight: 1.5 }}
       >
         {messageFor(errorCode)} Your connection is saved &mdash; try the scan
-        again, or reply to your audit email and we&rsquo;ll run it for you.
+        again, or reply to your catalog letter email and we&rsquo;ll run it for you.
       </p>
       <div className="mt-10 flex gap-4 flex-wrap" style={{ alignItems: 'center' }}>
         <button
@@ -69,7 +69,7 @@ export function PostConnectRetry({ auditId, errorCode }: PostConnectRetryProps) 
           {retrying ? 'Retrying…' : 'Try the scan again →'}
         </button>
         <a
-          href={`/audit/connect?audit=${encodeURIComponent(auditId)}`}
+          href={`/catalog-letter/connect?audit=${encodeURIComponent(auditId)}`}
           className="btn"
         >
           Back to connection

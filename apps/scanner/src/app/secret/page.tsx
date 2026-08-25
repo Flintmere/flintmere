@@ -75,7 +75,7 @@ export default function SecretPage() {
           }}
         >
           A free utility from the Flintmere team. Built originally for
-          handing read-only Shopify Admin tokens to the audit team —
+          handing read-only Shopify Admin tokens to the Flintmere team —
           available for any one-shot secret transfer.
         </p>
 

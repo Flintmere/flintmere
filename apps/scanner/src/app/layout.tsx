@@ -100,6 +100,9 @@ export default function RootLayout({
                   'https://github.com/Flintmere',
                   'https://x.com/flintmere_',
                   'https://bsky.app/profile/flintmere.bsky.social',
+                  // ADR 0028 §5 — handle move to @flintmere (or
+                  // @flintmere.scan) is an operator action outside this
+                  // repo. This value updates in the same change.
                   'https://instagram.com/flintmere.audit',
                 ],
               },
@@ -137,7 +140,7 @@ export default function RootLayout({
                   price: '0',
                   priceCurrency: 'GBP',
                   description:
-                    'Free 60-second catalog data audit for any public Shopify store.',
+                    'Free 60-second catalog data scan for any public Shopify store.',
                 },
               },
             ],

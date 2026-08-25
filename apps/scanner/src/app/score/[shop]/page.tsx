@@ -61,7 +61,7 @@ export async function generateMetadata({
   }
 
   const title = `${domain} · ${scan.score}/100 · catalog data score`;
-  const description = `${domain} scored ${scan.score}/100 (grade ${scan.grade}) on Flintmere's catalog data audit — the seven checks AI shopping agents use before recommending a product.`;
+  const description = `${domain} scored ${scan.score}/100 (grade ${scan.grade}) on Flintmere's catalog letter checks — the seven checks AI shopping agents use before recommending a product.`;
   return {
     title,
     description,

@@ -49,7 +49,7 @@ The cost side is controlled. The bet is on acquisition.
 
 - **Price:** £79/month. 14-day trial (no first-month discount — see ADR 0009).
 - **Target:** SMB stores, <500 SKUs, <£1M revenue.
-- **Scope:** Unlimited audits. Tier 1 auto-safe fixes — included by default (was gated pre-restructure). Monthly automated re-scan. 500 Tier 2 LLM enrichments per month. Weekly drift alerts. Score history (30 days).
+- **Scope:** Unlimited scans. Tier 1 auto-safe fixes — included by default (was gated pre-restructure). Monthly automated re-scan. 500 Tier 2 LLM enrichments per month. Weekly drift alerts. Score history (30 days).
 - **Shopify pricing ID:** `STRIPE_PRICE_GROWTH_MONTHLY` (via Shopify Managed Pricing, not direct Stripe).
 
 ### Scale — £249/month
@@ -80,7 +80,7 @@ The cost side is controlled. The bet is on acquisition.
 
 - **Shopify Managed Pricing** for Growth + Scale (automatic subscription, no Stripe integration needed).
   - Shopify keeps: 0% on first $1M lifetime (2025 policy), 15% after.
-- **Stripe direct** for Agency + Plus + the Concierge audit band ladder (ADR 0022 — £197 / £397 / from £597 bespoke; supersedes the £97 floor in SPEC §2.4).
+- **Stripe direct** for Agency + Plus + the Catalog Letter band ladder (ADR 0022 — £197 / £397 / from £597 bespoke; supersedes the £97 floor in SPEC §2.4).
 - No crypto payments. No alternative gateways.
 
 ## Promotions

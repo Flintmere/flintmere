@@ -60,7 +60,7 @@ describe('GET /api/auth/google/callback', () => {
     const res = await GET(makeRequest('?error=access_denied'));
     expect(res.status).toBe(307);
     const location = res.headers.get('location');
-    expect(location).toContain('/audit/connect');
+    expect(location).toContain('/catalog-letter/connect');
     expect(location).toContain('status=denied');
     expect(location).toContain('reason=access_denied');
     expect(captureServerEvent).toHaveBeenCalledWith('oauth_callback_denied', {
@@ -119,7 +119,7 @@ describe('GET /api/auth/google/callback', () => {
     expect(res.status).toBe(307);
     // Fix 1 — success routes to the auto-scan payoff, not the dead-end card.
     const okLocation = res.headers.get('location') ?? '';
-    expect(okLocation).toContain('/audit/connect/results');
+    expect(okLocation).toContain('/catalog-letter/connect/results');
     expect(okLocation).toContain('audit=aud_1');
     expect(captureServerEvent).toHaveBeenCalledWith('oauth_callback_ok', {
       shop: 'acme.com',

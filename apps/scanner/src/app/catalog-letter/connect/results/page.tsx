@@ -13,7 +13,7 @@ import { PostConnectRetry } from './PostConnectRetry';
 // the Connected card. We resolve the merchant's ground-truth scan (reuse a
 // recent row or run a fresh one — sidestepping the 30s domain dedupe) and
 // render the score + private GMC panel. Behind FEATURE_GMC_OAUTH; reverts by
-// pointing the callback back at /audit/connect?status=ok.
+// pointing the callback back at /catalog-letter/connect?status=ok.
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -94,7 +94,7 @@ export default async function PostConnectResultsPage({ searchParams }: Props) {
           </Link>{' '}
           and use the opt-in there. You can manage your connection on the{' '}
           <Link
-            href={`/audit/connect?audit=${encodeURIComponent(audit.id)}`}
+            href={`/catalog-letter/connect?audit=${encodeURIComponent(audit.id)}`}
             style={{
               color: 'var(--color-ink)',
               textDecoration: 'underline',

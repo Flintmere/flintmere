@@ -281,7 +281,7 @@ export function Results({ result }: { result: ScanResult }) {
             )
             .join(', ')}{' '}
           — read merchant-side data the free scan can&rsquo;t see. The £197
-          audit covers them.
+          catalog letter covers them.
         </p>
       ) : null}
     </section>

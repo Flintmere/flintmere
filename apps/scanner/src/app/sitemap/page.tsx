@@ -58,7 +58,7 @@ const MARKETING_LINKS: RouteLink[] = [
 
 const SCANNER_LINKS: RouteLink[] = [
   { href: `https://${SCANNER_HOST}/scan`, label: 'Run a scan' },
-  { href: `https://${SCANNER_HOST}/audit`, label: 'Concierge audit' },
+  { href: `https://${SCANNER_HOST}/catalog-letter`, label: 'The Catalog Letter' },
   { href: `https://${SCANNER_HOST}/bot`, label: 'FlintmereBot' },
   {
     href: `https://${SCANNER_HOST}/scan`,
@@ -262,7 +262,7 @@ export default function Sitemap() {
           <HostSection
             hostname={SCANNER_HOST}
             role="Scanner"
-            description="The public catalog-readiness audit. Run a scan, read the result, book a concierge if you want a human pass."
+            description="The public catalog-readiness scan. Run a scan, read the result, book a concierge if you want a human pass."
             links={SCANNER_LINKS}
             headingId="host-scanner"
           />

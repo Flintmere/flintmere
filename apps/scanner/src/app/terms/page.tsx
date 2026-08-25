@@ -7,7 +7,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = {
   title: 'Terms of Service — Your agreement with Flintmere',
   description:
-    'The agreement between you and Flintmere (Eazy Access Ltd) for the scanner, Shopify app, and concierge audits — 30-day refund window, English law, liability capped at 12 months of fees.',
+    'The agreement between you and Flintmere (Eazy Access Ltd) for the scanner, Shopify app, and catalog letters — 30-day refund window, English law, liability capped at 12 months of fees.',
   alternates: { canonical: '/terms' },
 };
 
@@ -49,7 +49,7 @@ export default function Terms() {
             and not offered to new sign-ups.
           </li>
           <li>
-            <strong>Concierge audits</strong>: a one-off written audit
+            <strong>Catalog Letter</strong>: a one-off written catalog letter
             delivered within three working days, purchased directly via Stripe.
             Three SKU bands &mdash; £197 (up to 1,500 SKUs), £397
             (1,501&ndash;5,000), or bespoke from £597 (5,001+, contracted by
@@ -59,7 +59,7 @@ export default function Terms() {
           <li>
             <strong>Optional Google Merchant Center connection</strong>: where
             you have a GMC account, you can grant us read-only access via
-            Google&rsquo;s OAuth flow so the audit reads ground-truth
+            Google&rsquo;s OAuth flow so we can use ground-truth
             disapproval data alongside our public-catalog signals. The
             integration is optional, never a precondition of any tier, and
             revocable at any time. Clause 06 covers the scope of what we
@@ -94,7 +94,7 @@ export default function Terms() {
             Stripe under a separate order form.
           </li>
           <li>
-            <strong>Concierge audits</strong> are one-off payments via Stripe.
+            <strong>Catalog Letter</strong> purchases are one-off payments via Stripe.
           </li>
           <li>
             <strong>30-day refund.</strong> If you pay Flintmere directly and
@@ -151,7 +151,7 @@ export default function Terms() {
             one-shot transfer of sensitive values between consenting
             parties — credentials, configuration values, API keys,
             short-lived secrets. Acceptable: handing a read-only Shopify
-            Admin token to the Flintmere audit team, sharing a recovery
+            Admin token to the Flintmere team, sharing a recovery
             phrase with a colleague who&rsquo;s expecting it, sending a
             CI deploy key to a teammate. Not acceptable: anonymous
             paste-hosting, distribution to recipients who haven&rsquo;t
@@ -192,7 +192,7 @@ export default function Terms() {
           GMC, never write back, never share GMC data with third parties
           beyond the sub-processors listed in the Privacy Policy, and never
           use GMC data for advertising or resale. You may revoke at any time
-          from your audit dashboard or directly at{' '}
+          from your catalog letter dashboard or directly at{' '}
           <a
             href="https://myaccount.google.com/permissions"
             className="underline"

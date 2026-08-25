@@ -1,7 +1,7 @@
 import { Bracket, SiteFooter } from '@flintmere/ui';
 
-// Rendered when the audit-id query param is missing or points at an
-// audit that's neither paid nor delivered. Standalone page (its own
+// Rendered when the connect link's audit-id param is missing or points at
+// a catalog letter that's neither paid nor delivered. Standalone page (its own
 // <main> + <SiteFooter />) — does not share the three-state chrome.
 
 export function ExpiredLink() {
@@ -38,8 +38,8 @@ export function ExpiredLink() {
             color: 'var(--color-ink-2)',
           }}
         >
-          Reply to your audit delivery email and we&rsquo;ll send a fresh
-          link within one working day.
+          Reply to your catalog letter delivery email and we&rsquo;ll send a
+          fresh link within one working day.
         </p>
       </section>
       <SiteFooter />

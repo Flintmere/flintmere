@@ -111,14 +111,14 @@ export async function runSlaScan(
     }),
   );
 
-  const subject = `[Flintmere] ${late.length} concierge audit${late.length === 1 ? '' : 's'} past SLA`;
-  const text = `${late.length} concierge audit${late.length === 1 ? '' : 's'} past the ${slaDays}-working-day SLA threshold:\n\n${lines.join('\n')}\n\nClear with: pnpm --filter scanner audit:deliver --intent <pi> --letter <pdf> --csv <csv>`;
+  const subject = `[Flintmere] ${late.length} catalog letter${late.length === 1 ? '' : 's'} past SLA`;
+  const text = `${late.length} catalog letter${late.length === 1 ? '' : 's'} past the ${slaDays}-working-day SLA threshold:\n\n${lines.join('\n')}\n\nClear with: pnpm --filter scanner audit:deliver --intent <pi> --letter <pdf> --csv <csv>`;
 
   const html = `<!doctype html>
 <html><body style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#F7F7F4;padding:24px;color:#0A0A0B;">
   <div style="max-width:560px;margin:0 auto;background:#FFFFFF;border:1px solid #0A0A0B;padding:24px;">
     <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;">Concierge SLA monitor</div>
-    <h2 style="margin:8px 0 16px 0;font-size:18px;font-weight:500;">${late.length} audit${late.length === 1 ? '' : 's'} past ${slaDays}-working-day SLA</h2>
+    <h2 style="margin:8px 0 16px 0;font-size:18px;font-weight:500;">${late.length} catalog letter${late.length === 1 ? '' : 's'} past ${slaDays}-working-day SLA</h2>
     <pre style="white-space:pre-wrap;background:#F7F7F4;border:1px solid #E1E1DD;padding:12px;font-size:12px;line-height:1.6;font-family:ui-monospace,Menlo,monospace;margin:0;">${lines.map(esc).join('\n')}</pre>
     <p style="margin:16px 0 0 0;color:#5A5C64;font-size:13px;line-height:1.55;">Clear with <code>pnpm --filter scanner audit:deliver</code>. Daily reminder until <code>deliveredAt</code> stamps.</p>
   </div>

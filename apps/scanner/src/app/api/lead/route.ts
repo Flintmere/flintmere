@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
     score: persistedScoreJson,
     unsubscribeUrl,
     appUrl: marketingUrl,
-    auditUrl: `${scannerUrl}/audit`,
+    auditUrl: `${scannerUrl}/catalog-letter`,
     recipientEmail: email,
     gmcGroundTruth: persistedScoreJson.gmcGroundTruth ?? null,
   });

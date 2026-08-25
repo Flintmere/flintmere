@@ -89,8 +89,8 @@ export function BandTriptych() {
   const fixCount = selected.deliverable.fullyDraftedFixCount;
   const isSample = selected.deliverable.auditScope === 'representative-sample';
   const valueLine = isSample
-    ? `Representative-sample audit. ${fixCount} fully-drafted fixes. Three working days.`
-    : `Per-product audit. ${fixCount} fully-drafted fixes. Three working days.`;
+    ? `Representative-sample catalog letter. ${fixCount} fully-drafted fixes. Three working days.`
+    : `Per-product catalog letter. ${fixCount} fully-drafted fixes. Three working days.`;
 
   return (
     <>
@@ -101,7 +101,7 @@ export function BandTriptych() {
           upgrade in place when ?band= URL param fires. Council
           2026-05-04 ratified hero-IS-checkout archetype. */}
       <h1
-        id="audit-hero"
+        id="letter-hero"
         data-reveal
         className="font-sans tracking-[-0.04em] leading-[0.88] text-[color:var(--color-ink)]"
         style={{

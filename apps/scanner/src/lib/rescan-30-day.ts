@@ -1,5 +1,5 @@
 /**
- * Day-30 re-scan runner — Slice B of the audit re-scan promise.
+ * Day-30 re-scan runner — Slice B of the catalog letter's re-scan promise.
  *
  * Slice A (already shipped in scripts/audit-deliver.ts) captures the
  * baseline scan + writes rescanDueAt = deliveredAt + 30d at delivery time.
@@ -133,7 +133,7 @@ export async function runDay30Rescans(
         (audit.baselineScoreJson as PersistedScoreShape | null) ?? null;
       if (!baselineScoreJson) {
         // Slice A guarantees baselineScoreJson on every newly-delivered
-        // audit, but legacy delivered rows (pre-Slice-A) won't have one.
+        // catalog letter, but legacy delivered rows (pre-Slice-A) won't have one.
         // Send the email with the rescan-only payload — the absence of a
         // baseline shows up as "Re-scan complete" with no delta.
       }

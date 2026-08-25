@@ -1,15 +1,15 @@
 import Link from 'next/link';
 import { Bracket } from '@flintmere/ui';
 import { crossHostHref } from '@/lib/host-routing';
-import { ScopeCredits } from '@/app/audit/connect/_shared/ScopeCredits';
+import { ScopeCredits } from '@/app/catalog-letter/connect/_shared/ScopeCredits';
 
 /**
  * MerchantCenterSection — homepage chapter 2.9, "Ground truth".
  *
  * Added 2026-06-09 to satisfy Google OAuth verification homepage
  * requirement #3: the consent-screen homepage (flintmere.com) must
- * describe the app's functionality — specifically the read-only Google
- * Merchant Center integration the verified OAuth app requests. Rendered
+ * describe the app's functionality — specifically the Google Merchant
+ * Center read-only integration the verified OAuth app requests. Rendered
  * in normal document flow on opaque paper, NOT inside the curtain-pair
  * sticky-reveal, so a reviewer scrolling reaches a plain description.
  *
@@ -17,14 +17,14 @@ import { ScopeCredits } from '@/app/audit/connect/_shared/ScopeCredits';
  * context/design/2026-06-09-design-is-merchant-center.md): a two-column
  * editorial split — left STATES it, right SHOWS it via an illustrative
  * "ground-truth readout" card. The disclosure grid (ScopeCredits, shared
- * with /audit/connect — single source of truth) sits as a quiet
+ * with /catalog-letter/connect — single source of truth) sits as a quiet
  * full-width band below.
  *
  * Honesty (claim-review PASS, Legal Council #9/#23/#24): the readout card
  * is a Flintmere mono DIAGRAM labelled "Illustrative example" — not real
  * merchant data and not a Google screenshot. Reason strings are real GMC
  * disapproval-reason types. No live "Connect" OAuth button (feature dark
- * behind FEATURE_GMC_OAUTH); links to /audit/connect + /privacy.
+ * behind FEATURE_GMC_OAUTH); links to /catalog-letter/connect + /privacy.
  *
  * Spec: context/design/marketing/2026-06-09-homepage-merchant-center-section.md.
  *
@@ -49,8 +49,8 @@ const MICRO_LABEL =
   'font-mono uppercase text-[color:var(--color-mute)] text-[11px] tracking-[0.16em]';
 
 /**
- * The ground-truth readout — an illustrative diagram of what the read-only
- * Merchant Center connection surfaces (per-product status + Google's stated
+ * The ground-truth readout — an illustrative diagram of what read-only
+ * access to Merchant Center surfaces (per-product status + Google's stated
  * reason). One amber marker per disapproved status: amber is the canon
  * diagnostic-warning colour ("warn rows").
  */
@@ -178,7 +178,7 @@ export function MerchantCenterSection() {
                 ['--reveal-delay' as string]: '120ms',
               }}
             >
-              Connect Google <Bracket>Merchant Center</Bracket> to your audit.
+              Connect Google <Bracket>Merchant Center</Bracket> to your catalog letter.
             </h2>
             <p
               data-reveal
@@ -196,7 +196,7 @@ export function MerchantCenterSection() {
               Connect your Google Merchant Center and we add Google&rsquo;s own
               record on top: the products it disapproved and the exact reasons
               it recorded, read directly from your account. It sharpens the
-              audit &mdash; it doesn&rsquo;t replace it. And it&rsquo;s
+              catalog letter &mdash; it doesn&rsquo;t replace it. And it&rsquo;s
               read-only; we never write to your account.
             </p>
             <div
@@ -207,12 +207,12 @@ export function MerchantCenterSection() {
                 ['--reveal-delay' as string]: '280ms',
               }}
             >
-              {/* Absolute cross-host URL via crossHostHref: /audit/connect is a
+              {/* Absolute cross-host URL via crossHostHref: /catalog-letter/connect is a
                   scanner route that 301s off flintmere.com → a relative <Link>
                   triggers a cross-origin RSC prefetch that always fails with
                   "Failed to fetch RSC payload" (vercel/next.js#53813). Absolute
                   cross-host hrefs are not RSC-prefetched, so no error. */}
-              <Link href={crossHostHref('/audit/connect')} className={ARROW_LINK}>
+              <Link href={crossHostHref('/catalog-letter/connect')} className={ARROW_LINK}>
                 See how the connection works
                 <span aria-hidden="true">→</span>
               </Link>
@@ -229,7 +229,7 @@ export function MerchantCenterSection() {
         </div>
 
         {/* Quiet full-width disclosure band — ScopeCredits is the single
-            source of truth for the GMC boundary copy (also on /audit/connect).
+            source of truth for the GMC boundary copy (also on /catalog-letter/connect).
             Its own top border + margin separate it from the split above. */}
         <div data-reveal style={{ ['--reveal-delay' as string]: '120ms' }}>
           <ScopeCredits variant="connected" />

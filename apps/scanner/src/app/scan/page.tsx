@@ -158,10 +158,10 @@ export default function ScanPage() {
               surface="private"
             />
           ) : (
-            /* Fix 3 — when this domain owns an eligible concierge audit and
+            /* Fix 3 — when this domain owns an eligible catalog letter and
                isn't connected yet, offer the connect path right here so a lost
-               audit email isn't a dead-end. Self-hides when ineligible or the
-               flag is off. */
+               catalog-letter email isn't a dead-end. Self-hides when ineligible
+               or the flag is off. */
             <ScanConnectCta scanId={state.result.id} />
           )}
           <BenchmarkOptIn scanId={state.result.id} />

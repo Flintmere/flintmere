@@ -12,7 +12,7 @@ export const dynamic = 'force-static';
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: 'Pricing — Single, agency, bundle, audit',
+  title: 'Pricing — Single, agency, bundle, catalog letter',
   description:
     'Flintmere pricing — the vertical standard licensed × distribution mode. Forward pricing finalising May–June 2026. Existing customers grandfathered.',
   alternates: { canonical: '/pricing' },
@@ -105,12 +105,12 @@ export default function Pricing() {
               color: 'var(--color-mute)',
             }}
           >
-            Two surfaces priced today &mdash; band-laddered concierge audits and the Plus anchor. The recurring food tier is calibrating with the merchants joining now; existing subscribers stay grandfathered at original prices.
+            Two surfaces priced today &mdash; band-laddered catalog letters and the Plus anchor. The recurring food tier is calibrating with the merchants joining now; existing subscribers stay grandfathered at original prices.
           </p>
         </div>
       </section>
 
-      {/* Concierge audit band ladder — primary anchor (Option B verdict
+      {/* Catalog Letter band ladder — primary anchor (Option B verdict
           2026-05-03). Real-priced surface; leads the page so the eye
           lands on £197 / £397 / £597+ before any calibrating slot. */}
       <ConciergeBands />
@@ -123,7 +123,7 @@ export default function Pricing() {
           loupe, dried thyme, barcode strip on warm cream linen — the
           food-vertical canon. */}
       <section
-        aria-label="Food audit in practice"
+        aria-label="Food catalog letter in practice"
         className="bg-[color:var(--color-paper)] border-b border-[color:var(--color-line)]"
       >
         <div
@@ -136,7 +136,7 @@ export default function Pricing() {
           }}
         >
           <p className="eyebrow mb-6">
-            <span aria-hidden="true">// </span>The audit, in practice
+            <span aria-hidden="true">// </span>The catalog letter, in practice
           </p>
           <figure className="relative w-full" style={{ maxWidth: 1216, margin: '0 auto' }}>
             <Image

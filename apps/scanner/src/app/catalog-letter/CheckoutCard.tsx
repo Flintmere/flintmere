@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Apple-style checkout for the Flintmere concierge audit.
+ * Apple-style checkout for the Flintmere Catalog Letter.
  *
  * Three-step shape on one card:
  *
@@ -16,7 +16,7 @@
  * Band 3 swaps the form for a mailto enquiry — bespoke quotes go via
  * email, never Stripe.
  *
- * On Stripe success: redirect to /audit/success?payment_intent=…
+ * On Stripe success: redirect to /catalog-letter/success?payment_intent=…
  * The webhook at /api/webhooks/stripe is the source of truth for
  * fulfilment and reads the `audit_band` metadata key set by the
  * checkout API.
@@ -287,8 +287,8 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
   if (state.kind === 'pay') {
     const returnUrl =
       typeof window !== 'undefined'
-        ? `${window.location.origin}/audit/success`
-        : 'https://audit.flintmere.com/audit/success';
+        ? `${window.location.origin}/catalog-letter/success`
+        : 'https://audit.flintmere.com/catalog-letter/success';
     const options: StripeElementsOptions = {
       clientSecret: state.clientSecret,
       appearance: APPEARANCE,
@@ -329,8 +329,8 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
             className="text-[color:var(--color-ink)]"
             style={{ fontSize: 16, lineHeight: 1.55, marginBottom: 12 }}
           >
-            For catalogs above 5,000 SKUs, the audit reads a representative
-            sample plus the structural data model. We scope and quote per
+            For catalogs above 5,000 SKUs, the catalog letter reads a
+            representative sample plus the structural data model. We scope and quote per
             store — typically £597+, contracted before any work starts.
           </p>
           <p
@@ -440,7 +440,8 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
       >
         30-day refund if we miss the three-working-day deadline. Card details
         stay with Stripe — never on our servers. Charge appears on your bank
-        statement as <strong>FLINTMERE AUDIT</strong>.
+        statement as{' '}
+        <strong>FLINT B{bandSlug === 'band-1' ? '1' : '2'}</strong>.
       </div>
     </CardShell>
   );
@@ -499,7 +500,7 @@ function OrderSummary({
       >
         <div style={{ minWidth: 0 }}>
           <p className="eyebrow" style={{ marginBottom: 6 }}>
-            {band.label} · Concierge audit
+            {band.label} · The Catalog Letter
           </p>
           <p
             style={{

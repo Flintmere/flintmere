@@ -49,7 +49,7 @@ const SECTIONS = [
     heading: 'Flintmere Regulatory Affairs, council seat #39.',
     body: [
       'Flintmere runs a standing council of functional seats. Seat #39, Regulatory Affairs, owns the accuracy of everything published here and holds a veto on regulatory claims — including a veto on the scope statement at the foot of every page.',
-      'Flintmere is a commercial company: we sell catalog auditing and a Shopify app. This standard is published free, under CC-BY 4.0, because a specification nobody can read or cite is worth nothing as a specification. We would rather it be used than owned.',
+      'Flintmere is a commercial company: we sell catalog letters and a Shopify app. This standard is published free, under CC-BY 4.0, because a specification nobody can read or cite is worth nothing as a specification. We would rather it be used than owned.',
     ],
   },
   {

@@ -99,6 +99,24 @@ describe('classifyRoute', () => {
   });
 });
 
+describe('catalog-letter routes (ADR 0028 Amendment 1)', () => {
+  it.each([
+    ['/catalog-letter', 'scanner'],
+    ['/catalog-letter/success', 'scanner'],
+    ['/catalog-letter/connect', 'scanner'],
+    ['/catalog-letter/connect/results', 'scanner'],
+  ])('classifies %s as scanner', (path, expected) => {
+    expect(classifyRoute(path)).toBe(expected);
+  });
+
+  it.each([
+    ['/audit', 'scanner'],
+    ['/audit/success', 'scanner'],
+  ])('still classifies legacy %s as scanner', (path, expected) => {
+    expect(classifyRoute(path)).toBe(expected);
+  });
+});
+
 describe('canonicalHost', () => {
   it('returns scanner host for scanner routes', () => {
     expect(canonicalHost('/scan')).toBe(SCANNER_HOST);

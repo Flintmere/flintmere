@@ -1,12 +1,12 @@
 /**
- * Operator alerts for concierge-audit refunds + disputes. Fired from the
+ * Operator alerts for catalog-letter refunds + disputes. Fired from the
  * Stripe webhook handler when `charge.refunded` or `charge.dispute.created`
  * lands on a charge whose linked PaymentIntent matches a row in
  * `scanner_concierge_audits`.
  *
  * Two refund severities — paid-then-refunded (normal customer remorse,
  * routine ops attention) versus delivered-then-refunded (someone refunded
- * an audit we already shipped, immediate investigation). Disputes always
+ * a catalog letter we already shipped, immediate investigation). Disputes always
  * urgent — chargebacks have a 7–21 day response window with Stripe.
  *
  * Ops-only. No customer-facing copy here; the customer's bank handles
@@ -44,7 +44,7 @@ export interface ConciergeRefundAlertInput {
   currency: string;
   /** True when the refund covers the full charge; false on partial. */
   fullyRefunded: boolean;
-  /** When true the audit had already been delivered — needs investigation, not just acknowledgement. */
+  /** When true the catalog letter had already been delivered — needs investigation, not just acknowledgement. */
   wasDelivered: boolean;
 }
 
@@ -70,15 +70,15 @@ export async function sendConciergeRefundOpsEmail(
   const chargeAmount = fmtAmount(amountPence, currency);
 
   const severity = wasDelivered
-    ? 'DELIVERED audit refunded — investigate'
+    ? 'DELIVERED catalog letter refunded — investigate'
     : fullyRefunded
-      ? 'Audit refunded'
+      ? 'Catalog letter refunded'
       : 'Partial refund applied';
 
   const subject = `[Flintmere] ${severity}: ${shopUrl}`;
 
   const investigateBlock = wasDelivered
-    ? `\n\nThis audit was already marked DELIVERED before the refund landed. The deliverable + 30-day re-scan promise has already been spent. Reach out to the merchant to confirm the refund context (dissatisfaction? duplicate booking? other?) and decide whether to revoke the re-scan + de-list the artefacts.`
+    ? `\n\nThis catalog letter was already marked DELIVERED before the refund landed. The deliverable + 30-day re-scan promise has already been spent. Reach out to the merchant to confirm the refund context (dissatisfaction? duplicate booking? other?) and decide whether to revoke the re-scan + de-list the artefacts.`
     : '';
 
   const text = `${severity}.
@@ -106,7 +106,7 @@ The scanner_concierge_audits row has been updated:
     </table>
     ${
       wasDelivered
-        ? `<p style="margin:24px 0 0 0;padding:12px;background:#FFF5F5;border-left:3px solid #A02020;font-size:13px;line-height:1.6;color:#141518;">This audit was already marked <strong>DELIVERED</strong> before the refund. The deliverable + 30-day re-scan promise has already been spent. Reach out to the merchant to confirm context and decide whether to revoke the re-scan.</p>`
+        ? `<p style="margin:24px 0 0 0;padding:12px;background:#FFF5F5;border-left:3px solid #A02020;font-size:13px;line-height:1.6;color:#141518;">This catalog letter was already marked <strong>DELIVERED</strong> before the refund. The deliverable + 30-day re-scan promise has already been spent. Reach out to the merchant to confirm context and decide whether to revoke the re-scan.</p>`
         : ''
     }
   </div>
@@ -170,7 +170,7 @@ Reason:      ${reason}
 Evidence due: ${dueBy}
 PaymentIntent: ${paymentIntentId}
 
-Stripe gives 7–21 days to submit evidence. Open the dispute in Stripe Dashboard, attach the audit deliverable + signed-off ConciergeAudit row + delivery email proof, and accept-or-contest before the deadline.
+Stripe gives 7–21 days to submit evidence. Open the dispute in Stripe Dashboard, attach the catalog-letter deliverable + signed-off ConciergeAudit row + delivery email proof, and accept-or-contest before the deadline.
 
 The scanner_concierge_audits row has been updated to status: 'disputed'.`;
 
@@ -186,7 +186,7 @@ The scanner_concierge_audits row has been updated to status: 'disputed'.`;
       <tr><td style="padding-right:16px;color:#5A5C64;">Evidence due</td><td><strong>${esc(dueBy)}</strong></td></tr>
       <tr><td style="padding-right:16px;color:#5A5C64;">PaymentIntent</td><td><code>${esc(paymentIntentId)}</code></td></tr>
     </table>
-    <p style="margin:24px 0 0 0;padding:12px;background:#FFF5F5;border-left:3px solid #A02020;font-size:13px;line-height:1.6;color:#141518;">Stripe gives 7–21 days to submit evidence. Open the dispute in Dashboard, attach the audit deliverable + signed-off row + delivery email proof, and accept-or-contest before the deadline.</p>
+    <p style="margin:24px 0 0 0;padding:12px;background:#FFF5F5;border-left:3px solid #A02020;font-size:13px;line-height:1.6;color:#141518;">Stripe gives 7–21 days to submit evidence. Open the dispute in Dashboard, attach the catalog-letter deliverable + signed-off row + delivery email proof, and accept-or-contest before the deadline.</p>
   </div>
 </body></html>`;
 

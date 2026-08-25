@@ -6,8 +6,8 @@ import { isFeatureEnabled } from '@/lib/gmc/oauth';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Audit booked',
-  description: 'Your Flintmere concierge audit is booked. Delivered within three working days.',
+  title: 'Your catalog letter is booked',
+  description: 'Your Flintmere catalog letter is booked. Delivered within three working days.',
   robots: { index: false, follow: false },
 };
 
@@ -55,7 +55,7 @@ export default async function AuditSuccess({ searchParams }: Props) {
           style={{ fontSize: 17, lineHeight: 1.55 }}
         >
           We start reading your store today. Within three working days your
-          audit letter, per-product CSV, and 30-day fix sequence will land in
+          catalog letter, per-product CSV, and 30-day fix sequence will land in
           your inbox. No call needed — the URL is all we need.
         </p>
         <p
@@ -83,13 +83,13 @@ export default async function AuditSuccess({ searchParams }: Props) {
               className="mt-3"
               style={{ fontSize: 15, lineHeight: 1.55, color: 'var(--color-ink-2)' }}
             >
-              Connect Google Merchant Center and your audit reads Google&rsquo;s
-              own disapproval reasons, not just public signals. Access is
+              Connect Google Merchant Center and your catalog letter reads
+              Google&rsquo;s own disapproval reasons, not just public signals. Access is
               restricted to read-only at our call-site. Disconnect anytime.
             </p>
             <p style={{ marginTop: 16 }}>
               <a
-                href={`/audit/connect?audit=${encodeURIComponent(connectAuditId)}`}
+                href={`/catalog-letter/connect?audit=${encodeURIComponent(connectAuditId)}`}
                 className="text-[color:var(--color-ink)] underline"
                 style={{ textUnderlineOffset: 3 }}
               >

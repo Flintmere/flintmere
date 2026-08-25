@@ -21,7 +21,7 @@ type GateState =
 
 /**
  * Post-scan commit surface. Three doors:
- *   1. Book the concierge audit (from £197) — primary, amber CTA.
+ *   1. Book your catalog letter (from £197) — primary, amber CTA.
  *   2. Email me the free report — secondary.
  *   3. Reply to John direct — tertiary, soft.
  * Canon: dark ink surface, paper text, amber accent, one bracket moment.
@@ -126,7 +126,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
           >
             Want the full fix plan instead of the summary?{' '}
             <Link
-              href={`/audit?shop=${encodeURIComponent(shopDomain)}#checkout`}
+              href={`/catalog-letter?shop=${encodeURIComponent(shopDomain)}#checkout`}
               onClick={() => {
                 writeHandoff({ email: email.trim(), scanId });
                 track('audit_cta_from_scan', {
@@ -137,7 +137,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
               }}
               style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}
             >
-              Book the concierge audit (from £197) →
+              Book your catalog letter (from £197) →
             </Link>
           </p>
         </div>
@@ -176,7 +176,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
           {shopDomain}.
         </h2>
 
-        {/* Door 1 — primary: concierge audit (from £197 per ADR 0022) */}
+        {/* Door 1 — primary: catalog letter (from £197 per ADR 0022) */}
         <div
           style={{
             marginTop: 32,
@@ -215,7 +215,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
               maxWidth: '52ch',
             }}
           >
-            We read your store product by product, write a detailed audit
+            We read your store product by product, write a detailed catalog
             letter pointing at exactly what to fix, and send a per-product CSV
             with the worst 10 (£197, up to 1,500 SKUs) or worst 25 (£397,
             1,501–5,000 SKUs) products already drafted. A 30-day re-scan is
@@ -223,7 +223,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
             scope bespoke from £597.
           </p>
           <Link
-            href={`/audit?shop=${encodeURIComponent(shopDomain)}#checkout`}
+            href={`/catalog-letter?shop=${encodeURIComponent(shopDomain)}#checkout`}
             onClick={() => {
               writeHandoff({ email: email.trim(), scanId });
               track('audit_cta_from_scan', {
@@ -246,7 +246,7 @@ export function EmailGate({ scanId, shopDomain }: EmailGateProps) {
               textDecoration: 'none',
             }}
           >
-            Book the audit →
+            Book your catalog letter →
           </Link>
         </div>
 

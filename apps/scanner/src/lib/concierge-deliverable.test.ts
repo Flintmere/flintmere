@@ -14,12 +14,35 @@ import { AUDIT_BANDS } from './audit-pricing'
 // surface; concierge-email.ts renders the post-purchase email line from
 // the same module. Drift detection lives here.
 
+describe('deliverable parity (ADR 0028)', () => {
+  it.each(['band-1', 'band-2', 'band-3'] as const)(
+    'keeps five items in canonical order for %s',
+    (slug) => {
+      expect(conciergeDeliverableItems(slug).map((i) => i.title)).toEqual([
+        'A 1,500-word letter',
+        'A per-product fix CSV',
+        'A 30-day fix sequence',
+        'A GS1 UK barcode path',
+        'A 30-day re-scan',
+      ]);
+    },
+  );
+
+  it('never says "audit" in any deliverable string', () => {
+    for (const slug of ['band-1', 'band-2', 'band-3'] as const) {
+      for (const item of conciergeDeliverableItems(slug)) {
+        expect(`${item.title} ${item.body}`.toLowerCase()).not.toContain('audit');
+      }
+    }
+  });
+});
+
 describe('conciergeDeliverableItems', () => {
   it('returns five items per band, in canonical order', () => {
     for (const band of AUDIT_BANDS) {
       const items = conciergeDeliverableItems(band.slug)
       expect(items).toHaveLength(5)
-      expect(items[0]?.title).toBe('A written audit letter')
+      expect(items[0]?.title).toBe('A 1,500-word letter')
       expect(items[1]?.title).toBe('A per-product fix CSV')
       expect(items[2]?.title).toBe('A 30-day fix sequence')
       expect(items[3]?.title).toBe('A GS1 UK barcode path')
@@ -69,7 +92,7 @@ describe('conciergeEmailDeliverableLine', () => {
   it('mentions all five deliverable items in the prose summary', () => {
     for (const band of AUDIT_BANDS) {
       const line = conciergeEmailDeliverableLine(band.slug)
-      expect(line).toContain('audit letter')
+      expect(line).toContain('catalog letter')
       expect(line).toContain('CSV')
       expect(line).toContain('30-day fix sequence')
       expect(line).toContain('GS1 UK barcode path')

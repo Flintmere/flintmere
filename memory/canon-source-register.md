@@ -56,7 +56,7 @@ Read first:
 - **`https://flintmere.com/methodology`** — pillar names + weights +
   public/install-gated split + voice register + regulatory positioning.
   Single source of truth for what the audit's STRUCTURE must reflect.
-- **`https://flintmere.com/audit`** — what's promised to the £197 buyer.
+- **`https://flintmere.com/catalog-letter`** — what's promised to the £197 buyer.
   Defines the deliverable shape from the demand side.
 - `projects/flintmere/decisions/0019-strategic-gate-window-six-month.md`
   — Gate 1 framing (workflow > taxonomy moat reframe).
@@ -81,11 +81,11 @@ audit-edit-pass schemas.
 reconcile against these (added 2026-05-09 after the deliverable-canon-
 alignment review):
 
-- **`apps/scanner/src/app/audit/page.tsx`** — the live `/audit`
-  conversion page; renders `CONCIERGE_DELIVERABLE_LIST` (5 items the
-  merchant is promised before they pay).
-- **`apps/scanner/src/app/audit/success/page.tsx`** — post-purchase
-  confirmation; promises "audit letter, per-product CSV, and 30-day fix
+- **`apps/scanner/src/app/catalog-letter/page.tsx`** — the live
+  `/catalog-letter` conversion page; renders `CONCIERGE_DELIVERABLE_LIST`
+  (5 items the merchant is promised before they pay).
+- **`apps/scanner/src/app/catalog-letter/success/page.tsx`** — post-purchase
+  confirmation; promises "catalog letter, per-product CSV, and 30-day fix
   sequence within three working days."
 - **`apps/scanner/src/lib/concierge-email.ts`** — Resend body fired
   on `payment_intent.succeeded`; renders
@@ -97,7 +97,7 @@ alignment review):
 
 Read also:
 
-- **`https://flintmere.com/audit`** — the rendered live page.
+- **`https://flintmere.com/catalog-letter`** — the rendered live page.
 - **`https://flintmere.com/methodology`** — voice register + structural
   reference.
 - `projects/flintmere/plans/2026-05-09-concierge-audit-deliverable-spec.md`
@@ -173,7 +173,7 @@ Files in scope: `apps/scanner/src/app/pricing/`,
 
 Read first:
 - **`https://flintmere.com/pricing`** — canonical tier ladder + prices.
-- **`https://flintmere.com/audit`** — canonical band ladder + prices.
+- **`https://flintmere.com/catalog-letter`** — canonical band ladder + prices.
 - `apps/scanner/src/lib/pricing.ts` — code-canonical pricing values.
 - `apps/scanner/src/lib/audit-pricing.ts` — code-canonical band ladder.
 - `projects/flintmere/decisions/0016-pricing-axis-vertical-distribution.md`.

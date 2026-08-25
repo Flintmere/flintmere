@@ -31,9 +31,9 @@ const HOMEPAGE_STATS: ReadonlyArray<Stat> = [
   },
   {
     eyebrow: 'paid',
-    numeral: '£97',
-    microLine: 'One-off concierge audit. Fix CSV + 30-day re-scan.',
-    numeralAriaLabel: 'ninety-seven pounds',
+    numeral: '£197',
+    microLine: 'One-off catalog letter. Fix CSV + 30-day re-scan.',
+    numeralAriaLabel: 'one hundred and ninety-seven pounds',
   },
 ];
 
@@ -80,15 +80,15 @@ describe('StatTriad — render shape', () => {
     expect(undertick?.length).toBe(1);
   });
 
-  it('numeral renders in --paper on ink-slab (Phase-C amendment — NO amber on £97)', () => {
+  it('numeral renders in --paper on ink-slab (Phase-C amendment — NO amber on £197)', () => {
     const html = renderToString(
       <StatTriad stats={HOMEPAGE_STATS} surface="ink-slab" focalIndex={1} />,
     );
-    // The numeral colour is --paper on ink-slab (NOT --accent for £97).
+    // The numeral colour is --paper on ink-slab (NOT --accent for £197).
     expect(html).toContain('text-[color:var(--color-paper)]');
-    // The £97 numeral text should be present.
-    expect(html).toContain('£97');
-    // No amber on the £97 numeral itself — the only --color-accent reference
+    // The £197 numeral text should be present.
+    expect(html).toContain('£197');
+    // No amber on the £197 numeral itself — the only --color-accent reference
     // is the under-tick (1 occurrence, asserted above).
   });
 
@@ -120,9 +120,9 @@ describe('StatTriad — render shape', () => {
     expect(html).toContain(
       'aria-label="60 seconds — Time the free scan takes on a 5,000-product store."',
     );
-    // Stat 2: numeralAriaLabel "ninety-seven pounds".
+    // Stat 2: numeralAriaLabel "one hundred and ninety-seven pounds".
     expect(html).toContain(
-      'aria-label="ninety-seven pounds — One-off concierge audit. Fix CSV + 30-day re-scan."',
+      'aria-label="one hundred and ninety-seven pounds — One-off catalog letter. Fix CSV + 30-day re-scan."',
     );
   });
 

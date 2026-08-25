@@ -178,7 +178,7 @@ export default async function FlintmereForBeauty() {
             Scan my beauty store →
           </Link>
           <Link href={`${AUDIT_URL}#checkout`} className="btn">
-            Book a concierge audit (from £197)
+            Book your catalog letter (from £197)
           </Link>
         </div>
       </section>
@@ -271,7 +271,7 @@ export default async function FlintmereForBeauty() {
       >
         <div className="mx-auto max-w-[1280px] px-8 py-24">
           <p className="eyebrow" style={{ color: 'var(--color-accent)' }}>
-            Concierge audit for beauty
+            The Catalog Letter for beauty
           </p>
           <h2
             id="beauty-cta-heading"
@@ -279,7 +279,7 @@ export default async function FlintmereForBeauty() {
             style={{ color: 'var(--color-paper)' }}
           >
             Send your shop URL. Three working days later, a written{' '}
-            <Bracket>audit</Bracket> lands in your inbox.
+            <Bracket>catalog letter</Bracket> lands in your inbox.
           </h2>
           <p
             className="mt-8 max-w-[56ch]"
@@ -306,7 +306,7 @@ export default async function FlintmereForBeauty() {
                 borderColor: 'var(--color-accent)',
               }}
             >
-              Book the audit →
+              Book your catalog letter →
             </Link>
             <Link
               href={SCAN_URL}

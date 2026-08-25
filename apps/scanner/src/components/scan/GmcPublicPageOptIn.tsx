@@ -120,7 +120,7 @@ export function GmcPublicPageOptIn({
             approved / disapproved / pending counts and the top three
             disapproval reasons (Google&rsquo;s own language) to the
             public page. We never publish your failing SKU titles &mdash;
-            those stay in the private audit email. You can turn this off
+            those stay in the private catalog letter email. You can turn this off
             here any time, which removes the GMC section from the page.
           </p>
         </div>
