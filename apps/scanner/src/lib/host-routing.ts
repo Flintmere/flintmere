@@ -74,9 +74,11 @@ export const MARKETING_ROUTES: readonly string[] = [
  *
  * `/read` is the canonical product noun (ADR 0028 — "audit" retired as
  * lexicon). `/audit` is retained as a legacy prefix: it must keep
- * classifying as scanner (not be deleted) because permanent redirects in
- * `next.config.ts` send `/audit*` → `/read*`, and a request arriving
- * mid-flight (or a client that ignores the 308) must still resolve.
+ * classifying as scanner (not be deleted) because `classifyRoute` also
+ * backs `canonicalHost()`, which `host-url.ts` calls directly (not over
+ * HTTP) to build absolute URLs for stale or legacy `/audit` paths — that
+ * call path never passes through the `redirects()` in `next.config.ts`,
+ * so it must still resolve `/audit*` to the scanner host itself.
  *
  * `/admin` is the operator-only surface (audit-assist v0). It binds to
  * the scanner host so the cookie issued at /admin/login carries on the
