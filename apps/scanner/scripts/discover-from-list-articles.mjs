@@ -27,7 +27,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..', '..', '..');
 
-const UA = 'FlintmereBot/1.0 (+https://audit.flintmere.com/bot; ops@flintmere.com)';
+const UA = 'FlintmereBot/1.0 (+https://catalog.flintmere.com/bot; ops@flintmere.com)';
 const API = 'https://en.wikipedia.org/w/api.php';
 const DELAY_MS = Number.parseInt(process.env.DELAY_MS ?? '250', 10);
 

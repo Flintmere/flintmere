@@ -1,10 +1,12 @@
 import Link from 'next/link';
 
-// Cross-host link absolutes — `flintmere.com` (marketing) → `audit.flintmere.com`
+// Cross-host link absolutes — `flintmere.com` (marketing) → `catalog.flintmere.com`
 // (scanner) routes would otherwise emit a 301 hop. Inlined here rather
 // than imported from `@/lib/host-routing` to keep packages/ui consumer-
 // agnostic; if Flintmere ever splits hosts further, update both.
-const SCANNER_HOST_URL = 'https://audit.flintmere.com';
+// `host-routing.ui-agreement.test.ts` in apps/scanner fails if this
+// literal and SCANNER_HOST ever drift apart.
+const SCANNER_HOST_URL = 'https://catalog.flintmere.com';
 const SCAN_URL = `${SCANNER_HOST_URL}/scan`;
 const CATALOG_LETTER_URL = `${SCANNER_HOST_URL}/catalog-letter`;
 

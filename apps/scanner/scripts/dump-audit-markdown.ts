@@ -7,7 +7,7 @@
  * in their editor, runs the 7-pass calibration checklist, and sends.
  *
  * Usage:
- *   SMOKE_HOST=https://audit.flintmere.com \
+ *   SMOKE_HOST=https://catalog.flintmere.com \
  *   ADMIN_SESSION_SECRET=<from Coolify> \
  *   DRAFT_ID=cmoysfi5d0000mpjel803b0be \
  *   pnpm --filter scanner audit:markdown > data/audits/matersandco-letter.md
@@ -33,7 +33,7 @@ interface DraftResponse {
   detail?: string
 }
 
-const host = (process.env.SMOKE_HOST ?? 'https://audit.flintmere.com').replace(
+const host = (process.env.SMOKE_HOST ?? 'https://catalog.flintmere.com').replace(
   /\/$/,
   '',
 )

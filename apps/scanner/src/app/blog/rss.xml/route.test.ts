@@ -10,7 +10,7 @@ describe('GET /blog/rss.xml', () => {
   it('emits the feed self-link on the scanner host', async () => {
     const res = GET();
     const body = await res.text();
-    expect(body).toContain('https://audit.flintmere.com/blog/rss.xml');
-    expect(body).toContain('<link>https://audit.flintmere.com/blog</link>');
+    expect(body).toContain('https://catalog.flintmere.com/blog/rss.xml');
+    expect(body).toContain('<link>https://catalog.flintmere.com/blog</link>');
   });
 });

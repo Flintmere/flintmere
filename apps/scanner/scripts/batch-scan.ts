@@ -28,7 +28,7 @@
  *                                    rows auto-retry; no manual wipe needed)
  *
  * Kindness:
- *   - UA: FlintmereBot/1.0 (+https://audit.flintmere.com/bot)
+ *   - UA: FlintmereBot/1.0 (+https://catalog.flintmere.com/bot)
  *   - Small pool (4). Each host is visited only once per run.
  *   - Failures are logged and do not abort the run.
  */
@@ -37,8 +37,11 @@ import { readFile, writeFile, appendFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { SCANNER_HOST } from '../src/lib/host-routing';
 
-const BOT_UA = 'FlintmereBot/1.0 (+https://audit.flintmere.com/bot)';
+// Built from SCANNER_HOST so the crawler's advertised UA and the /bot
+// policy page it cites can never drift (ADR 0028 Shipment 2 Task B3).
+const BOT_UA = `FlintmereBot/1.0 (+https://${SCANNER_HOST}/bot)`;
 const DEFAULT_BASE_URL = 'http://localhost:3001';
 const DEFAULT_CONCURRENCY = 4;
 const DEFAULT_BUDGET_MS = 70_000;

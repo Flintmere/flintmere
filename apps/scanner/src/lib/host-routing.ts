@@ -6,8 +6,10 @@
  *   flintmere.com               — marketing surfaces (homepage, /about,
  *                                 /pricing, /research, /methodology, /for/*,
  *                                 legal pages, /contact)
- *   audit.flintmere.com         — scanner surfaces (/scan, /audit,
- *                                 /score/[shop], /bot, /unsubscribe)
+ *   catalog.flintmere.com       — scanner surfaces (/scan, /catalog-letter,
+ *                                 /score/[shop], /bot, /unsubscribe).
+ *                                 Renamed from audit.flintmere.com on
+ *                                 2026-08-26 (ADR 0028 Shipment 2).
  *   standards.flintmere.com     — the food regulatory standard. Phase 1
  *                                 ships a holding page at the root; Phase 2
  *                                 (post-ingestion-engine, June 2026+) lands
@@ -22,8 +24,13 @@
  * page can live at `apps/scanner/src/app/standards/page.tsx` without
  * colliding with the marketing root.
  *
- * Cross-host 90-day window: 2026-05-03 → 2026-08-03. After that, evaluate
- * via PostHog whether to flip to 404 instead of 301. TODO: 2026-08-03.
+ * Cross-host redirects are PERMANENT. The 2026-05-03 plan left open the
+ * option of flipping them to 404 after 90 days; ADR 0028 Shipment 2
+ * withdrew it. Delivery emails already sent build links against
+ * audit.flintmere.com, merchants have shared /score/[shop] pages, cold
+ * outreach sits in inboxes, and the published FlintmereBot user-agent
+ * cites the host. Every one of those breaks permanently if the redirect
+ * is ever removed. It stays.
  *
  * Why this file exists, not constants in middleware.ts: route classification
  * needs to be testable without spinning up Next.js middleware. Helpers
@@ -31,18 +38,29 @@
  */
 
 export const MARKETING_HOST = 'flintmere.com';
-export const SCANNER_HOST = 'audit.flintmere.com';
+export const SCANNER_HOST = 'catalog.flintmere.com';
 export const STANDARDS_HOST = 'standards.flintmere.com';
+
+/**
+ * The scanner's former host (ADR 0028 Shipment 2, cutover 2026-08-26).
+ *
+ * It is a KNOWN_HOST, not a dead string: requests still arrive on it and
+ * must 301 to SCANNER_HOST rather than fall through as an unknown host.
+ * This is permanent — see the redirect note in the file header.
+ */
+export const LEGACY_SCANNER_HOST = 'audit.flintmere.com';
 
 export const KNOWN_HOSTS: readonly string[] = [
   MARKETING_HOST,
   SCANNER_HOST,
+  LEGACY_SCANNER_HOST,
   STANDARDS_HOST,
 ];
 
 /**
  * Routes that live on `flintmere.com`. Hitting one of these on
- * `audit.flintmere.com` or `standards.flintmere.com` → 301 to flintmere.com.
+ * `catalog.flintmere.com` or `standards.flintmere.com` → 301 to
+ * flintmere.com.
  *
  * Order matters: prefix matches are evaluated longest-first so `/for/plus`
  * resolves before `/for`. Keep this list manually sorted longest-first.
@@ -69,8 +87,9 @@ export const MARKETING_ROUTES: readonly string[] = [
 ];
 
 /**
- * Routes that live on `audit.flintmere.com`. Hitting one of these on
- * `flintmere.com` or `standards.flintmere.com` → 301 to audit.flintmere.com.
+ * Routes that live on `catalog.flintmere.com`. Hitting one of these on
+ * `flintmere.com`, `standards.flintmere.com` or the legacy
+ * `audit.flintmere.com` → 301 to catalog.flintmere.com.
  *
  * `/catalog-letter` is the canonical product route (ADR 0028 Amendment 1 —
  * the product noun is "The Catalog Letter"; "read" survives only as the

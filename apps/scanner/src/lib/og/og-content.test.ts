@@ -16,7 +16,7 @@ describe('og card content', () => {
       .filter((s): s is { text: string } => 'text' in s)
       .map((s) => s.text);
     expect(textSegments).toEqual(['A human reads', 'the catalog. From ', '.']);
-    expect(card.footerUrl).toBe('audit.flintmere.com/catalog-letter');
+    expect(card.footerUrl).toBe('catalog.flintmere.com/catalog-letter');
   });
 
   it('every card carries at least one non-empty bracket token', () => {

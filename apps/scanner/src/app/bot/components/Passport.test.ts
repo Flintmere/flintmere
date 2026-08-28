@@ -10,7 +10,7 @@ import { Passport } from './Passport';
 describe('Passport (bot UA display)', () => {
   it('renders the published bot UA on the scanner host, in both the label and the visible text', () => {
     const html = renderToStaticMarkup(Passport());
-    expect(html).toContain('FlintmereBot/1.0 (+https://audit.flintmere.com/bot)');
-    expect(html).toContain('https://audit.flintmere.com/bot');
+    expect(html).toContain('FlintmereBot/1.0 (+https://catalog.flintmere.com/bot)');
+    expect(html).toContain('https://catalog.flintmere.com/bot');
   });
 });

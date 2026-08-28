@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  KNOWN_HOSTS,
+  LEGACY_SCANNER_HOST,
   MARKETING_HOST,
   SCANNER_HOST,
   STANDARDS_HOST,
@@ -117,6 +119,43 @@ describe('catalog-letter routes (ADR 0028 Amendment 1)', () => {
   });
 });
 
+describe('catalog host (ADR 0028 Shipment 2)', () => {
+  it('names catalog.flintmere.com as the scanner host', () => {
+    expect(SCANNER_HOST).toBe('catalog.flintmere.com');
+  });
+
+  it('still recognises the legacy host', () => {
+    expect(LEGACY_SCANNER_HOST).toBe('audit.flintmere.com');
+    expect(KNOWN_HOSTS).toContain(LEGACY_SCANNER_HOST);
+  });
+
+  it('redirects scanner routes on the legacy host to the canonical one', () => {
+    expect(targetHostForRedirect(LEGACY_SCANNER_HOST, '/scan')).toBe(SCANNER_HOST);
+    expect(targetHostForRedirect(LEGACY_SCANNER_HOST, '/catalog-letter')).toBe(SCANNER_HOST);
+    expect(targetHostForRedirect(LEGACY_SCANNER_HOST, '/score/example.myshopify.com')).toBe(
+      SCANNER_HOST,
+    );
+    expect(targetHostForRedirect(LEGACY_SCANNER_HOST, '/bot')).toBe(SCANNER_HOST);
+  });
+
+  it('still routes marketing and standards routes off the legacy host', () => {
+    expect(targetHostForRedirect(LEGACY_SCANNER_HOST, '/pricing')).toBe(MARKETING_HOST);
+    expect(targetHostForRedirect(LEGACY_SCANNER_HOST, '/standards')).toBe(STANDARDS_HOST);
+  });
+
+  it('leaves host-agnostic routes on the legacy host alone', () => {
+    // Cron and webhook URLs already registered against audit.flintmere.com
+    // must keep answering there — a 301 would break POST bodies.
+    expect(targetHostForRedirect(LEGACY_SCANNER_HOST, '/api/cron/daily-brief')).toBeNull();
+    expect(targetHostForRedirect(LEGACY_SCANNER_HOST, '/api/webhooks/stripe')).toBeNull();
+    expect(targetHostForRedirect(LEGACY_SCANNER_HOST, '/ingest/e')).toBeNull();
+  });
+
+  it('does not redirect the canonical scanner host to itself', () => {
+    expect(targetHostForRedirect(SCANNER_HOST, '/scan')).toBeNull();
+  });
+});
+
 describe('canonicalHost', () => {
   it('returns scanner host for scanner routes', () => {
     expect(canonicalHost('/scan')).toBe(SCANNER_HOST);
@@ -223,8 +262,11 @@ describe('targetHostForRedirect', () => {
 
   it('case-insensitive on host comparison', () => {
     expect(targetHostForRedirect('FLINTMERE.COM', '/pricing')).toBeNull();
-    expect(targetHostForRedirect('Audit.Flintmere.Com', '/scan')).toBeNull();
+    expect(targetHostForRedirect('Catalog.Flintmere.Com', '/scan')).toBeNull();
     expect(targetHostForRedirect('Standards.Flintmere.Com', '/')).toBeNull();
+    // Normalisation applies on the legacy host too, or a mixed-case
+    // Host header would fall through as unknown and skip the 301.
+    expect(targetHostForRedirect('Audit.Flintmere.Com', '/scan')).toBe(SCANNER_HOST);
   });
 });
 

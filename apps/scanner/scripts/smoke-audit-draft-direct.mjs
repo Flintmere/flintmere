@@ -4,7 +4,7 @@
 // laptop-side smokes don't depend on the email round-trip.
 //
 // Run from laptop against prod:
-//   SMOKE_HOST=https://audit.flintmere.com \
+//   SMOKE_HOST=https://catalog.flintmere.com \
 //   ADMIN_SESSION_SECRET=<copy from Coolify env> \
 //   SMOKE_SHOP=matersandco.com \
 //   node apps/scanner/scripts/smoke-audit-draft-direct.mjs

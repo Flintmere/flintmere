@@ -25,7 +25,7 @@
  *   PRODUCT_COUNT integer                  (default 318)
  *   FIRST_NAME    string or empty          (default 'Sam')
  *   SENDER        operator name            (default 'Abu')
- *   BASE_URL      site origin              (default 'https://audit.flintmere.com')
+ *   BASE_URL      site origin              (default 'https://catalog.flintmere.com')
  *   SOURCE        cohort source slug       (default 'discovery-2026-05-11')
  *   TARGET_ID     target id (UTM `t=`)     (default 'cuidpreview000000000000000')
  */
@@ -43,7 +43,7 @@ const GRADE = process.env.GRADE ?? 'D';
 const PRODUCT_COUNT = Number.parseInt(process.env.PRODUCT_COUNT ?? '318', 10);
 const FIRST_NAME = process.env.FIRST_NAME ?? 'Sam';
 const SENDER = process.env.SENDER ?? 'Abu';
-const BASE_URL = (process.env.BASE_URL ?? 'https://audit.flintmere.com').replace(/\/+$/, '');
+const BASE_URL = (process.env.BASE_URL ?? 'https://catalog.flintmere.com').replace(/\/+$/, '');
 const SOURCE = process.env.SOURCE ?? 'discovery-2026-05-11';
 const TARGET_ID = process.env.TARGET_ID ?? 'cuidpreview000000000000000';
 

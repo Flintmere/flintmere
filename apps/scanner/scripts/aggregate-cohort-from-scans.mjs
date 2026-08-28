@@ -166,7 +166,7 @@ async function main() {
       }
       seen.add(r.shopDomain);
       const ukSignal = isUkDomain(r.shopDomain) ? 1 : 0;
-      const rescanUrl = `https://audit.flintmere.com/scan?url=${r.shopDomain}`;
+      const rescanUrl = `https://catalog.flintmere.com/scan?url=${r.shopDomain}`;
       rows.push(
         `${r.shopDomain},${r.score},${r.grade},${r.productCount},${ukSignal},${r.scanId},${rescanUrl}`,
       );

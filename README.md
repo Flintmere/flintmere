@@ -3,7 +3,8 @@
 Vertical-specialist commerce-data platform for UK food merchants. Multimodal ingestion — supplier PDFs, back-of-pack photos, spreadsheets — mapped against a proprietary food regulatory taxonomy, merchant-confirmed in 30 seconds, written to Shopify metafields under OAuth. The public scanner is the acquisition surface; the published food standard is the citable moat.
 
 - `flintmere.com` — marketing
-- `audit.flintmere.com` — public scanner (no install)
+- `catalog.flintmere.com` — public scanner (no install). The former
+  `audit.flintmere.com` permanently 301s here.
 - `app.flintmere.com` — Shopify embedded app
 - `standards.flintmere.com` — food catalog standard (planned, ADR 0018)
 
@@ -12,7 +13,7 @@ Vertical-specialist commerce-data platform for UK food merchants. Multimodal ing
 ```
 flintmere/
 ├── apps/
-│   ├── scanner/            Next.js 15 · audit.flintmere.com + flintmere.com · public scanner + marketing
+│   ├── scanner/            Next.js 15 · catalog.flintmere.com + flintmere.com · public scanner + marketing
 │   └── shopify-app/        Remix · app.flintmere.com · embedded Shopify app
 ├── packages/
 │   ├── llm/                Provider abstraction (Gemini primary, OpenAI Platform fallback) — ADRs 0005 / 0006 / 0010

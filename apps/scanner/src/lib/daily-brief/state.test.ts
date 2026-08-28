@@ -45,7 +45,7 @@ describe('collectBriefState — approve-link base URL', () => {
 
     expect(state.approvals.pending).toHaveLength(1);
     expect(state.approvals.pending[0]?.approveUrl).toMatch(
-      /^https:\/\/audit\.flintmere\.com\/api\/approve\?token=/,
+      /^https:\/\/catalog\.flintmere\.com\/api\/approve\?token=/,
     );
   });
 });

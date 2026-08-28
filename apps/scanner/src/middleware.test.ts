@@ -46,7 +46,7 @@ describe('middleware — cross-host RSC-prefetch carve-out', () => {
     );
     expect(res.status).toBe(204);
     expect(res.headers.get('x-flintmere-host-decision')).toBe(
-      'rsc-noop:audit.flintmere.com',
+      'rsc-noop:catalog.flintmere.com',
     );
   });
 
@@ -61,7 +61,7 @@ describe('middleware — cross-host RSC-prefetch carve-out', () => {
     );
     expect(res.status).toBe(204);
     expect(res.headers.get('x-flintmere-host-decision')).toBe(
-      'rsc-noop:audit.flintmere.com',
+      'rsc-noop:catalog.flintmere.com',
     );
   });
 
@@ -73,7 +73,7 @@ describe('middleware — cross-host RSC-prefetch carve-out', () => {
     );
     expect(res.status).toBe(301);
     expect(res.headers.get('x-flintmere-host-decision')).toBe(
-      'redirect:audit.flintmere.com',
+      'redirect:catalog.flintmere.com',
     );
   });
 
@@ -82,7 +82,7 @@ describe('middleware — cross-host RSC-prefetch carve-out', () => {
   it('returns 204 + CORS for a cross-origin RSC prefetch GET (next-url only)', () => {
     const res = middleware(
       req('http://localhost/scan', {
-        'x-forwarded-host': 'audit.flintmere.com',
+        'x-forwarded-host': 'catalog.flintmere.com',
         origin: 'https://flintmere.com',
         'next-url': '/',
       }),
@@ -100,7 +100,7 @@ describe('middleware — cross-host RSC-prefetch carve-out', () => {
       req(
         'http://localhost/scan',
         {
-          'x-forwarded-host': 'audit.flintmere.com',
+          'x-forwarded-host': 'catalog.flintmere.com',
           origin: 'https://flintmere.com',
         },
         'OPTIONS',
