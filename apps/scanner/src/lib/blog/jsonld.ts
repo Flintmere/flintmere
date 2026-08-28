@@ -1,5 +1,6 @@
 import type { BlogPost } from './posts';
 import { getAuthor } from './authors';
+import { SCANNER_HOST } from '../host-routing';
 
 /**
  * JSON-LD builders — the AEO/GEO surface (editorial standard §D). Every post
@@ -13,15 +14,15 @@ import { getAuthor } from './authors';
  */
 
 const ORG_NAME = 'Flintmere';
-const ORG_LOGO = 'https://audit.flintmere.com/icon.svg';
+const ORG_LOGO = `https://${SCANNER_HOST}/icon.svg`;
 
 /** Canonical absolute URL for a post on the scanner host. */
-export function postUrl(slug: string, host = 'audit.flintmere.com'): string {
+export function postUrl(slug: string, host = SCANNER_HOST): string {
   return `https://${host}/blog/${slug}`;
 }
 
 /** OG image URL for a post (the per-post opengraph-image route). */
-export function postImageUrl(slug: string, host = 'audit.flintmere.com'): string {
+export function postImageUrl(slug: string, host = SCANNER_HOST): string {
   return `https://${host}/blog/${slug}/opengraph-image`;
 }
 
@@ -97,7 +98,7 @@ function breadcrumbs(post: BlogPost, host: string): Record<string, unknown> {
  * <script type="application/ld+json"> tag. Throws (via getAuthor) on an
  * unknown author — caught at build time, never ships.
  */
-export function postJsonLd(post: BlogPost, host = 'audit.flintmere.com'): string {
+export function postJsonLd(post: BlogPost, host = SCANNER_HOST): string {
   const graph: Record<string, unknown>[] = [blogPosting(post, host)];
   const faq = faqPage(post);
   if (faq) graph.push(faq);

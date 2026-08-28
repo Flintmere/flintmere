@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Bracket, SiteFooter } from '@flintmere/ui';
 import { getAllPosts } from '@/lib/blog/posts';
 import { PostCard } from '@/components/blog/PostCard';
-import { SCAN_URL } from '@/lib/host-routing';
+import { SCAN_URL, SCANNER_HOST } from '@/lib/host-routing';
 
 /**
  * /blog — index of catalog data field notes. Lives on
@@ -23,12 +23,12 @@ export const metadata: Metadata = {
   title: 'Blog — Catalog data for AI shopping',
   description:
     'Field notes on catalog data quality, GTINs, metafields, and how AI shopping agents read your products. Source-cited, from first-hand scan data.',
-  alternates: { canonical: 'https://audit.flintmere.com/blog' },
+  alternates: { canonical: `https://${SCANNER_HOST}/blog` },
   openGraph: {
     title: 'Flintmere Blog — Catalog data for AI shopping',
     description:
       'Field notes on catalog data quality, GTINs, metafields, and how AI shopping agents read your products.',
-    url: 'https://audit.flintmere.com/blog',
+    url: `https://${SCANNER_HOST}/blog`,
     type: 'website',
   },
 };

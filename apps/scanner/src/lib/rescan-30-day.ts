@@ -29,6 +29,7 @@
  */
 
 import { prisma } from './db';
+import { SCANNER_HOST } from './host-routing';
 import { sendDay30RescanEmail, type PersistedScoreShape } from './rescan-email';
 import { runScanForShop } from './run-scan';
 
@@ -56,7 +57,7 @@ export async function runDay30Rescans(
   const scannerOrigin =
     options.scannerOrigin ??
     process.env.NEXT_PUBLIC_SCANNER_ORIGIN ??
-    'https://audit.flintmere.com';
+    `https://${SCANNER_HOST}`;
 
   // The query has two terminal states the runner respects:
   //   - Scan-not-yet-run: rescanCompletedAt IS NULL — runner does scan + email.

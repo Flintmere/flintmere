@@ -1,4 +1,5 @@
 import { bandPriceLine } from '@/lib/audit-pricing';
+import { SCANNER_HOST } from '@/lib/host-routing';
 import type { OgCardContent } from './og-card';
 
 // Per-route OG card content. Copy is canon-traced (flintmere.com/methodology +
@@ -20,7 +21,7 @@ export function letterCard(): OgCardContent {
       [{ text: 'A human reads' }],
       [{ text: 'the catalog. From ' }, { bracket: price }, { text: '.' }],
     ],
-    footerUrl: 'audit.flintmere.com/catalog-letter',
+    footerUrl: `${SCANNER_HOST}/catalog-letter`,
     alt: `Flintmere Catalog Letter — a human-read catalog letter from ${price}.`,
   };
 }

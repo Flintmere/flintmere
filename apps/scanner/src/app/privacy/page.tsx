@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { LegalShell, Clause } from '@/components/LegalShell';
+import { SCANNER_HOST } from '@/lib/host-routing';
 
 export const dynamic = 'force-static';
 export const revalidate = 86400;
@@ -26,7 +27,7 @@ export default function Privacy() {
           company registered in England and Wales (Companies House
           number <strong>13205428</strong>). Flintmere is the
           <em> data controller</em> for personal data you share with our
-          website, the public scanner at <code>audit.flintmere.com</code>, and
+          website, the public scanner at <code>{SCANNER_HOST}</code>, and
           the Shopify app at <code>app.flintmere.com</code>.
         </p>
         <p className="mt-4">
@@ -318,7 +319,7 @@ export default function Privacy() {
 
       <Clause n="09" heading="Cookies">
         <p>
-          We use one functional cookie on <code>audit.flintmere.com</code> for
+          We use one functional cookie on <code>{SCANNER_HOST}</code> for
           CSRF protection. We do not use tracking, analytics, or advertising
           cookies on the marketing site. Full details:{' '}
           <a href="/cookies" className="underline">flintmere.com/cookies</a>.

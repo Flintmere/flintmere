@@ -1,6 +1,7 @@
 import { getAllPosts } from '@/lib/blog/posts';
 import { getAuthor } from '@/lib/blog/authors';
 import { postUrl } from '@/lib/blog/jsonld';
+import { SCANNER_HOST } from '@/lib/host-routing';
 
 /**
  * /blog/rss.xml — RSS 2.0 feed of non-draft posts, newest first. Static
@@ -10,7 +11,7 @@ import { postUrl } from '@/lib/blog/jsonld';
 export const dynamic = 'force-static';
 export const revalidate = 3600;
 
-const HOST = 'audit.flintmere.com';
+const HOST = SCANNER_HOST;
 const FEED_TITLE = 'Flintmere — Catalog data for AI shopping';
 const FEED_DESC =
   'Field notes on catalog data quality, GTINs, metafields, and how AI shopping agents read your products.';

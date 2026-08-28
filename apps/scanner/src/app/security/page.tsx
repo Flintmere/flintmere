@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { LegalShell, Clause } from '@/components/LegalShell';
+import { SCANNER_HOST } from '@/lib/host-routing';
 
 export const dynamic = 'force-static';
 export const revalidate = 86400;
@@ -38,7 +39,7 @@ export default function Security() {
       <Clause n="02" heading="Encryption in transit">
         <p>
           All traffic to <code>flintmere.com</code>,{' '}
-          <code>audit.flintmere.com</code>, and <code>app.flintmere.com</code>{' '}
+          <code>{SCANNER_HOST}</code>, and <code>app.flintmere.com</code>{' '}
           uses <strong>TLS 1.2 or higher</strong> with modern cipher suites.
           HTTP is redirected to HTTPS. HSTS is enabled on all subdomains.
         </p>
@@ -47,7 +48,7 @@ export default function Security() {
       <Clause n="03" heading="Script-injection defence (CSP)">
         <p>
           Every page served from <code>flintmere.com</code> and{' '}
-          <code>audit.flintmere.com</code> carries a Content Security Policy
+          <code>{SCANNER_HOST}</code> carries a Content Security Policy
           header with a per-request cryptographic nonce. Inline scripts run
           only if they carry the matching nonce; scripts loaded by the
           framework propagate trust via <code>&lsquo;strict-dynamic&rsquo;</code>.

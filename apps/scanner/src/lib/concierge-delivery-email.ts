@@ -13,6 +13,7 @@
  */
 
 import { bandBySlug, bandPriceLine, type AuditBandSlug } from './audit-pricing';
+import { scannerBaseUrl } from './host-url';
 import {
   FOUNDER_SIGNATURE_IMAGE_URL,
   FOUNDER_SIGNATURE_NAME,
@@ -74,7 +75,7 @@ export async function sendConciergeDeliveryEmail(
   const safeNotesText = notes ? `\n${notes}\n` : '';
 
   const connectUrl = auditId
-    ? `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://audit.flintmere.com'}/catalog-letter/connect?audit=${encodeURIComponent(auditId)}`
+    ? `${scannerBaseUrl()}/catalog-letter/connect?audit=${encodeURIComponent(auditId)}`
     : null;
   const connectHtml = connectUrl
     ? `

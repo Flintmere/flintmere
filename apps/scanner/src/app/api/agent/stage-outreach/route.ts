@@ -13,6 +13,7 @@ import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { verifyAgentSecret } from '@/lib/cron-auth'
+import { scannerBaseUrl } from '@/lib/host-url'
 import { buildApproveUrl } from '@/lib/outreach/approval'
 import {
   STAGE_LIMIT_MAX,
@@ -59,7 +60,7 @@ export async function POST(req: Request): Promise<NextResponse> {
   try {
     const result = await stageOutreachBatch(parsed.data.limit)
     const secret = process.env.ADMIN_SESSION_SECRET
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://audit.flintmere.com'
+    const baseUrl = scannerBaseUrl()
     const approveUrl =
       result.batchId && secret ? buildApproveUrl(result.batchId, secret, baseUrl) : null
     return NextResponse.json(
