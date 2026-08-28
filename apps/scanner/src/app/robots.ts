@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { headers } from 'next/headers';
 import {
+  LEGACY_SCANNER_HOST,
   MARKETING_HOST,
   SCANNER_HOST,
   STANDARDS_HOST,
@@ -24,7 +25,14 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     .split(':')[0]!
     .toLowerCase();
 
-  const host = KNOWN_HOSTS.includes(requestHost) ? requestHost : MARKETING_HOST;
+  // `/robots.txt` is host-agnostic, so it is never redirected — a crawler
+  // on the legacy scanner host gets a real response from here. Fold it onto
+  // the canonical host so it inherits the scanner disallow rules and
+  // advertises the canonical sitemap; advertising the legacy host as
+  // canonical would work against the Search Console change of address.
+  const resolved =
+    requestHost === LEGACY_SCANNER_HOST ? SCANNER_HOST : requestHost;
+  const host = KNOWN_HOSTS.includes(resolved) ? resolved : MARKETING_HOST;
 
   const disallow =
     host === SCANNER_HOST ? ['/api/', '/score/*/raw'] : ['/api/'];
