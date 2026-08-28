@@ -30,7 +30,7 @@ Every source a data-intelligence skill may reference. Skills are read-only again
 - Retention (in context/): 30 days
 - Lawful basis: legitimate interest (cookieless analytics — `persistence: 'memory'`, zero cookies/localStorage, no consent banner required per ADR 0025 + Cookie Policy)
 - PII present: no for events (anonymous, `person_profiles: 'identified_only'`, no `identify()`); session replay recordings are pseudonymous and input-masked (all keyboard input masked in-browser before send; retained on PostHog EU infrastructure for a limited period before automatic deletion)
-- Aggregation required: per-event + per-day at report level; `$host` splits `flintmere.com` vs `audit.flintmere.com` (single project, both hosts — same Next.js app behind two domains); custom property dimensions read as cohort splits.
+- Aggregation required: per-event + per-day at report level; `$host` splits `flintmere.com` vs `catalog.flintmere.com` (single project, both hosts — same Next.js app behind two domains). The legacy `audit.flintmere.com` is a third bucket and its views are scanner views: sum it with `catalog.` until it reaches zero (ADR 0028 Shipment 2); custom property dimensions read as cohort splits.
 - Privacy Policy reference: analytics + cookies section + session-replay disclosure
 - Site: single PostHog project "Flintmere web" (EU Cloud, Frankfurt), both hosts split via `$host`.
 - Adopted 2026-06-06 per ADR 0025 (supersedes Plausible Cloud — trial lapsed, no free tier; cookieless rationale carried forward from ADR 0013).

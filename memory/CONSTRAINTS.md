@@ -8,7 +8,7 @@ Don't ship anything that breaks free-tier, bypasses consent, exposes secrets, or
 
 ## Product
 
-- Do not break or remove the free public scanner at `audit.flintmere.com`. It is the top of the funnel.
+- Do not break or remove the free public scanner at `catalog.flintmere.com`. It is the top of the funnel.
 - Do not gate scorecard visibility behind auth. Merchants see a score; email is required for the full report; install is required for pillars 2/4/6.
 - Do not make the free tier feel punishing. It should feel generous, with clear value in upgrading to Growth.
 - Do not expose Tier 2 LLM enrichment or Tier 3 GTIN guidance without a paid subscription check.

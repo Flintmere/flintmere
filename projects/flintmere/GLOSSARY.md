@@ -6,7 +6,7 @@ Canonical definitions of terms used across Flintmere. Extended from `SPEC.md` Ap
 
 **Flintmere** — The product. Scores Shopify product catalogs for AI-agent readiness and fixes what's broken. The parent brand.
 
-**Public scanner** — The tool at `audit.flintmere.com` that runs a partial (4-pillar) audit on any public Shopify store URL without installation. Public, no-auth.
+**Public scanner** — The tool at `catalog.flintmere.com` that runs a partial (4-pillar) audit on any public Shopify store URL without installation. Public, no-auth.
 
 **Shopify app** — The embedded merchant app at `app.flintmere.com`, installed via OAuth from the Shopify App Store. Full 7-pillar scoring + auto-fix engine.
 

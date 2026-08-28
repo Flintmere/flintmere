@@ -351,8 +351,8 @@ The audit-assist v0 surface at `/admin/audit-draft` drafts the structured findin
 
 **Per-audit workflow** (paid concierge booking via Stripe → audit needed)
 
-- [ ] Confirm a recent public scan exists for the merchant. If not, paste the shop into `https://audit.flintmere.com/scan` and let it run. The audit-draft route 409s with `no-recent-scan` if no successful scan in the last 7 days.
-- [ ] Sign in at `https://audit.flintmere.com/admin/login`.
+- [ ] Confirm a recent public scan exists for the merchant. If not, paste the shop into `https://catalog.flintmere.com/scan` and let it run. The audit-draft route 409s with `no-recent-scan` if no successful scan in the last 7 days.
+- [ ] Sign in at `https://catalog.flintmere.com/admin/login`.
 - [ ] At `/admin/audit-draft`: enter shop URL, pick band, vertical (defaults to food). Click **Generate draft →**. Hold the tab — Gemini 2.5 Pro typically takes 15–25s.
 - [ ] Read the headline. **Two-beat lede check** — does it lead with a deterministic anchor (a number) and demote any range to the body? If not, edit it.
 - [ ] Read every pillar's observations. Quote-check any product titles cited — they must appear in the catalog.
@@ -405,6 +405,53 @@ The audit-assist v0 surface at `/admin/audit-draft` drafts the structured findin
 - Tasks blocked by external parties (legal, accountant, GS1) — flag the blocker and move on.
 - When a stage triggers a new ADR (e.g. SOC 2 posture decision), write the ADR first; don't ad-hoc it.
 - Operator owns this file. Claude proposes additions but does not tick items on your behalf.
+
+## ADR 0028 Shipment 2 Phase C — catalog.flintmere.com cutover
+
+Repo work (Phases A + B) is committed. Nothing below is live until you do
+these, and **step 1 gates every other step**. Sequenced deliberately.
+
+- [ ] **1. Google Cloud Console — do this first.** Add
+      `https://catalog.flintmere.com/api/auth/google/callback` to the
+      OAuth client's **Authorized redirect URIs**. Exact match. Read the
+      list back to confirm. No review cycle is triggered: scopes are
+      unchanged, and *Authorized domains* takes eTLD+1 (`flintmere.com`),
+      which already covers the new subdomain. Miss this and every GMC
+      connect fails `redirect_uri_mismatch`.
+- [ ] **2. DNS** — `catalog.flintmere.com` A-record → `134.122.102.159`
+      (Namecheap). Leave the `audit.` record in place permanently.
+- [ ] **3. Coolify / Traefik** — add the router and Let's Encrypt cert for
+      the new host on the `flintmere-scanner` resource. Keep the `audit.`
+      router alive permanently — it is not a migration window (ADR 0028
+      Amendment 3).
+- [ ] **4. Deploy and verify.**
+      `curl -sI https://catalog.flintmere.com/scan` → 200.
+      `curl -sI https://audit.flintmere.com/scan` → 301 to
+      `catalog.flintmere.com/scan`.
+- [ ] **5. GMC connect smoke test** — one real OAuth connect, end to end.
+      This is the step that catches a missed redirect URI in step 1.
+- [ ] **6. Google Search Console** — add `catalog.flintmere.com` as a
+      property, verify it, submit a change of address from `audit.`.
+      Expect 2–8 weeks of ranking movement; the 301 carries most equity
+      but not instantly.
+- [ ] **7. Stripe** — confirm the checkout success and cancel URLs resolve
+      on the new host. The webhook route is host-agnostic and keeps
+      answering on `audit.`, so it needs no change.
+- [ ] **8. BetterStack** — repoint the three scanner monitors
+      (`/api/healthz`, `/`, `/scan`) at the new host, and add one on
+      `audit.flintmere.com/scan` asserting a 301 so a silently dropped
+      redirect pages you.
+- [ ] **9. Public profiles** — the X bio, Bluesky and Instagram profile
+      links still read `audit.flintmere.com` (see
+      `runbooks/2026-05-11-marketing-launch-and-cadence.md`). They will
+      redirect, but the printed link should name the canonical host.
+- [ ] **10. Monitor for two weeks** — the admin health PostHog signal now
+      reports `scanner N · legacy N`; watch the legacy count trend to
+      zero. Sentry for `redirect_uri_mismatch`. Search Console coverage
+      for crawl errors.
+
+**Queued social posts are unaffected** — the five posts scheduled 25–29
+Aug cite `audit.flintmere.com`, which 301s. No need to re-queue.
 
 ## Current state
 

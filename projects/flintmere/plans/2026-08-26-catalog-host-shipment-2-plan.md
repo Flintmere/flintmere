@@ -46,7 +46,7 @@ Six modules declare their own copy of the host. Each is a place the next host ch
   (b) keep a literal in `packages/ui` and add a test in `apps/scanner` asserting the two agree.
 Do NOT invent a third mechanism. If neither fits, stop and report.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `apps/scanner/src/lib/blog/jsonld.test.ts` — assert the default resolves from the constant, not a literal:
 
@@ -64,12 +64,12 @@ describe('jsonld host default (ADR 0028 Shipment 2)', () => {
 
 This passes today by coincidence — both are `audit.flintmere.com`. It becomes load-bearing in Phase B, where it fails if `jsonld.ts` kept its own literal. That is the point: it is the regression guard for the whole phase.
 
-- [ ] **Step 2: Run it**
+- [x] **Step 2: Run it**
 
 Run: `pnpm --filter scanner test jsonld`
 Expected: PASS (coincidentally). Record that it passed.
 
-- [ ] **Step 3: Replace each shadow constant**
+- [x] **Step 3: Replace each shadow constant**
 
 Import `SCANNER_HOST` and use it. Example, `blog/rss.xml/route.ts`:
 
@@ -80,11 +80,11 @@ const HOST = SCANNER_HOST;
 
 Keep the local name where it reads better than the import; the point is one source, not one identifier.
 
-- [ ] **Step 4: Prove the coincidence is gone**
+- [x] **Step 4: Prove the coincidence is gone**
 
 Temporarily edit `host-routing.ts:34` to `'TEMP-PROOF.example.com'`, run `pnpm --filter scanner test`, and confirm failures appear in every module you touched. **Then revert that line.** This is the only way to prove the wiring is real rather than coincidentally equal — a passing suite proves nothing when both values are the same string.
 
-- [ ] **Step 5: Full suite + commit**
+- [x] **Step 5: Full suite + commit**
 
 ```bash
 pnpm --filter scanner test && pnpm --filter scanner typecheck
@@ -98,7 +98,7 @@ Five `process.env.NEXT_PUBLIC_APP_URL ?? 'https://audit.flintmere.com'` fallback
 
 **Files:** `app/api/agent/stage-outreach/route.ts:62`, `app/api/lead/route.ts:139`, `lib/concierge-delivery-email.ts:77`, `lib/rescan-30-day.ts:59`, plus `apps/scanner/scripts/stage-outreach-batch.ts:35`.
 
-- [ ] **Step 1: Add one helper, not five edits**
+- [x] **Step 1: Add one helper, not five edits**
 
 `apps/scanner/src/lib/host-url.ts` already owns host construction and already imports `SCANNER_HOST`. Add:
 
@@ -114,11 +114,11 @@ export function scannerBaseUrl(): string {
 }
 ```
 
-- [ ] **Step 2: Replace all five call sites with `scannerBaseUrl()`**
+- [x] **Step 2: Replace all five call sites with `scannerBaseUrl()`**
 
 The script under `apps/scanner/scripts/` may not be able to import from `src/` — check its existing imports before assuming. If it cannot, leave it as a literal and note it in the report; scripts are operator-run, not shipped.
 
-- [ ] **Step 3: Test, typecheck, commit**
+- [x] **Step 3: Test, typecheck, commit**
 
 ### Task A3: Rendered copy + metadata → `SCANNER_HOST`
 
@@ -126,13 +126,13 @@ The host appears as visible text to users and in machine-readable metadata.
 
 **Files:** `app/security/page.tsx:41,50`; `app/privacy/page.tsx:29,321`; `app/terms/page.tsx:37`; `app/cookies/page.tsx:19,32`; `app/sitemap/page.tsx:34,89,90,239`; `app/unsubscribe/page.tsx:36`; `app/layout.tsx:122,136` (JSON-LD); `app/blog/page.tsx:26,31` (canonical + OG); `app/opengraph-image.tsx:137`; `app/scan/opengraph-image.tsx:144`; `app/blog/[slug]/opengraph-image.tsx:109`; `app/research/components/BodyBottom.tsx:428`.
 
-- [ ] **Step 1: Substitute the constant**
+- [x] **Step 1: Substitute the constant**
 
 In JSX, `<code>audit.flintmere.com</code>` becomes `<code>{SCANNER_HOST}</code>`.
 
 **`/terms`, `/privacy` and `/cookies` are legal-class.** Changing how a host is *rendered* does not change the agreement, but confirm the sentence still reads correctly — some of these name the host mid-sentence and a substitution can break the grammar around it.
 
-- [ ] **Step 2: Do NOT touch the six frozen legal "audit" instances**
+- [x] **Step 2: Do NOT touch the six frozen legal "audit" instances**
 
 `/dpa` Clause 09, `/security:174,176`, `/privacy:167`. Those are the word "audit", not the hostname. Verify after editing:
 
@@ -141,7 +141,7 @@ sed -n '167p' apps/scanner/src/app/privacy/page.tsx   # must still say "audit-tr
 grep -c "SOC 2 audited" apps/scanner/src/app/security/page.tsx  # must be 1
 ```
 
-- [ ] **Step 3: Test, typecheck, commit**
+- [x] **Step 3: Test, typecheck, commit**
 
 ---
 
@@ -151,7 +151,7 @@ Only now does anything observable change. After Phase A this should be a small d
 
 ### Task B1: The constant, the redirect, the CSP
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```typescript
 // host-routing.test.ts
@@ -170,7 +170,7 @@ describe('catalog host (ADR 0028 Shipment 2)', () => {
 
 Read `targetHostForRedirect`'s actual signature before writing this — adapt the call to match rather than assuming the argument order.
 
-- [ ] **Step 2: Flip the constant**
+- [x] **Step 2: Flip the constant**
 
 `apps/scanner/src/lib/host-routing.ts:34`:
 
@@ -181,28 +181,28 @@ export const LEGACY_SCANNER_HOST = 'audit.flintmere.com';
 
 Add `LEGACY_SCANNER_HOST` to `KNOWN_HOSTS` and make the redirect logic map it to `SCANNER_HOST`. **This redirect is permanent and must never be removed** — say so in the comment, with the reason (already-sent emails, shared score pages, the published bot UA).
 
-- [ ] **Step 3: CSP**
+- [x] **Step 3: CSP**
 
 `apps/scanner/src/middleware.ts:286` — `connect-src` must list **both** hosts through the transition and keep the legacy one indefinitely, since redirected requests still originate from it.
 
-- [ ] **Step 4: Delete the stale TODO**
+- [x] **Step 4: Delete the stale TODO**
 
 `host-routing.ts:25-26` carries `TODO: 2026-08-03` on the cross-host 301 window — 23 days overdue at time of writing. This shipment resolves it: the redirects are permanent, so the "flip to 404" option is withdrawn. Remove the TODO and record the decision in the comment.
 
-- [ ] **Step 5: Update every test literal**
+- [x] **Step 5: Update every test literal**
 
 51 host literals live in tests. They are assertions and stay literal — update the expected values. `grep -rln "audit\.flintmere\.com" apps packages --include="*.test.ts" --include="*.test.tsx"` finds them.
 
 Any test asserting the **legacy** host redirects correctly should keep `audit.flintmere.com` — read each one before changing it.
 
-- [ ] **Step 6: Full suite + commit**
+- [x] **Step 6: Full suite + commit**
 
 ### Task B2: PostHog dual-host bucketing
 
 `app/admin/health/_signals/posthog.ts:53` buckets pageviews by the literal host string. On cutover, traffic splits across two hosts and this signal will false-alarm.
 
-- [ ] **Step 1:** Sum both hosts for the transition, reading from `SCANNER_HOST` and `LEGACY_SCANNER_HOST` rather than new literals. Add a comment stating when the legacy bucket can be dropped (when legacy traffic reaches zero — not a fixed date).
-- [ ] **Step 2:** Test, commit.
+- [x] **Step 1:** Sum both hosts for the transition, reading from `SCANNER_HOST` and `LEGACY_SCANNER_HOST` rather than new literals. Add a comment stating when the legacy bucket can be dropped (when legacy traffic reaches zero — not a fixed date).
+- [x] **Step 2:** Test, commit.
 
 ### Task B3: The published bot user-agent
 
@@ -210,8 +210,8 @@ Any test asserting the **legacy** host redirects correctly should keep `audit.fl
 
 Every store Flintmere crawls sees this string in its logs, and `/bot` is the published policy page it points at.
 
-- [ ] **Step 1:** Change all five in lockstep so the UA and the policy page agree. The `/bot` URL must resolve without a redirect — a UA pointing at a 301 looks like a stale or spoofed crawler to anyone auditing their logs.
-- [ ] **Step 2:** Test, commit.
+- [x] **Step 1:** Change all five in lockstep so the UA and the policy page agree. The `/bot` URL must resolve without a redirect — a UA pointing at a 301 looks like a stale or spoofed crawler to anyone auditing their logs.
+- [x] **Step 2:** Test, commit.
 
 ---
 
@@ -232,13 +232,13 @@ Not repo work. Sequenced, and step 1 gates the rest.
 
 ## Docs
 
-- [ ] ADR 0028 gains an Amendment 3 recording the host cutover date and the permanent-redirect commitment.
-- [ ] `CLAUDE.md`, `PROJECT.md`, `ARCHITECTURE.md`, `SPEC.md`, `DESIGN.md`, `GLOSSARY.md`, `STATUS.md`, `OPERATOR-TASKS.md`, `README.md`, `SECURITY.md` and the `memory/` files carrying the host — 25+ files. Dated historical entries stay as records.
+- [x] ADR 0028 gains an Amendment 3 recording the host cutover date and the permanent-redirect commitment.
+- [x] `CLAUDE.md`, `PROJECT.md`, `ARCHITECTURE.md`, `SPEC.md`, `DESIGN.md`, `GLOSSARY.md`, `STATUS.md`, `OPERATOR-TASKS.md`, `README.md`, `SECURITY.md` and the `memory/` files carrying the host — 25+ files. Dated historical entries stay as records.
 
 ## Gates
 
 - [ ] `canon-audit` on the full diff — legal pages and metadata change here.
 - [ ] `claim-review` on the `/privacy`, `/terms`, `/cookies`, `/security` diffs.
-- [ ] Playwright reflow: all 18 still pass.
+- [ ] Playwright reflow: all 18 still pass. *(not yet run — needs a dev server)*
 - [ ] Final whole-branch review.
-- [ ] **Scope check, learned from Shipment 1:** the blast-radius survey must cover `packages/`, `apps/scanner/content/`, `apps/scanner/scripts/`, `README.md`, `SECURITY.md`, `memory/` and `projects/` — not just `apps/scanner/src`. Shipment 1 missed four such directories and each held a real defect.
+- [x] **Scope check, learned from Shipment 1:** the blast-radius survey must cover `packages/`, `apps/scanner/content/`, `apps/scanner/scripts/`, `README.md`, `SECURITY.md`, `memory/` and `projects/` — not just `apps/scanner/src`. Shipment 1 missed four such directories and each held a real defect.

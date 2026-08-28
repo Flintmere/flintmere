@@ -179,3 +179,50 @@ Rename the value emitted at `api/concierge/checkout/route.ts:164` or `lib/stripe
 **Verdict:** not worth it. The value is invisible to merchants; it appears only in the Stripe dashboard and in our own logs. It costs nothing to leave and cannot be changed cheaply. Treat it as a historical identifier, exactly like `AuditDraft`, `auditId` and `scanner_concierge_audits`.
 
 Related and also confirmed safe: the card statement descriptor is `FLINT B1` / `FLINT B2` (`api/concierge/checkout/route.ts:147`). The string `FLINTMERE AUDIT B1` survives only in a comment recording a superseded value, so no buyer sees the retired word on a bank statement.
+
+---
+
+## Amendment 3 — 2026-08-26: the host cutover, and why the legacy host answers forever
+
+Recorded on completion of Shipment 2 Phase B (repo work). The `audit.` →
+`catalog.` migration decided in the original ADR is now implemented in
+code; Phase C (DNS, Traefik, Search Console) is operator work and is
+tracked in `OPERATOR-TASKS.md`.
+
+**`SCANNER_HOST` is `catalog.flintmere.com`.** One constant, in
+`apps/scanner/src/lib/host-routing.ts`. Shipment 2 Phase A first collapsed
+42 scattered host references onto it — shadow constants, env fallbacks and
+rendered copy each holding their own copy — so that the cutover could be a
+one-line change with a reviewable diff rather than a 42-site search.
+
+**The legacy host is permanent, and this is the binding half of the
+amendment.** `LEGACY_SCANNER_HOST` (`audit.flintmere.com`) stays in
+`KNOWN_HOSTS` so requests arriving on it classify and 301 rather than
+falling through as an unknown host. The original 2026-05-03 routing plan
+left open the option of flipping cross-host redirects to 404 after a
+90-day window; **that option is withdrawn.** Four categories of already-
+issued reference cite the legacy host and cannot be recalled:
+
+1. Catalog Letter delivery emails already in merchants' inboxes, whose
+   links are built against it (`concierge-delivery-email.ts`).
+2. `/score/[shop]` pages merchants have shared publicly.
+3. Cold outreach sitting in prospect inboxes.
+4. The published `FlintmereBot/1.0` user-agent, which every crawled store
+   sees in its logs and which cites `/bot` as its policy page.
+
+Removing the redirect breaks all four permanently, and (4) additionally
+makes the crawler look stale or spoofed to anyone auditing their logs.
+The redirect is not a migration window. It is part of the contract.
+
+**Consequences carried into the code.** `connect-src` lists both scanner
+hosts indefinitely, because a redirected request still originates from the
+legacy origin. The admin health signal sums pageviews across both hosts —
+bucketing on either one alone reads as a traffic collapse — and its legacy
+bucket is dropped when it reaches zero and stays there, not on a date. The
+bot user-agent derives from `SCANNER_HOST` in both crawl scripts so the UA
+and the policy page it cites cannot drift.
+
+**Unchanged:** prices (£197 / £397 / from £597 bespoke), the product
+lexicon settled in Amendment 1, the frozen Stripe metadata of Amendment 2,
+the six legal-register "audit" instances, and all `audit*` code
+identifiers.

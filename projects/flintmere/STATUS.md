@@ -11,7 +11,7 @@ What's provisioned right now. Source of truth for "is this live?" questions. Upd
 - **Coolify Postgres** ✅ live — `flintmere-pg` (postgres:18-alpine, Running:Healthy, internal-only, no public ports)
 - **Coolify Redis** ⏸ deferred — provisions alongside `apps/shopify-app/Dockerfile.worker` (next stage); scanner does not need it
 - **Coolify GitHub source** ✅ connected — private GitHub App `flintmere-coolify-deploy` (App ID `3446415`, Installation ID `125652053`), org `Flintmere`, Resources empty (no apps wired yet)
-- **Coolify scanner app** ✅ live — `https://audit.flintmere.com` reachable over HTTPS (Let's Encrypt via Traefik), commit `f9a9b20`. Deploy attempt #7 green after seven iterations through path / workspace-build / prisma-binary / openssl / public-dir / curl / HOSTNAME-binding fixes
+- **Coolify scanner app** ✅ live — `https://audit.flintmere.com` reachable over HTTPS (host migrating to `catalog.flintmere.com`, ADR 0028 Shipment 2 — Phase C pending) (Let's Encrypt via Traefik), commit `f9a9b20`. Deploy attempt #7 green after seven iterations through path / workspace-build / prisma-binary / openssl / public-dir / curl / HOSTNAME-binding fixes
 - **Coolify shopify-app web** ⏸ pending
 - **Coolify shopify-app worker** ⏸ pending — separate service per `apps/shopify-app/Dockerfile.worker`
 - **DO Spaces off-site backups** ✅ live — bucket `flintmere-backups` (Standard storage, region `lon1`), Coolify S3 Storage `do-spaces-lon1`, daily 03:00 UTC, 30d retention. Spaces access keys live in Coolify S3 Storages dashboard, not in repo.
@@ -19,7 +19,8 @@ What's provisioned right now. Source of truth for "is this live?" questions. Upd
 
 ### DNS (Namecheap, all → `134.122.102.159`)
 - `app.flintmere.com` ✅ A
-- `audit.flintmere.com` ✅ A
+- `audit.flintmere.com` ✅ A (legacy — kept permanently; 301s to `catalog.`)
+- `catalog.flintmere.com` ⏸ pending A — ADR 0028 Shipment 2 Phase C
 - `status.flintmere.com` ✅ A
 - `app-staging.flintmere.com` ✅ A
 - `audit-staging.flintmere.com` ✅ A
@@ -32,7 +33,7 @@ What's provisioned right now. Source of truth for "is this live?" questions. Upd
 
 ### Email & payments
 - **Resend** ✅ live — `flintmere.com` verified, region `eu-west-1`, Pro plan
-- **Stripe** ✅ live — verification cleared, live keys (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_CONCIERGE_PRICE_ID`) pasted into Coolify scanner env (2026-04-25). Webhook endpoint to point at `https://audit.flintmere.com/api/webhooks/stripe` once scanner is publicly reachable
+- **Stripe** ✅ live — verification cleared, live keys (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_CONCIERGE_PRICE_ID`) pasted into Coolify scanner env (2026-04-25). Webhook endpoint to point at `https://audit.flintmere.com/api/webhooks/stripe` once scanner is publicly reachable. Host-agnostic route — keeps answering on the legacy host after the ADR 0028 Shipment 2 cutover
 
 ### Observability
 - **Sentry** ✅ live (scanner) / 🟡 in-code (shopify-app) — Sentry org `flintmere` (de.sentry.io). Project `flintmere-scanner` verified, errors flowing in `flintmere-scanner` Issues feed. Project `flintmere-shopify-app` SDK wired (web via Remix wizard, worker via manual `Sentry.init` at top of `scripts/worker.ts` since wizard doesn't touch worker process); flips to ✅ on first shopify-app deploy. Both projects: PII scrubbing in `beforeSend`, sendDefaultPii false (Privacy clause 04), no session replay (Cookie clauses 03+05), 90d retention, EU region.
@@ -107,7 +108,7 @@ Provider abstraction per ADRs 0005 + 0006. Shipped:
 - `MockProvider` for tests
 - `CircuitBreaker` with per-provider error thresholds + cooldown
 
-### `apps/scanner/` (Next.js 15, audit.flintmere.com + marketing)
+### `apps/scanner/` (Next.js 15, catalog.flintmere.com + marketing)
 
 - App Router layout, Tailwind v4 with `@theme` directive, Geist fonts self-hosted
 - Marketing home (`/`) with hero + seven pillars + before/after + three-chapter narrative + testimonials + pricing grid + manifesto + footer — live benchmark strip (median + n) wired to `/api/benchmark/summary`
@@ -153,7 +154,7 @@ Provider abstraction per ADRs 0005 + 0006. Shipped:
 ## Next (in order of leverage)
 
 1. **Operator launch prep** — Stage 2 account creation (Shopify Partner, Google Vertex, Azure OpenAI, Stripe, Resend, Sentry, BetterStack) + Stage 3 Coolify deploy. See `OPERATOR-TASKS.md`.
-2. **Validation week (SPEC §2)** — scanner live at `audit.flintmere.com`, cold outreach (LinkedIn + r/shopify + Partner Slack), Concierge audits on the ADR 0022 band ladder (£197 / £397 / from £597 bespoke). Predeclared 5% conversion trigger across 30+ qualified prospects in the first 14 days for ADR re-open.
+2. **Validation week (SPEC §2)** — scanner live at `catalog.flintmere.com`, cold outreach (LinkedIn + r/shopify + Partner Slack), Concierge audits on the ADR 0022 band ladder (£197 / £397 / from £597 bespoke). Predeclared 5% conversion trigger across 30+ qualified prospects in the first 14 days for ADR re-open.
 3. **Fix History UI + revert endpoint** (SPEC §5.2.1) — schema + job exist; UI + `POST /api/fix/:id/revert` route to wire.
 4. **Share-for-trial loop** (SPEC §2.1.3) — public score page ✅ shipped 2026-04-24; still to build: share-verification endpoint, trial-unlock token flow, Shopify subscription-API interplay, PDF certificate download, embeddable badge SVG widget.
 5. **Legal pages** — drafts landed 2026-04-20 in `context/compliance/legal-drafts/`. Next: #24 + #9 review, resolve per-doc "Open items" blockers (registered office, ICO number, consent-banner implementation, backup retention verification), then user-confirmed writes to `apps/scanner/src/app/{privacy,terms,cookies,dpa}/page.tsx`.

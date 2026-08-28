@@ -9,7 +9,7 @@ Single repo, pnpm workspaces:
 ```
 flintmere/
 ├── apps/
-│   ├── scanner/     Next.js · audit.flintmere.com · public, no auth
+│   ├── scanner/     Next.js · catalog.flintmere.com · public, no auth
 │   └── shopify-app/ Remix · app.flintmere.com · OAuth, Polaris, App Bridge
 ├── packages/
 │   └── scoring/     shared scoring engine, pure TS, no framework deps
