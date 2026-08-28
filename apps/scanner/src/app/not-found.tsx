@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { Bracket } from '@flintmere/ui';
-import { MARKETING_HOST, SCANNER_HOST } from '@/lib/host-routing';
+import { LEGACY_SCANNER_HOST, MARKETING_HOST, SCANNER_HOST } from '@/lib/host-routing';
 import { marketingUrl, scannerUrl } from '@/lib/host-url';
 
 // Root not-found. Without this, Next.js's built-in default emits a stray
@@ -43,7 +43,11 @@ export default async function NotFound() {
     .split(':')[0]!
     .toLowerCase();
 
-  const onScanner = requestHost === SCANNER_HOST;
+  // Unknown paths are not redirected, so the legacy scanner host renders
+  // this page too. Treat it as the scanner host or a 404 there would
+  // offer marketing wayfinding to someone who wanted the scanner.
+  const onScanner =
+    requestHost === SCANNER_HOST || requestHost === LEGACY_SCANNER_HOST;
   const otherHost = onScanner ? MARKETING_HOST : SCANNER_HOST;
   const otherSurface = onScanner
     ? 'pricing, the methodology, or the research benchmark'
