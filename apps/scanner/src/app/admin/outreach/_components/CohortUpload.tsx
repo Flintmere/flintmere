@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { SCANNER_HOST } from '@/lib/host-routing'
 
 export function CohortUpload() {
   const router = useRouter()
@@ -97,8 +98,8 @@ export function CohortUpload() {
         <textarea
           value={csv}
           onChange={(e) => setCsv(e.target.value)}
-          placeholder="shop_domain,score,grade,product_count,uk_signal,scan_id,re_scan_url
-matersandco.com,42,D,318,1,cmop...,https://audit.flintmere.com/scan?url=matersandco.com"
+          placeholder={`shop_domain,score,grade,product_count,uk_signal,scan_id,re_scan_url
+matersandco.com,42,D,318,1,cmop...,https://${SCANNER_HOST}/scan?url=matersandco.com`}
           rows={8}
           disabled={busy || pending}
           style={{

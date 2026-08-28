@@ -33,7 +33,7 @@ export async function GET(): Promise<Response> {
           .join('\n')
       : '- (No posts published yet.)';
 
-    body = `# Flintmere — Catalog (audit.flintmere.com)
+    body = `# Flintmere — Catalog (${SCANNER_HOST})
 
 > The public catalog data scanner. Reads a Shopify storefront's public catalog and reports how complete its data is for Google Merchant Center, Amazon Fresh, and AI shopping agents. Free 60-second scan; one-off Catalog Letters; weekly field notes grounded in first-hand scan data.
 

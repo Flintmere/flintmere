@@ -38,6 +38,7 @@ import {
   useStripe,
 } from '@stripe/react-stripe-js';
 import { track } from '@/lib/analytics';
+import { SCANNER_HOST } from '@/lib/host-routing';
 import { readAndConsumeHandoff } from '@/lib/audit-handoff';
 import {
   bandBySlug,
@@ -288,7 +289,7 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
     const returnUrl =
       typeof window !== 'undefined'
         ? `${window.location.origin}/catalog-letter/success`
-        : 'https://audit.flintmere.com/catalog-letter/success';
+        : `https://${SCANNER_HOST}/catalog-letter/success`;
     const options: StripeElementsOptions = {
       clientSecret: state.clientSecret,
       appearance: APPEARANCE,
