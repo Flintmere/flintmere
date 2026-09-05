@@ -13,14 +13,16 @@
  * swapped, update here and in the playbook in the same commit.
  */
 
+import { SCANNER_HOST } from '../host-routing';
+
 export const DAILY_HEALTH_CHECK_MARKDOWN = `## Daily health check
 
 Five tabs, one glance each. ≤5 min. If anything red, drop a line into today's notes and surface in the next Claude session.
 
 1. **BetterStack** — https://uptime.betterstack.com — any monitor red in the last 24h?
 2. **Resend** — https://resend.com/emails — bounces or complaints since yesterday?
-3. **PostHog** — https://eu.posthog.com — yesterday's pageviews + any replay worth watching (single project covers both \`flintmere.com\` and \`audit.flintmere.com\` — same Next.js app behind two domains). Note anything zero or unusually high.
-4. **Admin outreach** — https://audit.flintmere.com/admin/outreach — queued / sent / replied. Anything stuck?
+3. **PostHog** — https://eu.posthog.com — yesterday's pageviews + any replay worth watching (single project covers both \`flintmere.com\` and \`${SCANNER_HOST}\` — same Next.js app behind two domains). Note anything zero or unusually high.
+4. **Admin outreach** — https://${SCANNER_HOST}/admin/outreach — queued / sent / replied. Anything stuck?
 5. **Sentry** — https://sentry.io/organizations/flintmere/issues/?project=flintmere-scanner — any new error in 24h?
 
 If all five clear, move on.

@@ -163,7 +163,7 @@ Single source of truth for vendor relationships. `vendor-review` reads this; `fi
 - Plan: Free tier
 - Monthly cost: £0 (upgrade when we exit Free tier)
 - Lock-in: **low**
-- Notes: monitors `audit.flintmere.com`, `app.flintmere.com`, OAuth callback.
+- Notes: monitors `catalog.flintmere.com`, `app.flintmere.com`, OAuth callback.
 
 ## Source control + CI
 

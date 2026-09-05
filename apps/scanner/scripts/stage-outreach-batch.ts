@@ -10,6 +10,7 @@
  */
 
 import { prisma } from '../src/lib/db';
+import { scannerBaseUrl } from '../src/lib/host-url';
 import { buildApproveUrl } from '../src/lib/outreach/approval';
 import { stageOutreachBatch } from '../src/lib/outreach/stage-batch';
 
@@ -32,7 +33,7 @@ async function main(): Promise<void> {
   for (const domain of result.shopDomains) console.log(`  - ${domain}`);
 
   const secret = process.env.ADMIN_SESSION_SECRET;
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://audit.flintmere.com';
+  const baseUrl = scannerBaseUrl();
   if (secret) {
     console.log(`approve URL: ${buildApproveUrl(result.batchId, secret, baseUrl)}`);
   } else {

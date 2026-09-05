@@ -90,3 +90,13 @@ export function canonicalUrl(path: string): string {
   if (!isProd) return path.startsWith('/') ? path : `/${path}`;
   return absolute(canonicalHost(path), path);
 }
+
+/**
+ * Public base URL for the scanner. Prefers the deploy-time env var and
+ * falls back to the canonical host. Five call sites previously carried
+ * their own copy of this fallback — each was a place a host change would
+ * be silently missed.
+ */
+export function scannerBaseUrl(): string {
+  return process.env.NEXT_PUBLIC_APP_URL ?? `https://${SCANNER_HOST}`;
+}

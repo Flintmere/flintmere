@@ -31,7 +31,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = {
   title: 'Sitemap — every public Flintmere surface',
   description:
-    'Index of every public Flintmere page across flintmere.com, audit.flintmere.com, and standards.flintmere.com — plus the legal footprint and machine-readable endpoints.',
+    `Index of every public Flintmere page across flintmere.com, ${SCANNER_HOST}, and standards.flintmere.com — plus the legal footprint and machine-readable endpoints.`,
   alternates: { canonical: 'https://flintmere.com/sitemap' },
 };
 
@@ -86,8 +86,8 @@ const LEGAL_LINKS: RouteLink[] = [
 const MACHINE_LINKS: RouteLink[] = [
   { href: `https://${MARKETING_HOST}/sitemap.xml`, label: 'flintmere.com/sitemap.xml' },
   { href: `https://${MARKETING_HOST}/robots.txt`, label: 'flintmere.com/robots.txt' },
-  { href: `https://${SCANNER_HOST}/sitemap.xml`, label: 'audit.flintmere.com/sitemap.xml' },
-  { href: `https://${SCANNER_HOST}/robots.txt`, label: 'audit.flintmere.com/robots.txt' },
+  { href: `https://${SCANNER_HOST}/sitemap.xml`, label: `${SCANNER_HOST}/sitemap.xml` },
+  { href: `https://${SCANNER_HOST}/robots.txt`, label: `${SCANNER_HOST}/robots.txt` },
   { href: `https://${STANDARDS_HOST}/sitemap.xml`, label: 'standards.flintmere.com/sitemap.xml' },
   { href: `https://${STANDARDS_HOST}/robots.txt`, label: 'standards.flintmere.com/robots.txt' },
 ];
@@ -236,7 +236,7 @@ export default function Sitemap() {
           >
             One platform, three subdomains. Marketing lives on{' '}
             <strong>flintmere.com</strong>. The public scanner lives on{' '}
-            <strong>audit.flintmere.com</strong>. The food regulatory standard
+            <strong>{SCANNER_HOST}</strong>. The food regulatory standard
             (Phase 2, June 2026) will live on{' '}
             <strong>standards.flintmere.com</strong>. The Shopify embedded app
             at <strong>app.flintmere.com</strong> is private — it lives behind

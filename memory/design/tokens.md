@@ -279,7 +279,7 @@ Paper → ink token swap for dark sections (email gate, hero over-inverted momen
 Amber is one palette across all three surfaces (ADR 0007). Rules below govern *where* amber lands on each.
 
 - **Marketing (flintmere.com)** — canvas `--paper`, type-led, one bracket per section. Amber appears as: optional under-tick on the hero bracket moment, `StatNumber` accent on display-scale figures, icon-fill on any line-art graphic, amber-fill CTA (ink text on amber) once per view. Never as body text, eyebrow text, or inline link colour on paper.
-- **Scanner (audit.flintmere.com)** — canvas `--paper`. Amber is the live-diagnostic colour: score-ring conic fill, pillar progress bars, severity-high dot, terminal `warn` row, `prompt` marker in the scan-progress overlay. All text roles on paper stay ink.
+- **Scanner (catalog.flintmere.com)** — canvas `--paper`. Amber is the live-diagnostic colour: score-ring conic fill, pillar progress bars, severity-high dot, terminal `warn` row, `prompt` marker in the scan-progress overlay. All text roles on paper stay ink.
 - **Shopify app (app.flintmere.com)** — Polaris is the host chrome; Flintmere's score card, pillar cells, and Channel Health widget render as **a Flintmere island inside a Polaris sea**. Brackets appear on issue titles and the score header. Amber is OK on the score-ring conic fill and severity-high dots inside the island only; everywhere else inside the app uses Polaris greens/yellows. Polaris primary buttons stay Polaris green — never recoloured to amber.
 
 ## Proposing a new token

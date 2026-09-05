@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { SCANNER_HOST } from '@/lib/host-routing';
 
 // Hex values below mirror --color-paper / --color-ink / --color-accent.
 // Next.js OG generation runs in an Edge/satori context that doesn't read
@@ -134,7 +135,7 @@ export default async function OG() {
               opacity: 0.7,
             }}
           >
-            audit.flintmere.com
+            {SCANNER_HOST}
           </div>
         </div>
       </div>

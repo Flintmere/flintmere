@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { SCANNER_HOST } from '@/lib/host-routing';
 
 // Sibling card to `src/app/opengraph-image.tsx` — same amber-on-ink
 // palette, same Geist Bold + GeistMono Bold typography, same eyebrow
@@ -141,7 +142,7 @@ export default async function OG() {
               opacity: 0.7,
             }}
           >
-            audit.flintmere.com/scan
+            {SCANNER_HOST}/scan
           </div>
         </div>
       </div>

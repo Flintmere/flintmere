@@ -46,7 +46,7 @@ Four primary segments. Each row is a writable prompt: what they feel, what they 
 
 | Segment | Primary surface | Primary metric |
 |---|---|---|
-| SMB merchant | Public scanner (`audit.flintmere.com`) | Scans per day, Growth tier conversion |
+| SMB merchant | Public scanner (`catalog.flintmere.com`) | Scans per day, Growth tier conversion |
 | Mid-market | Pricing page + Shopify app listing | Scale tier conversion, 60-day retention |
 | Agency | Agency tier landing + direct outreach | Agency tier signups, client-seat utilisation |
 | Plus | Custom sales + Plus Partner referrals | Plus deals booked, ACV |

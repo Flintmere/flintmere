@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { LegalShell, Clause } from '@/components/LegalShell';
+import { SCANNER_HOST } from '@/lib/host-routing';
 
 export const dynamic = 'force-static';
 export const revalidate = 86400;
@@ -16,7 +17,7 @@ export default function Cookies() {
     <LegalShell
       eyebrow="Cookies"
       title="Almost none. On purpose."
-      summary="Neither the marketing site at flintmere.com nor the scanner at audit.flintmere.com sets any first-party cookies — CSRF protection is enforced by a request-origin check, not a cookie. The Shopify app uses Shopify&rsquo;s session cookie, scoped to the embedded admin. We do not use any third-party tracking, advertising, or cross-site analytics cookies, anywhere."
+      summary={`Neither the marketing site at flintmere.com nor the scanner at ${SCANNER_HOST} sets any first-party cookies — CSRF protection is enforced by a request-origin check, not a cookie. The Shopify app uses Shopify’s session cookie, scoped to the embedded admin. We do not use any third-party tracking, advertising, or cross-site analytics cookies, anywhere.`}
       lastUpdated="2026-05-14"
       anchorNumeral="04"
     >
@@ -29,7 +30,7 @@ export default function Cookies() {
         </p>
       </Clause>
 
-      <Clause n="02" heading="Cookies on flintmere.com and audit.flintmere.com (marketing + scanner)">
+      <Clause n="02" heading={`Cookies on flintmere.com and ${SCANNER_HOST} (marketing + scanner)`}>
         <p>
           The marketing site and the public scanner set <strong>no cookies</strong>.
           No analytics cookies, no ad pixels, and nothing written to{' '}

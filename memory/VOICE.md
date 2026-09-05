@@ -104,7 +104,7 @@ Manifesto energy. Long paragraphs allowed. Declarative. Numbers and named custom
 
 > Example hero prose — "AI shopping agents now drive measurable commerce traffic on Shopify. Roughly 40% of catalogs get excluded from agent recommendations because the product data isn't structured the way agents read it. We tell you where you stand in 60 seconds."
 
-### Scanner results (`audit.flintmere.com`)
+### Scanner results (`catalog.flintmere.com`)
 
 Diagnostic voice. Like a doctor's report — specific, calm, honest about what we can and can't see from outside.
 

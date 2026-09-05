@@ -9,7 +9,7 @@ Flintmere runs on a single Coolify droplet at launch (shared CPU — build varia
 | Surface | LCP | CLS | INP | Notes |
 |---|---|---|---|---|
 | Marketing home (`flintmere.com`) | ≤ 2.0s | ≤ 0.05 | ≤ 200ms | Apple-bold posture — must feel premium-fast |
-| Scanner (`audit.flintmere.com`) | ≤ 2.5s | ≤ 0.05 | ≤ 200ms | Public promise is "60 seconds for a score" — the page itself loads in under 2.5s |
+| Scanner (`catalog.flintmere.com`) | ≤ 2.5s | ≤ 0.05 | ≤ 200ms | Public promise is "60 seconds for a score" — the page itself loads in under 2.5s |
 | Shopify app dashboard | ≤ 3.0s | ≤ 0.10 | ≤ 300ms | Inside Shopify admin iframe — budget is generous but Polaris is already the weight |
 | API responses (p95) | ≤ 500ms | — | — | Scanner scoring routes, app API routes |
 | Scan-complete-to-results (wall clock) | ≤ 55s | — | — | Public promise is 60s; 5s buffer for email send |

@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { Prisma } from '@/generated/prisma';
 import { checkAntiBot } from '@/lib/anti-bot';
 import { prisma } from '@/lib/db';
+import { scannerBaseUrl } from '@/lib/host-url';
 import { checkLeadRateLimit } from '@/lib/rate-limit';
 import { buildReportEmail } from '@/lib/report-email';
 import { sendEmail } from '@/lib/resend';
@@ -135,8 +136,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const scannerUrl =
-    process.env.NEXT_PUBLIC_APP_URL ?? 'https://audit.flintmere.com';
+  const scannerUrl = scannerBaseUrl();
   const marketingUrl =
     process.env.NEXT_PUBLIC_MARKETING_URL ?? 'https://flintmere.com';
   const token = signUnsubToken(lead.id);

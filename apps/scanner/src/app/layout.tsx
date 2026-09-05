@@ -3,6 +3,7 @@ import Script from 'next/script';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import { SiteHeader } from '@/components/SiteHeader';
+import { SCANNER_HOST } from '@/lib/host-routing';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -119,7 +120,7 @@ export default function RootLayout({
                   // search action actually executes — even though the
                   // WebSite entity itself is the brand site.
                   target:
-                    'https://audit.flintmere.com/scan?shop={shop_url}',
+                    `https://${SCANNER_HOST}/scan?shop={shop_url}`,
                   'query-input': 'required name=shop_url',
                 },
               },
@@ -133,7 +134,7 @@ export default function RootLayout({
                 // Organization and WebSite entities stay on flintmere.com
                 // (the brand domain) — only the SoftwareApplication URL
                 // moves.
-                url: 'https://audit.flintmere.com/scan',
+                url: `https://${SCANNER_HOST}/scan`,
                 publisher: { '@id': 'https://flintmere.com/#organization' },
                 offers: {
                   '@type': 'Offer',

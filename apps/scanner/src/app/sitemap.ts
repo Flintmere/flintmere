@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/db';
 import {
+  LEGACY_SCANNER_HOST,
   MARKETING_HOST,
   SCANNER_HOST,
   STANDARDS_HOST,
@@ -10,7 +11,7 @@ import { getAllPosts } from '@/lib/blog/posts';
 
 // Per-host sitemap. Reads x-forwarded-host (Coolify/Traefik) before
 // falling back to the host header. Each host emits ONLY the routes that
-// live on it — flintmere.com lists marketing surfaces, audit.flintmere.com
+// live on it — flintmere.com lists marketing surfaces, catalog.flintmere.com
 // lists scanner surfaces + opt-in /score pages, standards.flintmere.com
 // lists the food regulatory standard surface.
 //
@@ -81,7 +82,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .split(':')[0]!
     .toLowerCase();
 
-  if (requestHost === STANDARDS_HOST) {
+  // Legacy scanner host folds onto the canonical one: /sitemap.xml is
+  // host-agnostic and is never redirected, so without this the legacy host
+  // would fall through and serve the MARKETING sitemap (ADR 0028 Shipment 2).
+  const host =
+    requestHost === LEGACY_SCANNER_HOST ? SCANNER_HOST : requestHost;
+
+  if (host === STANDARDS_HOST) {
     const base = `https://${STANDARDS_HOST}`;
     return STANDARDS_SITEMAP_ROUTES.map((r) => ({
       url: `${base}${r.path}`,
@@ -91,7 +98,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
   }
 
-  if (requestHost === SCANNER_HOST) {
+  if (host === SCANNER_HOST) {
     const base = `https://${SCANNER_HOST}`;
     const publicScores = await prisma.scan.findMany({
       where: {

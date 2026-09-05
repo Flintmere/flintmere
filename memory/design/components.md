@@ -88,7 +88,7 @@ The marketing site lives at `flintmere.com` and (initially) is served from the s
 
 ## Scanner components — `apps/scanner/src/components/scanner/`
 
-Surfaces specific to the public scanner at `audit.flintmere.com`.
+Surfaces specific to the public scanner at `catalog.flintmere.com`.
 
 | Component | Purpose | Canon notes |
 |---|---|---|

@@ -4,7 +4,7 @@ System-level design — API routes, DB schema, integrations, data flow, feature 
 
 ## Two apps, one repo
 
-### Scanner (`apps/scanner/`, Next.js → audit.flintmere.com)
+### Scanner (`apps/scanner/`, Next.js → catalog.flintmere.com)
 
 Public, no auth. Merchant enters a Shopify store URL; app scrapes the public feed, sitemap, and sample JSON-LD; returns a partial score (4 of 7 pillars: identifiers, titles, consistency, crawlability); gates the full report behind email. Also hosts the £97 concierge audit landing page.
 
@@ -171,7 +171,7 @@ Enforcement: `apps/shopify-app/src/lib/tier.ts`. Canonical tier data comes from 
 - **Stripe** — Agency + Enterprise direct invoicing, £97 concierge audit one-offs
 - **Sentry** — error tracking across both apps
 - **PostHog** — product analytics (self-hosted on droplet)
-- **BetterStack Uptime** — external monitoring on `flintmere.com`, `audit.flintmere.com`, `app.flintmere.com`, and the OAuth callback
+- **BetterStack Uptime** — external monitoring on `flintmere.com`, `catalog.flintmere.com`, `app.flintmere.com`, and the OAuth callback
 - **GS1 GEPIR** (optional, paid per-call) — real-time GTIN verification at a rate-limited cadence
 
 ## BullMQ queues

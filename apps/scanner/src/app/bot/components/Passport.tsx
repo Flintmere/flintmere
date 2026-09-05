@@ -9,7 +9,9 @@
  * Mechanic #7 cascade fade-in. Sage hairline beneath.
  */
 
-const USER_AGENT = 'FlintmereBot/1.0 (+https://audit.flintmere.com/bot)';
+import { SCANNER_HOST } from '@/lib/host-routing';
+
+const USER_AGENT = `FlintmereBot/1.0 (+https://${SCANNER_HOST}/bot)`;
 
 export function Passport() {
   return (
@@ -70,7 +72,7 @@ export function Passport() {
             aria-hidden="true"
             style={{ fontWeight: 700, color: 'var(--color-ink)' }}
           >
-            https://audit.flintmere.com/bot
+            https://{SCANNER_HOST}/bot
           </strong>
           <span aria-hidden="true">)</span>
         </p>

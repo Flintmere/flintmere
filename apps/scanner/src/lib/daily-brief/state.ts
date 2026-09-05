@@ -14,6 +14,7 @@ import { prisma } from '../db';
 import { OUTREACH_STATUS } from '../outreach/db';
 import { buildApproveUrl } from '../outreach/approval';
 import { fetchPosthogRollup } from './posthog-rollup';
+import { SCANNER_HOST } from '../host-routing';
 import type {
   BriefState,
   OutreachSnapshot,
@@ -23,7 +24,7 @@ import type {
 } from './types';
 
 const LONDON_TZ = 'Europe/London';
-const DEFAULT_BASE_URL = 'https://audit.flintmere.com';
+const DEFAULT_BASE_URL = `https://${SCANNER_HOST}`;
 
 export interface CollectOptions {
   /** Override for tests. */

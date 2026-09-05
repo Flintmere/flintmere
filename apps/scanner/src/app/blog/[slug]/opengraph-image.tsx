@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { getPostBySlug, getAllPosts } from '@/lib/blog/posts';
 import { CLUSTER_LABELS } from '@/components/blog/PostCard';
+import { SCANNER_HOST } from '@/lib/host-routing';
 
 // Per-post OG card. Mirrors the root opengraph-image (src/app/opengraph-image.tsx)
 // register — amber field, ink type, mono eyebrow + bracket signature, wordmark
@@ -106,7 +107,7 @@ export default async function OG({ params }: { params: { slug: string } }) {
             <span style={{ fontFamily: 'GeistMono', fontWeight: 700, marginLeft: 2 }}>]</span>
           </div>
           <div style={{ display: 'flex', fontFamily: 'GeistMono', fontWeight: 700, fontSize: 22, opacity: 0.7 }}>
-            audit.flintmere.com/blog
+            {SCANNER_HOST}/blog
           </div>
         </div>
       </div>

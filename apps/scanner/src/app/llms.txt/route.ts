@@ -1,6 +1,11 @@
 import { headers } from 'next/headers';
 import { getAllPosts } from '@/lib/blog/posts';
-import { MARKETING_HOST, SCANNER_HOST, STANDARDS_HOST } from '@/lib/host-routing';
+import {
+  LEGACY_SCANNER_HOST,
+  MARKETING_HOST,
+  SCANNER_HOST,
+  STANDARDS_HOST,
+} from '@/lib/host-routing';
 
 /**
  * /llms.txt — the llmstxt.org convention: a curated map for AI / answer
@@ -16,9 +21,16 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(): Promise<Response> {
   const hdrs = await headers();
-  const host = (hdrs.get('x-forwarded-host') ?? hdrs.get('host') ?? MARKETING_HOST)
+  const requestHost = (hdrs.get('x-forwarded-host') ?? hdrs.get('host') ?? MARKETING_HOST)
     .split(':')[0]!
     .toLowerCase();
+
+  // /llms.txt is not in HOST_AGNOSTIC_PREFIXES but classifies as unknown,
+  // so it is served on every host without a redirect. Fold the legacy
+  // scanner host onto the canonical one or it would advertise the
+  // marketing surfaces to an engine that asked the scanner.
+  const host =
+    requestHost === LEGACY_SCANNER_HOST ? SCANNER_HOST : requestHost;
 
   let body: string;
 
@@ -33,7 +45,7 @@ export async function GET(): Promise<Response> {
           .join('\n')
       : '- (No posts published yet.)';
 
-    body = `# Flintmere — Catalog (audit.flintmere.com)
+    body = `# Flintmere — Catalog (${SCANNER_HOST})
 
 > The public catalog data scanner. Reads a Shopify storefront's public catalog and reports how complete its data is for Google Merchant Center, Amazon Fresh, and AI shopping agents. Free 60-second scan; one-off Catalog Letters; weekly field notes grounded in first-hand scan data.
 

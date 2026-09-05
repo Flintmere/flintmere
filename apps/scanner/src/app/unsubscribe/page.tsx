@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Bracket, SiteFooter } from '@flintmere/ui';
+import { SCANNER_HOST } from '@/lib/host-routing';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -33,7 +34,7 @@ export default async function UnsubscribePage({ searchParams }: Props) {
               className="mt-4 text-[color:var(--color-mute)]"
               style={{ fontSize: 14 }}
             >
-              If you unsubscribed by mistake, you can run another scan and opt in again at <Link href="/scan" className="underline">audit.flintmere.com/scan</Link>.
+              If you unsubscribed by mistake, you can run another scan and opt in again at <Link href="/scan" className="underline">{SCANNER_HOST}/scan</Link>.
             </p>
           </>
         ) : (

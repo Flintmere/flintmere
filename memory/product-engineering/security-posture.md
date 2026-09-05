@@ -4,7 +4,7 @@ Security invariants for `apps/*`. **#4 Security** owns this file and holds veto 
 
 ## Authentication
 
-### Scanner (audit.flintmere.com)
+### Scanner (catalog.flintmere.com)
 
 - Public endpoint. No user auth. Email collection is pre-auth lead capture, not identity.
 - Lead submissions rate-limited per IP and per submitted email domain.

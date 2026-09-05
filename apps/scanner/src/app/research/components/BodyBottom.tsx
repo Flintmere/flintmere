@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Bracket } from '@flintmere/ui';
-import { BOT_URL } from '@/lib/host-routing';
+import { BOT_URL, SCANNER_HOST } from '@/lib/host-routing';
 import { BENCHMARK_PUBLISH_FLOOR } from '@/lib/copy';
 import { type Published } from '../data';
 import { CountUp } from './CountUp';
@@ -425,7 +425,7 @@ export function BodyBottom({ data }: { data: Published }) {
                 className="font-mono"
                 style={{ fontSize: '0.85em', color: 'var(--color-ink)' }}
               >
-                FlintmereBot/1.0 (+audit.flintmere.com/bot)
+                FlintmereBot/1.0 (+{SCANNER_HOST}/bot)
               </code>{' '}
               and rate-limits to one request per two seconds per host. Each
               scan fetches robots.txt, sitemap.xml, llms.txt, products.json,

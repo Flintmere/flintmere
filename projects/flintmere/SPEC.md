@@ -4,7 +4,7 @@
 
 **Status**: Pre-build scoping document. v1.2 — **intent, not truth.**
 **Target market**: Shopify merchants, 100–5,000 SKUs, $500K–$20M revenue
-**Brand**: Flintmere (parent brand). Public scanner lives at `audit.flintmere.com`. Main marketing site at `flintmere.com`.
+**Brand**: Flintmere (parent brand). Public scanner lives at `catalog.flintmere.com`. Main marketing site at `flintmere.com`.
 
 > ## ⚠ Supersede header — read before trusting any §
 >
@@ -49,7 +49,7 @@ The single biggest risk is building for a problem merchants don't know they have
 
 ### 2.1 Public scanner (ship by end of week 1)
 
-A standalone web page at `audit.flintmere.com`. User enters a Shopify store URL. App scrapes:
+A standalone web page at `catalog.flintmere.com`. User enters a Shopify store URL. App scrapes:
 
 - Public product feed (`/products.json`)
 - Sitemap (`/sitemap_products_1.xml`)

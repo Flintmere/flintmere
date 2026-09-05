@@ -24,7 +24,7 @@
  *      batch-scan worker runs its own sitemap fallback for scoring.
  *
  * Kindness rules (per memory/project_benchmark_decisions.md + /bot page):
- *   - UA: FlintmereBot/1.0 (+https://audit.flintmere.com/bot)
+ *   - UA: FlintmereBot/1.0 (+https://catalog.flintmere.com/bot)
  *   - Concurrency 2 + 2s-per-worker floor → ~60 req/min from our IP,
  *     inside Shopify's global per-IP allowance and matching the
  *     "1 req/2s per host" rule published on /bot.
@@ -37,8 +37,11 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { SCANNER_HOST } from '../src/lib/host-routing';
 
-const BOT_UA = 'FlintmereBot/1.0 (+https://audit.flintmere.com/bot)';
+// Built from SCANNER_HOST so the crawler's advertised UA and the /bot
+// policy page it cites can never drift (ADR 0028 Shipment 2 Task B3).
+const BOT_UA = `FlintmereBot/1.0 (+https://${SCANNER_HOST}/bot)`;
 const REQUEST_TIMEOUT_MS = 10_000;
 // Shopify's edge CDN applies a per-IP throttle pooled across all the
 // stores it fronts. At concurrency=8 with no inter-request delay we

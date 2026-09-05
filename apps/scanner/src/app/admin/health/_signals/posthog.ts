@@ -1,3 +1,4 @@
+import { LEGACY_SCANNER_HOST, MARKETING_HOST, SCANNER_HOST } from '@/lib/host-routing';
 import { fetchWithTimeout } from './fetch-with-timeout';
 import type { SignalResult } from './types';
 
@@ -19,7 +20,7 @@ function yesterdayUtc(): string {
 }
 
 export async function fetchPosthogViews(): Promise<
-  SignalResult<{ audit: number; marketing: number; date: string }>
+  SignalResult<{ scanner: number; marketing: number; date: string }>
 > {
   const fetchedAt = new Date().toISOString();
   const token = process.env.POSTHOG_PERSONAL_API_KEY;
@@ -50,15 +51,24 @@ export async function fetchPosthogViews(): Promise<
     if (!res.ok) throw new Error(`PostHog query: HTTP ${res.status}`);
     const json = (await res.json()) as QueryResponse;
     const byHost = new Map(json.results);
-    const audit = byHost.get('audit.flintmere.com') ?? 0;
-    const marketing = byHost.get('flintmere.com') ?? 0;
-    const zero = audit === 0 || marketing === 0;
+    // Scanner traffic is split across both hosts through the ADR 0028
+    // Shipment 2 cutover: the legacy host still receives real requests and
+    // 301s them, so its pageviews are scanner pageviews. Summing keeps this
+    // signal honest — bucketing on the canonical host alone would have read
+    // as a traffic collapse on cutover day, and on the legacy host alone it
+    // reads as one every day after. Drop the legacy bucket when its count
+    // reaches zero and stays there, not on a fixed date.
+    const legacy = byHost.get(LEGACY_SCANNER_HOST) ?? 0;
+    const scanner = (byHost.get(SCANNER_HOST) ?? 0) + legacy;
+    const marketing = byHost.get(MARKETING_HOST) ?? 0;
+    const zero = scanner === 0 || marketing === 0;
+    const legacyNote = legacy > 0 ? ` · legacy ${legacy}` : '';
     return {
       status: zero ? 'warn' : 'ok',
-      metric: `${audit + marketing} views (audit ${audit} · marketing ${marketing}) on ${date}`,
+      metric: `${scanner + marketing} views (scanner ${scanner}${legacyNote} · marketing ${marketing}) on ${date}`,
       fetchedAt,
       sourceUrl: DASHBOARD_URL,
-      data: { audit, marketing, date },
+      data: { scanner, marketing, date },
     };
   } catch (e) {
     return {

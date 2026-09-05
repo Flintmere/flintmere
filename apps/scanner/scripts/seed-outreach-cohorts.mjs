@@ -5,7 +5,7 @@
 // sign-in flow.
 //
 // Run from laptop against prod:
-//   SMOKE_HOST=https://audit.flintmere.com \
+//   SMOKE_HOST=https://catalog.flintmere.com \
 //   ADMIN_SESSION_SECRET=<copy from Coolify env> \
 //   node apps/scanner/scripts/seed-outreach-cohorts.mjs
 //
@@ -19,7 +19,7 @@ import { createHmac } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const host = (process.env.SMOKE_HOST ?? 'https://audit.flintmere.com').replace(/\/$/, '')
+const host = (process.env.SMOKE_HOST ?? 'https://catalog.flintmere.com').replace(/\/$/, '')
 const secret = process.env.ADMIN_SESSION_SECRET
 if (!secret || secret.length < 32) {
   console.error('error: ADMIN_SESSION_SECRET missing or too short (need ≥32 chars)')

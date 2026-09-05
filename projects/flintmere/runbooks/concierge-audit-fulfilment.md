@@ -163,7 +163,7 @@ In the Coolify dashboard → project **flintmere** → application **scanner** �
    | Field | Value |
    |---|---|
    | Name | `Concierge SLA monitor` |
-   | Command | `curl -fsS -X POST -H "X-Cron-Secret: $CRON_SECRET" https://audit.flintmere.com/api/cron/concierge-sla` |
+   | Command | `curl -fsS -X POST -H "X-Cron-Secret: $CRON_SECRET" https://catalog.flintmere.com/api/cron/concierge-sla` |
    | Frequency | `0 9 * * 1-5` |
    | Container | `<paste the scanner container name from Step 3>` |
 
@@ -241,10 +241,10 @@ Expected. The scanner container runs as a non-root user. Never write files into 
 Read the Coolify task log in this order:
 
 1. **`Job permanently failed: More than one container exists but no container name was provided`** — the Container field in the Scheduled Task UI is empty. Fill it with the scanner container name (Coolify dashboard → scanner → Containers tab → copy the running container's name).
-2. **`curl: (7) Failed to connect to localhost…`** — you're using a localhost URL but the task runs in a different container. Switch to the public HTTPS URL: `https://audit.flintmere.com/api/cron/concierge-sla`.
+2. **`curl: (7) Failed to connect to localhost…`** — you're using a localhost URL but the task runs in a different container. Switch to the public HTTPS URL: `https://catalog.flintmere.com/api/cron/concierge-sla`.
 3. **`curl: (22) The requested URL returned error: 403`** — the `CRON_SECRET` env var doesn't match what the route expects. Re-paste it into Coolify scanner env vars, redeploy, retry.
 4. **`curl: (22) The requested URL returned error: 503`** — `CRON_SECRET` is unset or shorter than 32 chars. Generate a new one with `openssl rand -hex 32` and paste.
-5. **`curl: (6) Could not resolve host: audit.flintmere.com`** — DNS issue, or you're using a typo on the URL. Verify the domain resolves on the droplet (`nslookup audit.flintmere.com` from inside the container).
+5. **`curl: (6) Could not resolve host: catalog.flintmere.com`** — DNS issue, or you're using a typo on the URL. Verify the domain resolves on the droplet (`nslookup catalog.flintmere.com` from inside the container).
 6. **JSON response with `"alertSent":false`, no `alertReason`** — healthy idle. No late audits, no email expected.
 7. **JSON response with `"alertSent":true`, `"lateCount":N`** — alert was sent. Check Resend dashboard for delivery status.
 8. **JSON response with `"alertSent":false`, `"alertReason":"…"`** — Resend is misconfigured. Check `RESEND_API_KEY` in Coolify scanner env.

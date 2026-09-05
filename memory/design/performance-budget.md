@@ -13,7 +13,7 @@ This budget exists so every new design choice pays for itself or is paid for els
 | Surface | JS budget (gzipped per route) | Image budget | Fonts |
 |---|---|---|---|
 | Marketing (`flintmere.com` inside scanner app) | ≤ 100KB | Photoreal hero ≤ 100KB AVIF; product screenshots ≤ 40KB AVIF each; inline SVG for diagrams. Total raster ≤ 220KB per page. (Updated 2026-04-26 — line-art-only mandate retired; see `tokens.md` §Imagery.) | Geist Sans (400/500/700) + Geist Mono (400/500), self-hosted, Latin subset |
-| Scanner (`audit.flintmere.com`) | ≤ 100KB | Inline SVG for score ring + pillar marks; raster screenshots permitted on results / score pages within marketing budget if used. | Same |
+| Scanner (`catalog.flintmere.com`) | ≤ 100KB | Inline SVG for score ring + pillar marks; raster screenshots permitted on results / score pages within marketing budget if used. | Same |
 | Shopify app (`app.flintmere.com` — Flintmere-island-only) | ≤ 60KB on top of Polaris | Inline SVG; no image-based icons | Same |
 | Shopify app (Polaris baseline, shared budget ceiling) | ≤ 200KB (including Polaris itself) | — | — |
 

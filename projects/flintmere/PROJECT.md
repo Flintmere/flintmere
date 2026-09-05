@@ -4,11 +4,11 @@ Entry-point doc. Every skill reads this on tasks that need repo layout, stack, e
 
 ## TL;DR
 
-**Flintmere is a Shopify app that scores product catalogs for AI-agent readiness and fixes what's broken.** Built for Shopify merchants (£500K–£20M revenue, 100–5,000 SKUs) and the agencies that serve them. Free public scanner at `audit.flintmere.com`; paid app subscriptions in transition (ADR 0016 — grandfathered ladder + WTP-pending forward tiers; never cite a fixed figure, trace to `apps/scanner/src/lib/pricing.ts`). Full business case in `BUSINESS.md` and `SPEC.md`.
+**Flintmere is a Shopify app that scores product catalogs for AI-agent readiness and fixes what's broken.** Built for Shopify merchants (£500K–£20M revenue, 100–5,000 SKUs) and the agencies that serve them. Free public scanner at `catalog.flintmere.com`; paid app subscriptions in transition (ADR 0016 — grandfathered ladder + WTP-pending forward tiers; never cite a fixed figure, trace to `apps/scanner/src/lib/pricing.ts`). Full business case in `BUSINESS.md` and `SPEC.md`.
 
 ## Stack
 
-- **Scanner (audit.flintmere.com):** Next.js 15 (App Router), TypeScript, Tailwind
+- **Scanner (catalog.flintmere.com):** Next.js 15 (App Router), TypeScript, Tailwind
 - **Shopify app (app.flintmere.com):** Remix + `@shopify/shopify-app-remix`, TypeScript, Polaris + App Bridge
 - **Shared:** `packages/llm/` (provider abstraction), `packages/scoring/` (pillar engine)
 - **Database:** Postgres 16 (single instance, two schemas: `scanner_*` / `app_*`)
@@ -27,7 +27,7 @@ Entry-point doc. Every skill reads this on tasks that need repo layout, stack, e
 ```
 flintmere/
 ├── apps/
-│   ├── scanner/            Next.js · audit.flintmere.com · public scanner
+│   ├── scanner/            Next.js · catalog.flintmere.com · public scanner
 │   └── shopify-app/        Remix · app.flintmere.com · embedded Shopify app
 ├── packages/
 │   ├── llm/                LLM provider abstraction (Gemini / Azure / fallback)
@@ -44,7 +44,7 @@ flintmere/
 ## Domains
 
 - `flintmere.com` — marketing site (can be static; lives in `apps/scanner/` initially or a separate mini-app later)
-- `audit.flintmere.com` — public scanner (Next.js)
+- `catalog.flintmere.com` — public scanner (Next.js); legacy `audit.flintmere.com` 301s here
 - `app.flintmere.com` — Shopify embedded app (Remix)
 
 Subdomain routing handled by Coolify / Traefik reverse proxy on the single droplet. Let's Encrypt SSL per subdomain.
@@ -85,7 +85,7 @@ Production values in Coolify environment configuration. Rotation schedule docume
 - **Migrations:** `prisma migrate deploy` runs on container start, not during build (Coolify build container cannot reach the DB). The `flintmere-scanner` service auto-migrates on start (see its `Dockerfile` `CMD`). The `flintmere-app-web` service auto-migrates on start; the `flintmere-app-worker` service does not (avoids start-time races). Operator never needs to run `prisma migrate deploy` by hand against production — pushing to `main` is sufficient.
 - **Rollback:** Coolify's redeploy-previous-commit button. Prisma migrations are forward-only; down-migrations via a new commit, not by reverting.
 - **Coolify services (production):**
-  - `flintmere-scanner` — Dockerfile at `apps/scanner/Dockerfile` → `audit.flintmere.com` (+ root `flintmere.com` marketing)
+  - `flintmere-scanner` — Dockerfile at `apps/scanner/Dockerfile` → `catalog.flintmere.com` (+ root `flintmere.com` marketing, + legacy `audit.flintmere.com`)
   - `flintmere-app-web` — Dockerfile at `apps/shopify-app/Dockerfile` → `app.flintmere.com` (Remix + OAuth + webhooks; runs `prisma migrate deploy` on start)
   - `flintmere-app-worker` — Dockerfile at `apps/shopify-app/Dockerfile.worker` → no public route (BullMQ consumer; bulk-sync, scoring, drift-rescore)
   - Postgres 16 + Redis 7 via Coolify one-click services

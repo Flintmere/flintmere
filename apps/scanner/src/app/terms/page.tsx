@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { LegalShell, Clause } from '@/components/LegalShell';
+import { SCANNER_HOST } from '@/lib/host-routing';
 
 export const dynamic = 'force-static';
 export const revalidate = 86400;
@@ -34,7 +35,7 @@ export default function Terms() {
       <Clause n="02" heading="What you get">
         <ul className="mt-4 list-disc pl-6 space-y-2">
           <li>
-            <strong>Scanner</strong> at <code>audit.flintmere.com</code>: a
+            <strong>Scanner</strong> at <code>{SCANNER_HOST}</code>: a
             free, public diagnostic of any Shopify store&rsquo;s AI-agent
             readiness. No account required.
           </li>

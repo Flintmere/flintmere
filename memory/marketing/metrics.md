@@ -6,7 +6,7 @@ One primary metric per surface. Everything else is secondary observation.
 
 | Surface | Primary metric | Why |
 |---|---|---|
-| Public scanner (`audit.flintmere.com`) | Successful scans per day | The free scanner is top-of-funnel. If merchants aren't scanning, nothing else matters. |
+| Public scanner (`catalog.flintmere.com`) | Successful scans per day | The free scanner is top-of-funnel. If merchants aren't scanning, nothing else matters. |
 | Scanner → email capture | Email opt-in rate (% of completed scans that submit email) | The only signal we have for intent before install. |
 | Scanner → catalog letter | Paid catalog letters per week | Week 1 validation metric (SPEC §2). Proves willingness to pay. |
 | Marketing site blog | Organic search sessions to `flintmere.com/blog/*` | Content's job is discovery. Social traffic is a bonus. |

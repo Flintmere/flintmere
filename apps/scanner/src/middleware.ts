@@ -15,8 +15,14 @@ import {
  * Host routing — C1 architecture (council-ratified 2026-05-03, extended
  * to three hosts 2026-05-03). One Next.js app serves three hosts:
  *
- *   GET https://audit.flintmere.com/pricing  → 301 https://flintmere.com/pricing
- *   GET https://flintmere.com/scan           → 301 https://audit.flintmere.com/scan
+ *   GET https://catalog.flintmere.com/pricing → 301 https://flintmere.com/pricing
+ *   GET https://flintmere.com/scan            → 301 https://catalog.flintmere.com/scan
+ *   GET https://audit.flintmere.com/scan      → 301 https://catalog.flintmere.com/scan
+ *
+ * The legacy `audit.` host keeps answering permanently — see the redirect
+ * note in lib/host-routing.ts. `connect-src` therefore lists both scanner
+ * hosts indefinitely, since a redirected request still originates from the
+ * legacy origin.
  *   GET https://standards.flintmere.com/     → rewrite → /standards (internal)
  *
  * Routes classified as 'both' (APIs, assets, metadata files) and 'unknown'
@@ -76,7 +82,7 @@ export function middleware(request: NextRequest): NextResponse {
   // cross-subdomain fix in #36 exposed the next layer of the same
   // problem). Next.js Link prefetch fires fetch() with custom RSC
   // headers (RSC, next-router-prefetch, next-router-state-tree). For
-  // cross-host Links — Audit on flintmere.com → audit.flintmere.com,
+  // cross-host Links — Catalog Letter on flintmere.com → catalog.flintmere.com,
   // the Standards external, etc. — those custom headers trigger a CORS
   // preflight. Without explicit Access-Control-Allow-* on the OPTIONS
   // response, the preflight fails and DevTools fills with "Refused to
@@ -283,7 +289,7 @@ function buildCsp(): string {
     // the current origin; without the four hosts below, hovering a
     // cross-host link in production trips a CSP block (caught live
     // 2026-05-11 immediately after the enforced flip in #33).
-    "connect-src 'self' https://flintmere.com https://audit.flintmere.com https://app.flintmere.com https://standards.flintmere.com https://challenges.cloudflare.com https://api.stripe.com https://*.ingest.de.sentry.io https://*.ingest.sentry.io",
+    "connect-src 'self' https://flintmere.com https://catalog.flintmere.com https://audit.flintmere.com https://app.flintmere.com https://standards.flintmere.com https://challenges.cloudflare.com https://api.stripe.com https://*.ingest.de.sentry.io https://*.ingest.sentry.io",
     "frame-src https://challenges.cloudflare.com https://js.stripe.com https://hooks.stripe.com",
     "worker-src 'self' blob:",
     "manifest-src 'self'",

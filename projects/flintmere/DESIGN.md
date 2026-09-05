@@ -11,7 +11,7 @@ Visual canon pointers. Authoritative tokens and rules live in `../../memory/desi
 | Surface | URL | Chrome | Brand posture | Reference |
 |---|---|---|---|---|
 | Marketing | `flintmere.com` | Custom (Apple-bold) | Technical confidence, manifesto-scroll, amber accent at display scale + brand moments | `wireframes/` + `memory/design/tokens.md` |
-| Scanner | `audit.flintmere.com` | Custom (Apple-bold) | Diagnostic tool, amber is the live-state colour (score-ring, severity high, warn rows) | `wireframes/` scanner variants |
+| Scanner | `catalog.flintmere.com` | Custom (Apple-bold) | Diagnostic tool, amber is the live-state colour (score-ring, severity high, warn rows) | `wireframes/` scanner variants |
 | Shopify app | `app.flintmere.com` | Polaris (host) + Flintmere island (ours) | Platform-native with Flintmere-brand moments; amber inside island only | Below |
 
 ## The Shopify app island rule
