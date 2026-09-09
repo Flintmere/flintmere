@@ -1,6 +1,8 @@
 # Flintmere
 
-Vertical-specialist commerce-data platform for UK food merchants. Multimodal ingestion — supplier PDFs, back-of-pack photos, spreadsheets — mapped against a proprietary food regulatory taxonomy, merchant-confirmed in 30 seconds, written to Shopify metafields under OAuth. The public scanner is the acquisition surface; the published food standard is the citable moat.
+Commerce-data diagnostic for UK food merchants. The free public scanner grades a Shopify store's catalog data from public sources; the Catalog Letter is a hand-prepared read of a catalog. The food catalog standard is published at `standards.flintmere.com`.
+
+> **Direction under revision — see [ADR 0029](projects/flintmere/decisions/0029-retail-gate-pivot.md).** Earlier revisions of this file described a multimodal ingestion engine (supplier PDFs, back-of-pack photos, spreadsheets → Shopify metafields). That was never built, and the claim is removed rather than restated.
 
 - `flintmere.com` — marketing
 - `catalog.flintmere.com` — public scanner (no install). The former
