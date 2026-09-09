@@ -72,7 +72,7 @@ ${postLines}
   } else {
     body = `# Flintmere (flintmere.com)
 
-> A vertical-specialist commerce-data platform for UK food merchants. We make catalogs readable by AI shopping agents and channel feeds — multimodal extraction, a proprietary food regulatory taxonomy, merchant-verified, written to Shopify metafields under OAuth.
+> A commerce-data diagnostic for UK food merchants. The free public scanner grades a Shopify store's catalog data from public sources; the Catalog Letter is a hand-prepared read of a catalog. The food catalog standard is published at ${STANDARDS_HOST}.
 
 ## Pages
 - [Pricing](https://${MARKETING_HOST}/pricing): subscription ladder + one-off Catalog Letter bands.
