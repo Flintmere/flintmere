@@ -7,8 +7,11 @@
 - **Council pre-flight (binding 2026-05-09):** `projects/flintmere/decisions/0029-retail-gate-pivot.md` §5 (what is retired, and why the signals fail); `memory/VOICE.md` §AI-agent outcome claims + §Overpromises (what replacement copy may assert); `memory/compliance-risk/claims-register.md` §Banned claim patterns (quantified-outcome discipline). Verified live against `https://flintmere.com/methodology` for pillar names and weights.
 - **Executes:** ADR 0029 §5, second clause.
 - **Amends:** ADR 0029 §5's phrase "`llms.txt` as a scored pillar" — factually imprecise; corrected below.
-- **Affects:** `apps/scanner/src/app/scan/{layout,page,opengraph-image}.tsx`, `apps/scanner/src/app/page.tsx`, `apps/scanner/src/app/api/scan/route.ts`, `apps/scanner/src/components/scan/{SuppressionLede,Results,types}.tsx`, `apps/scanner/src/components/sections/FounderStrip.tsx`, `apps/scanner/src/lib/{copy,run-scan}.ts`, `packages/scoring/src/pillars/{suppression-estimate,aov-estimate}.ts`, `packages/scoring/src/types.ts`, `memory/compliance-risk/claims-register.md`.
+- **Affects:** `apps/scanner/src/app/scan/{layout,page,opengraph-image}.tsx`, `apps/scanner/src/app/page.tsx`, `apps/scanner/src/app/api/scan/route.ts`, `apps/scanner/src/components/scan/{SuppressionLede,Results,types}.tsx`, `apps/scanner/src/components/sections/FounderStrip.tsx`, `apps/scanner/src/lib/{copy,run-scan}.ts`, `packages/scoring/src/pillars/{suppression-estimate,aov-estimate}.ts`, `packages/scoring/src/types.ts`, `memory/compliance-risk/claims-register.md`, and — added during implementation, see Amendment 2 — `apps/scanner/src/lib/methodology-data.ts`, `apps/scanner/src/components/methodology/EvidenceFigure.tsx`, `apps/scanner/src/lib/outreach/template.ts`.
 - **Existing customers:** none. Unchanged from ADR 0029 — Flintmere has never taken a payment from a third party.
+- **Amendment 1 (2026-09-10, same day):** §2 as first ratified kept the signal counting on the stated grounds that the three signals feed the Identifiers, Attributes and Mapping pillars. Implementation disproved it. The pillars compute those signals themselves — `identifiers.ts` does its own barcode and `isValidGtin` counting, `mapping.ts` its own GMC coverage via `googleProductCategoryByProduct`, `attributes.ts` its own allergen metafield checks. `estimateSuppression` had exactly two consumers, `estimateAov` and `SuppressionLede`, both retired by this ADR. Keeping the counting would have left roughly 600 lines computing on every scan with nothing reading the result. §2 is restated below; the original rationale is preserved here as the record of what was believed at ratification.
+
+- **Amendment 2 (2026-09-10, same day):** implementation found the wedge on two surfaces this ADR's original `Affects` list did not name, both broken rather than merely off-canon. (a) `methodology-data.ts` ships live on `flintmere.com/methodology` claiming "a missing or invalid identifier is the most common reason a product is suppressed from a feed" — which contradicts ADR 0029 premise 2 (missing GTIN yields `Limited`, relaxed from disapproval 2023-12-21; only an *incorrect* GTIN disapproves) and carries an unsourced superlative. `EvidenceFigure.tsx` quotes the same prose. (b) `outreach/template.ts` sends merchants to the scan URL promising "the full breakdown including an estimated suppressed-revenue band" — a band the scanner no longer produces, so the email would promise output that cannot appear. Both are corrected in the implementation and added to `Affects`.
 
 ## Context
 
@@ -64,11 +67,15 @@ The Google Shopping suppression framing leaves the acquisition surface entirely.
 
 The deterministic anchor is not preserved as a lede. Keeping it would have been the smaller diff, but it retains a Google Shopping framing on a surface the pivot is moving away from, and it invites the probabilistic subline back the moment someone wants a sharper hook.
 
-### 2. The probability model is deleted; the signal counting is kept
+### 2. The suppression and AOV modules are deleted outright
 
-`PROBABILITY_BANDS` and the revenue derivation in `aov-estimate.ts` are removed. The deterministic signal counting stays, because those three signals are pillar inputs — Identifiers, Attributes and Mapping consume them independently of any suppression claim. Deleting the counting would take out working scoring to remove a claim that lives above it.
+*(Restated per Amendment 1. See the frontmatter for what this section said at ratification and why it changed.)*
 
-The distinction is the whole point: **counting products that lack a barcode is a fact; asserting what Google will do about it was the claim.**
+`suppression-estimate.ts` and `aov-estimate.ts` are removed, with their types (`SuppressionEstimate`, `AovEstimate`, `RevenueEstimate`), their package exports, their tests, and their `run-scan` wiring.
+
+The distinction that mattered — **counting products that lack a barcode is a fact; asserting what Google will do about it was the claim** — turns out not to require keeping this module. The pillars already count the facts. This module counted them a second time, from the public catalog, for no purpose but to feed the lede and the revenue band. With both retired, nothing reads it.
+
+What survives is the pillar scoring, untouched: a merchant still learns how many products lack a barcode, lack a GMC category, or lack structured allergen data. They learn it from Identifiers, Mapping and Attributes, which is where it was always computed.
 
 ### 3. `suppressionEstimate` and `scaledSuppressionEstimate` leave the public API response
 

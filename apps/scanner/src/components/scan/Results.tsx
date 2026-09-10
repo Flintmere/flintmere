@@ -3,9 +3,8 @@
 /**
  * Results — the main score + verdict + issues + pillar-breakdown block.
  *
- * Composed below the SuppressionLede + ScanScopeLine. Renders:
+ * Composed below the CatalogSummary + ScanScopeLine. Renders:
  *   - Scope line (sampled-of-actual products)
- *   - Suppression lede (wedge frame, three states)
  *   - ScoreRing + verdict + benchmark context
  *   - Top 3 issues with severity + affected count
  *   - "What we checked" pillar grid
@@ -29,7 +28,6 @@ import {
 import type { PillarId } from '@flintmere/scoring';
 import { CatalogSummary } from './CatalogSummary';
 import { ScanScopeLine } from './ScanScopeLine';
-import { SuppressionLede } from './SuppressionLede';
 import { useLiveSample } from './use-live-sample';
 import type { ScanResult } from './types';
 
@@ -75,22 +73,6 @@ export function Results({ result }: { result: ScanResult }) {
         for the rationale arc and the vertical-blind-copy memory.
       */}
       <CatalogSummary summary={result.catalogSummary} />
-
-      {/*
-        Dead-inventory wedge — v2 strategic report §7. Surface the
-        suppression estimate as the LEAD result, ahead of the score +
-        pillar breakdown. The score block remains below as the deeper
-        detail; this is the headline a merchant should see first.
-      */}
-      <SuppressionLede
-        estimate={result.suppressionEstimate}
-        productCount={result.productCount}
-        revenueEstimate={result.revenueEstimate}
-        scaledEstimate={result.scaledSuppressionEstimate ?? null}
-        scaledRevenueEstimate={result.scaledRevenueEstimate ?? null}
-        truncated={result.truncated ?? false}
-        actualProductCount={result.actualProductCount ?? null}
-      />
 
       <div className="grid md:grid-cols-[300px_1fr] gap-12 items-center">
         <div>

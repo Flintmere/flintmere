@@ -6,8 +6,6 @@ export { scoreCrawlability } from './pillars/crawlability.js';
 export { scoreAttributes } from './pillars/attributes.js';
 export { scoreMapping } from './pillars/mapping.js';
 export { scoreCheckout } from './pillars/checkout.js';
-export { estimateSuppression } from './pillars/suppression-estimate.js';
-export { estimateAov } from './pillars/aov-estimate.js';
 export { summarizeCatalog } from './catalog-summary.js';
 export { enrichIssuesWithExamples } from './enrich-issues.js';
 export { isValidGtin, gtinLength } from './utils/gtin.js';
@@ -39,8 +37,5 @@ export type {
   AdminContextInput,
   AdminMetafield,
   AdminCheckoutContext,
-  SuppressionEstimate,
-  AovEstimate,
-  RevenueEstimate,
   CatalogSummary,
 } from './types.js';

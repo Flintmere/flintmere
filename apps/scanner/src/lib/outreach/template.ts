@@ -124,13 +124,11 @@ ${input.productCount} of your products in our most recent pass.
 
 The pattern we see most often at that score: a meaningful chunk of
 products miss valid GTINs or carry title formats Google's shopping
-crawler can't parse, which silently demotes them in shopping results.
-The lost demand compounds because the same catalog data feeds the AI
-channels — Perplexity Shopping, ChatGPT product cards, the new Google
-AI Overviews carousels.
+crawler can't parse. The same catalog data feeds the AI channels —
+Perplexity Shopping, ChatGPT product cards, the new Google AI Overviews
+carousels — so a gap shows up in more than one place.
 
-If it's useful, you can pull the full breakdown including an estimated
-suppressed-revenue band here:
+If it's useful, you can pull the full per-pillar breakdown here:
 
 ${input.rescanUrl}
 
@@ -158,8 +156,8 @@ not to hear from us — we won't email you again.`;
     <div style="${STYLE_COLUMN}">
       <p style="${STYLE_PARA}">${greeting(input.recipientFirstName)}</p>
       <p style="${STYLE_PARA}">We benchmark Shopify catalogs against the data-quality requirements that Google Shopping, Amazon Fresh, and the AI shopping channels coming online this year look for. ${esc(shop)} scored <span style="${STYLE_BRACKET_MONO}">[&nbsp;${input.score}/100&nbsp;]</span> (${esc(input.grade)}-grade) across ${input.productCount} of your products in our most recent pass.</p>
-      <p style="${STYLE_PARA}">The pattern we see most often at that score: a meaningful chunk of products miss valid GTINs or carry title formats Google&rsquo;s shopping crawler can&rsquo;t parse, which silently demotes them in shopping results. The lost demand compounds because the same catalog data feeds the AI channels &mdash; Perplexity Shopping, ChatGPT product cards, the new Google AI Overviews carousels.</p>
-      <p style="${STYLE_PARA}">If it&rsquo;s useful, you can pull the full breakdown including an estimated suppressed-revenue band: <a href="${esc(input.rescanUrl)}" style="${STYLE_LINK}">run the free scan &rarr;</a></p>
+      <p style="${STYLE_PARA}">The pattern we see most often at that score: a meaningful chunk of products miss valid GTINs or carry title formats Google&rsquo;s shopping crawler can&rsquo;t parse. The same catalog data feeds the AI channels &mdash; Perplexity Shopping, ChatGPT product cards, the new Google AI Overviews carousels &mdash; so a gap shows up in more than one place.</p>
+      <p style="${STYLE_PARA}">If it&rsquo;s useful, you can pull the full per-pillar breakdown: <a href="${esc(input.rescanUrl)}" style="${STYLE_LINK}">run the free scan &rarr;</a></p>
       <p style="${STYLE_PARA}">We also do a £197 catalog letter, delivered within three working days &mdash; top priorities identified, top fixes spec&rsquo;d &mdash; and a £349/month Concierge retainer that keeps the score moving as the channels evolve. Worth a 15-minute reply if either&rsquo;s interesting: <a href="${esc(input.auditUrl)}" style="${STYLE_LINK}">see catalog letter + retainer details &rarr;</a></p>
       <p style="${STYLE_PARA}">Best,<br>${esc(input.senderName)}<br>The <span style="${STYLE_MONO}">[&nbsp;Flintmere&nbsp;]</span> team</p>
       <hr style="${STYLE_RULE}">

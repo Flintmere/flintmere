@@ -147,11 +147,6 @@ export async function POST(req: NextRequest) {
       truncated: result.truncated,
       actualProductCount: result.actualProductCount,
       catalogSummary: result.catalogSummary,
-      suppressionEstimate: result.suppressionEstimate,
-      scaledSuppressionEstimate: result.scaledSuppressionEstimate,
-      aovEstimate: result.aovEstimate,
-      revenueEstimate: result.revenueEstimate,
-      scaledRevenueEstimate: result.scaledRevenueEstimate,
       pillars: result.pillars,
       issues: result.issues.slice(0, 10),
       // Per ADR 0023 slice 3 — null today (no merchant has connected

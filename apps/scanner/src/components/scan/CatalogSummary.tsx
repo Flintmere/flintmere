@@ -2,7 +2,7 @@
 
 /**
  * "What we read" preamble — sits between the ScanScopeLine and the
- * SuppressionLede on the scan results page.
+ * the score block on the scan results page.
  *
  * Plays back verbatim productType (or vendor / generic-fallback) strings
  * from the merchant's own catalog so the merchant can see we read THEIR

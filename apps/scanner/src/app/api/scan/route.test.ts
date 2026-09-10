@@ -112,8 +112,11 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-describe('POST /api/scan — suppressionEstimate field', () => {
-  it('includes suppressionEstimate in the response payload', async () => {
+describe('POST /api/scan — response payload', () => {
+  // ADR 0030 §3: the suppression + revenue chain left the public response.
+  // This locks the removal — the fields were served on an unauthenticated
+  // endpoint, so a silent reintroduction would re-publish a retired model.
+  it('serves none of the retired suppression or revenue fields', async () => {
     const { POST } = await import('./route');
     const req = new Request('http://localhost/api/scan', {
       method: 'POST',
@@ -125,20 +128,15 @@ describe('POST /api/scan — suppressionEstimate field', () => {
     expect(res.status).toBe(200);
     const body = await res.json();
 
-    expect(body.suppressionEstimate).toBeDefined();
-    expect(typeof body.suppressionEstimate.low).toBe('number');
-    expect(typeof body.suppressionEstimate.high).toBe('number');
-    expect(body.suppressionEstimate.high).toBeGreaterThanOrEqual(
-      body.suppressionEstimate.low,
-    );
-    // The fixture has 1 triple-signal product, so high should be at
-    // least 1; low may be 0 after floor (3 signals → low band 0.85).
-    expect(body.suppressionEstimate.high).toBeGreaterThanOrEqual(1);
-
-    expect(body.suppressionEstimate.signals).toBeDefined();
-    expect(body.suppressionEstimate.signals.missingGtin).toBe(1);
-    expect(body.suppressionEstimate.signals.ambiguousAllergen).toBe(1);
-    expect(body.suppressionEstimate.signals.missingGmcCategory).toBe(1);
+    for (const field of [
+      'suppressionEstimate',
+      'scaledSuppressionEstimate',
+      'aovEstimate',
+      'revenueEstimate',
+      'scaledRevenueEstimate',
+    ]) {
+      expect(body).not.toHaveProperty(field);
+    }
   });
 
   it('includes catalogSummary in the response payload', async () => {

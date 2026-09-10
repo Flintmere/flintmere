@@ -5,15 +5,10 @@
  * the pre-emptive 600-line ceiling refactor (memory/PROCESS.md §2).
  *
  * No runtime — pure type module. Imported by the page orchestrator + every
- * scan-results sub-component (Results, SuppressionLede, etc).
+ * scan-results sub-component (Results, CatalogSummary, etc).
  */
 
-import type {
-  AovEstimate,
-  CatalogSummary,
-  RevenueEstimate,
-  SuppressionEstimate,
-} from '@flintmere/scoring';
+import type { CatalogSummary } from '@flintmere/scoring';
 import type { GmcGroundTruth } from '@/lib/gmc/types';
 
 export type ScanState =
@@ -41,32 +36,6 @@ export interface ScanResult {
    * scans persisted before 2026-05-05. See packages/scoring/src/catalog-summary.ts.
    */
   catalogSummary?: CatalogSummary;
-  /**
-   * Optional for backwards compatibility — older scans persisted before
-   * the dead-inventory wedge shipped won't carry this field.
-   */
-  suppressionEstimate?: SuppressionEstimate;
-  /**
-   * Sample-projected suppression. Present when truncated AND actualProductCount
-   * is known and exceeds the sampled count. UI prefers this over raw when
-   * present. Null otherwise.
-   */
-  scaledSuppressionEstimate?: SuppressionEstimate | null;
-  /**
-   * AOV inference (wedge finish arc). Null for non-food catalogs and
-   * below-sample-floor catalogs. Older persisted scans won't carry it.
-   */
-  aovEstimate?: AovEstimate | null;
-  /**
-   * Annual-demand-at-risk band. Null when suppression.high === 0 OR when
-   * `aovEstimate` itself is null.
-   */
-  revenueEstimate?: RevenueEstimate | null;
-  /**
-   * Sample-projected revenue band. Same scaling logic as
-   * scaledSuppressionEstimate. Null when no scaling applies.
-   */
-  scaledRevenueEstimate?: RevenueEstimate | null;
   pillars: Array<{
     pillar: string;
     score: number;

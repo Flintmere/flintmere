@@ -288,9 +288,8 @@ export default function MarketingHome() {
               className="font-sans tracking-[-0.04em] leading-[0.88] max-w-[14ch] text-[color:var(--color-ink)] max-lg:text-[color:var(--color-paper-on-ink)]"
               style={{ fontSize: 'var(--scale-h1-anchor)', fontWeight: 700 }}
             >
-              Which of your products are{' '}
-              <Bracket size="saks">suppressed</Bracket>
-              {' '}in Google Shopping today?
+              How much of your product data is actually{' '}
+              <Bracket size="saks">structured</Bracket>?
             </h1>
           </ViewportReveal>
 
@@ -307,11 +306,10 @@ export default function MarketingHome() {
               fontWeight: 400,
             }}
           >
-            Paste your URL. We estimate how much annual demand is routing to
-            competitors while these products stay suppressed — and show the
-            catalog facts behind it.{' '}
+            Paste your URL. We read your public catalog and score it against
+            seven pillars of product-data quality.{' '}
             <span className="max-lg:hidden">
-              Most fixes are food-specific: a wrong GTIN, a missing allergen, a
+              Most gaps are food-specific: a wrong GTIN, a missing allergen, a
               field no channel can read off your description.
             </span>
           </p>
