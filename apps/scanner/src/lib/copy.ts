@@ -141,7 +141,7 @@ export const pillarExplanationCustomerFacing: Record<PillarId, string> = {
   // titles.ts — title ≤150 chars, brand + product type in the title,
   // fluff-free title, description ≥200 chars with structure and use-case.
   titles:
-    'Whether titles lead with brand and product type inside 150 characters, and descriptions carry structured detail.',
+    'Whether titles include brand and product type, stay within 150 characters, avoid marketing hype, and descriptions carry structured detail.',
   // mapping.ts — Google product category present, and at least three
   // levels deep ("Food, Beverages & Tobacco > Beverages > Coffee").
   mapping:

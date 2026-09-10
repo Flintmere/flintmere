@@ -85,16 +85,25 @@ export function scoreCrawlability(input: CrawlabilityInput): PillarResult {
   }
 
   if (!llmsPresent) {
+    // Severity dropped high -> low 2026-09-10. ADR 0029 retired llms.txt as
+    // a scored pillar (Google, 2026-06-02: "none of the AI systems use it"),
+    // and report-email.ts filters the email body to critical | high — so a
+    // merchant was emailed a high-priority finding whose own merchant-facing
+    // consequence says no search engine or AI company has confirmed reading
+    // the file. revenueImpactScore matched down to its malformed-llms-txt
+    // sibling: same file, same unconfirmed consequence. The CHECKS weights
+    // are untouched — retiring those 40 points moves every store's score and
+    // belongs in its own PR.
     issues.push({
       pillar: 'crawlability',
       code: 'missing-llms-txt',
-      severity: 'high',
+      severity: 'low',
       title: 'No llms.txt served at the site root',
       description:
         'llms.txt is the emerging standard for declaring content to AI agents. A one-screen markdown file at /llms.txt lets agents discover your key pages without scraping a full sitemap.',
       affectedCount: 1,
       affectedProductIds: [],
-      revenueImpactScore: 70,
+      revenueImpactScore: 20,
     });
   } else if (!llmsWellFormed) {
     issues.push({
