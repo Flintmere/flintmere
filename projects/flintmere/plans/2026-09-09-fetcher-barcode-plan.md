@@ -568,7 +568,12 @@ describe('fetchCatalog — barcode budget', () => {
         if (url.includes('/products/count.json')) return json({ count: 10 });
         // Each .js request costs 8 seconds of the 20s barcode budget.
         vi.advanceTimersByTime(8_000);
-        return json(jsDoc([{ id: 10, barcode: '5012345678900' }]));
+        // Key the response to the handle asked for. A fixed variant id here
+        // would share no id with products 2..10, and the match-guard would
+        // score those as mismatches rather than reads — the test would then
+        // measure the guard, not the budget.
+        const n = Number(url.match(/\/products\/product-(\d+)\.js/)?.[1] ?? 0);
+        return json(jsDoc([{ id: n * 10, barcode: '5012345678900' }]));
       });
       vi.stubGlobal('fetch', fn);
 
