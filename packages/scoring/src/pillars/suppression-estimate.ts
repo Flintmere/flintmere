@@ -221,12 +221,14 @@ function extractSignals(
 ): ProductSignals {
   // Signal 1 — missing GTIN: any variant lacks a non-empty barcode.
   // We use "missing" rather than "invalid checksum" here — the strict
-  // checksum signal is what `identifiers` already grades. Suppression
-  // estimate uses the broader "the product has no GTIN at all" signal,
-  // which is what GMC actually rejects on.
-  const missingGtin = product.variants.some(
-    (v) => !v.barcode || v.barcode.trim().length === 0,
-  );
+  // checksum signal is what `identifiers` already grades.
+  //
+  // A product whose barcode was never read is not evidence of a missing
+  // barcode. The public fetcher reads a sample; absent flag means the
+  // source carries barcodes natively, so absent reads as "read".
+  const missingGtin =
+    product.barcodeRead !== false &&
+    product.variants.some((v) => !v.barcode || v.barcode.trim().length === 0);
 
   // Signal 2 — ambiguous allergen text: only meaningful on food-plausible
   // products in food catalogs. A non-food product cannot have an ambiguous

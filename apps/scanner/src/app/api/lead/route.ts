@@ -143,6 +143,9 @@ export async function POST(req: NextRequest) {
   const unsubscribeUrl = `${scannerUrl}/api/unsubscribe/${token}`;
   const persistedScoreJson = scan.scoreJson as unknown as CompositeScore & {
     gmcGroundTruth?: import('@/lib/gmc/types').GmcGroundTruth | null;
+    truncated?: boolean;
+    actualProductCount?: number | null;
+    barcodesRead?: number | null;
   };
   const mail = buildReportEmail({
     score: persistedScoreJson,
@@ -151,6 +154,18 @@ export async function POST(req: NextRequest) {
     auditUrl: `${scannerUrl}/catalog-letter`,
     recipientEmail: email,
     gmcGroundTruth: persistedScoreJson.gmcGroundTruth ?? null,
+    // Absent (undefined truncated) on scans persisted before the
+    // sampling-honesty fields shipped — omit the scope line rather than
+    // guess at a scan shape we don't have.
+    scanScope:
+      persistedScoreJson.truncated !== undefined
+        ? {
+            sampledCount: persistedScoreJson.productCount,
+            actualProductCount: persistedScoreJson.actualProductCount ?? null,
+            truncated: persistedScoreJson.truncated,
+            barcodesRead: persistedScoreJson.barcodesRead ?? null,
+          }
+        : null,
   });
 
   const send = await sendEmail({

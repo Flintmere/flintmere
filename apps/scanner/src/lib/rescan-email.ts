@@ -17,10 +17,12 @@
  * is post-purchase 1:1 communication.
  */
 
+import type { PillarId } from '@flintmere/scoring';
 import {
   FOUNDER_SIGNATURE_NAME,
   FOUNDER_SIGNATURE_REPLY_INVITE,
   FOUNDER_SIGNATURE_TEAM_LINE,
+  pillarLabelCustomerFacing,
 } from './copy';
 import { sendEmail, type SendEmailResult } from './resend';
 
@@ -80,27 +82,13 @@ function topPillarMovements(
   return movements.slice(0, limit);
 }
 
+// Merchant-facing pillar labels come from copy.ts. This used to be a
+// hand-kept switch mirroring that table "to avoid a circular import if
+// copy.ts grows email helpers later" — a circular that never arrived,
+// against a drift that did: the two copies disagreed the moment the
+// labels were renamed. One table, one import.
 function pillarLabel(pillar: string): string {
-  // Mirror copy.ts pillarLabelCustomerFacing without importing it
-  // (avoids a circular if copy.ts grows email helpers later).
-  switch (pillar) {
-    case 'identifiers':
-      return 'Product IDs';
-    case 'attributes':
-      return 'Structured Attributes';
-    case 'titles':
-      return 'Title & Description Quality';
-    case 'mapping':
-      return 'Google Category Match';
-    case 'consistency':
-      return 'Data Consistency';
-    case 'checkout-eligibility':
-      return 'Agent Checkout Readiness';
-    case 'crawlability':
-      return 'AI Agent Access';
-    default:
-      return pillar;
-  }
+  return pillarLabelCustomerFacing[pillar as PillarId] ?? pillar;
 }
 
 export function composeDay30RescanSubject(args: {

@@ -7,10 +7,12 @@ import {
   FOUNDER_SIGNATURE_TEAM_LINE,
   REPLY_SLA,
   gradeBadgeAnchor,
+  isStrongGrade,
   issueCodeToFounderSpeak,
   pillarLabelCustomerFacing,
   verdictHeader,
 } from './copy';
+import { scanScopeLine } from './copy-scan-scope';
 import {
   GMC_EMAIL_BANNER_LABEL,
   GMC_EMAIL_FOOTNOTE,
@@ -53,6 +55,17 @@ export interface ReportEmailInput {
    * own issue language ahead of the modelled signals. Null otherwise.
    */
   gmcGroundTruth?: GmcGroundTruth | null;
+  /**
+   * Scan scope, so a sampled count is never read as a whole-catalog count.
+   * Optional: reports rebuilt from a scan persisted before the barcode pass
+   * shipped do not carry it, and omit the line rather than guess.
+   */
+  scanScope?: {
+    sampledCount: number;
+    actualProductCount: number | null;
+    truncated: boolean;
+    barcodesRead?: number | null;
+  } | null;
 }
 
 export function buildReportEmail(input: ReportEmailInput): {
@@ -66,37 +79,58 @@ export function buildReportEmail(input: ReportEmailInput): {
   return { subject, html, text };
 }
 
-function invisibleCountFor(score: CompositeScore): number {
+/**
+ * The LARGEST single-issue affectedCount among critical and high severity
+ * issues — a FLOOR, not a total. Two disjoint 100-product issues return
+ * 100 while 200 products are actually affected.
+ *
+ * Deliberately not a union over affectedProductIds: site-level issues
+ * (robots.txt blocking every crawler, checkout, identifiers) carry no
+ * product IDs, so a union would report zero products affected by a
+ * site-wide critical failure. A floor beats a zero.
+ *
+ * Every render of this number must carry the "at least" hedge.
+ */
+function affectedCountFor(score: CompositeScore): number {
   return score.issues
     .filter((i) => i.severity === 'critical' || i.severity === 'high')
     .reduce((max, i) => Math.max(max, i.affectedCount), 0);
 }
 
 function buildSubject(score: CompositeScore): string {
-  const invisible = invisibleCountFor(score);
+  const affected = affectedCountFor(score);
   const total = score.productCount;
-  if (score.grade === 'A') {
-    return `${score.shopDomain} — ready for AI shopping agents · Grade ${score.grade}`;
-  }
-  if (invisible === 0) {
+  // The good-shape claim is gated on the COUNT, not the grade. Gating it
+  // on the grade alone shipped "catalog data in good shape" to a grade-A
+  // store whose every product carried a gap — the same contradiction the
+  // verdict headline had (review finding 2).
+  if (affected === 0) {
+    // Same threshold as the body headline. This used to test grade 'A'
+    // alone while verdictHeader() said "in good shape" for A and B, so a
+    // grade-B merchant with nothing affected got a subject and a headline
+    // that disagreed inside one email.
+    if (isStrongGrade(score.grade)) {
+      return `${score.shopDomain} — catalog data in good shape · Grade ${score.grade}`;
+    }
     return `${score.shopDomain} — full catalog scan · Grade ${score.grade}`;
   }
-  return `${score.shopDomain} — at least ${invisible.toLocaleString()} of ${total.toLocaleString()} products invisible to AI agents`;
+  return `${score.shopDomain} — at least ${affected.toLocaleString()} of ${total.toLocaleString()} products have incomplete data`;
 }
 
 function renderHtml(input: ReportEmailInput): string {
-  const { score, unsubscribeUrl, appUrl, auditUrl, gmcGroundTruth } = input;
+  const { score, unsubscribeUrl, appUrl, auditUrl, gmcGroundTruth, scanScope } = input;
   const topIssues = score.issues.slice(0, 3);
   const unlockedPillars = score.pillars.filter((p) => !p.locked);
   const lockedPillars = score.pillars.filter((p) => p.locked);
 
-  const invisible = invisibleCountFor(score);
+  const affected = affectedCountFor(score);
   const verdict = verdictHeader({
     grade: score.grade,
-    invisibleCount: invisible,
+    affectedCount: affected,
     totalProducts: score.productCount,
   });
   const gradeAnchor = gradeBadgeAnchor({ grade: score.grade });
+  const scopeLine = scanScope ? scanScopeLine(scanScope) : null;
   const gmcSection = gmcGroundTruth ? renderGmcSectionHtml(gmcGroundTruth) : '';
 
   const evidenceRows = topIssues
@@ -167,6 +201,11 @@ function renderHtml(input: ReportEmailInput): string {
               <div style="margin-top:10px;font-size:15px;color:#5A5C64;line-height:1.5;">
                 ${esc(verdict.subhead)}
               </div>
+              ${
+                scopeLine
+                  ? `<div style="margin-top:10px;font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.08em;color:#8B8D95;">${esc(scopeLine)}</div>`
+                  : ''
+              }
               <div style="margin-top:16px;font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.08em;color:#5A5C64;">
                 ${esc(gradeAnchor)}
               </div>
@@ -186,7 +225,7 @@ function renderHtml(input: ReportEmailInput): string {
           <!-- Evidence: top 3 issues in founder-speak -->
           <tr>
             <td style="padding:8px 32px 24px 32px;">
-              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;margin:16px 0 4px 0;">What AI agents see first</div>
+              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;margin:16px 0 4px 0;">What we found first</div>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${evidenceRows}</table>
             </td>
           </tr>
@@ -375,13 +414,14 @@ ${GMC_EMAIL_FOOTNOTE}`;
 }
 
 function renderText(input: ReportEmailInput): string {
-  const { score, unsubscribeUrl, appUrl, auditUrl, gmcGroundTruth } = input;
-  const invisible = invisibleCountFor(score);
+  const { score, unsubscribeUrl, appUrl, auditUrl, gmcGroundTruth, scanScope } = input;
+  const affected = affectedCountFor(score);
   const verdict = verdictHeader({
     grade: score.grade,
-    invisibleCount: invisible,
+    affectedCount: affected,
     totalProducts: score.productCount,
   });
+  const scopeLine = scanScope ? scanScopeLine(scanScope) : null;
   const gmcBlock = gmcGroundTruth ? `${renderGmcSectionText(gmcGroundTruth)}\n\n` : '';
 
   const top = score.issues
@@ -418,12 +458,12 @@ ${verdict.headline}
 
 ${verdict.subhead}
 
-${gradeBadgeAnchor({ grade: score.grade })}
+${scopeLine ? `${scopeLine}\n\n` : ''}${gradeBadgeAnchor({ grade: score.grade })}
 
 ${gmcBlock}How we score
 ${AUTHORITY_LINE}
 
-What AI agents see first
+What we found first
 ${top}
 
 What we checked

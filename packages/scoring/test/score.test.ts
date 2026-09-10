@@ -102,7 +102,11 @@ describe('scoreCatalog', () => {
     const catalog = makeCatalog([noGtinProduct]);
     const result = scoreCatalog(catalog);
     expect(result.issues.length).toBeGreaterThan(0);
-    expect(result.issues[0]?.severity).toBe('critical');
+    // A missing GTIN limits a listing rather than disapproving it, so it now
+    // ranks as high, not critical — see identifiers.test.ts for the same
+    // severity correction on the pillar's own assertions.
+    expect(result.issues[0]?.code).toBe('missing-gtin');
+    expect(result.issues[0]?.severity).toBe('high');
   });
 
   it('computes a GTIN-less ceiling below 100', () => {

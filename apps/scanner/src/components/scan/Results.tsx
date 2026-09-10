@@ -38,13 +38,13 @@ export function Results({ result }: { result: ScanResult }) {
   const criticalAndHigh = result.issues.filter(
     (i) => i.severity === 'critical' || i.severity === 'high',
   );
-  const invisibleCount = criticalAndHigh.reduce(
+  const affectedCount = criticalAndHigh.reduce(
     (max, issue) => Math.max(max, issue.affectedCount),
     0,
   );
   const verdict = verdictHeader({
     grade: result.grade,
-    invisibleCount,
+    affectedCount,
     totalProducts: result.productCount,
   });
   const gradeAnchor = gradeBadgeAnchor({ grade: result.grade });
@@ -64,6 +64,7 @@ export function Results({ result }: { result: ScanResult }) {
         sampledCount={result.productCount}
         actualProductCount={result.actualProductCount ?? null}
         truncated={result.truncated ?? false}
+        barcodesRead={result.barcodesRead ?? null}
       />
 
       {/*

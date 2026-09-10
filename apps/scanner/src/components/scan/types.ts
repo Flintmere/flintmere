@@ -36,6 +36,12 @@ export interface ScanResult {
   truncated?: boolean;
   actualProductCount?: number | null;
   /**
+   * How many products had a barcode read. Optional: scans persisted before
+   * the barcode pass shipped do not carry it, and /score/[shop] re-renders
+   * those from scoreJson.
+   */
+  barcodesRead?: number | null;
+  /**
    * "What we read" preamble — verbatim merchant categories played back to
    * prove vertical-correctness. Optional for backwards compatibility with
    * scans persisted before 2026-05-05. See packages/scoring/src/catalog-summary.ts.
