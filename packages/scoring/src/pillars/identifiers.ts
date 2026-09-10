@@ -10,6 +10,9 @@ const CHECKS = {
   skuUnique: 5,
 } as const;
 
+/** The two sub-checks that need a barcode to mean anything. */
+const BARCODE_CHECKS = CHECKS.barcodePresence + CHECKS.gtinChecksum;
+
 export function scoreIdentifiers(input: CatalogInput): PillarResult {
   const productCount = input.products.length;
   const allVariants = input.products.flatMap((p) =>
@@ -21,11 +24,24 @@ export function scoreIdentifiers(input: CatalogInput): PillarResult {
     return emptyResult('empty-catalog');
   }
 
-  // --- Sub-check 1: barcode presence on variants ---
-  const variantsWithBarcode = allVariants.filter(
+  // The public fetcher reads barcodes for a sample; anything outside it is
+  // marked barcodeRead: false. An absent flag means the source carries
+  // barcodes natively (Admin API, fixtures), so absent reads as "read".
+  // Counting an unchecked product as a product without a barcode is the
+  // false claim this scoping exists to prevent.
+  const readProducts = input.products.filter((p) => p.barcodeRead !== false);
+  const readVariants = allVariants.filter(
+    ({ product }) => product.barcodeRead !== false,
+  );
+  const barcodesAssessable = readVariants.length > 0;
+
+  // --- Sub-check 1: barcode presence on variants we actually read ---
+  const variantsWithBarcode = readVariants.filter(
     ({ variant }) => variant.barcode && variant.barcode.trim().length > 0,
   );
-  const barcodeCoverage = variantsWithBarcode.length / variantCount;
+  const barcodeCoverage = barcodesAssessable
+    ? variantsWithBarcode.length / readVariants.length
+    : 0;
   const barcodeScore = barcodeCoverage * CHECKS.barcodePresence;
 
   // --- Sub-check 2: GTIN checksum on present barcodes ---
@@ -64,31 +80,46 @@ export function scoreIdentifiers(input: CatalogInput): PillarResult {
   const uniquenessRate = totalSkus ? uniqueSkus / totalSkus : 0;
   const uniquenessScore = uniquenessRate * CHECKS.skuUnique;
 
-  const score = Math.round(
-    (barcodeScore + checksumScore + brandScore + skuScore + uniquenessScore) *
-      100,
-  ) / 100;
+  const assessedScore = barcodesAssessable
+    ? barcodeScore + checksumScore + brandScore + skuScore + uniquenessScore
+    : brandScore + skuScore + uniquenessScore;
+  const score = Math.round(assessedScore * 100) / 100;
+  const maxScore = barcodesAssessable ? 100 : 100 - BARCODE_CHECKS;
 
   const issues = [];
 
-  const missingBarcodeProducts = input.products.filter((p) =>
+  if (!barcodesAssessable) {
+    issues.push({
+      pillar: 'identifiers' as const,
+      code: 'barcodes-not-read',
+      severity: 'low' as const,
+      title: 'Barcodes were not read',
+      description:
+        'Your storefront did not serve the per-product endpoint that carries barcodes, so this scan says nothing about your GTINs either way. The rest of the pillar is scored without them.',
+      affectedCount: 0,
+      affectedProductIds: [],
+      revenueImpactScore: 0,
+    });
+  }
+
+  const missingBarcodeProducts = readProducts.filter((p) =>
     p.variants.some((v) => !v.barcode || !v.barcode.trim()),
   );
   if (missingBarcodeProducts.length > 0) {
     issues.push({
       pillar: 'identifiers' as const,
       code: 'missing-gtin',
-      severity: 'critical' as const,
+      severity: 'high' as const,
       title: `Missing GTINs on ${missingBarcodeProducts.length} products`,
       description:
-        'Products without GS1-registered barcodes are excluded from most AI agent matching. See GTIN guidance for your geography.',
+        'A product with no GTIN can be limited in where Google Merchant Center shows it. It is not disapproved for that alone.',
       affectedCount: missingBarcodeProducts.length,
       affectedProductIds: missingBarcodeProducts.map((p) => p.id),
-      revenueImpactScore: 100,
+      revenueImpactScore: 80,
     });
   }
 
-  const invalidChecksumProducts = input.products.filter((p) =>
+  const invalidChecksumProducts = readProducts.filter((p) =>
     p.variants.some(
       (v) => v.barcode && v.barcode.trim() && !isValidGtin(v.barcode),
     ),
@@ -97,13 +128,13 @@ export function scoreIdentifiers(input: CatalogInput): PillarResult {
     issues.push({
       pillar: 'identifiers' as const,
       code: 'invalid-gtin-checksum',
-      severity: 'high' as const,
+      severity: 'critical' as const,
       title: `Invalid GTIN checksum on ${invalidChecksumProducts.length} products`,
       description:
-        'Barcode values are present but fail modulo-10 checksum validation. These may be third-party or resold codes; Amazon and Google Shopping verify against GS1.',
+        'Google Merchant Center disapproves a listing whose GTIN is invalid. These values are present but fail the modulo-10 check digit.',
       affectedCount: invalidChecksumProducts.length,
       affectedProductIds: invalidChecksumProducts.map((p) => p.id),
-      revenueImpactScore: 80,
+      revenueImpactScore: 100,
     });
   }
 
@@ -130,7 +161,7 @@ export function scoreIdentifiers(input: CatalogInput): PillarResult {
     pillar: 'identifiers',
     weight: 20,
     score,
-    maxScore: 100,
+    maxScore,
     locked: false,
     issues,
   };

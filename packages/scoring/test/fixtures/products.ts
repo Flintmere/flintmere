@@ -88,6 +88,21 @@ export const invalidChecksumProduct: ProductInput = {
   ],
 };
 
+/** Outside the fetcher's barcode sample — we never looked at this one. */
+export const unreadBarcodeProduct: ProductInput = {
+  ...cleanProduct,
+  id: 'gid://shopify/Product/8',
+  handle: 'unread-barcode',
+  barcodeRead: false,
+  variants: [
+    {
+      ...cleanProduct.variants[0]!,
+      id: 'gid://shopify/ProductVariant/8',
+      barcode: null,
+    },
+  ],
+};
+
 export const activeZeroStockProduct: ProductInput = {
   ...cleanProduct,
   id: 'gid://shopify/Product/7',
