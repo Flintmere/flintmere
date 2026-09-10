@@ -850,7 +850,8 @@ behaviour: an invalid value is disapproved, a missing one is limited."
 `issueCodeToFounderSpeak` is the merchant-facing translation used by the report email. Its two GTIN entries assert outcomes ADR 0029 retired: that products without barcodes "stay invisible" and that agents "reject these as fake codes". Leaving them behind a `critical` badge ships the same false claim the fetcher fix exists to remove.
 
 **Files:**
-- Modify: `apps/scanner/src/lib/copy.ts:155-170`
+- Modify: `apps/scanner/src/lib/copy.ts:155-170` (GTIN consequences), `:189-192` (`robots-blocks-all`), `:239-269` (`verdictHeader`)
+- Modify: `apps/scanner/src/lib/report-email.ts:69-85`, `:93-97`, `:379-383`
 - Test: `apps/scanner/src/lib/report-email.test.ts`
 
 **Interfaces:**
@@ -921,16 +922,129 @@ Expected: FAIL — the first test finds "invisible" in the current `missing-gtin
 
 `report-email.test.ts:143` asserts the string `'Products have no barcode'`, which is unchanged.
 
+- [ ] **Step 3b: Retire the "invisible to AI agents" claim — added 2026-09-10 on the operator's ruling**
+
+Found during Task 5's review. This is a P0 under CLAUDE.md §Binding 2026-05-09,
+of the same class as the `llms.txt` ingestion-engine claim removed in PR #108 —
+except this one is *sent to merchants*, not merely published.
+
+Two canon sources retire it independently:
+
+- `memory/VOICE.md:91` — "invisible" retired 2026-04-26, post-Shopify Agentic Storefronts.
+- `ADR 0029:73` — *"Shopify merchants enter Catalog by default; the store is the
+  feed. There is nothing for a Shopify merchant to be invisible to."*
+
+`apps/scanner/src/lib/copy.ts:189-192`, the `robots-blocks-all` consequence,
+currently asserts no AI agent can see the catalog and the merchant is invisible
+by default. Replace with what robots.txt actually does (≤20 words per the
+`FounderSpeak` rule at `:147-150`):
+
+```ts
+    consequence:
+      'Your robots.txt tells every crawler to stay out, including Googlebot, so your pages cannot be indexed.',
+```
+
+Leave `robots-blocks-ai-agents` alone — a robots.txt that names those agents
+really does exclude them, which is a directive fact, not the retired positioning.
+
+- [ ] **Step 3c: Rewrite `verdictHeader`, and fix its inverted B branch**
+
+`apps/scanner/src/lib/copy.ts:239-269`. Two defects, one of them arithmetic.
+
+**The arithmetic bug:** `invisibleCountFor` (`report-email.ts:69-73`) returns the
+largest `affectedCount` among `critical | high` issues — a count of products
+**with** a problem. The B branch (`copy.ts:255`) renders it as the count that are
+*"already visible"*, so a merchant graded B is told their broken products are
+their good ones. The A, C and D/F branches use it correctly as a problem count.
+
+Rename the parameter to say what it holds, and replace all four branches:
+
+```ts
+export function verdictHeader(args: {
+  grade: string
+  /** Products carrying at least one critical or high issue. */
+  affectedCount: number
+  totalProducts: number
+}): { headline: string; subhead: string } {
+  const { grade, affectedCount, totalProducts } = args
+  const pct = totalProducts > 0 ? Math.round((affectedCount / totalProducts) * 100) : 0
+
+  if (grade === 'A' || grade === 'A+') {
+    return {
+      headline: `Your catalog data is in good shape.`,
+      subhead: `${totalProducts.toLocaleString()} products checked. ${affectedCount.toLocaleString()} still carry a gap worth closing.`,
+    }
+  }
+  if (grade === 'B') {
+    return {
+      headline: `Most of your catalog data is complete.`,
+      subhead: `${affectedCount.toLocaleString()} of ${totalProducts.toLocaleString()} products carry a gap. Google Merchant Center can limit where it shows a listing whose data is incomplete.`,
+    }
+  }
+  if (grade === 'C') {
+    return {
+      headline: `${affectedCount.toLocaleString()} of your ${totalProducts.toLocaleString()} products carry a data gap.`,
+      subhead: `That is ${pct}% of your catalog. Merchant Center can limit where it shows those listings.`,
+    }
+  }
+  // D or F
+  return {
+    headline: `Most of your catalog data is incomplete.`,
+    subhead: `${affectedCount.toLocaleString()} of ${totalProducts.toLocaleString()} products fail at least one of the checks in this report.`,
+  }
+}
+```
+
+Every string above uses Google's own outcome vocabulary — a listing's visibility
+is *limited* — and claims no agent behaviour. Do not reintroduce a channel name
+beyond Google Merchant Center: naming grocery retailers here would put the
+unbuilt retail-gate service on a public surface, which is forbidden.
+
+- [ ] **Step 3d: Rewrite the email subject line**
+
+`apps/scanner/src/lib/report-email.ts:69-85`. Rename `invisibleCountFor` to
+`affectedCountFor` (its body is already correct — only the name lies), and
+replace the two claim-bearing subjects:
+
+```ts
+  if (score.grade === 'A') {
+    return `${score.shopDomain} — catalog data in good shape · Grade ${score.grade}`;
+  }
+  if (affected === 0) {
+    return `${score.shopDomain} — full catalog scan · Grade ${score.grade}`;
+  }
+  return `${score.shopDomain} — ${affected.toLocaleString()} of ${total.toLocaleString()} products have incomplete data`;
+```
+
+- [ ] **Step 3e: Update the call sites**
+
+`report-email.ts:93-97` and `:379-383` pass `invisibleCount:` into
+`verdictHeader`; both become `affectedCount:`. Grep for `invisibleCount` and
+`invisibleCountFor` across `apps/scanner/src` and update every hit — the results
+page consumes `verdictHeader` too. Add assertions to
+`report-email.test.ts` that neither the subject nor the body contains the string
+"invisible", in any case, on any grade.
+
 - [ ] **Step 4: Run the scanner suite**
 
 Run: `pnpm -F scanner test`
-Expected: PASS.
+Expected: PASS. Existing tests that assert the old verdict or subject strings
+must be updated to the new ones — but if a test fails for any reason other than
+a changed string, stop and report it.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add apps/scanner/src/lib/copy.ts apps/scanner/src/lib/report-email.test.ts
-git commit -m "fix(copy): GTIN consequences use Google's own outcome vocabulary"
+git add apps/scanner/src/lib/copy.ts apps/scanner/src/lib/report-email.ts apps/scanner/src/lib/report-email.test.ts
+git commit -m "fix(copy): retire the invisible-to-AI-agents claim, correct the B verdict
+
+VOICE.md retired 'invisible' in April and ADR 0029 retired the positioning
+outright: a Shopify merchant is in Catalog by default, so there is nothing
+to be invisible to. The claim was still going out in report emails.
+
+The B branch also rendered the problem count as the count of products that
+were fine, telling a B-grade merchant their broken products were their
+good ones."
 ```
 
 ---
