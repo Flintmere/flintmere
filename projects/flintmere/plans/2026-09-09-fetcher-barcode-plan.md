@@ -477,26 +477,29 @@ The failure this task pins is the one that would put a false claim back on a cus
 - Test: `apps/scanner/src/lib/shopify-fetcher.test.ts`
 
 **Interfaces:**
-- Consumes: Task 2's `barcodesRead` and `barcodeRead`. No production change is expected — this task proves Task 2's `if (read === 0) break;` is correct, and fixes it if not.
+- Consumes: Task 2's `barcodesRead` and `barcodeRead`, and its `BARCODE_FAILURE_CEILING` (3 consecutive non-404 failures) plus the `miss`/`blocked`/`ok` outcome classification. No production change is expected — this task proves that classification behaves, and fixes it if not.
+- **Superseded by Task 2's fix round (operator ruling, 2026-09-10):** the original `if (read === 0) break;` is gone. A 404 is a per-handle miss and continues; a 429/5xx/403 counts toward the ceiling. Do not reinstate the single-failure break.
 
 - [ ] **Step 1: Write the failing tests**
 
 ```ts
 describe('fetchCatalog — barcode endpoint blocked', () => {
   it('reports zero read and leaves every product unread when .js 403s', async () => {
+    const products = [1, 2, 3, 4, 5].map((n) => rawProduct(n, [n * 10]));
     const fn = mockFetch([
-      ['/products.json', () => json({ products: [rawProduct(1), rawProduct(2), rawProduct(3)] })],
-      ['/products/count.json', () => json({ count: 3 })],
-      ['.js', () => json({}, 403)],
+      ['/products.json', () => json({ products })],
+      ['/products/count.json', () => json({ count: 5 })],
+      ['/products/product-', () => json({}, 403)],
     ]);
 
     const result = await fetchCatalog('example.com');
 
     expect(result.barcodesRead).toBe(0);
     expect(result.catalog.products.every((p) => p.barcodeRead === false)).toBe(true);
-    // Stops after the first refusal instead of spending the budget proving
-    // the same 403 fifty times.
-    expect(fn.mock.calls.filter((c) => String(c[0]).endsWith('.js'))).toHaveLength(1);
+    // Stops once BARCODE_FAILURE_CEILING consecutive non-404 refusals have
+    // been seen, rather than spending the budget proving the same 403 fifty
+    // times. Five products, three calls: the early stop is the assertion.
+    expect(fn.mock.calls.filter((c) => String(c[0]).endsWith('.js'))).toHaveLength(3);
   });
 
   it('skips a single bad handle and keeps reading the rest', async () => {
@@ -532,7 +535,7 @@ describe('fetchCatalog — barcode endpoint blocked', () => {
 - [ ] **Step 2: Run them**
 
 Run: `pnpm -F scanner exec vitest run src/lib/shopify-fetcher.test.ts`
-Expected: PASS, 9 tests. Task 2's implementation already satisfies these — that is the point of writing them. If the third fails with an unhandled `SyntaxError`, the `try` in `fetchVariantBarcodes` does not wrap `res.json()`; move the `await res.json()` inside it.
+Expected: PASS, 16 tests (13 from Task 2 after its fix round, 3 added here). Task 2's implementation already satisfies these — that is the point of writing them. If the third fails with an unhandled `SyntaxError`, the `try` in `fetchVariantBarcodes` does not wrap `res.json()`; move the `await res.json()` inside it.
 
 - [ ] **Step 3: Commit**
 
