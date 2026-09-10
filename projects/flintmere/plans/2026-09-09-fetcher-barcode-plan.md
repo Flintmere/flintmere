@@ -1025,6 +1025,43 @@ page consumes `verdictHeader` too. Add assertions to
 `report-email.test.ts` that neither the subject nor the body contains the string
 "invisible", in any case, on any grade.
 
+- [ ] **Step 3f: The seven dimension names and definitions — added 2026-09-10 on the operator's ruling**
+
+Found by the Task 6 fix round, which could not defend five of them. These render
+in the results grid (`Results.tsx:230-232`), on `/score/[shop]`
+(`page.tsx:206-208`) **and in the report email** — so they are not an internal
+label set.
+
+Rename two labels in `pillarLabelCustomerFacing`:
+
+| Pillar | From | To |
+|---|---|---|
+| `crawlability` | `AI Agent Access` | `Crawler Access` |
+| `checkout-eligibility` | `Agent Checkout Readiness` | `Checkout Readiness` |
+
+`apps/scanner/src/lib/rescan-email.ts:98,:100` hand-mirrors both strings rather
+than importing them. Update it in the same commit — and if the duplication can be
+removed by importing from `copy.ts`, do that instead; two hand-kept copies of a
+merchant-facing label is how they drift.
+
+Then rewrite the explanations in `pillarExplanationCustomerFacing` that assert
+agent behaviour — `identifiers` ("the codes AI shopping agents use to look it
+up"), `titles` ("spec sheets an agent can parse"), `mapping` ("so agents know
+what you sell"), `checkout-eligibility` ("whether an AI agent can actually
+complete a purchase"), `crawlability` ("whether AI shopping agents are allowed to
+read your site"). `attributes` and `consistency` make no agent claim — leave them.
+
+**Ground each replacement in what that pillar's code actually checks.** Read the
+pillar in `packages/scoring/src/pillars/` before writing its sentence; do not
+paraphrase the old one with the agent noun swapped out. One line each, plain
+language, Google Merchant Center as the only named channel.
+
+On `crawlability`: its current sentence lists `llms.txt` among what it measures.
+The Task 6 sweep established that no confirmed AI system reads llms.txt, and
+ADR 0029 retired it as a scored pillar. Check whether the pillar still scores it
+before naming it in the sentence — and if it does, that inconsistency is a
+finding for the final review, not something to paper over in copy.
+
 - [ ] **Step 4: Run the scanner suite**
 
 Run: `pnpm -F scanner test`
