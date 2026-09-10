@@ -328,3 +328,51 @@ describe('fetchCatalog — parent abort mid-pass (Finding 4)', () => {
     }
   });
 });
+
+describe('fetchCatalog — barcode endpoint blocked', () => {
+  it('reports zero read and leaves every product unread when .js 403s', async () => {
+    const products = [1, 2, 3, 4, 5].map((n) => rawProduct(n, [n * 10]));
+    const fn = mockFetch([
+      ['/products.json', () => json({ products })],
+      ['/products/count.json', () => json({ count: 5 })],
+      ['/products/product-', () => json({}, 403)],
+    ]);
+
+    const result = await fetchCatalog('example.com');
+
+    expect(result.barcodesRead).toBe(0);
+    expect(result.catalog.products.every((p) => p.barcodeRead === false)).toBe(true);
+    // Stops once BARCODE_FAILURE_CEILING consecutive non-404 refusals have
+    // been seen, rather than spending the budget proving the same 403 fifty
+    // times. Five products, three calls: the early stop is the assertion.
+    expect(fn.mock.calls.filter((c) => String(c[0]).endsWith('.js'))).toHaveLength(3);
+  });
+
+  it('skips a single bad handle and keeps reading the rest', async () => {
+    mockFetch([
+      ['/products.json', () => json({ products: [rawProduct(1, [10]), rawProduct(2, [20]), rawProduct(3, [30])] })],
+      ['/products/count.json', () => json({ count: 3 })],
+      ['/products/product-2.js', () => json({}, 404)],
+      ['.js', () => json(jsDoc([{ id: 10, barcode: '5012345678900' }, { id: 30, barcode: '5012345678900' }]))],
+    ]);
+
+    const result = await fetchCatalog('example.com');
+
+    expect(result.barcodesRead).toBe(2);
+    expect(result.catalog.products.map((p) => p.barcodeRead)).toEqual([true, false, true]);
+  });
+
+  it('does not fail the scan when .js returns HTML instead of JSON', async () => {
+    mockFetch([
+      ['/products.json', () => json({ products: [rawProduct(1, [10])] })],
+      ['/products/count.json', () => json({ count: 1 })],
+      ['.js', () => new Response('<!doctype html><html>password page</html>', { status: 200 })],
+    ]);
+
+    const result = await fetchCatalog('example.com');
+
+    expect(result.barcodesRead).toBe(0);
+    expect(result.catalog.products).toHaveLength(1);
+    expect(result.catalog.products[0]!.barcodeRead).toBe(false);
+  });
+});
