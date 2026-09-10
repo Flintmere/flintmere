@@ -1,0 +1,84 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('./ssrf', () => ({
+  assertPublicHost: vi.fn(async () => undefined),
+  isPrivateHostLiteral: vi.fn(() => false),
+  SsrfBlockedError: class SsrfBlockedError extends Error {},
+}));
+
+import { fetchCatalog, ShopifyFetchError } from './shopify-fetcher';
+
+/** One product as /products.json serves it — note: no `barcode` key. */
+function rawProduct(n: number, variantIds: number[] = [n * 10]) {
+  return {
+    id: n,
+    handle: `product-${n}`,
+    title: `Product ${n}`,
+    body_html: '<p>x</p>',
+    vendor: 'Meridian',
+    product_type: 'Coffee',
+    tags: 'a,b',
+    published_at: '2026-01-01T00:00:00Z',
+    variants: variantIds.map((id) => ({
+      id,
+      sku: `SKU-${id}`,
+      price: '9.00',
+      compare_at_price: null,
+      inventory_quantity: 5,
+      inventory_policy: 'deny',
+      available: true,
+    })),
+    images: [],
+  };
+}
+
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), { status });
+}
+
+/**
+ * Routes by URL substring, first match wins. Anything unmatched is a 404 —
+ * so a test that forgets a route fails loudly instead of hanging.
+ */
+function mockFetch(routes: Array<[string, () => Response]>) {
+  const fn = vi.fn(async (input: string | URL) => {
+    const url = String(input);
+    for (const [needle, make] of routes) {
+      if (url.includes(needle)) return make();
+    }
+    return json({}, 404);
+  });
+  vi.stubGlobal('fetch', fn);
+  return fn;
+}
+
+beforeEach(() => {
+  vi.unstubAllGlobals();
+  vi.clearAllMocks();
+});
+
+describe('fetchCatalog — catalog shape', () => {
+  it('normalises a single page of products.json', async () => {
+    mockFetch([
+      ['/products.json', () => json({ products: [rawProduct(1), rawProduct(2)] })],
+      ['/products/count.json', () => json({ count: 2 })],
+    ]);
+
+    const result = await fetchCatalog('example.com');
+
+    expect(result.catalog.shopDomain).toBe('example.com');
+    expect(result.catalog.products).toHaveLength(2);
+    expect(result.truncated).toBe(false);
+    expect(result.actualProductCount).toBe(2);
+  });
+
+  it('throws not-shopify on a 404 from products.json', async () => {
+    mockFetch([['/products.json', () => json({}, 404)]]);
+
+    await expect(fetchCatalog('example.com')).rejects.toMatchObject({
+      name: 'ShopifyFetchError',
+      code: 'not-shopify',
+    });
+    expect(ShopifyFetchError).toBeDefined();
+  });
+});
