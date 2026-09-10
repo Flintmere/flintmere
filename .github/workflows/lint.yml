@@ -31,8 +31,14 @@ jobs:
       - name: Build workspace packages
         run: pnpm -r --filter "@flintmere/*" build
 
-      - name: Lint scanner
-        run: pnpm -F scanner lint
+      # Whole workspace, not just scanner. When ESLint 9 dropped `.eslintrc`
+      # only `apps/scanner` was migrated, and this step's previous
+      # `pnpm -F scanner lint` scope meant the other three packages could
+      # sit broken — `eslint` against no config, exiting non-zero — without
+      # CI ever saying so. `-r` skips packages that declare no lint script
+      # (packages/ui), so this covers exactly the four that do.
+      - name: Lint workspace
+        run: pnpm -r lint
 
       # Blog content gate (blog-system, editorial standard §F). Assistive —
       # blocks merge on mechanical failures (word floor, banned phrase /
