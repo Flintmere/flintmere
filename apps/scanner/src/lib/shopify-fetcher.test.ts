@@ -376,3 +376,35 @@ describe('fetchCatalog — barcode endpoint blocked', () => {
     expect(result.catalog.products[0]!.barcodeRead).toBe(false);
   });
 });
+
+describe('fetchCatalog — barcode budget', () => {
+  it('stops reading barcodes once the 20s budget is spent', async () => {
+    vi.useFakeTimers();
+    try {
+      const products = Array.from({ length: 10 }, (_, i) => rawProduct(i + 1, [(i + 1) * 10]));
+      const fn = vi.fn(async (input: string | URL) => {
+        const url = String(input);
+        if (url.includes('/products.json')) return json({ products });
+        if (url.includes('/products/count.json')) return json({ count: 10 });
+        // Each .js request costs 8 seconds of the 20s barcode budget.
+        vi.advanceTimersByTime(8_000);
+        // Key the response to the handle asked for. A fixed variant id here
+        // would share no id with products 2..10, and the match-guard would
+        // score those as mismatches rather than reads — the test would then
+        // measure the guard, not the budget.
+        const n = Number(url.match(/\/products\/product-(\d+)\.js/)?.[1] ?? 0);
+        return json(jsDoc([{ id: n * 10, barcode: '5012345678900' }]));
+      });
+      vi.stubGlobal('fetch', fn);
+
+      const result = await fetchCatalog('example.com');
+
+      // 0s → read #1 → 8s → read #2 → 16s → read #3 → 24s > 20s, stop.
+      expect(result.barcodesRead).toBe(3);
+      expect(result.catalog.products).toHaveLength(10);
+      expect(result.catalog.products[9]!.barcodeRead).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
