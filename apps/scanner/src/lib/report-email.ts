@@ -66,22 +66,22 @@ export function buildReportEmail(input: ReportEmailInput): {
   return { subject, html, text };
 }
 
-function invisibleCountFor(score: CompositeScore): number {
+function affectedCountFor(score: CompositeScore): number {
   return score.issues
     .filter((i) => i.severity === 'critical' || i.severity === 'high')
     .reduce((max, i) => Math.max(max, i.affectedCount), 0);
 }
 
 function buildSubject(score: CompositeScore): string {
-  const invisible = invisibleCountFor(score);
+  const affected = affectedCountFor(score);
   const total = score.productCount;
   if (score.grade === 'A') {
-    return `${score.shopDomain} — ready for AI shopping agents · Grade ${score.grade}`;
+    return `${score.shopDomain} — catalog data in good shape · Grade ${score.grade}`;
   }
-  if (invisible === 0) {
+  if (affected === 0) {
     return `${score.shopDomain} — full catalog scan · Grade ${score.grade}`;
   }
-  return `${score.shopDomain} — at least ${invisible.toLocaleString()} of ${total.toLocaleString()} products invisible to AI agents`;
+  return `${score.shopDomain} — ${affected.toLocaleString()} of ${total.toLocaleString()} products have incomplete data`;
 }
 
 function renderHtml(input: ReportEmailInput): string {
@@ -90,10 +90,10 @@ function renderHtml(input: ReportEmailInput): string {
   const unlockedPillars = score.pillars.filter((p) => !p.locked);
   const lockedPillars = score.pillars.filter((p) => p.locked);
 
-  const invisible = invisibleCountFor(score);
+  const affected = affectedCountFor(score);
   const verdict = verdictHeader({
     grade: score.grade,
-    invisibleCount: invisible,
+    affectedCount: affected,
     totalProducts: score.productCount,
   });
   const gradeAnchor = gradeBadgeAnchor({ grade: score.grade });
@@ -376,10 +376,10 @@ ${GMC_EMAIL_FOOTNOTE}`;
 
 function renderText(input: ReportEmailInput): string {
   const { score, unsubscribeUrl, appUrl, auditUrl, gmcGroundTruth } = input;
-  const invisible = invisibleCountFor(score);
+  const affected = affectedCountFor(score);
   const verdict = verdictHeader({
     grade: score.grade,
-    invisibleCount: invisible,
+    affectedCount: affected,
     totalProducts: score.productCount,
   });
   const gmcBlock = gmcGroundTruth ? `${renderGmcSectionText(gmcGroundTruth)}\n\n` : '';

@@ -157,12 +157,17 @@ export const issueCodeToFounderSpeak: Record<string, FounderSpeak> = {
   'missing-gtin': {
     title: 'Products have no barcode',
     consequence:
-      'AI shopping agents cannot match these to the product graph — they stay invisible when a buyer searches by item.',
+      'Google Merchant Center can limit where it shows a product with no GTIN. It does not disapprove the listing for that alone.',
   },
   'invalid-gtin-checksum': {
-    title: 'Barcode numbers fail the checksum',
+    title: 'Barcode numbers fail the check digit',
     consequence:
-      'Agents reject these as fake codes, so the product is dropped from results.',
+      'Google Merchant Center disapproves a listing whose GTIN is invalid, so the product stops showing in Shopping.',
+  },
+  'barcodes-not-read': {
+    title: 'Barcodes were not read',
+    consequence:
+      'We could not read barcodes on this scan, so it says nothing about your GTINs either way.',
   },
   'missing-brand': {
     title: 'Products have no brand name',
@@ -189,7 +194,7 @@ export const issueCodeToFounderSpeak: Record<string, FounderSpeak> = {
   'robots-blocks-all': {
     title: 'Your site blocks every crawler',
     consequence:
-      'No AI agent — not ChatGPT, not Perplexity, not Google — can see your catalog. You are invisible by default.',
+      'Your robots.txt tells every crawler to stay out, including Googlebot, so your pages cannot be indexed.',
   },
   'robots-blocks-ai-agents': {
     title: 'Your robots.txt blocks AI agents specifically',
@@ -238,34 +243,35 @@ export const issueCodeToFounderSpeak: Record<string, FounderSpeak> = {
 // results page. Pick one based on the grade.
 export function verdictHeader(args: {
   grade: string
-  invisibleCount: number
+  /** Products carrying at least one critical or high issue. */
+  affectedCount: number
   totalProducts: number
 }): { headline: string; subhead: string } {
-  const { grade, invisibleCount, totalProducts } = args
-  const pct = totalProducts > 0 ? Math.round((invisibleCount / totalProducts) * 100) : 0
+  const { grade, affectedCount, totalProducts } = args
+  const pct = totalProducts > 0 ? Math.round((affectedCount / totalProducts) * 100) : 0
 
   if (grade === 'A' || grade === 'A+') {
     return {
-      headline: `Your catalog is ready for AI shopping agents.`,
-      subhead: `${totalProducts.toLocaleString()} products scanned. ${invisibleCount.toLocaleString()} still have gaps an agent will treat as missing.`,
+      headline: `Your catalog data is in good shape.`,
+      subhead: `${totalProducts.toLocaleString()} products checked. ${affectedCount.toLocaleString()} still carry a gap worth closing.`,
     }
   }
   if (grade === 'B') {
     return {
-      headline: `${invisibleCount.toLocaleString()} of your ${totalProducts.toLocaleString()} products are already visible to AI shopping agents.`,
-      subhead: `The rest have gaps that cause an agent to skip them — fixable, but they need attention.`,
+      headline: `Most of your catalog data is complete.`,
+      subhead: `${affectedCount.toLocaleString()} of ${totalProducts.toLocaleString()} products carry a gap. Google Merchant Center can limit where it shows a listing whose data is incomplete.`,
     }
   }
   if (grade === 'C') {
     return {
-      headline: `${invisibleCount.toLocaleString()} of your ${totalProducts.toLocaleString()} products are invisible to AI shopping agents right now.`,
-      subhead: `That's ${pct}% of your catalog a ChatGPT or Perplexity buyer will never see.`,
+      headline: `${affectedCount.toLocaleString()} of your ${totalProducts.toLocaleString()} products carry a data gap.`,
+      subhead: `That is ${pct}% of your catalog. Merchant Center can limit where it shows those listings.`,
     }
   }
   // D or F
   return {
-    headline: `Your catalog is invisible to AI shopping agents.`,
-    subhead: `${invisibleCount.toLocaleString()} of ${totalProducts.toLocaleString()} products fail the checks an agent runs before it will recommend you.`,
+    headline: `Most of your catalog data is incomplete.`,
+    subhead: `${affectedCount.toLocaleString()} of ${totalProducts.toLocaleString()} products fail at least one of the checks in this report.`,
   }
 }
 

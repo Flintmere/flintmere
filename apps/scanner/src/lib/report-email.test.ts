@@ -60,12 +60,13 @@ function makeScore(overrides: Partial<CompositeScore> = {}): CompositeScore {
       {
         pillar: 'identifiers',
         code: 'missing-gtin',
-        severity: 'critical',
+        severity: 'high',
         title: 'Missing GTINs on 412 products',
-        description: 'Products without GS1-registered barcodes are excluded from AI agent matching.',
+        description:
+          'A product with no GTIN can be limited in where Google Merchant Center shows it. It is not disapproved for that alone.',
         affectedCount: 412,
         affectedProductIds: [],
-        revenueImpactScore: 100,
+        revenueImpactScore: 80,
       },
     ],
     ...overrides,
@@ -80,20 +81,20 @@ const baseInput = {
 };
 
 describe('buildReportEmail', () => {
-  it('puts the invisible-product count and domain in the subject', () => {
+  it('puts the affected-product count and domain in the subject', () => {
     const email = buildReportEmail({ score: makeScore(), ...baseInput });
-    // Critical issue affects 412 products → invisibleCount = 412.
+    // High-severity issue affects 412 products → affectedCount = 412.
     expect(email.subject).toContain('meridian-coffee.myshopify.com');
     expect(email.subject).toContain('412');
-    expect(email.subject).toContain('invisible to AI agents');
+    expect(email.subject).toContain('products have incomplete data');
   });
 
-  it('uses a ready-for-agents subject when the grade is A', () => {
+  it('uses a good-shape subject when the grade is A', () => {
     const email = buildReportEmail({
       score: makeScore({ grade: 'A', score: 92 }),
       ...baseInput,
     });
-    expect(email.subject).toContain('ready for AI shopping agents');
+    expect(email.subject).toContain('catalog data in good shape');
     expect(email.subject).toContain('Grade A');
   });
 
@@ -247,5 +248,46 @@ describe('buildReportEmail — GMC ground truth section (ADR 0023 slice 3)', () 
     // the section IS, but the deterministic anchor flips to the
     // good-news shape.
     expect(email.html).toContain('412 products approved by Google');
+  });
+});
+
+describe('buildReportEmail — GTIN consequences match Google behaviour', () => {
+  it('does not claim a missing barcode makes a product invisible', () => {
+    const email = buildReportEmail({ score: makeScore(), ...baseInput });
+    expect(email.text.toLowerCase()).not.toContain('invisible');
+    expect(email.text.toLowerCase()).not.toContain('cannot match');
+  });
+
+  it('reserves disapproval for the invalid-checksum code', () => {
+    const email = buildReportEmail({
+      score: makeScore({
+        issues: [
+          {
+            pillar: 'identifiers',
+            code: 'invalid-gtin-checksum',
+            severity: 'critical',
+            title: 'Invalid GTIN checksum on 3 products',
+            description: 'x',
+            affectedCount: 3,
+            affectedProductIds: [],
+            revenueImpactScore: 100,
+          },
+        ],
+      }),
+      ...baseInput,
+    });
+    expect(email.text).toContain('disapproves');
+  });
+});
+
+describe('buildReportEmail — no "invisible" claim on any grade', () => {
+  it.each(['A', 'B', 'C', 'D'] as const)('grade %s: subject and body never say invisible', (grade) => {
+    const email = buildReportEmail({
+      score: makeScore({ grade }),
+      ...baseInput,
+    });
+    expect(email.subject.toLowerCase()).not.toContain('invisible');
+    expect(email.html.toLowerCase()).not.toContain('invisible');
+    expect(email.text.toLowerCase()).not.toContain('invisible');
   });
 });
