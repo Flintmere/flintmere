@@ -141,7 +141,7 @@ export async function revertBrandFromVendor(
   beforeState: BrandPlanItem[],
 ): Promise<{ deleted: number; restored: number; failed: number }> {
   let deleted = 0;
-  let restored = 0;
+  const restored = 0;
   let failed = 0;
 
   // Phase 1: only delete-paths exist (we skip products that already had a brand metafield).

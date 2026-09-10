@@ -6,7 +6,6 @@ import {
   Badge,
   BlockStack,
   Box,
-  Button,
   Card,
   IndexTable,
   InlineStack,
