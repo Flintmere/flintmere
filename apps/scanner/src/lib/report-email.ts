@@ -81,7 +81,7 @@ function buildSubject(score: CompositeScore): string {
   if (invisible === 0) {
     return `${score.shopDomain} — full catalog scan · Grade ${score.grade}`;
   }
-  return `${score.shopDomain} — at least ${invisible.toLocaleString()} of ${total.toLocaleString()} products invisible to AI agents`;
+  return `${score.shopDomain} — at least ${invisible.toLocaleString()} of ${total.toLocaleString()} products missing agent-readable data`;
 }
 
 function renderHtml(input: ReportEmailInput): string {

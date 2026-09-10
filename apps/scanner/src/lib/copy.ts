@@ -157,7 +157,7 @@ export const issueCodeToFounderSpeak: Record<string, FounderSpeak> = {
   'missing-gtin': {
     title: 'Products have no barcode',
     consequence:
-      'AI shopping agents cannot match these to the product graph — they stay invisible when a buyer searches by item.',
+      'AI shopping agents match on identifiers. With no barcode there is nothing to match these against.',
   },
   'invalid-gtin-checksum': {
     title: 'Barcode numbers fail the checksum',
@@ -189,7 +189,7 @@ export const issueCodeToFounderSpeak: Record<string, FounderSpeak> = {
   'robots-blocks-all': {
     title: 'Your site blocks every crawler',
     consequence:
-      'No AI agent — not ChatGPT, not Perplexity, not Google — can see your catalog. You are invisible by default.',
+      'No crawler — not ChatGPT, not Perplexity, not Google — is permitted to fetch your catalog.',
   },
   'robots-blocks-ai-agents': {
     title: 'Your robots.txt blocks AI agents specifically',
@@ -252,20 +252,20 @@ export function verdictHeader(args: {
   }
   if (grade === 'B') {
     return {
-      headline: `${invisibleCount.toLocaleString()} of your ${totalProducts.toLocaleString()} products are already visible to AI shopping agents.`,
-      subhead: `The rest have gaps that cause an agent to skip them — fixable, but they need attention.`,
+      headline: `${invisibleCount.toLocaleString()} of your ${totalProducts.toLocaleString()} products carry gaps an agent reads as missing data.`,
+      subhead: `Most of your catalog parses cleanly. These are the ones that do not — fixable, but they need attention.`,
     }
   }
   if (grade === 'C') {
     return {
-      headline: `${invisibleCount.toLocaleString()} of your ${totalProducts.toLocaleString()} products are invisible to AI shopping agents right now.`,
-      subhead: `That's ${pct}% of your catalog a ChatGPT or Perplexity buyer will never see.`,
+      headline: `${invisibleCount.toLocaleString()} of your ${totalProducts.toLocaleString()} products are missing data an agent needs to match them.`,
+      subhead: `That's ${pct}% of your catalog with gaps in the fields agents read first.`,
     }
   }
   // D or F
   return {
-    headline: `Your catalog is invisible to AI shopping agents.`,
-    subhead: `${invisibleCount.toLocaleString()} of ${totalProducts.toLocaleString()} products fail the checks an agent runs before it will recommend you.`,
+    headline: `Your catalog is missing the data agents read first.`,
+    subhead: `${invisibleCount.toLocaleString()} of ${totalProducts.toLocaleString()} products fail the checks an agent runs before it can match them.`,
   }
 }
 

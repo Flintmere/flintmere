@@ -93,7 +93,7 @@ const PILLARS: PillarSpec[] = [
   },
   {
     name: 'Google category match',
-    headline: 'Categorised, or invisible.',
+    headline: 'Mapped, or unclassified.',
     weight: '15%',
     weightPct: 0.15,
     looksFor:
@@ -538,12 +538,13 @@ export default function MarketingHome() {
 
       {/* Chapter 4.5 — Post-Manifesto scan re-invite. Picks up the user
           where the chord left them ("this is what an AI agent reads on
-          your store. The rest is invisible.") with the natural follow-up:
-          see what's invisible on YOUR store. Sits between curtain-pair
+          your store. The rest is unstructured text.") with the natural
+          follow-up: see what an agent reads on YOUR store. Sits between
+          curtain-pair
           and the sticky footer reveal. */}
       <ScanCallout
         eyebrow="// now yours"
-        headline="See what's invisible on your store."
+        headline="See what an agent reads on your store."
       />
 
       {/* Chapter 5 — Footer (sticky-reveal mechanic; Batch B 2026-04-29).

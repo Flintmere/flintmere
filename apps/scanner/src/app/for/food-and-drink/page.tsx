@@ -48,7 +48,7 @@ const MISTAKES: Mistake[] = [
     n: '03',
     title: 'Origin and provenance claims without structured country-of-origin',
     symptom:
-      "Your description talks about 'single-origin Ethiopian beans' or 'British free-range eggs'. Beautiful; no structured country_of_origin field. Agents serving 'British cheese' or 'Italian pasta' queries depend on this metafield. Your provenance-led positioning is invisible to the filter.",
+      "Your description talks about 'single-origin Ethiopian beans' or 'British free-range eggs'. Beautiful; no structured country_of_origin field. Agents serving 'British cheese' or 'Italian pasta' queries depend on this metafield. Your provenance-led positioning sits in prose the filter never reads.",
     pillar: 'Google category match',
     fix: "Flintmere checks for country_of_origin using the ISO 3166-1 spec (GB, IT, ET, FR) and flags products using only prose provenance. We also flag products with Protected Designation of Origin terms in the title but no structured PDO field.",
   },
@@ -86,7 +86,7 @@ const MISTAKES: Mistake[] = [
   },
   {
     n: '08',
-    title: 'Shipping restrictions invisible to agents (alcohol, chilled, age-restricted)',
+    title: 'Shipping restrictions undeclared in structured data (alcohol, chilled, age-restricted)',
     symptom:
       "You ship alcohol, chilled meats, or age-restricted products. An agent recommending your 'artisan charcuterie box' to a shopper in a chilled-delivery blackout zone sends them to a checkout failure. Trust drops; the next agent recommendation goes to a competitor that declared its shipping rules.",
     pillar: 'Agent checkout readiness',

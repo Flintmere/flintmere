@@ -184,7 +184,7 @@ export function buildSystemPrompt(
     'Voice example (acceptable):',
     '  "23 products lack a structured allergen field. Three of these',
     '   reference allergens in the body copy only — readable to humans,',
-    '   invisible to feed validators."',
+    '   absent from the fields a feed validator reads."',
     '',
     'Voice example (banned shape — do not write):',
     '  "We\'re really excited to share that your store has a great',
