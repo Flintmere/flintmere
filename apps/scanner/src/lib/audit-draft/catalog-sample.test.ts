@@ -1,6 +1,38 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { ProductInput } from '@flintmere/scoring'
-import { summariseProductsForLLM } from './catalog-sample'
+
+vi.mock('../shopify-fetcher', () => ({
+  fetchCatalog: vi.fn(async () => ({
+    catalog: {
+      shopDomain: 'example.com',
+      scoredAt: '2026-09-09T00:00:00Z',
+      products: [
+        {
+          id: 'gid://product/1',
+          handle: 'sample-product',
+          title: 'Sample Product',
+          tags: [],
+          variants: [{ id: 'v1', sku: 'SKU-1', barcode: '5012345678900', price: '14.50' }],
+          images: [],
+          barcodeRead: true,
+        },
+      ],
+    },
+    truncated: false,
+    actualProductCount: 1,
+    barcodesRead: 1,
+  })),
+  ShopifyFetchError: class ShopifyFetchError extends Error {
+    code: string
+    constructor(code: string, message: string) {
+      super(message)
+      this.code = code
+    }
+  },
+}))
+
+import { getCatalogSampleForDraft, summariseProductsForLLM } from './catalog-sample'
+import { fetchCatalog } from '../shopify-fetcher'
 
 function buildProduct(overrides: Partial<ProductInput> = {}): ProductInput {
   return {
@@ -134,5 +166,15 @@ describe('summariseProductsForLLM', () => {
     const fields = out.split(' | ')
     expect(fields[1]).toBe('—')
     expect(fields[2]).toBe('—')
+  })
+})
+
+describe('getCatalogSampleForDraft', () => {
+  it('asks the fetcher for a barcode on every product it will summarise', async () => {
+    await getCatalogSampleForDraft('example.com')
+    expect(fetchCatalog).toHaveBeenCalledWith('example.com', {
+      maxPages: 1,
+      barcodeSampleSize: 50,
+    })
   })
 })

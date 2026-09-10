@@ -49,7 +49,13 @@ export async function getCatalogSampleForDraft(
 ): Promise<CatalogSample> {
   let fetched: FetchedCatalog
   try {
-    fetched = await fetchCatalog(rawUrl, { maxPages: 1 })
+    // Ask for a barcode on exactly the products we will summarise. The
+    // summary prints barcode:y/n per product and feeds a paid Catalog
+    // Letter, so the two sizes must not drift apart.
+    fetched = await fetchCatalog(rawUrl, {
+      maxPages: 1,
+      barcodeSampleSize: SAMPLE_SIZE,
+    })
   } catch (err) {
     if (err instanceof ShopifyFetchError) {
       throw new CatalogSampleError(
