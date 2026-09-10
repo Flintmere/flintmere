@@ -43,7 +43,7 @@ export const PILLARS: Pillar[] = [
     weight: 20,
     measures:
       'Whether your products carry the structured attributes a food catalog needs: allergens (FSA Big-14), nutrition declarations (EU 1169/2011), provenance claims (PDO/PGI/TSG), certifications (organic, Fairtrade, RSPCA, etc.), and ingredient lists at the product-data level rather than only in description text.',
-    why: 'AI shopping channels and merchant-side filters work on structured fields, not on free-text descriptions. A product with allergens buried in HTML is invisible to a query like "show me dairy-free granola."',
+    why: 'AI shopping channels and merchant-side filters work on structured fields, not on free-text descriptions. Allergens buried in HTML sit outside the fields those filters read.',
     sources:
       'FSA Big-14 allergen list (food.gov.uk), EU Regulation 1169/2011 (Food Information to Consumers), DEFRA UK GI register, certification-body schemas.',
     installGated: true,

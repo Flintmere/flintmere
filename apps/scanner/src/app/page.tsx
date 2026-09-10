@@ -93,13 +93,13 @@ const PILLARS: PillarSpec[] = [
   },
   {
     name: 'Google category match',
-    headline: 'Categorised, or invisible.',
+    headline: 'Categorised, or limited.',
     weight: '15%',
     weightPct: 0.15,
     looksFor:
       'Every product mapped to a Google Merchant Center taxonomy node, so the agent knows what category your product belongs in.',
     commonMiss:
-      'Default or missing category. Your product is not classified for Google Shopping and falls out of the comparison set.',
+      'Default or missing category. Google assigns one itself, and Merchant Center can limit where it shows a listing whose category it had to infer.',
     whatToDo:
       'Map every product to a specific Google Merchant taxonomy node — not the parent category, the leaf. The more specific, the more agents include you in their comparison set.',
     image: '/marketing/pillars/04-category-match.webp',
@@ -538,12 +538,12 @@ export default function MarketingHome() {
 
       {/* Chapter 4.5 — Post-Manifesto scan re-invite. Picks up the user
           where the chord left them ("this is what an AI agent reads on
-          your store. The rest is invisible.") with the natural follow-up:
-          see what's invisible on YOUR store. Sits between curtain-pair
-          and the sticky footer reveal. */}
+          your store. The rest it has to guess.") with the natural
+          follow-up: see what's missing on YOUR store. Sits between
+          curtain-pair and the sticky footer reveal. */}
       <ScanCallout
         eyebrow="// now yours"
-        headline="See what's invisible on your store."
+        headline="See what's missing on your store."
       />
 
       {/* Chapter 5 — Footer (sticky-reveal mechanic; Batch B 2026-04-29).
