@@ -105,6 +105,46 @@ ADR 0027's own monitor trigger — "revisit the moment Shopify ships food-specif
 
 ## Open questions this ADR does not settle
 
-- **Ocado Roots.** Ocado offers micro and small brands bespoke onboarding, a dedicated team and faster payment terms, free, by invitation on winning a listing. Whether Roots covers the data work or only commercial support determines whether the first gate is contested. Establish before pricing.
+- **Ocado Roots.** Ocado offers micro and small brands bespoke onboarding, a dedicated team and faster payment terms, free, by invitation on winning a listing. Whether Roots covers the data work or only commercial support determines whether the first gate is contested. Establish before pricing. **Closed 2026-09-10 — see Amendment 1.**
 - **Brandbank subscription pricing.** Not published anywhere; NielsenIQ has withdrawn supplier-facing commercial pages. This price sets the reference point for the whole gate.
 - **Amazon UK's gate.** Never verified — the research branch exhausted its search budget. Treated as unknown, not as absent.
+
+## Amendment 1 — 2026-09-10: Roots is commercial support only; the data work is unclaimed
+
+Closes the first open question above. It asked whether Ocado Roots covers the
+data work or only commercial support. That answer decides whether Ocado already
+meets this need for free, and it blocked pricing.
+
+A note on wording: the pivot spec uses "contested" for *a competitor already
+serves this*, so a contested gate is bad for us. Readouts have used the same word
+for *the gate is a real obstacle brands face alone*, which is the opposite. This
+amendment avoids the word.
+
+**Finding.** Roots covers the commercial side: bespoke onboarding that tells a
+brand what the rules are, a named contact, faster payment terms, free analytics.
+It does not do the data work. Four things remain the brand's own problem —
+the Brandbank subscription and content upload, Pro-Forma master data on Olive,
+compliant allergen and nutrition fields, and images prepared to Ocado's spec.
+
+**Consequence 1 — the work is unclaimed, and pricing is unblocked.** A brand
+arrives knowing the requirements and still faces the work alone. Nobody is doing
+it for free. The band magnitudes this ADR re-opened and deferred can now be set;
+that deferral was waiting on exactly this answer.
+
+**Consequence 2 — Roots changes category.** It was filed as a retailer
+accelerator worth noting. It is better read as a referral population with an
+aligned incentive: the programme's own success measure is brands going on to do
+other things elsewhere, so brands stalling at the data gate is the programme's
+problem too. Pivot spec §6 promotes it from the adjacent list to a route in.
+
+**What this does not change.** The binding constraint stands: under 10 hours a
+week, no case study, no warm network in UK food. Confirming demand does not
+create supply. One brand taken from listing chaos to Ocado live remains the only
+unlock — and it *gates* the Roots introduction rather than following it. A
+referral source with nothing to refer to is spent, not used.
+
+**Sourcing.** Desk research, 2026-09-10; the readout reached this repo without
+citations. The programme mailbox and any named contact must be re-verified
+against a citable source before any outreach artifact uses them, and no named
+individual is recorded here on an uncited claim. The standing constraint holds:
+nothing about the retail-gate service appears on a public surface.
