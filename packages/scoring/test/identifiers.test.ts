@@ -110,4 +110,20 @@ describe('scoreIdentifiers — products whose barcode was never read', () => {
     // Only the read product is counted.
     expect(result.issues.find((i) => i.code === 'missing-gtin')?.affectedCount).toBe(1);
   });
+
+  it('pins the score so the barcode-coverage denominator cannot silently regress', () => {
+    // cleanProduct's one read variant carries a valid barcode: full marks on
+    // both barcode sub-checks (45 + 30) if — and only if — the coverage
+    // denominator is readVariants.length (1), not variantCount (2). Brand
+    // (2/2) and SKU-presence (2/2) also score full; SKU-uniqueness scores
+    // zero because both fixtures share cleanProduct's SKU unmodified
+    // (45 + 30 + 10 + 10 + 0 = 95). If the denominator regressed to
+    // variantCount, barcode coverage would silently halve to 0.5 and the
+    // score would drop to 72.5 — this assertion is the one that catches it;
+    // every other test in this suite would still pass.
+    const catalog = makeCatalog([cleanProduct, unreadBarcodeProduct]);
+    const result = scoreIdentifiers(catalog);
+    expect(result.maxScore).toBe(100);
+    expect(result.score).toBe(95);
+  });
 });

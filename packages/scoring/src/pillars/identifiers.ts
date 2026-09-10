@@ -95,7 +95,7 @@ export function scoreIdentifiers(input: CatalogInput): PillarResult {
       severity: 'low' as const,
       title: 'Barcodes were not read',
       description:
-        'Your storefront did not serve the per-product endpoint that carries barcodes, so this scan says nothing about your GTINs either way. The rest of the pillar is scored without them.',
+        'We could not read barcodes on this scan, so it says nothing about your GTINs either way. The brand and SKU checks ran as normal.',
       affectedCount: 0,
       affectedProductIds: [],
       revenueImpactScore: 0,
