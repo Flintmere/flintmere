@@ -827,7 +827,9 @@ The added clause is the only change. Leave the rest of `extractSignals` alone.
 - [ ] **Step 6: Run the whole scoring suite**
 
 Run: `pnpm -F @flintmere/scoring test`
-Expected: PASS. `score.test.ts:82` and `:88` still hold — their fixtures set no `barcodeRead`, so nothing about their scoring changes. If `enrich-issues.test.ts` fails, an `affectedProductIds` array changed shape; re-check the `readProducts` filters.
+Expected: PASS **after one more edit this plan originally missed.** `score.test.ts:82` and `:88` hold — their fixtures set no `barcodeRead`, so their scoring is unchanged. But `score.test.ts:101-106` (`ranks issues by severity × revenue impact`) asserts `result.issues[0]?.severity === 'critical'` for a `noGtinProduct`-only catalog. That is the same inverted severity the two `identifiers.test.ts` assertions encode, reached through `scoreCatalog` instead of `scoreIdentifiers`. Update it to the severity the corrected ranking actually produces, and confirm the top issue is still `missing-gtin` — if it is not, stop and report, because the ranking has changed shape rather than just its label.
+
+If `enrich-issues.test.ts` fails, an `affectedProductIds` array changed shape; re-check the `readProducts` filters.
 
 - [ ] **Step 7: Rebuild and commit**
 
