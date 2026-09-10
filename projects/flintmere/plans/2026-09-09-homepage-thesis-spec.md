@@ -96,6 +96,10 @@ a participle. ≤1 bracket per section holds.
 Inputs (public-scan payload only, unscaled — `{total}` is `score.productCount`, the
 sampled count, never `scaledSuppressionEstimate`):
 
+- `{checked}` = `barcodesRead` from the scan envelope — how many products had a
+  barcode read. Never `{total}`. When `barcodesRead === 0`, no barcode branch fires
+  at all: the header says *We could not read barcodes from your storefront.* and the
+  subhead carries the product-type sentence alone.
 - `{invalidGtin}` = `issues['invalid-gtin-checksum'].affectedCount ?? 0`
 - `{missingBarcode}` = `issues['missing-gtin'].affectedCount ?? 0`
 - `{missingOnly}` = products in `missing-gtin.affectedProductIds` not in `invalid-gtin-checksum.affectedProductIds` (`identifiers.ts:86,105`)
@@ -104,10 +108,11 @@ sampled count, never `scaledSuppressionEstimate`):
 
 **Headline** (first match wins):
 
-1. `{invalidGtin} > 0` → *{invalidGtin} of the {total} products we read carry a barcode that isn't a valid GTIN.*
-2. `{missingBarcode} == {total}` → *None of the {total} products we read carries a barcode.*
-3. `{missingBarcode} > 0` → *Every barcode we read passes its check digit. {missingBarcode} of {total} products have none on at least one variant.*
-4. else → *Every barcode on the {total} products we read passes its check digit.*
+1. `{checked} === 0` → *We could not read barcodes from your storefront.*
+2. `{invalidGtin} > 0` → *{invalidGtin} of the {checked} products we read carry a barcode that fails its check digit.*
+3. `{missingBarcode} == {checked}` → *None of the {checked} products we checked carries a barcode.*
+4. `{missingBarcode} > 0` → *Every barcode we read passes its check digit. {missingBarcode} of {checked} products have none on at least one variant.*
+5. else → *Every barcode on the {checked} products we checked passes its check digit.*
 
 **Subhead** (join every sentence whose condition holds, in order):
 
@@ -145,13 +150,15 @@ Nothing in §4 goes live until `shopify-fetcher.ts` reads `barcode` from
 `/products/{handle}.js`. Planned separately in
 `2026-09-09-fetcher-barcode-plan.md`. Design constraints for that plan:
 
-- One extra request per product. The scan's kindness budget (`PACE_MS`, the 250/page
-  cap, `maxPages=4`) applies. **Ponytail: sample, and state the sampled count** —
-  `{total}` already means the sampled count, and `ScanScopeLine` already states scope.
+- One extra request per product, sampled. The scan's real bound is the 55-second
+  whole-pipeline timeout (`DEFAULT_OPTIONS.timeoutMs`), and the barcode pass takes at
+  most 20s of it, sequentially — one request in flight, which is the pacing. There is
+  no `PACE_MS` in the fetcher; that is an env var of `scripts/batch-scan.ts`.
+  **Ponytail: sample, and state the sampled count** — `ScanScopeLine` states it.
 - Fallback wording when the `.js` endpoint is blocked (password-protected or headless
   storefront): the header must say barcodes were not read, not that none exist.
 - A store whose products genuinely carry no barcodes (the `.js` returns `null`) must
-  land on headline branch 2, not branch 4.
+  land on headline branch 3, not branch 5.
 - `identifiers.ts` severity is currently inverted — `missing-gtin` is *critical* above
   `invalid-gtin-checksum` at *high*. Under Google's actual behaviour that is backwards.
   Swap them in the same change.
@@ -256,7 +263,7 @@ and a manual pass at 1280px (pinned wheel, modal open/ESC/focus-restore, and the
 
 ## 7. Risks accepted, named
 
-- **The common result is a pass.** Most catalogs leave barcode blank or paste a real GTIN; the paste usually returns branch 2, 3 or 4, not a wrong digit. The hero is true and the path from a clean result to the £197 letter is thin (one product-type line). Accepted — this page is not the acquisition strategy; partner-first is (pivot spec §3).
+- **The common result is a pass.** Most catalogs leave barcode blank or paste a real GTIN; the paste usually returns branch 3, 4 or 5, not a wrong digit. The hero is true and the path from a clean result to the £197 letter is thin (one product-type line). Accepted — this page is not the acquisition strategy; partner-first is (pivot spec §3).
 - **Diagnostics-fluent merchants** already get their invalid-GTIN list free from Merchant Center. The differentiator is pre-feed, every-variant storefront reading; the copy implies it, doesn't state it. Accepted.
 - **Non-Google-Shopping merchants** have no stake in "Disapproved." Accepted per ADR 0015 target; the page self-selects.
 - **320px:** *"Disapproved."* measures 292px in a 272px column and the hero's `overflow-hidden` clips it. Needs a `max-sm` font step. 375 was the floor; this is a follow-up, not a blocker.
