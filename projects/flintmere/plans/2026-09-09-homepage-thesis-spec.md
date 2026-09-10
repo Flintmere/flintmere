@@ -10,7 +10,7 @@ canon_sources:
   - packages/scoring/src/pillars/identifiers.ts
   - memory/VOICE.md
   - memory/design/tokens.md
-canon_audit_run: 2026-09-09
+canon_audit_run: 2026-09-10
 binding: CLAUDE.md §Binding 2026-05-09 (canon protection)
 parity_note: >
   The deliverable-parity surfaces (catalog-letter/page.tsx, catalog-letter/success/page.tsx,
@@ -85,7 +85,7 @@ guess what it costs you.*
 | 4 | Manifesto close | `ManifestoChord.tsx:454-456` | `// this is a product, read as data.` / `// yours, checked to the last digit.` |
 | 5 | `/scan` H1 + lede | `scan/page.tsx:111-129` | H1 identical to slot 1. Lede = slot 2a alone; drop 2b (the form is directly beneath). |
 | 6 | OG headline | `opengraph-image.tsx:74` | One wrong [ digit ]. Disapproved. |
-| 7 | Results verdict header | `copy.ts:261-268` `verdictHeader()` | Branching template — §2.2 |
+| 7 | Results verdict header | `copy.ts:280` `verdictHeader()` (was `:261-268`; pushed down by `isStrongGrade`, which this branch added) | Branching template — §2.2 |
 | 8 | Report email subject | `report-email.ts:84` | Branching template — §2.3 |
 
 The bracket noun is **digit**. `memory/VOICE.md:32` requires a noun; "suppressed" was
@@ -93,13 +93,16 @@ a participle. ≤1 bracket per section holds.
 
 ### 2.2 Results verdict header — template
 
-Inputs (public-scan payload only, unscaled — `{total}` is `score.productCount`, the
-sampled count, never `scaledSuppressionEstimate`):
+Inputs (public-scan payload only, unscaled — never `scaledSuppressionEstimate`):
 
-- `{checked}` = `barcodesRead` from the scan envelope — how many products had a
-  barcode read. Never `{total}`. When `barcodesRead === 0`, no barcode branch fires
-  at all: the header says *We could not read barcodes from your storefront.* and the
-  subhead carries the product-type sentence alone.
+- `{checked}` = `barcodesRead ?? 0` — how many products had a barcode read.
+  `barcodesRead` is optional on both `FetchedCatalog` and `ScanResult`: a cached scan,
+  a scan persisted before this field existed, or an envelope where the barcode pass
+  never ran can carry `undefined`. The `?? 0` default routes all three cases into
+  `{checked} === 0`, the same branch a genuine zero takes — never into `undefined`
+  appearing in rendered copy. When `{checked} === 0`, branch 1 fires (it is itself a
+  barcode branch, not an absence of one): the header says *We could not read barcodes
+  from your storefront.* and the subhead carries the product-type sentence alone.
 - `{invalidGtin}` = `issues['invalid-gtin-checksum'].affectedCount ?? 0`
 - `{missingBarcode}` = `issues['missing-gtin'].affectedCount ?? 0`
 - `{missingOnly}` = products in `missing-gtin.affectedProductIds` not in `invalid-gtin-checksum.affectedProductIds` (`identifiers.ts:86,105`)
@@ -128,12 +131,13 @@ sufficient; GS1 registration is not tested. Never write "N GTINs" — counts are
 with ≥1 failing variant. The `ambiguousAllergen` count does **not** render in the
 header (false-positive on coffee, tea, wine, honey); it stays in the pillar breakdown
 with the caveat *"products containing none of the 14 regulated allergens need no
-statement."* When `truncated`, keep the sampled `{total}` and let `ScanScopeLine` state
-scope.
+statement."* When `truncated`, the header's denominator stays `{checked}` — never
+`{total}`, which this section no longer defines; `ScanScopeLine` states
+catalog-truncation scope separately.
 
 ### 2.3 Report email subject — template
 
-Built by `buildSubject()` (`report-email.ts:100`). Task 6 of this branch
+Built by `buildSubject()` (`report-email.ts:100`). Task 6 of `fix/fetcher-barcode-read`
 renamed the underlying floor helper `invisibleCountFor()` → `affectedCountFor()`
 and replaced the barcode-specific branching this section originally specified
 with a single generic template — the shipped code has no invalid-GTIN,
@@ -156,6 +160,9 @@ Inputs:
 1. `{affected} === 0 && isStrongGrade(grade)` → *{shopDomain} — catalog data in good shape · Grade {grade}*
 2. `{affected} === 0 && !isStrongGrade(grade)` → *{shopDomain} — full catalog scan · Grade {grade}*
 3. else → *{shopDomain} — at least {affected} of {total} products have incomplete data*
+
+`{affected}` and `{total}` both render via `.toLocaleString()` in the shipped code
+(`report-email.ts:117`) — a four-figure catalog reads "1,076 products", not "1076".
 
 No branch names a barcode, a GTIN, or a product type; none claims a product
 is invisible to, excluded from, skipped by, or unmatchable by an AI agent.
@@ -186,15 +193,36 @@ Nothing in §4 goes live until `shopify-fetcher.ts` reads `barcode` from
 ## 4. Scope — one PR, after §3 lands
 
 ### 4.1 Thesis slots
-Slots 1–8 as tabled in §2.1.
+Slots 1–8 as tabled in §2.1. Slot 8 (report email subject) needs no further change in
+this PR — it shipped on `fix/fetcher-barcode-read` (§2.3 already describes the shipped
+`buildSubject()`).
 
 ### 4.2 Same-PR contradictions (the scan result must not contradict the hero)
-- `copy.ts:287` `SUPPRESSION_LEDE_EYEBROW` "Likely suppressed in Google Shopping" — remove with SuppressionLede.
-- `copy.ts:126,138` pillar descriptions ("the codes AI shopping agents use", "robots rules, sitemaps, llms.txt") — rewrite.
-- `copy.ts:160,192` "invisible" sentences — remove.
-- `copy.ts:197-206` GPTBot / llms.txt issue titles — rewrite to crawlability without llms.txt.
+
+Reconciled against the shipped `copy.ts` and `report-email.ts` on
+`fix/fetcher-barcode-read` (2026-09-10). Task 6 of that branch already did two of the
+items below; both are marked **DONE**. Three more carry corrected line references —
+this branch's own edits to `copy.ts` and `app/score/[shop]/page.tsx` pushed the
+originally-cited lines down. Everything else is unchanged and still owed to the
+homepage PR.
+
+- **DONE** — `copy.ts:126,138` pillar descriptions ("the codes AI shopping agents
+  use", "robots rules, sitemaps, llms.txt") — Task 6 (commits `6892573`, `51ef8d8`,
+  `d041955`, `b07a7b5`) rewrote every entry in `pillarExplanationCustomerFacing`
+  against the pillar source; see the comment at `copy.ts:125-133`. No "AI shopping
+  agents" framing remains in that record.
+- **DONE** — `copy.ts:160,192` "invisible" sentences — Task 6 (commit `6892573`)
+  retired every "invisible" claim; the word does not occur in `copy.ts` any more.
+- `copy.ts:351` (was `:287` — pushed down by Task 6's edits)
+  `SUPPRESSION_LEDE_EYEBROW` "Likely suppressed in Google Shopping" — still present
+  verbatim; remove with SuppressionLede as originally specified.
+- `copy.ts:222-236` (was `:197-206` — same drift) GPTBot / llms.txt issue titles
+  (`robots-blocks-ai-agents`, `missing-llms-txt`, `malformed-llms-txt`) — still
+  present verbatim; rewrite to crawlability without llms.txt as originally specified.
 - `methodology-data.ts:32` → *An invalid identifier gets a product disapproved; a missing one limits where it shows.* `:46` — remove the "invisible to a query" line.
-- `app/score/[shop]/page.tsx:64,135` — drop "the seven checks AI shopping agents use" and the llms.txt mention.
+- `app/score/[shop]/page.tsx:65,154` (was `:64,135` — drifted when this branch's
+  Task 8 added the scan-scope line to this page) — drop "the seven checks AI shopping
+  agents use" and the llms.txt mention.
 - `app/about/page.tsx:144-145` — the company purpose statement; rewrite to the §2 thesis register.
 - `app/pricing/page.tsx:52` "Fake barcodes get listings suppressed" → *disapproved* (a fake GTIN is an incorrect one).
 - `app/for/plus/page.tsx:20-30` — llms.txt scoring claim and "invisible to every GPT-powered shopping surface"; remove.
@@ -211,11 +239,24 @@ Slots 1–8 as tabled in §2.1.
 - `packages/ui/src/SiteFooter.tsx:151-157` — the *"App (Plus beta)"* link; the app is retired as a near-term deliverable (ADR 0029 §5).
 
 ### 4.4 Tests that are supposed to fail, then be rewritten
-- `lib/copy-revenue-lede.test.ts:23-25,38,48` — asserts the "annual demand at risk while these stay suppressed" string.
-- `lib/report-email.test.ts:88` — asserts subject contains "invisible to AI agents".
-- `lib/copy-integrity.test.ts:4,47-48` — imports `SUPPRESSION_LEDE_SUBHEAD`; breaks at import if the export goes. **Decision: keep the `copy.ts` exports as dead code, delete the SuppressionLede component; the model-retirement PR removes the exports and their tests together.**
-- `app/api/scan/route.test.ts:115-130` — asserts `suppressionEstimate` on the payload; safe while the field stays.
-- `app/page.hero-fold.test.ts` — checks `lg:min-h-screen` only; safe.
+
+Reconciled against the shipped test files on `fix/fetcher-barcode-read` (2026-09-10).
+
+- `lib/copy-revenue-lede.test.ts:23-25,38,48` — asserts the "annual demand at risk while these stay suppressed" string. Confirmed accurate, unchanged.
+- **DONE / MOOT** — `lib/report-email.test.ts:88` — this line no longer asserts
+  "invisible to AI agents". Task 6 of this branch (commits `6892573`, `51ef8d8`,
+  `b07a7b5`) replaced the barcode-specific subject branching with the generic
+  `affectedCountFor`/`isStrongGrade` template (§2.3); line 88 now reads
+  `expect(email.subject).toContain('412');` — a plain affected-count assertion with
+  nothing barcode- or AI-agent-specific left to fail when the model-retirement PR
+  lands. Nothing left for this item.
+- `lib/copy-integrity.test.ts:5,51-52` (was `:4,47-48` — drifted by an unrelated
+  import-order edit) — imports `SUPPRESSION_LEDE_SUBHEAD`; breaks at import if the
+  export goes. **Decision unchanged: keep the `copy.ts` exports as dead code, delete
+  the SuppressionLede component; the model-retirement PR removes the exports and
+  their tests together.**
+- `app/api/scan/route.test.ts:115-130` — asserts `suppressionEstimate` on the payload; safe while the field stays. Confirmed accurate, unchanged.
+- `app/page.hero-fold.test.ts` — checks `lg:min-h-screen` only; safe. Confirmed accurate, unchanged.
 
 ### 4.5 Out of scope, deliberately
 - **`suppressionEstimate` / `aov-estimate` model retirement** (`run-scan.ts:129-182`, `packages/scoring/src/pillars/suppression-estimate.ts`, `aov-estimate.ts`, `index.ts:9`, `api/scan/route.ts:150-154`, `copy.ts:287-505`, `gmc-copy.ts` truncatedNote). Own tests, own PR. This PR removes every *render* of the model; the model itself keeps computing into fields nothing displays.
