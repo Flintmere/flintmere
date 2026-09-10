@@ -369,6 +369,34 @@ describe('buildReportEmail — the verdict headline agrees with its own count', 
   });
 });
 
+describe('buildReportEmail — scan scope line (Task 7)', () => {
+  // Same trust-anchor as the on-page ScanScopeLine: a merchant reading
+  // only the email must not mistake a sampled barcode count for a
+  // whole-catalog count.
+  it('states "barcodes not read" when the scope carries barcodesRead: 0', () => {
+    const email = buildReportEmail({
+      score: makeScore(),
+      ...baseInput,
+      scanScope: {
+        sampledCount: 120,
+        actualProductCount: 120,
+        truncated: false,
+        barcodesRead: 0,
+      },
+    });
+    expect(email.html).toContain('barcodes not read');
+    expect(email.text).toContain('barcodes not read');
+  });
+
+  it('renders no scope line at all when scanScope is absent', () => {
+    // Reports rebuilt from a scan persisted before the barcode pass
+    // shipped carry no scanScope — omit the line rather than guess.
+    const email = buildReportEmail({ score: makeScore(), ...baseInput });
+    expect(email.html).not.toContain('Scanned');
+    expect(email.text).not.toContain('Scanned');
+  });
+});
+
 describe('verdictHeader — every branch is true for every reachable input', () => {
   // verdictHeader takes `grade: string`, so it accepts 'A+' even though
   // CompositeScore['grade'] has no such member and no caller can produce

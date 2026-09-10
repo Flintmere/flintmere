@@ -64,6 +64,7 @@ export function Results({ result }: { result: ScanResult }) {
         sampledCount={result.productCount}
         actualProductCount={result.actualProductCount ?? null}
         truncated={result.truncated ?? false}
+        barcodesRead={result.barcodesRead ?? null}
       />
 
       {/*

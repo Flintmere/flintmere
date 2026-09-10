@@ -499,29 +499,6 @@ export function sampledRevenueDisclosure(args: {
 }
 
 /**
- * Scope line shown above every results lede — gives the merchant
- * calibration on what we scanned BEFORE they read the £-figure. Per
- * BUSINESS.md:19 council ruling 2026-04-27 #3: trust-anchor sits ahead of
- * the headline so the merchant absorbs the sampling story before the
- * number lands.
- */
-export function scanScopeLine(args: {
-  sampledCount: number
-  actualProductCount: number | null
-  truncated: boolean
-}): string {
-  const sampled = args.sampledCount.toLocaleString()
-  if (!args.truncated) {
-    return `Scanned ${sampled} products · 60 seconds`
-  }
-  const total =
-    args.actualProductCount !== null
-      ? args.actualProductCount.toLocaleString()
-      : `${sampled}+`
-  return `Scanned ${sampled} of ${total} products · 60 seconds`
-}
-
-/**
  * Revenue-band lede — two-beat with deterministic count-anchor.
  *
  * Headline anchors on a number the merchant can re-derive from their own

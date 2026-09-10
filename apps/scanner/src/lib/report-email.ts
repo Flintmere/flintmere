@@ -12,6 +12,7 @@ import {
   pillarLabelCustomerFacing,
   verdictHeader,
 } from './copy';
+import { scanScopeLine } from './copy-scan-scope';
 import {
   GMC_EMAIL_BANNER_LABEL,
   GMC_EMAIL_FOOTNOTE,
@@ -54,6 +55,17 @@ export interface ReportEmailInput {
    * own issue language ahead of the modelled signals. Null otherwise.
    */
   gmcGroundTruth?: GmcGroundTruth | null;
+  /**
+   * Scan scope, so a sampled count is never read as a whole-catalog count.
+   * Optional: reports rebuilt from a scan persisted before the barcode pass
+   * shipped do not carry it, and omit the line rather than guess.
+   */
+  scanScope?: {
+    sampledCount: number;
+    actualProductCount: number | null;
+    truncated: boolean;
+    barcodesRead?: number | null;
+  } | null;
 }
 
 export function buildReportEmail(input: ReportEmailInput): {
@@ -106,7 +118,7 @@ function buildSubject(score: CompositeScore): string {
 }
 
 function renderHtml(input: ReportEmailInput): string {
-  const { score, unsubscribeUrl, appUrl, auditUrl, gmcGroundTruth } = input;
+  const { score, unsubscribeUrl, appUrl, auditUrl, gmcGroundTruth, scanScope } = input;
   const topIssues = score.issues.slice(0, 3);
   const unlockedPillars = score.pillars.filter((p) => !p.locked);
   const lockedPillars = score.pillars.filter((p) => p.locked);
@@ -118,6 +130,7 @@ function renderHtml(input: ReportEmailInput): string {
     totalProducts: score.productCount,
   });
   const gradeAnchor = gradeBadgeAnchor({ grade: score.grade });
+  const scopeLine = scanScope ? scanScopeLine(scanScope) : null;
   const gmcSection = gmcGroundTruth ? renderGmcSectionHtml(gmcGroundTruth) : '';
 
   const evidenceRows = topIssues
@@ -188,6 +201,11 @@ function renderHtml(input: ReportEmailInput): string {
               <div style="margin-top:10px;font-size:15px;color:#5A5C64;line-height:1.5;">
                 ${esc(verdict.subhead)}
               </div>
+              ${
+                scopeLine
+                  ? `<div style="margin-top:10px;font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.08em;color:#8B8D95;">${esc(scopeLine)}</div>`
+                  : ''
+              }
               <div style="margin-top:16px;font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.08em;color:#5A5C64;">
                 ${esc(gradeAnchor)}
               </div>
@@ -396,13 +414,14 @@ ${GMC_EMAIL_FOOTNOTE}`;
 }
 
 function renderText(input: ReportEmailInput): string {
-  const { score, unsubscribeUrl, appUrl, auditUrl, gmcGroundTruth } = input;
+  const { score, unsubscribeUrl, appUrl, auditUrl, gmcGroundTruth, scanScope } = input;
   const affected = affectedCountFor(score);
   const verdict = verdictHeader({
     grade: score.grade,
     affectedCount: affected,
     totalProducts: score.productCount,
   });
+  const scopeLine = scanScope ? scanScopeLine(scanScope) : null;
   const gmcBlock = gmcGroundTruth ? `${renderGmcSectionText(gmcGroundTruth)}\n\n` : '';
 
   const top = score.issues
@@ -439,7 +458,7 @@ ${verdict.headline}
 
 ${verdict.subhead}
 
-${gradeBadgeAnchor({ grade: score.grade })}
+${scopeLine ? `${scopeLine}\n\n` : ''}${gradeBadgeAnchor({ grade: score.grade })}
 
 ${gmcBlock}How we score
 ${AUTHORITY_LINE}
