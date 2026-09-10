@@ -44,6 +44,7 @@ canon_audit_run: pending — Task 9 gate 6 runs it on the final diff
 | `packages/scoring/test/identifiers.test.ts` | modify | Severity assertions flip; unread-product cases added. |
 | `packages/scoring/test/fixtures/products.ts` | modify | Adds `unreadBarcodeProduct`. |
 | `apps/scanner/src/lib/copy.ts` | modify | Two issue consequences rewritten; `scanScopeLine` states the barcode count. |
+| `apps/scanner/src/lib/copy-scan-scope.ts` | **create** | `scanScopeLine` and its helpers. Extracted 2026-09-10: the change would have pushed `copy.ts` from 588 to 604, over the 600-line ceiling (`memory/PROCESS.md` rule 2). One function, one responsibility, and the test file below already implied the module. Callers import from here; no re-export shim in `copy.ts`. |
 | `apps/scanner/src/lib/copy-scan-scope.test.ts` | **create** | Locks the scope-line branches. |
 | `apps/scanner/src/lib/run-scan.ts` | modify | Threads `barcodesRead` into the result + persisted JSON. |
 | `apps/scanner/src/app/api/scan/route.ts` | modify | Emits `barcodesRead` in the envelope. |
