@@ -75,8 +75,34 @@ const DEFAULT_OPTIONS: Required<FetchOptions> = {
   barcodeSampleSize: 50,
 };
 
-/** Wall-clock ceiling for the barcode pass alone, inside the 55s pipeline. */
+/**
+ * Wall-clock ceiling for the barcode pass alone, inside the 55s pipeline.
+ * This is only a real ceiling because every request inside the pass is
+ * itself bounded by `BARCODE_REQUEST_TIMEOUT_MS` (mirroring
+ * `fetchProductCount`'s local-controller pattern) — the deadline check
+ * between requests can be overrun by at most one in-flight request's
+ * timeout, never by an unbounded stall.
+ */
 const BARCODE_BUDGET_MS = 20_000;
+
+/**
+ * Per-request ceiling for a single /products/{handle}.js fetch, forwarding
+ * the parent pipeline abort — same pattern as `fetchProductCount`. Without
+ * this, `BARCODE_BUDGET_MS` is checked only between requests, so one
+ * stalled request could run until the 55s pipeline abort fires instead of
+ * the 20s barcode budget.
+ */
+const BARCODE_REQUEST_TIMEOUT_MS = 5_000;
+
+/**
+ * How many consecutive non-404 failures (429, 5xx, malformed body, network
+ * error) the pass tolerates before concluding the endpoint is struggling
+ * and giving up on the rest of the storefront. A 404 is a per-handle miss
+ * — it never counts here. Kept small: the kindness contract means a
+ * struggling host sees at most a handful of probes, not the full sample,
+ * and the ceiling applies whether or not a product has already been read.
+ */
+const BARCODE_FAILURE_CEILING = 3;
 
 /** One literal, three call sites. */
 const SCANNER_UA = 'Flintmere-Scanner/0.1 (+https://flintmere.com/bot)';
@@ -276,6 +302,21 @@ async function fetchProductCount(
 }
 
 /**
+ * Outcome of reading one product's .js document.
+ * - `ok`: usable JSON with a variants array — may still share no variant
+ *   ids with the product that requested it (a redirected/stale handle).
+ * - `miss`: 404 — this handle doesn't exist any more. A per-handle fact,
+ *   not evidence the endpoint itself is struggling.
+ * - `blocked`: any other non-2xx status, an unparsable body, or a network
+ *   error — the kind of failure that suggests the endpoint (or the host)
+ *   is the problem, not this one handle.
+ */
+type BarcodeFetchOutcome =
+  | { kind: 'ok'; barcodes: Map<string, string | null> }
+  | { kind: 'miss' }
+  | { kind: 'blocked' };
+
+/**
  * Second pass: reads `barcode` for the first `sampleSize` products from
  * /products/{handle}.js and writes it onto the already-built variants.
  *
@@ -283,7 +324,9 @@ async function fetchProductCount(
  * key. `toProductInput` read `v.barcode ?? null` from a field that was
  * never in the response, so every public scan reported 100% missing GTIN.
  *
- * Mutates `products` in place — one pass, no copy of a 1,000-product array.
+ * Mutates `products` in place. `.slice` below copies only up to
+ * `sampleSize` references (a small array of pointers) — not a deep copy of
+ * the products, and not a copy of the whole catalog.
  * Returns how many products were successfully read.
  */
 async function readBarcodes(
@@ -299,65 +342,98 @@ async function readBarcodes(
 
   const deadline = Date.now() + BARCODE_BUDGET_MS;
   let read = 0;
+  let consecutiveFailures = 0;
 
   for (const product of products.slice(0, sampleSize)) {
     if (signal.aborted || Date.now() > deadline) break;
 
-    const barcodeByVariantId = await fetchVariantBarcodes(
-      domain,
-      product.handle,
-      signal,
-    );
+    const outcome = await fetchVariantBarcodes(domain, product.handle, signal);
 
-    if (barcodeByVariantId === null) {
-      // Nothing has worked yet, so the endpoint is blocked storefront-wide
-      // (password page, headless front end) — stop rather than spend the
-      // budget proving it 50 times. A failure after a success is a one-off,
-      // typically a handle that 404s; skip that product and carry on.
-      if (read === 0) break;
+    if (outcome.kind === 'miss') {
+      // Per-handle fact (the product is gone/renamed) — no signal about
+      // the endpoint's health, so it never counts towards the ceiling.
+      continue;
+    }
+
+    if (outcome.kind === 'blocked') {
+      consecutiveFailures += 1;
+      if (consecutiveFailures >= BARCODE_FAILURE_CEILING) break;
+      continue;
+    }
+
+    // outcome.kind === 'ok'. A doc that shares none of this product's
+    // variant ids (e.g. a handle that now redirects elsewhere) is not a
+    // genuine read of THIS product — don't claim we checked it, and let it
+    // count towards the same failure ceiling as any other failed read. A
+    // partial match is still a successful read (a variant added between
+    // the two fetches is expected drift, not a mismatch).
+    const anyMatch = product.variants.some((variant) =>
+      outcome.barcodes.has(variant.id),
+    );
+    if (!anyMatch) {
+      consecutiveFailures += 1;
+      if (consecutiveFailures >= BARCODE_FAILURE_CEILING) break;
       continue;
     }
 
     for (const variant of product.variants) {
-      variant.barcode = barcodeByVariantId.get(variant.id) ?? null;
+      variant.barcode = outcome.barcodes.get(variant.id) ?? null;
     }
     product.barcodeRead = true;
     read += 1;
+    consecutiveFailures = 0;
   }
 
   return read;
 }
 
 /**
- * Reads one product's .js document. Returns variant-id → barcode, or null
- * when the endpoint did not serve usable JSON. Never throws: a barcode we
+ * Reads one product's .js document. Bounded by its own local abort
+ * controller (`BARCODE_REQUEST_TIMEOUT_MS`), forwarding the parent signal —
+ * same pattern as `fetchProductCount` — so a single stalled request cannot
+ * itself exceed the barcode pass's budget. Never throws: a barcode we
  * could not read is a smaller problem than a scan that fails outright.
  */
 async function fetchVariantBarcodes(
   domain: string,
   handle: string,
-  signal: AbortSignal,
-): Promise<Map<string, string | null> | null> {
+  parentSignal: AbortSignal,
+): Promise<BarcodeFetchOutcome> {
+  const localController = new AbortController();
+  const localTimer = setTimeout(
+    () => localController.abort(),
+    BARCODE_REQUEST_TIMEOUT_MS,
+  );
+  const onParentAbort = () => localController.abort();
+  parentSignal.addEventListener('abort', onParentAbort, { once: true });
+
   try {
     const res = await fetch(
       `https://${domain}/products/${encodeURIComponent(handle)}.js`,
       {
-        signal,
+        signal: localController.signal,
         headers: { 'user-agent': SCANNER_UA, accept: 'application/json' },
       },
     );
-    if (!res.ok) return null;
+    if (res.status === 404) return { kind: 'miss' };
+    if (!res.ok) return { kind: 'blocked' };
 
     const body = (await res.json()) as {
       variants?: Array<{ id: number | string; barcode?: string | null }>;
     };
-    if (!Array.isArray(body.variants)) return null;
+    if (!Array.isArray(body.variants)) return { kind: 'blocked' };
 
-    return new Map(
-      body.variants.map((v) => [String(v.id), v.barcode ?? null] as const),
-    );
+    return {
+      kind: 'ok',
+      barcodes: new Map(
+        body.variants.map((v) => [String(v.id), v.barcode ?? null] as const),
+      ),
+    };
   } catch {
-    return null;
+    return { kind: 'blocked' };
+  } finally {
+    clearTimeout(localTimer);
+    parentSignal.removeEventListener('abort', onParentAbort);
   }
 }
 

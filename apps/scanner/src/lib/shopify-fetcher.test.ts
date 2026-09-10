@@ -138,7 +138,13 @@ describe('fetchCatalog — barcode pass', () => {
     mockFetch([
       ['/products.json', () => json({ products })],
       ['/products/count.json', () => json({ count: 3 })],
-      ['.js', () => json(jsDoc([{ id: 10, barcode: '5012345678900' }]))],
+      // Anchored on the product path (not a bare '.js', which also matches
+      // '/products.json' — Minor 5) and keyed per handle so each doc
+      // carries that product's own variant id (Finding 3's fix rejects a
+      // doc that shares no variant ids with the product being read).
+      ['/products/product-1.js', () => json(jsDoc([{ id: 10, barcode: '5012345678900' }]))],
+      ['/products/product-2.js', () => json(jsDoc([{ id: 20, barcode: '5012345678901' }]))],
+      ['/products/product-3.js', () => json(jsDoc([{ id: 30, barcode: '5012345678902' }]))],
     ]);
 
     const result = await fetchCatalog('example.com', { barcodeSampleSize: 2 });
@@ -158,5 +164,167 @@ describe('fetchCatalog — barcode pass', () => {
     expect(result.barcodesRead).toBe(0);
     expect(result.catalog.products[0]!.barcodeRead).toBe(false);
     expect(fn.mock.calls.every((c) => !String(c[0]).endsWith('.js'))).toBe(true);
+  });
+});
+
+describe('fetchCatalog — barcode read integrity (Finding 3)', () => {
+  it('does not mark a product read when its .js document shares no variant ids with it', async () => {
+    mockFetch([
+      ['/products.json', () => json({ products: [rawProduct(1, [10])] })],
+      ['/products/count.json', () => json({ count: 1 })],
+      // A redirected/stale handle: the doc that comes back describes a
+      // completely different product's variants.
+      ['/products/product-1.js', () => json(jsDoc([{ id: 999, barcode: '5012345678900' }]))],
+    ]);
+
+    const result = await fetchCatalog('example.com');
+
+    expect(result.catalog.products[0]!.barcodeRead).toBe(false);
+    expect(result.barcodesRead).toBe(0);
+    expect(result.catalog.products[0]!.variants[0]!.barcode).toBeNull();
+  });
+
+  it('still counts a partial match as a successful read', async () => {
+    mockFetch([
+      ['/products.json', () => json({ products: [rawProduct(1, [10, 11])] })],
+      ['/products/count.json', () => json({ count: 1 })],
+      // Only variant 10 appears in the doc — 11 was added since the two
+      // fetches ran. Still a genuine read of this product.
+      ['/products/product-1.js', () => json(jsDoc([{ id: 10, barcode: '5012345678900' }]))],
+    ]);
+
+    const result = await fetchCatalog('example.com');
+
+    expect(result.catalog.products[0]!.barcodeRead).toBe(true);
+    expect(result.barcodesRead).toBe(1);
+    expect(result.catalog.products[0]!.variants[0]!.barcode).toBe('5012345678900');
+  });
+});
+
+describe('fetchCatalog — barcode failure ceiling (Finding 2)', () => {
+  it('stops after consecutive non-404 failures before any product has been read', async () => {
+    const products = [1, 2, 3, 4, 5].map((n) => rawProduct(n, [n * 10]));
+    const fn = mockFetch([
+      ['/products.json', () => json({ products })],
+      ['/products/count.json', () => json({ count: 5 })],
+      ['.js', () => json({}, 429)],
+    ]);
+
+    const result = await fetchCatalog('example.com');
+
+    expect(result.barcodesRead).toBe(0);
+    expect(result.catalog.products.every((p) => p.barcodeRead === false)).toBe(true);
+    // Ceiling is 3 — stops there rather than probing all 5.
+    expect(fn.mock.calls.filter((c) => String(c[0]).endsWith('.js'))).toHaveLength(3);
+  });
+
+  it('stops after consecutive non-404 failures even once a prior product was read', async () => {
+    const products = [1, 2, 3, 4, 5].map((n) => rawProduct(n, [n * 10]));
+    const fn = mockFetch([
+      ['/products.json', () => json({ products })],
+      ['/products/count.json', () => json({ count: 5 })],
+      ['/products/product-1.js', () => json(jsDoc([{ id: 10, barcode: '5012345678900' }]))],
+      ['.js', () => json({}, 500)],
+    ]);
+
+    const result = await fetchCatalog('example.com');
+
+    // One success does not grant an unlimited pass afterwards — the
+    // ceiling still applies to failures that follow it.
+    expect(result.barcodesRead).toBe(1);
+    expect(result.catalog.products.map((p) => p.barcodeRead)).toEqual([
+      true,
+      false,
+      false,
+      false,
+      false,
+    ]);
+    expect(fn.mock.calls.filter((c) => String(c[0]).endsWith('.js'))).toHaveLength(4);
+  });
+
+  it('lets 404s continue indefinitely without counting towards the stop ceiling', async () => {
+    const products = [1, 2, 3, 4, 5, 6].map((n) => rawProduct(n, [n * 10]));
+    const fn = mockFetch([
+      ['/products.json', () => json({ products })],
+      ['/products/count.json', () => json({ count: 6 })],
+      ['/products/product-2.js', () => json({}, 404)],
+      ['/products/product-4.js', () => json({}, 404)],
+      ['.js', () => json({}, 503)],
+    ]);
+
+    const result = await fetchCatalog('example.com');
+
+    // products 1, 3, 5 all 503 — three non-404 failures reaches the
+    // ceiling even though 404s at 2 and 4 are interleaved between them,
+    // because a 404 never resets or advances the failure count either way.
+    expect(result.barcodesRead).toBe(0);
+    expect(result.catalog.products.every((p) => p.barcodeRead === false)).toBe(true);
+    expect(fn.mock.calls.filter((c) => String(c[0]).endsWith('.js'))).toHaveLength(5);
+  });
+});
+
+describe('fetchCatalog — barcode per-request ceiling (Finding 1)', () => {
+  it('bounds a single stalled .js request to its own timeout, not the whole barcode budget', async () => {
+    vi.useFakeTimers();
+    try {
+      const fn = vi.fn((input: string | URL, init?: RequestInit) => {
+        const url = String(input);
+        if (url.includes('/products.json')) {
+          return Promise.resolve(json({ products: [rawProduct(1, [10])] }));
+        }
+        if (url.includes('/products/count.json')) {
+          return Promise.resolve(json({ count: 1 }));
+        }
+        // A request that never resolves on its own — only the per-request
+        // AbortController (Finding 1) can end it, by aborting `init.signal`.
+        return new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () => {
+            reject(new Error('aborted'));
+          });
+        });
+      });
+      vi.stubGlobal('fetch', fn);
+
+      const resultPromise = fetchCatalog('example.com');
+      // Past BARCODE_REQUEST_TIMEOUT_MS (5s) but nowhere near the 20s
+      // barcode budget or the 55s pipeline timeout.
+      await vi.advanceTimersByTimeAsync(6_000);
+      const result = await resultPromise;
+
+      expect(result.barcodesRead).toBe(0);
+      expect(result.catalog.products[0]!.barcodeRead).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe('fetchCatalog — parent abort mid-pass (Finding 4)', () => {
+  it('stops the barcode pass when the pipeline signal aborts between requests', async () => {
+    vi.useFakeTimers();
+    try {
+      const products = [1, 2, 3].map((n) => rawProduct(n, [n * 10]));
+      const fn = vi.fn(async (input: string | URL) => {
+        const url = String(input);
+        if (url.includes('/products.json')) return json({ products });
+        if (url.includes('/products/count.json')) return json({ count: 3 });
+        // The first .js request pushes the fake clock past timeoutMs,
+        // firing the pipeline's own AbortController mid-pass.
+        vi.advanceTimersByTime(1_000);
+        return json(jsDoc([{ id: 10, barcode: '5012345678900' }]));
+      });
+      vi.stubGlobal('fetch', fn);
+
+      const result = await fetchCatalog('example.com', { timeoutMs: 500 });
+
+      expect(result.barcodesRead).toBe(1);
+      expect(result.catalog.products.map((p) => p.barcodeRead)).toEqual([
+        true,
+        false,
+        false,
+      ]);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
