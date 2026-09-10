@@ -7,6 +7,7 @@ import {
   pillarExplanationCustomerFacing,
   pillarLabelCustomerFacing,
 } from '@/lib/copy';
+import { scanScopeLine } from '@/lib/copy-scan-scope';
 import { badgeUrl, scoreUrl, validateDomainSegment } from '@/lib/badge-url';
 import { publishedScanQuery } from '@/lib/public-score';
 import type { CompositeScore, PillarId } from '@flintmere/scoring';
@@ -98,7 +99,16 @@ export default async function ScorePage({ params }: PageProps) {
   if (!scan || scan.score === null || scan.grade === null) notFound();
 
   const composite = scan.scoreJson as unknown as
-    | (CompositeScore & { gmcGroundTruth?: GmcGroundTruth | null })
+    | (CompositeScore & {
+        gmcGroundTruth?: GmcGroundTruth | null;
+        // Absent (undefined `truncated`) on scans persisted before the
+        // sampling-honesty fields shipped — omit the scope line rather
+        // than guess at a scan shape we don't have. Mirrors the gate in
+        // apps/scanner/src/app/api/lead/route.ts.
+        truncated?: boolean;
+        actualProductCount?: number | null;
+        barcodesRead?: number | null;
+      })
     | null;
   const pillars = composite?.pillars ?? [];
   const runPillars = pillars.filter((p) => !p.locked);
@@ -108,6 +118,15 @@ export default async function ScorePage({ params }: PageProps) {
       : null;
 
   const scannedOn = formatScanned(scan.completedAt);
+  const scopeLine =
+    composite && composite.truncated !== undefined
+      ? scanScopeLine({
+          sampledCount: composite.productCount,
+          actualProductCount: composite.actualProductCount ?? null,
+          truncated: composite.truncated,
+          barcodesRead: composite.barcodesRead ?? null,
+        })
+      : null;
 
   const badgeAlt = `Flintmere catalog data score: ${scan.score}/100, grade ${scan.grade} — ${domain}`;
   const embedSnippet = `<a href="${scoreUrl(domain)}">
@@ -228,6 +247,14 @@ export default async function ScorePage({ params }: PageProps) {
               );
             })}
           </ol>
+          {scopeLine ? (
+            <p
+              className="mt-8 text-[color:var(--color-mute)]"
+              style={{ fontSize: 13, lineHeight: 1.55, maxWidth: '72ch' }}
+            >
+              {scopeLine}
+            </p>
+          ) : null}
         </section>
       ) : null}
 
