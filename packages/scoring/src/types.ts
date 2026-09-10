@@ -166,53 +166,6 @@ export interface AdminContextInput {
   checkoutContext: AdminCheckoutContext;
 }
 
-// ---- Suppression-estimate (dead-inventory wedge) ----
-// Per v2 strategic report §7: a probabilistic estimate of how many
-// products in the catalog are likely suppressed in Google Shopping today,
-// expressed as a low/high RANGE — not a point estimate. Computed from
-// existing per-product signals (no new fetches, no LLM, no OAuth).
-export interface SuppressionEstimate {
-  /** Lower bound of likely-suppressed product count (stricter probabilities). */
-  low: number;
-  /** Upper bound of likely-suppressed product count (looser probabilities). */
-  high: number;
-  /**
-   * Deterministic count of products carrying ≥1 suppression signal — the
-   * union over the three per-signal counts. Anchors the lede with a
-   * reproducible number ahead of the probability-banded `low/high` range,
-   * so the headline reads as data not as a guess. Optional for backward
-   * compatibility with scoreJson rows persisted before this field shipped.
-   */
-  productsWithAnySignal?: number;
-  /** Per-signal counts driving the estimate (transparency, not aggregation maths). */
-  signals: {
-    missingGtin: number;
-    ambiguousAllergen: number;
-    missingGmcCategory: number;
-  };
-}
-
-// ---- AOV inference (wedge finish arc) ----
-export interface AovEstimate {
-  /** Lower bound: median minus band-half (floored at £1). */
-  low: number;
-  /** Upper bound: median plus band-half. */
-  high: number;
-  /** Median variant price — the anchor signal. */
-  medianPrice: number;
-  /** Confidence reflects sample size and price spread. */
-  confidence: 'high' | 'medium' | 'low';
-}
-
-export interface RevenueEstimate {
-  /** Lower bound of annual demand at risk (£, integer). */
-  low: number;
-  /** Upper bound of annual demand at risk (£, integer). */
-  high: number;
-  /** The AovEstimate that generated this band. */
-  aovEstimate: AovEstimate;
-}
-
 // ---- Catalog summary ("What we read" preamble) ----
 // A vertical-correct projection over the catalog the scanner actually
 // observed. Surfaces verbatim merchant strings (productType first,

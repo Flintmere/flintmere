@@ -7,8 +7,8 @@ import { SCANNER_HOST } from '@/lib/host-routing';
 // palette, same Geist Bold + GeistMono Bold typography, same eyebrow
 // + asymmetric `Flintmere]` footer. Only the display claim shifts:
 // the root card carries the brand statement ("What agents see. In
-// [ 60 seconds ]."), this card carries the suppression wedge that
-// matches the on-page hero verbatim. Share → click → land continuity.
+// [ 60 seconds ]."), this card carries the scan question that matches
+// the on-page hero verbatim. Share → click → land continuity.
 //
 // Hex values mirror --color-paper / --color-ink / --color-accent.
 // Next.js OG generation runs in an Edge/satori context that doesn't
@@ -16,7 +16,7 @@ import { SCANNER_HOST } from '@/lib/host-routing';
 // with globals.css @theme if those tokens change.
 
 export const alt =
-  'Which of your products are suppressed in Google Shopping today? Flintmere — free 60-second catalog scan.';
+  'How much of your product data is actually structured? Flintmere — free 60-second catalog scan.';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -83,9 +83,10 @@ export default async function OG() {
             letterSpacing: -4,
           }}
         >
-          <span>Which of your products</span>
+          <span>How much of your</span>
+          <span>product data is</span>
           <span style={{ display: 'flex', alignItems: 'baseline' }}>
-            are&nbsp;
+            actually&nbsp;
             <span
               style={{
                 fontFamily: 'GeistMono',
@@ -95,20 +96,18 @@ export default async function OG() {
             >
               [
             </span>
-            suppressed
+            structured
             <span
               style={{
                 fontFamily: 'GeistMono',
                 fontWeight: 700,
                 marginLeft: 6,
-                marginRight: 6,
               }}
             >
               ]
             </span>
-            in
+            ?
           </span>
-          <span>Google Shopping today?</span>
         </div>
 
         {/* footer — wordmark + URL (matches root card) */}

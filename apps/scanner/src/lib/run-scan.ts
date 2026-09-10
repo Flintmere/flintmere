@@ -5,8 +5,7 @@
  * Responsibilities:
  *   - Persist the Scan row in `running` state (so failure has an id to update).
  *   - Fetch the public catalog + crawlability signals.
- *   - Compute the score, summary, suppression + revenue estimates,
- *     scaled projections, and per-issue example citations.
+ *   - Compute the score, summary, and per-issue example citations.
  *   - Persist the Scan row in `complete` state with the projection envelope.
  *   - On failure, persist the Scan row in `failed` state with errorCode + message.
  *
@@ -20,14 +19,9 @@
 
 import {
   enrichIssuesWithExamples,
-  estimateAov,
-  estimateSuppression,
   scoreCatalog,
   summarizeCatalog,
-  type AovEstimate,
   type Issue,
-  type RevenueEstimate,
-  type SuppressionEstimate,
 } from '@flintmere/scoring';
 import { fetchCrawlability } from './crawlability-fetcher';
 import { fetchCatalog, ShopifyFetchError } from './shopify-fetcher';
@@ -62,11 +56,6 @@ interface RunScanCompleteResult {
   truncated: boolean;
   actualProductCount: number | null;
   catalogSummary: ReturnType<typeof summarizeCatalog>;
-  suppressionEstimate: SuppressionEstimate;
-  scaledSuppressionEstimate: SuppressionEstimate | null;
-  aovEstimate: AovEstimate | null;
-  revenueEstimate: RevenueEstimate | null;
-  scaledRevenueEstimate: RevenueEstimate | null;
   gmcGroundTruth: GmcGroundTruth | null;
   pillars: Array<{
     pillar: string;
@@ -126,46 +115,6 @@ export async function runScanForShop(input: RunScanInput): Promise<RunScanResult
     const score = scoreCatalog(catalog, crawlability ? { crawlability } : {});
     const catalogSummary = summarizeCatalog(catalog);
     const enrichedIssues = enrichIssuesWithExamples(score.issues, catalog);
-    const suppressionEstimate = estimateSuppression(catalog);
-    const aovResult = estimateAov(catalog, suppressionEstimate);
-
-    // Ratio-scaling projects sample-derived counts up to the merchant's
-    // true catalog size. Only when truncated AND we know the total.
-    const sampledCount = catalog.products.length;
-    const scaleRatio =
-      truncated && actualProductCount !== null && actualProductCount > sampledCount
-        ? actualProductCount / sampledCount
-        : null;
-
-    const scaledSuppressionEstimate: SuppressionEstimate | null =
-      scaleRatio !== null
-        ? {
-            low: Math.ceil(suppressionEstimate.low * scaleRatio),
-            high: Math.ceil(suppressionEstimate.high * scaleRatio),
-            signals: {
-              missingGtin: Math.ceil(suppressionEstimate.signals.missingGtin * scaleRatio),
-              ambiguousAllergen: Math.ceil(
-                suppressionEstimate.signals.ambiguousAllergen * scaleRatio,
-              ),
-              missingGmcCategory: Math.ceil(
-                suppressionEstimate.signals.missingGmcCategory * scaleRatio,
-              ),
-            },
-            productsWithAnySignal:
-              suppressionEstimate.productsWithAnySignal !== undefined
-                ? Math.ceil(suppressionEstimate.productsWithAnySignal * scaleRatio)
-                : undefined,
-          }
-        : null;
-
-    const scaledRevenueEstimate: RevenueEstimate | null =
-      scaleRatio !== null && aovResult?.revenueEstimate
-        ? {
-            low: Math.floor(aovResult.revenueEstimate.low * scaleRatio),
-            high: Math.ceil(aovResult.revenueEstimate.high * scaleRatio),
-            aovEstimate: aovResult.revenueEstimate.aovEstimate,
-          }
-        : null;
 
     const gmcGroundTruth = await gmcPromise;
 
@@ -175,11 +124,6 @@ export async function runScanForShop(input: RunScanInput): Promise<RunScanResult
       truncated,
       actualProductCount,
       catalogSummary,
-      suppressionEstimate,
-      scaledSuppressionEstimate,
-      aovEstimate: aovResult?.aovEstimate ?? null,
-      revenueEstimate: aovResult?.revenueEstimate ?? null,
-      scaledRevenueEstimate,
       gmcGroundTruth,
     };
 
@@ -209,11 +153,6 @@ export async function runScanForShop(input: RunScanInput): Promise<RunScanResult
       truncated,
       actualProductCount,
       catalogSummary,
-      suppressionEstimate,
-      scaledSuppressionEstimate,
-      aovEstimate: aovResult?.aovEstimate ?? null,
-      revenueEstimate: aovResult?.revenueEstimate ?? null,
-      scaledRevenueEstimate,
       gmcGroundTruth,
       pillars: score.pillars.map((p) => ({
         pillar: p.pillar,
