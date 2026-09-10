@@ -82,3 +82,81 @@ describe('fetchCatalog — catalog shape', () => {
     expect(ShopifyFetchError).toBeDefined();
   });
 });
+
+/** One product as /products/{handle}.js serves it — this one HAS barcode. */
+function jsDoc(variants: Array<{ id: number; barcode: string | null }>) {
+  return {
+    id: 1,
+    handle: 'product-1',
+    title: 'Product 1',
+    variants: variants.map((v) => ({
+      id: v.id,
+      barcode: v.barcode,
+      sku: `SKU-${v.id}`,
+      price: 900,
+      available: true,
+    })),
+  };
+}
+
+describe('fetchCatalog — barcode pass', () => {
+  it('fills variant barcodes from the .js document', async () => {
+    const fn = mockFetch([
+      ['/products.json', () => json({ products: [rawProduct(1, [10])] })],
+      ['/products/count.json', () => json({ count: 1 })],
+      ['/products/product-1.js', () => json(jsDoc([{ id: 10, barcode: '5012345678900' }]))],
+    ]);
+
+    const result = await fetchCatalog('example.com');
+
+    expect(result.catalog.products[0]!.variants[0]!.barcode).toBe('5012345678900');
+    expect(result.catalog.products[0]!.barcodeRead).toBe(true);
+    expect(result.barcodesRead).toBe(1);
+    expect(fn.mock.calls.map((c) => String(c[0]))).toContain(
+      'https://example.com/products/product-1.js',
+    );
+  });
+
+  it('records a genuine null barcode as read, not as unread', async () => {
+    mockFetch([
+      ['/products.json', () => json({ products: [rawProduct(1, [10])] })],
+      ['/products/count.json', () => json({ count: 1 })],
+      ['/products/product-1.js', () => json(jsDoc([{ id: 10, barcode: null }]))],
+    ]);
+
+    const result = await fetchCatalog('example.com');
+
+    // The distinction the whole plan exists for: we looked, and there is
+    // nothing there. Not: we never looked.
+    expect(result.catalog.products[0]!.variants[0]!.barcode).toBeNull();
+    expect(result.catalog.products[0]!.barcodeRead).toBe(true);
+    expect(result.barcodesRead).toBe(1);
+  });
+
+  it('reads at most barcodeSampleSize products and marks the rest unread', async () => {
+    const products = [1, 2, 3].map((n) => rawProduct(n, [n * 10]));
+    mockFetch([
+      ['/products.json', () => json({ products })],
+      ['/products/count.json', () => json({ count: 3 })],
+      ['.js', () => json(jsDoc([{ id: 10, barcode: '5012345678900' }]))],
+    ]);
+
+    const result = await fetchCatalog('example.com', { barcodeSampleSize: 2 });
+
+    expect(result.barcodesRead).toBe(2);
+    expect(result.catalog.products.map((p) => p.barcodeRead)).toEqual([true, true, false]);
+  });
+
+  it('skips the pass entirely at barcodeSampleSize 0', async () => {
+    const fn = mockFetch([
+      ['/products.json', () => json({ products: [rawProduct(1, [10])] })],
+      ['/products/count.json', () => json({ count: 1 })],
+    ]);
+
+    const result = await fetchCatalog('example.com', { barcodeSampleSize: 0 });
+
+    expect(result.barcodesRead).toBe(0);
+    expect(result.catalog.products[0]!.barcodeRead).toBe(false);
+    expect(fn.mock.calls.every((c) => !String(c[0]).endsWith('.js'))).toBe(true);
+  });
+});

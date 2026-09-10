@@ -29,8 +29,18 @@ export interface FetchOptions {
   timeoutMs?: number;
   /** Max product pages to request. Each page returns up to 250. Default 4 (1,000 products). */
   maxPages?: number;
-  /** Sampling fraction when catalog is large (0..1). Default 1. */
-  sampleFraction?: number;
+  /**
+   * How many products to read barcodes for, via /products/{handle}.js.
+   * /products.json carries no `barcode` key at all, so without this pass
+   * every GTIN check scores zero on every store. 0 disables the pass.
+   *
+   * Sampled rather than exhaustive: the pass is sequential (one request in
+   * flight, ~180ms observed), so 50 products costs ~9s of the 55s budget.
+   * Reading 1,000 would cost ~3 minutes and put unpaced load on a
+   * merchant's CDN. The sampled count is stated in the UI, never implied
+   * to be the whole catalog.
+   */
+  barcodeSampleSize?: number;
 }
 
 /**
@@ -52,13 +62,24 @@ export interface FetchedCatalog {
    * "an estimated N+" fallback when null.
    */
   actualProductCount: number | null;
+  /**
+   * How many products we actually read a barcode field for. Optional so
+   * existing mocks of this module keep type-checking; treat absent as 0.
+   */
+  barcodesRead?: number;
 }
 
 const DEFAULT_OPTIONS: Required<FetchOptions> = {
   timeoutMs: 55_000,
   maxPages: 4,
-  sampleFraction: 1,
+  barcodeSampleSize: 50,
 };
+
+/** Wall-clock ceiling for the barcode pass alone, inside the 55s pipeline. */
+const BARCODE_BUDGET_MS = 20_000;
+
+/** One literal, three call sites. */
+const SCANNER_UA = 'Flintmere-Scanner/0.1 (+https://flintmere.com/bot)';
 
 export function normaliseDomain(raw: string): string {
   const trimmed = raw.trim();
@@ -126,7 +147,7 @@ export async function fetchCatalog(
       const res = await fetch(pageUrl, {
         signal: controller.signal,
         headers: {
-          'user-agent': 'Flintmere-Scanner/0.1 (+https://flintmere.com/bot)',
+          'user-agent': SCANNER_UA,
           accept: 'application/json',
         },
       });
@@ -180,6 +201,16 @@ export async function fetchCatalog(
       provisionalTruncated &&
       (actualProductCount === null || actualProductCount > products.length);
 
+    // Barcodes come from a different endpoint than the catalog. Runs after
+    // the count fetch so the count — load-bearing for sampling honesty —
+    // is never starved by this budget.
+    const barcodesRead = await readBarcodes(
+      domain,
+      products,
+      opts.barcodeSampleSize,
+      controller.signal,
+    );
+
     return {
       catalog: {
         shopDomain: domain,
@@ -188,6 +219,7 @@ export async function fetchCatalog(
       },
       truncated,
       actualProductCount,
+      barcodesRead,
     };
   } catch (err) {
     if (err instanceof ShopifyFetchError) throw err;
@@ -228,7 +260,7 @@ async function fetchProductCount(
     const res = await fetch(`https://${domain}/products/count.json`, {
       signal: localController.signal,
       headers: {
-        'user-agent': 'Flintmere-Scanner/0.1 (+https://flintmere.com/bot)',
+        'user-agent': SCANNER_UA,
         accept: 'application/json',
       },
     });
@@ -240,6 +272,92 @@ async function fetchProductCount(
   } finally {
     clearTimeout(localTimer);
     parentSignal.removeEventListener('abort', onParentAbort);
+  }
+}
+
+/**
+ * Second pass: reads `barcode` for the first `sampleSize` products from
+ * /products/{handle}.js and writes it onto the already-built variants.
+ *
+ * Why a second pass at all: /products.json has never carried a `barcode`
+ * key. `toProductInput` read `v.barcode ?? null` from a field that was
+ * never in the response, so every public scan reported 100% missing GTIN.
+ *
+ * Mutates `products` in place — one pass, no copy of a 1,000-product array.
+ * Returns how many products were successfully read.
+ */
+async function readBarcodes(
+  domain: string,
+  products: ProductInput[],
+  sampleSize: number,
+  signal: AbortSignal,
+): Promise<number> {
+  for (const product of products) {
+    product.barcodeRead = false;
+  }
+  if (sampleSize <= 0) return 0;
+
+  const deadline = Date.now() + BARCODE_BUDGET_MS;
+  let read = 0;
+
+  for (const product of products.slice(0, sampleSize)) {
+    if (signal.aborted || Date.now() > deadline) break;
+
+    const barcodeByVariantId = await fetchVariantBarcodes(
+      domain,
+      product.handle,
+      signal,
+    );
+
+    if (barcodeByVariantId === null) {
+      // Nothing has worked yet, so the endpoint is blocked storefront-wide
+      // (password page, headless front end) — stop rather than spend the
+      // budget proving it 50 times. A failure after a success is a one-off,
+      // typically a handle that 404s; skip that product and carry on.
+      if (read === 0) break;
+      continue;
+    }
+
+    for (const variant of product.variants) {
+      variant.barcode = barcodeByVariantId.get(variant.id) ?? null;
+    }
+    product.barcodeRead = true;
+    read += 1;
+  }
+
+  return read;
+}
+
+/**
+ * Reads one product's .js document. Returns variant-id → barcode, or null
+ * when the endpoint did not serve usable JSON. Never throws: a barcode we
+ * could not read is a smaller problem than a scan that fails outright.
+ */
+async function fetchVariantBarcodes(
+  domain: string,
+  handle: string,
+  signal: AbortSignal,
+): Promise<Map<string, string | null> | null> {
+  try {
+    const res = await fetch(
+      `https://${domain}/products/${encodeURIComponent(handle)}.js`,
+      {
+        signal,
+        headers: { 'user-agent': SCANNER_UA, accept: 'application/json' },
+      },
+    );
+    if (!res.ok) return null;
+
+    const body = (await res.json()) as {
+      variants?: Array<{ id: number | string; barcode?: string | null }>;
+    };
+    if (!Array.isArray(body.variants)) return null;
+
+    return new Map(
+      body.variants.map((v) => [String(v.id), v.barcode ?? null] as const),
+    );
+  } catch {
+    return null;
   }
 }
 
