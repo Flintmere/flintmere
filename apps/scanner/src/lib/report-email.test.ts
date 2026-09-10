@@ -80,12 +80,12 @@ const baseInput = {
 };
 
 describe('buildReportEmail', () => {
-  it('puts the invisible-product count and domain in the subject', () => {
+  it('puts the affected-product count and domain in the subject', () => {
     const email = buildReportEmail({ score: makeScore(), ...baseInput });
     // Critical issue affects 412 products → invisibleCount = 412.
     expect(email.subject).toContain('meridian-coffee.myshopify.com');
     expect(email.subject).toContain('412');
-    expect(email.subject).toContain('invisible to AI agents');
+    expect(email.subject).toContain('missing agent-readable data');
   });
 
   it('uses a ready-for-agents subject when the grade is A', () => {
