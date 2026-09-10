@@ -652,16 +652,6 @@
   paint-order: stroke fill;
 }
 
-.text-outlined--reveal {
-  transition: color 600ms cubic-bezier(0.4, 0, 0.2, 1),
-              -webkit-text-stroke-width 600ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.text-outlined--reveal.is-visible {
-  color: var(--color-ink);
-  -webkit-text-stroke-width: 0;
-}
-
 /* --- Outline-shimmer utility — signature canon carry-through (2026-04-30) ---
    The closing chord's outline-shimmer pattern, generalised for any heroic-scale
    typographic anchor moment. Operator-approved 2026-04-30 ("the detail in the
