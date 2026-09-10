@@ -115,27 +115,47 @@ export const pillarLabelCustomerFacing: Record<PillarId, string> = {
   titles: 'Title & Description Quality',
   mapping: 'Google Category Match',
   consistency: 'Data Consistency',
-  'checkout-eligibility': 'Agent Checkout Readiness',
-  crawlability: 'AI Agent Access',
+  'checkout-eligibility': 'Checkout Readiness',
+  crawlability: 'Crawler Access',
 }
 
 // One-line explanation of what each dimension measures, in founder-speak.
 // Used under the label in the results grid and in the report email.
+//
+// Each sentence states the CHECKS THE SCORER ACTUALLY RUNS, traced to the
+// pillar file in packages/scoring/src/pillars/. Five of them used to assert
+// agent behaviour instead ("the codes AI shopping agents use to look it
+// up", "an agent can parse", "so agents know what you sell", "whether an
+// AI agent can actually complete a purchase", "whether AI shopping agents
+// are allowed to read your site") — unciteable per the rule at the head of
+// issueCodeToFounderSpeak below, and these strings ship in the report
+// email as well as on /score/[shop]. Rewritten 2026-09-10 against the
+// pillar source, not against the old sentence.
 export const pillarExplanationCustomerFacing: Record<PillarId, string> = {
+  // identifiers.ts — barcode presence, GTIN check digit, brand (metafield
+  // or vendor), SKU presence, SKU uniqueness.
   identifiers:
-    'Whether each product carries the codes AI shopping agents use to look it up (barcode, brand, MPN).',
+    'Whether each product carries a barcode that passes its check digit, a brand, and a unique SKU.',
   attributes:
     'Whether size, colour, material and other structured fields exist — not hidden inside the description.',
+  // titles.ts — title ≤150 chars, brand + product type in the title,
+  // fluff-free title, description ≥200 chars with structure and use-case.
   titles:
-    'Whether product titles and descriptions read like spec sheets an agent can parse, not marketing copy.',
+    'Whether titles lead with brand and product type inside 150 characters, and descriptions carry structured detail.',
+  // mapping.ts — Google product category present, and at least three
+  // levels deep ("Food, Beverages & Tobacco > Beverages > Coffee").
   mapping:
-    'Whether your products carry a Google Merchant Center category, so agents know what you sell.',
+    'Whether each product carries a Google product category, and whether it goes at least three levels deep.',
   consistency:
     'Whether the catalog looks healthy — images load, active products have stock, alt text exists.',
+  // checkout.ts — customer-accounts version, inventoryQuantity set per
+  // variant, compare-at price strictly above the live price.
   'checkout-eligibility':
-    'Whether an AI agent can actually complete a purchase without human intervention.',
+    'Whether your store runs Shopify’s new customer accounts, tracks stock per variant, and shows no fake discounts.',
+  // crawlability.ts — robots.txt blanket / named-crawler Disallow,
+  // sitemap.xml present and referenced, llms.txt present and well-formed.
   crawlability:
-    'Whether AI shopping agents are allowed to read your site at all — robots rules, sitemaps, llms.txt.',
+    'Whether your robots.txt lets crawlers in, and whether your sitemap and llms.txt are present and well-formed.',
 }
 
 // Per-issue founder-speak. Every issue code the scoring package emits
@@ -242,6 +262,19 @@ export const issueCodeToFounderSpeak: Record<string, FounderSpeak> = {
   },
 }
 
+/**
+ * The one definition of "good shape" — shared by the verdict headline
+ * (below) and the report-email subject line, which used to gate on
+ * `grade === 'A'` while the headline gated on A/B and disagreed with it
+ * inside a single email.
+ *
+ * `CompositeScore['grade']` is 'A' | 'B' | 'C' | 'D' | 'F' — there is no
+ * 'A+' member, so no caller can produce one.
+ */
+export function isStrongGrade(grade: string): boolean {
+  return grade === 'A' || grade === 'B'
+}
+
 // Verdict templates for the top of the report email and the scan
 // results page. Pick one based on the grade.
 export function verdictHeader(args: {
@@ -264,9 +297,14 @@ export function verdictHeader(args: {
   totalProducts: number
 }): { headline: string; subhead: string } {
   const { grade, affectedCount, totalProducts } = args
-  const pct = totalProducts > 0 ? Math.round((affectedCount / totalProducts) * 100) : 0
   const affected = affectedCount.toLocaleString()
   const total = totalProducts.toLocaleString()
+  // No percentage is rendered. affectedCount is a floor, so a percentage
+  // derived from it is a floor too — but "49% of your catalog" reads as a
+  // measured fact, and two disjoint 200-of-412 issues would render 49%
+  // when the true figure is near 97%. The sentence already states the
+  // hedged ratio ("at least 200 of 412"); the percentage restated it less
+  // precisely and bought nothing.
 
   // The headline's quantifier is derived from the SAME count the subhead
   // renders. Deriving it from the grade instead let the two flatly
@@ -275,9 +313,8 @@ export function verdictHeader(args: {
   // products carry a gap." — and a UK food merchant with no barcodes is
   // exactly the case this product exists to serve.
   if (affectedCount === 0) {
-    const strongGrade = grade === 'A+' || grade === 'A' || grade === 'B'
     return {
-      headline: strongGrade
+      headline: isStrongGrade(grade)
         ? `Your catalog data is in good shape.`
         : `No product carries a critical gap.`,
       subhead: `${total} products checked. No critical or high-priority gap affects a product.`,
@@ -287,12 +324,12 @@ export function verdictHeader(args: {
   if (affectedCount * 2 > totalProducts) {
     return {
       headline: `Most of your catalog data is incomplete.`,
-      subhead: `At least ${affected} of ${total} products carry a gap — ${pct}% of your catalog. Google Merchant Center can limit where it shows a listing whose data is incomplete.`,
+      subhead: `At least ${affected} of ${total} products carry a gap. Google Merchant Center can limit where it shows a listing whose data is incomplete.`,
     }
   }
   return {
     headline: `At least ${affected} of your ${total} products carry a data gap.`,
-    subhead: `That is ${pct}% of your catalog. Merchant Center can limit where it shows those listings.`,
+    subhead: `Google Merchant Center can limit where it shows a listing whose data is incomplete.`,
   }
 }
 

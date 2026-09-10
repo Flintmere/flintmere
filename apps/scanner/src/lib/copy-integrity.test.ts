@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
+  BANNED_JARGON,
   REVENUE_LEDE_DISCLOSURE,
   SUPPRESSION_LEDE_SUBHEAD,
   issueCodeToFounderSpeak,
+  pillarExplanationCustomerFacing,
+  pillarLabelCustomerFacing,
   sampledRevenueDisclosure,
 } from './copy';
 
@@ -105,5 +108,51 @@ describe('issueCodeToFounderSpeak conforms to the FounderSpeak rule', () => {
     const lower = speak.consequence.toLowerCase();
     const hits = BANNED_IN_CONSEQUENCE.filter((term) => lower.includes(term));
     expect(hits).toEqual([]);
+  });
+});
+
+// The seven dimension names + definitions render in the results grid
+// (Results.tsx), on /score/[shop], AND in the report email — they are not
+// an internal label set. Two labels ("Agent Checkout Readiness", "AI Agent
+// Access") and five definitions asserted agent behaviour until 2026-09-10.
+// The label rule above pillarLabelCustomerFacing caps a label at 4 words
+// and bans BANNED_JARGON; the definitions inherit the FounderSpeak ban on
+// agent-behaviour claims because they ship in the same email body.
+describe('pillar labels + definitions claim no agent behaviour', () => {
+  const labels = Object.entries(pillarLabelCustomerFacing);
+  const explanations = Object.entries(pillarExplanationCustomerFacing);
+
+  it('covers all seven pillars (guard is not vacuous)', () => {
+    expect(labels).toHaveLength(7);
+    expect(explanations).toHaveLength(7);
+  });
+
+  it.each(labels)('%s: label is ≤ 4 words', (_pillar, label) => {
+    expect(words(label)).toBeLessThanOrEqual(4);
+  });
+
+  it.each(labels)('%s: label names no agent behaviour', (_pillar, label) => {
+    const lower = label.toLowerCase();
+    expect(BANNED_IN_CONSEQUENCE.filter((t) => lower.includes(t))).toEqual([]);
+  });
+
+  it.each(labels)('%s: label uses no banned jargon', (_pillar, label) => {
+    const lower = label.toLowerCase();
+    expect(BANNED_JARGON.filter((t) => lower.includes(t.toLowerCase()))).toEqual(
+      [],
+    );
+  });
+
+  it.each(explanations)(
+    '%s: definition claims no agent behaviour',
+    (_pillar, explanation) => {
+      const lower = explanation.toLowerCase();
+      expect(BANNED_IN_CONSEQUENCE.filter((t) => lower.includes(t))).toEqual([]);
+    },
+  );
+
+  it.each(explanations)('%s: definition is one line, ≤ 20 words', (_p, text) => {
+    expect(text).not.toContain('\n');
+    expect(words(text)).toBeLessThanOrEqual(20);
   });
 });

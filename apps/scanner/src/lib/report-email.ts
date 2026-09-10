@@ -7,6 +7,7 @@ import {
   FOUNDER_SIGNATURE_TEAM_LINE,
   REPLY_SLA,
   gradeBadgeAnchor,
+  isStrongGrade,
   issueCodeToFounderSpeak,
   pillarLabelCustomerFacing,
   verdictHeader,
@@ -92,9 +93,11 @@ function buildSubject(score: CompositeScore): string {
   // store whose every product carried a gap — the same contradiction the
   // verdict headline had (review finding 2).
   if (affected === 0) {
-    // CompositeScore['grade'] has no 'A+' member — the scorer cannot
-    // produce one, so there is nothing to test for here.
-    if (score.grade === 'A') {
+    // Same threshold as the body headline. This used to test grade 'A'
+    // alone while verdictHeader() said "in good shape" for A and B, so a
+    // grade-B merchant with nothing affected got a subject and a headline
+    // that disagreed inside one email.
+    if (isStrongGrade(score.grade)) {
       return `${score.shopDomain} — catalog data in good shape · Grade ${score.grade}`;
     }
     return `${score.shopDomain} — full catalog scan · Grade ${score.grade}`;
