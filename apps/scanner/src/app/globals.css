@@ -641,17 +641,6 @@
   margin-top: 0;
 }
 
-/* --- Outlined text (for "invisible" moments — literalises the metaphor) ---
-   Council: #6 Yann (signature), #8 Noor (AAA stroke contrast), #12 Motion
-   (reveal on viewport entry, static fallback for prefers-reduced-motion),
-   #37 Consumer Psychologist (readable once noticed).
-*/
-.text-outlined {
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--color-ink);
-  paint-order: stroke fill;
-}
-
 /* --- Outline-shimmer utility — signature canon carry-through (2026-04-30) ---
    The closing chord's outline-shimmer pattern, generalised for any heroic-scale
    typographic anchor moment. Operator-approved 2026-04-30 ("the detail in the
@@ -1406,8 +1395,9 @@
 
 /* --- Manifesto chord — Reduction Cascade × 3 (#9, 2026-04-30) ---
    Prose segments fade their opacity as the section scrolls; structured
-   tokens remain. The literal subtractive demonstration of the metaphor
-   "marketing prose is invisible to bots; only structured data registers."
+   tokens remain. The literal subtractive demonstration of the thesis
+   "[ catalogs as data ]. Or catalogs as prose." — structured tokens
+   register; marketing prose does not.
    Three sequential cascades (one per example) play across the section's
    300vh runway. --prose-fade is set on the section via inline style;
    React updates it from the rAF-throttled scroll listener. Inherited by
