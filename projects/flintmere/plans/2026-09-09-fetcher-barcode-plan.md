@@ -1387,6 +1387,22 @@ Replace line 148, which names a constant that does not exist in this file:
 
 Then in the headline list, branch 2 becomes `{missingBarcode} == {checked}` → *None of the {checked} products we checked carries a barcode.*; branch 3 → *Every barcode we read passes its check digit. {missingBarcode} of {checked} products have none on at least one variant.*; branch 4 → *Every barcode on the {checked} products we checked passes its check digit.* Branch 1 keeps `{invalidGtin}` and swaps `{total}` for `{checked}`.
 
+- [ ] **Step 2b: Correct §2.2 branch 1's "valid GTIN" phrasing — added 2026-09-10**
+
+Line 107 reads *"{invalidGtin} of the {total} products we read carry a barcode
+that isn't a valid GTIN."* The whole branch has established that a modulo-10
+check-digit pass is necessary but not sufficient — GS1 registration is not tested
+by this code — which is why the Global Constraints forbid "valid" in a clean-state
+string and why Task 5 rewrote the pillar descriptions to say "passes its check
+digit". Branch 4 already uses the correct phrasing; branch 1 does not.
+
+The rule binds clean-state strings and this is a defect string, so it is not a
+canon breach — but "isn't a valid GTIN" still asserts a validity test the scanner
+does not perform. Replace with *"carry a barcode that fails its check digit."*
+
+Check branches 2 and 3 for the same word while you are there.
+
+
 - [ ] **Step 3: Run everything**
 
 ```bash
