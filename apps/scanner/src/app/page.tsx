@@ -93,7 +93,7 @@ const PILLARS: PillarSpec[] = [
   },
   {
     name: 'Google category match',
-    headline: 'Categorised, or limited.',
+    headline: 'Mapped, or unclassified.',
     weight: '15%',
     weightPct: 0.15,
     looksFor:
