@@ -453,7 +453,7 @@ function ClosingCaption({ opacity }: { opacity: number }) {
     >
       // this is what an AI agent reads on your store.
       <br />
-      // the rest is invisible.
+      // the rest it has to guess.
     </p>
   );
 }

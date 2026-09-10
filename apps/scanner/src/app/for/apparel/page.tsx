@@ -55,7 +55,7 @@ const MISTAKES: Mistake[] = [
     n: '04',
     title: 'Size chart delivered as a 1,200×800 PNG',
     symptom:
-      "Your size chart is a designed image. Stunning for shoppers, invisible to agents. Returns rate stays high because agents can't answer 'will a UK 12 fit me?' and shoppers order one size up 'just in case'.",
+      "Your size chart is a designed image. Stunning for shoppers, unreadable as data. Returns rate stays high because nothing can answer 'will a UK 12 fit me?' from a PNG, so shoppers order one size up 'just in case'.",
     pillar: 'Data consistency',
     fix: "We detect image-only size charts via image-to-text ratio and flag products pointing to a size-chart metafield that isn't structured. Recommended fix: a table metafield agents can parse row-by-row.",
   },
@@ -71,7 +71,7 @@ const MISTAKES: Mistake[] = [
     n: '06',
     title: 'One product with six colours grouped as variants',
     symptom:
-      "Your 'Rainbow Pack T-Shirt' lists six colours as variants. Tidy for your ops team; invisible to agents. A shopper asking 'black t-shirt' gets none of your six because the product itself has no colour — only its variants do, and they're buried.",
+      "Your 'Rainbow Pack T-Shirt' lists six colours as variants. Tidy for your ops team; thin as product data. `color` is a required attribute for apparel in Merchant Center, and a listing that ships without one gets disapproved — here the product itself has no colour, only its variants do.",
     pillar: 'Structured attributes',
     fix: "Flintmere detects multi-colour variant groupings and flags them against the agent-best-practice pattern (one product per colour, shared size range). We show you which SKUs this applies to before you decide whether to restructure.",
   },
