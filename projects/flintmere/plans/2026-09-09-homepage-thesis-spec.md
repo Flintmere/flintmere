@@ -133,14 +133,32 @@ scope.
 
 ### 2.3 Report email subject — template
 
-Number first, so it survives ~40-character mobile truncation. Replaces
-`invisibleCountFor()` entirely.
+Built by `buildSubject()` (`report-email.ts:100`). Task 6 of this branch
+renamed the underlying floor helper `invisibleCountFor()` → `affectedCountFor()`
+and replaced the barcode-specific branching this section originally specified
+with a single generic template — the shipped code has no invalid-GTIN,
+missing-barcode or no-product-type branch, and `{shopDomain}` leads every
+branch, not the count (the "number first, for ~40-character mobile
+truncation" rationale no longer describes what ships). This section now
+describes the shipped function.
 
-1. `{invalidGtin} > 0` → *{invalidGtin} of {total} products with a barcode that isn't a valid GTIN — {shopDomain}*
-2. `{missingBarcode} == {total}` → *No barcode on any of {total} products — {shopDomain}*
-3. `{missingBarcode} > 0` → *Barcodes pass; {missingBarcode} of {total} products have none — {shopDomain}*
-4. `{noType} > 0` → *Every barcode passes its check digit; {noType} products with no product type — {shopDomain}*
-5. else → *Every barcode passes its check digit: {total} products read — {shopDomain}*
+Inputs:
+- `{affected}` = `affectedCountFor(score)` (`report-email.ts:94`) — the
+  largest single `affectedCount` among `critical | high` severity issues,
+  across every pillar (identifiers, titles, checkout, crawlability — not
+  barcodes alone). A **floor**, not a union and not an exact total: two
+  disjoint 100-product issues both render 100, not 200. Every render carries
+  the "at least" hedge.
+- `{total}` = `score.productCount`.
+- `{grade}` = `score.grade`; `isStrongGrade(grade)` is true for `A` or `B`
+  (`copy.ts:274`).
+
+1. `{affected} === 0 && isStrongGrade(grade)` → *{shopDomain} — catalog data in good shape · Grade {grade}*
+2. `{affected} === 0 && !isStrongGrade(grade)` → *{shopDomain} — full catalog scan · Grade {grade}*
+3. else → *{shopDomain} — at least {affected} of {total} products have incomplete data*
+
+No branch names a barcode, a GTIN, or a product type; none claims a product
+is invisible to, excluded from, skipped by, or unmatchable by an AI agent.
 
 ---
 
