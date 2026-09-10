@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   REVENUE_LEDE_DISCLOSURE,
   SUPPRESSION_LEDE_SUBHEAD,
+  issueCodeToFounderSpeak,
   sampledRevenueDisclosure,
 } from './copy';
 
@@ -62,5 +63,47 @@ describe('copy.ts cross-vertical disclosure guard', () => {
       actualProductCount: null,
     });
     expect(findVerticalLeak(out)).toEqual([]);
+  });
+});
+
+// The FounderSpeak rule (copy.ts, above issueCodeToFounderSpeak) caps a
+// title at 8 words and a consequence at 20, and forbids claims about what
+// an AI agent does. These strings ship in the report email body — the
+// evidence rows are built from score.issues.slice(0, 3) with NO severity
+// filter, so any entry here can reach a merchant, medium ones included.
+// Nothing enforced the rule until a review found a 22-word consequence and
+// thirteen agent-behaviour claims still in the table.
+const BANNED_IN_CONSEQUENCE: readonly string[] = [
+  'pillar',
+  'score',
+  'ceiling',
+  // Retired positioning: we cannot cite a source for agent behaviour.
+  'agent',
+  'invisible',
+];
+
+function words(text: string): number {
+  return text.trim().split(/\s+/).length;
+}
+
+describe('issueCodeToFounderSpeak conforms to the FounderSpeak rule', () => {
+  const entries = Object.entries(issueCodeToFounderSpeak);
+
+  it('covers every entry (guard is not vacuous)', () => {
+    expect(entries.length).toBeGreaterThan(10);
+  });
+
+  it.each(entries)('%s: title is ≤ 8 words', (_code, speak) => {
+    expect(words(speak.title)).toBeLessThanOrEqual(8);
+  });
+
+  it.each(entries)('%s: consequence is ≤ 20 words', (_code, speak) => {
+    expect(words(speak.consequence)).toBeLessThanOrEqual(20);
+  });
+
+  it.each(entries)('%s: consequence claims no agent behaviour', (_code, speak) => {
+    const lower = speak.consequence.toLowerCase();
+    const hits = BANNED_IN_CONSEQUENCE.filter((term) => lower.includes(term));
+    expect(hits).toEqual([]);
   });
 });

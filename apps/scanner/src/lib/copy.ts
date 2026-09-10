@@ -145,7 +145,10 @@ export const pillarExplanationCustomerFacing: Record<PillarId, string> = {
 //
 // Rules enforced by #37:
 //   - Title = what the problem IS, in ≤ 8 words, zero jargon.
-//   - Consequence = what an AI agent does as a result, ≤ 20 words.
+//   - Consequence = what Google Merchant Center or a crawler does as a
+//     result, ≤ 20 words. Never what an AI agent does, sees, skips,
+//     ranks or prefers — we cannot cite a source for any of that, and
+//     these strings ship in the report email body.
 //   - No mention of "pillar", "score", "ceiling".
 export interface FounderSpeak {
   title: string
@@ -157,7 +160,7 @@ export const issueCodeToFounderSpeak: Record<string, FounderSpeak> = {
   'missing-gtin': {
     title: 'Products have no barcode',
     consequence:
-      'Google Merchant Center can limit where it shows a product with no GTIN. It does not disapprove the listing for that alone.',
+      'Google Merchant Center can limit where it shows a product with no GTIN. It is not disapproved for that.',
   },
   'invalid-gtin-checksum': {
     title: 'Barcode numbers fail the check digit',
@@ -172,23 +175,23 @@ export const issueCodeToFounderSpeak: Record<string, FounderSpeak> = {
   'missing-brand': {
     title: 'Products have no brand name',
     consequence:
-      'Agents filter by brand first. No brand field means the product is filtered out before it ever gets ranked.',
+      'Google Merchant Center requires a brand on most products. A listing without one can be disapproved.',
   },
   // titles
   'title-over-limit': {
     title: 'Titles are too long',
     consequence:
-      'Agents truncate and lose the specs at the end — buyers see a stub, not the full name.',
+      'Google Merchant Center caps a title at 150 characters. Anything past that is cut before a shopper sees it.',
   },
   'title-marketing-fluff': {
     title: 'Titles read like marketing, not specs',
     consequence:
-      'Words like "premium" and "must-have" tell a buyer nothing an agent can use to match their query.',
+      'Google asks titles to lead with brand, product type and size — not words like "premium" or "must-have".',
   },
   'description-too-short': {
     title: 'Descriptions are too thin',
     consequence:
-      'Agents have nothing to extract — no material, no dimensions, no use-case. The product looks generic next to competitors.',
+      'Google Merchant Center requires a description, and it is where material, size and use-case detail belongs.',
   },
   // crawlability
   'robots-blocks-all': {
@@ -197,45 +200,45 @@ export const issueCodeToFounderSpeak: Record<string, FounderSpeak> = {
       'Your robots.txt tells every crawler to stay out, including Googlebot, so your pages cannot be indexed.',
   },
   'robots-blocks-ai-agents': {
-    title: 'Your robots.txt blocks AI agents specifically',
+    title: 'Your robots.txt blocks AI crawlers by name',
     consequence:
-      'ChatGPT, Claude, and Perplexity are told to stay out — so they do. Google may still see you, agents will not.',
+      'Your robots.txt carries a Disallow rule naming these crawlers, which asks them not to fetch your pages.',
   },
   'missing-llms-txt': {
     title: 'No llms.txt file on your domain',
     consequence:
-      'llms.txt is the emerging standard for telling AI agents what to read. Without it, you rely on them guessing.',
+      'llms.txt is an emerging convention. No search engine or AI company has confirmed it reads one.',
   },
   'malformed-llms-txt': {
-    title: 'Your llms.txt is broken',
+    title: 'Your llms.txt is malformed',
     consequence:
-      'Agents skip files they cannot parse, so a malformed file is worse than no file at all.',
+      'Your file does not follow the convention. No search engine or AI company has confirmed it reads one.',
   },
   'missing-sitemap': {
     title: 'No sitemap at /sitemap.xml',
     consequence:
-      'Agents use sitemaps to discover every product URL. Without one, they see whatever they stumble across.',
+      'Google uses a sitemap to discover product URLs it might not reach by following links. You have none.',
   },
   'sitemap-not-referenced': {
     title: 'robots.txt does not point to your sitemap',
     consequence:
-      'Even when the sitemap exists, agents will miss it if robots.txt does not list it.',
+      'Google reads the Sitemap line in robots.txt to find your sitemap. Yours does not carry one.',
   },
   // consistency
   'image-missing-alt': {
     title: 'Product images have no alt text',
     consequence:
-      'Alt text is how an agent understands an image when the image itself cannot be read. No alt = no signal.',
+      'Alt text is how Google Images reads a picture, and how a screen reader describes it.',
   },
   'active-zero-inventory': {
     title: 'Active products show zero stock',
     consequence:
-      'Agents send buyers to out-of-stock pages and it looks like your catalog is unreliable.',
+      'A product page showing no stock can trigger a Google Merchant Center availability mismatch, which disapproves the listing.',
   },
   'image-invalid-url': {
     title: 'Image URLs do not load',
     consequence:
-      'Broken images tell an agent the data is stale — they deprioritise the whole catalog.',
+      'Google Merchant Center disapproves a listing whose image link does not resolve. The image is a required attribute.',
   },
 }
 
@@ -243,35 +246,53 @@ export const issueCodeToFounderSpeak: Record<string, FounderSpeak> = {
 // results page. Pick one based on the grade.
 export function verdictHeader(args: {
   grade: string
-  /** Products carrying at least one critical or high issue. */
+  /**
+   * The LARGEST single-issue affectedCount among critical and high
+   * severity issues — a floor, not a total. Two disjoint issues of 100
+   * products each report 100, while 200 products are actually affected.
+   *
+   * It is deliberately not a union over affectedProductIds: eight issues
+   * across crawlability, checkout and identifiers are site-level and
+   * carry no product IDs at all, so a union would report ZERO products
+   * affected by "your robots.txt blocks every crawler". A floor beats
+   * a zero.
+   *
+   * Because it is a floor, always render it hedged — "at least N" —
+   * never as an exact count.
+   */
   affectedCount: number
   totalProducts: number
 }): { headline: string; subhead: string } {
   const { grade, affectedCount, totalProducts } = args
   const pct = totalProducts > 0 ? Math.round((affectedCount / totalProducts) * 100) : 0
+  const affected = affectedCount.toLocaleString()
+  const total = totalProducts.toLocaleString()
 
-  if (grade === 'A' || grade === 'A+') {
+  // The headline's quantifier is derived from the SAME count the subhead
+  // renders. Deriving it from the grade instead let the two flatly
+  // contradict each other: a grade-B store with no barcodes at all read
+  // "Most of your catalog data is complete." directly above "412 of 412
+  // products carry a gap." — and a UK food merchant with no barcodes is
+  // exactly the case this product exists to serve.
+  if (affectedCount === 0) {
+    const strongGrade = grade === 'A+' || grade === 'A' || grade === 'B'
     return {
-      headline: `Your catalog data is in good shape.`,
-      subhead: `${totalProducts.toLocaleString()} products checked. ${affectedCount.toLocaleString()} still carry a gap worth closing.`,
+      headline: strongGrade
+        ? `Your catalog data is in good shape.`
+        : `No product carries a critical gap.`,
+      subhead: `${total} products checked. No critical or high-priority gap affects a product.`,
     }
   }
-  if (grade === 'B') {
+  // Strict majority — at exactly half, "most" would not be true.
+  if (affectedCount * 2 > totalProducts) {
     return {
-      headline: `Most of your catalog data is complete.`,
-      subhead: `${affectedCount.toLocaleString()} of ${totalProducts.toLocaleString()} products carry a gap. Google Merchant Center can limit where it shows a listing whose data is incomplete.`,
+      headline: `Most of your catalog data is incomplete.`,
+      subhead: `At least ${affected} of ${total} products carry a gap — ${pct}% of your catalog. Google Merchant Center can limit where it shows a listing whose data is incomplete.`,
     }
   }
-  if (grade === 'C') {
-    return {
-      headline: `${affectedCount.toLocaleString()} of your ${totalProducts.toLocaleString()} products carry a data gap.`,
-      subhead: `That is ${pct}% of your catalog. Merchant Center can limit where it shows those listings.`,
-    }
-  }
-  // D or F
   return {
-    headline: `Most of your catalog data is incomplete.`,
-    subhead: `${affectedCount.toLocaleString()} of ${totalProducts.toLocaleString()} products fail at least one of the checks in this report.`,
+    headline: `At least ${affected} of your ${total} products carry a data gap.`,
+    subhead: `That is ${pct}% of your catalog. Merchant Center can limit where it shows those listings.`,
   }
 }
 

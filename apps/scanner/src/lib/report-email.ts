@@ -66,6 +66,18 @@ export function buildReportEmail(input: ReportEmailInput): {
   return { subject, html, text };
 }
 
+/**
+ * The LARGEST single-issue affectedCount among critical and high severity
+ * issues — a FLOOR, not a total. Two disjoint 100-product issues return
+ * 100 while 200 products are actually affected.
+ *
+ * Deliberately not a union over affectedProductIds: site-level issues
+ * (robots.txt blocking every crawler, checkout, identifiers) carry no
+ * product IDs, so a union would report zero products affected by a
+ * site-wide critical failure. A floor beats a zero.
+ *
+ * Every render of this number must carry the "at least" hedge.
+ */
 function affectedCountFor(score: CompositeScore): number {
   return score.issues
     .filter((i) => i.severity === 'critical' || i.severity === 'high')
@@ -75,13 +87,19 @@ function affectedCountFor(score: CompositeScore): number {
 function buildSubject(score: CompositeScore): string {
   const affected = affectedCountFor(score);
   const total = score.productCount;
-  if (score.grade === 'A') {
-    return `${score.shopDomain} — catalog data in good shape · Grade ${score.grade}`;
-  }
+  // The good-shape claim is gated on the COUNT, not the grade. Gating it
+  // on the grade alone shipped "catalog data in good shape" to a grade-A
+  // store whose every product carried a gap — the same contradiction the
+  // verdict headline had (review finding 2).
   if (affected === 0) {
+    // CompositeScore['grade'] has no 'A+' member — the scorer cannot
+    // produce one, so there is nothing to test for here.
+    if (score.grade === 'A') {
+      return `${score.shopDomain} — catalog data in good shape · Grade ${score.grade}`;
+    }
     return `${score.shopDomain} — full catalog scan · Grade ${score.grade}`;
   }
-  return `${score.shopDomain} — ${affected.toLocaleString()} of ${total.toLocaleString()} products have incomplete data`;
+  return `${score.shopDomain} — at least ${affected.toLocaleString()} of ${total.toLocaleString()} products have incomplete data`;
 }
 
 function renderHtml(input: ReportEmailInput): string {
@@ -186,7 +204,7 @@ function renderHtml(input: ReportEmailInput): string {
           <!-- Evidence: top 3 issues in founder-speak -->
           <tr>
             <td style="padding:8px 32px 24px 32px;">
-              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;margin:16px 0 4px 0;">What AI agents see first</div>
+              <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#8B8D95;margin:16px 0 4px 0;">What we found first</div>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${evidenceRows}</table>
             </td>
           </tr>
@@ -423,7 +441,7 @@ ${gradeBadgeAnchor({ grade: score.grade })}
 ${gmcBlock}How we score
 ${AUTHORITY_LINE}
 
-What AI agents see first
+What we found first
 ${top}
 
 What we checked

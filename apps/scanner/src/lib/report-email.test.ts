@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { CompositeScore } from '@flintmere/scoring';
 import { buildReportEmail } from './report-email';
+import { verdictHeader } from './copy';
 import type { GmcGroundTruth } from './gmc/types';
 
 function makeGmcGroundTruth(
@@ -89,13 +90,25 @@ describe('buildReportEmail', () => {
     expect(email.subject).toContain('products have incomplete data');
   });
 
-  it('uses a good-shape subject when the grade is A', () => {
+  it('uses a good-shape subject when the grade is A and nothing is affected', () => {
+    // The claim is gated on the count, not the grade: makeScore()'s
+    // default issue affects all 412 products, and a grade-A store in that
+    // state must not be told its data is in good shape.
     const email = buildReportEmail({
-      score: makeScore({ grade: 'A', score: 92 }),
+      score: makeScore({ grade: 'A', score: 92, issues: [] }),
       ...baseInput,
     });
     expect(email.subject).toContain('catalog data in good shape');
     expect(email.subject).toContain('Grade A');
+  });
+
+  it('does not use a good-shape subject when a grade-A store has an affected product', () => {
+    const email = buildReportEmail({
+      score: makeScore({ grade: 'A', score: 92 }),
+      ...baseInput,
+    });
+    expect(email.subject).not.toContain('good shape');
+    expect(email.subject).toContain('at least 412 of 412');
   });
 
   it('embeds the unsubscribe link in HTML + text', () => {
@@ -259,7 +272,7 @@ describe('buildReportEmail — GTIN consequences match Google behaviour', () => 
   });
 
   it('reserves disapproval for the invalid-checksum code', () => {
-    const email = buildReportEmail({
+    const checksum = buildReportEmail({
       score: makeScore({
         issues: [
           {
@@ -276,12 +289,20 @@ describe('buildReportEmail — GTIN consequences match Google behaviour', () => 
       }),
       ...baseInput,
     });
-    expect(email.text).toContain('disapproves');
+    expect(checksum.text).toContain('disapproves');
+
+    // The other half of "reserves": the missing-gtin case must NOT claim
+    // a disapproval. Google limits where it shows a GTIN-less product; it
+    // does not disapprove the listing for that alone. makeScore()'s
+    // default issue list is the missing-gtin one.
+    const missing = buildReportEmail({ score: makeScore(), ...baseInput });
+    expect(missing.text).not.toContain('disapproves');
+    expect(missing.text).toContain('It is not disapproved for that.');
   });
 });
 
 describe('buildReportEmail — no "invisible" claim on any grade', () => {
-  it.each(['A', 'B', 'C', 'D'] as const)('grade %s: subject and body never say invisible', (grade) => {
+  it.each(['A', 'B', 'C', 'D', 'F'] as const)('grade %s: subject and body never say invisible', (grade) => {
     const email = buildReportEmail({
       score: makeScore({ grade }),
       ...baseInput,
@@ -289,5 +310,108 @@ describe('buildReportEmail — no "invisible" claim on any grade', () => {
     expect(email.subject.toLowerCase()).not.toContain('invisible');
     expect(email.html.toLowerCase()).not.toContain('invisible');
     expect(email.text.toLowerCase()).not.toContain('invisible');
+  });
+});
+
+describe('buildReportEmail — the verdict headline agrees with its own count', () => {
+  // Review finding 2. The headline used to come from the grade and the
+  // subhead from the count, so they could flatly contradict: grade B
+  // rendered "Most of your catalog data is complete." directly above
+  // "412 of 412 products carry a gap." A UK food merchant with no
+  // barcodes at all is exactly the affectedCount === productCount case.
+  const everyProductAffected = (grade: CompositeScore['grade']) =>
+    makeScore({
+      grade,
+      issues: [
+        {
+          pillar: 'identifiers',
+          code: 'missing-gtin',
+          severity: 'high',
+          title: 'Missing GTINs on 412 products',
+          description: 'x',
+          affectedCount: 412, // === productCount
+          affectedProductIds: [],
+          revenueImpactScore: 80,
+        },
+      ],
+    });
+
+  it.each(['A', 'B', 'C', 'D', 'F'] as const)(
+    'grade %s: never claims the catalog is complete while every product carries a gap',
+    (grade) => {
+      const email = buildReportEmail({
+        score: everyProductAffected(grade),
+        ...baseInput,
+      });
+      const body = `${email.subject}\n${email.text}`.toLowerCase();
+      expect(body).not.toContain('catalog data is complete');
+      expect(body).not.toContain('in good shape');
+      expect(body).toContain('most of your catalog data is incomplete');
+    },
+  );
+
+  it('hedges the affected count as a floor, not an exact total', () => {
+    // affectedCountFor takes the MAX over critical/high issues, so two
+    // disjoint issues under-report the true union. Every render of the
+    // number must say "at least".
+    const email = buildReportEmail({ score: makeScore(), ...baseInput });
+    expect(email.subject).toContain('at least');
+    expect(email.text).toContain('At least');
+  });
+
+  it('does not claim a gap when no product carries a critical or high issue', () => {
+    const email = buildReportEmail({
+      score: makeScore({ grade: 'A', score: 94, issues: [] }),
+      ...baseInput,
+    });
+    expect(email.text).toContain('No critical or high-priority gap affects a product.');
+    expect(email.text).not.toContain('carry a gap');
+  });
+});
+
+describe('verdictHeader — every branch is true for every reachable input', () => {
+  // verdictHeader takes `grade: string`, so it accepts 'A+' even though
+  // CompositeScore['grade'] has no such member and no caller can produce
+  // one. Sweeping it here covers the branch the email-level sweep cannot
+  // reach without lying about the type.
+  const GRADES = ['A+', 'A', 'B', 'C', 'D', 'F'] as const;
+
+  it.each(GRADES)(
+    'grade %s: headline never claims completeness when every product is affected',
+    (grade) => {
+      const { headline, subhead } = verdictHeader({
+        grade,
+        affectedCount: 412,
+        totalProducts: 412,
+      });
+      expect(headline.toLowerCase()).not.toContain('data is complete');
+      expect(headline.toLowerCase()).not.toContain('good shape');
+      expect(headline).toBe('Most of your catalog data is incomplete.');
+      expect(subhead).toContain('At least 412 of 412');
+    },
+  );
+
+  it.each(GRADES)('grade %s: a single site-level failure is not called "most"', (grade) => {
+    // robots-blocks-all is critical with affectedCount 1. "Most of your
+    // catalog data is incomplete" asserted from the grade alone was false
+    // here; the quantifier now comes from the count.
+    const { headline } = verdictHeader({ grade, affectedCount: 1, totalProducts: 412 });
+    expect(headline.toLowerCase()).not.toContain('most');
+    expect(headline).toContain('At least 1 of your 412');
+  });
+
+  it('does not call an exact half "most"', () => {
+    const { headline } = verdictHeader({ grade: 'C', affectedCount: 206, totalProducts: 412 });
+    expect(headline.toLowerCase()).not.toContain('most');
+  });
+
+  it('handles a zero product count without dividing by zero', () => {
+    const { headline, subhead } = verdictHeader({
+      grade: 'F',
+      affectedCount: 0,
+      totalProducts: 0,
+    });
+    expect(headline).toBe('No product carries a critical gap.');
+    expect(subhead).toContain('0 products checked');
   });
 });
