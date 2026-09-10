@@ -21,7 +21,7 @@ import {
  * categories.
  */
 
-const SAMPLE_SIZE = 50
+export const SAMPLE_SIZE = 50
 
 export class CatalogSampleError extends Error {
   constructor(
@@ -95,10 +95,20 @@ export async function getCatalogSampleForDraft(
 /**
  * Compact pipe-delimited summary the LLM consumes. ~70–90 tokens per
  * product on Gemini's tokeniser. Each line: title | vendor | type |
- * tags | variants | price-range | has-images | barcode-presence | alt-
+ * tags | variants | price-range | has-images | barcode-state | alt-
  * text-presence. Newline-separated. The LLM grounds product references
  * in this set; observations that cite specific titles must use one of
  * these.
+ *
+ * barcode-state is three-valued, not boolean: `barcode:y` (present),
+ * `barcode:n` (checked, absent), `barcode:unread` (this scan never read
+ * the product's barcode field). `readBarcodes` in shopify-fetcher.ts can
+ * stop mid-sample after three consecutive non-404 failures, so a product
+ * inside the sampled window can still end up unread — collapsing that
+ * into `barcode:n` would tell the drafting model a barcode is absent
+ * when nobody looked. `p.barcodeRead === false` is the only signal for
+ * "not read"; absent (Admin-API products, fixtures) reads as read, per
+ * the same polarity as `packages/scoring/src/pillars/identifiers.ts`.
  */
 export function summariseProductsForLLM(products: ProductInput[]): string {
   return products.map(summariseProduct).join('\n')
@@ -113,9 +123,12 @@ function summariseProduct(p: ProductInput): string {
       : `£${Math.min(...prices).toFixed(2)}–£${Math.max(...prices).toFixed(2)}`
     : '—'
   const hasImages = p.images.length > 0 ? 'images:y' : 'images:n'
-  const hasBarcode = p.variants.some((v) => v.barcode && v.barcode.trim())
-    ? 'barcode:y'
-    : 'barcode:n'
+  const hasBarcode =
+    p.barcodeRead === false
+      ? 'barcode:unread'
+      : p.variants.some((v) => v.barcode && v.barcode.trim())
+        ? 'barcode:y'
+        : 'barcode:n'
   const hasAltText = p.images.some((i) => i.altText && i.altText.trim())
     ? 'alt:y'
     : 'alt:n'

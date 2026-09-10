@@ -31,7 +31,7 @@ vi.mock('../shopify-fetcher', () => ({
   },
 }))
 
-import { getCatalogSampleForDraft, summariseProductsForLLM } from './catalog-sample'
+import { SAMPLE_SIZE, getCatalogSampleForDraft, summariseProductsForLLM } from './catalog-sample'
 import { fetchCatalog } from '../shopify-fetcher'
 
 function buildProduct(overrides: Partial<ProductInput> = {}): ProductInput {
@@ -120,6 +120,20 @@ describe('summariseProductsForLLM', () => {
     expect(out).toContain('barcode:n')
   })
 
+  it('marks barcode:y when barcodeRead is undefined and a barcode is present (Admin-API/fixture default)', () => {
+    const product = buildProduct({ barcodeRead: undefined })
+    const out = summariseProductsForLLM([product])
+    expect(out).toContain('barcode:y')
+  })
+
+  it('marks barcode:unread when barcodeRead is explicitly false, even if a barcode value is present', () => {
+    const product = buildProduct({ barcodeRead: false })
+    const out = summariseProductsForLLM([product])
+    expect(out).toContain('barcode:unread')
+    expect(out).not.toContain('barcode:n')
+    expect(out).not.toContain('barcode:y')
+  })
+
   it('marks alt:n when no image carries alt text', () => {
     const product = buildProduct({
       images: [
@@ -172,9 +186,12 @@ describe('summariseProductsForLLM', () => {
 describe('getCatalogSampleForDraft', () => {
   it('asks the fetcher for a barcode on every product it will summarise', async () => {
     await getCatalogSampleForDraft('example.com')
+    // Pinned against the SAMPLE_SIZE identity, not the literal 50 — a
+    // hardcoded literal in the source that happens to equal SAMPLE_SIZE
+    // today would still fail this assertion once the two drift apart.
     expect(fetchCatalog).toHaveBeenCalledWith('example.com', {
       maxPages: 1,
-      barcodeSampleSize: 50,
+      barcodeSampleSize: SAMPLE_SIZE,
     })
   })
 })
