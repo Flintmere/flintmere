@@ -757,7 +757,7 @@ Replace the two barcode issue blocks (`:74-108`). Both filters now run over `rea
       severity: 'low' as const,
       title: 'Barcodes were not read',
       description:
-        'Your storefront did not serve the per-product endpoint that carries barcodes, so this scan says nothing about your GTINs either way. The rest of the pillar is scored without them.',
+        'We could not read barcodes on this scan, so it says nothing about your GTINs either way. The brand and SKU checks ran as normal.',
       affectedCount: 0,
       affectedProductIds: [],
       revenueImpactScore: 0,
@@ -915,7 +915,7 @@ Expected: FAIL — the first test finds "invisible" in the current `missing-gtin
   'barcodes-not-read': {
     title: 'Barcodes were not read',
     consequence:
-      'Your storefront did not serve the endpoint that carries barcodes, so this scan says nothing about your GTINs either way.',
+      'We could not read barcodes on this scan, so it says nothing about your GTINs either way.',
   },
 ```
 
@@ -1056,10 +1056,44 @@ export function scanScopeLine(args: {
 Run: `pnpm -F scanner exec vitest run src/lib/copy-scan-scope.test.ts && pnpm -F scanner typecheck`
 Expected: PASS, 4 tests; `tsc --noEmit` exits 0.
 
+- [ ] **Step 5b: The report email states the scope too**
+
+Added 2026-09-10 on the operator's ruling, after the Task 5 review found the
+disclosure ranked where no merchant reads it. `report-email.ts` has **no scope
+line at all**, and `:71` filters issues to `critical | high`, so the `low`
+`barcodes-not-read` issue never reaches the email. A merchant can therefore be
+emailed *"Missing GTINs on 47 products"* with nothing stating that 47 is out of
+the 50 we checked rather than their whole catalog. That is misled-by-omission —
+the same defect the on-page scope line exists to prevent.
+
+`ReportEmailInput` (`report-email.ts:43-56`) carries only `score`, so add an
+optional field rather than threading a required one through every caller:
+
+```ts
+  /**
+   * Scan scope, so a sampled count is never read as a whole-catalog count.
+   * Optional: reports rebuilt from a scan persisted before the barcode pass
+   * shipped do not carry it, and omit the line rather than guess.
+   */
+  scanScope?: {
+    sampledCount: number
+    actualProductCount: number | null
+    truncated: boolean
+    barcodesRead?: number | null
+  } | null;
+```
+
+Render it with the same `scanScopeLine` helper this task already changed — one
+source of truth for the sentence — immediately under the verdict header in both
+`renderHtml` and `renderText`, and omit the line entirely when `scanScope` is
+absent. Pass it from the send site alongside `score`. Assert in
+`report-email.test.ts` that a `barcodesRead: 0` scope renders "barcodes not
+read" and that an absent scope renders no scope line at all.
+
 - [ ] **Step 6: Commit**
 
 ```bash
-git add apps/scanner/src/lib/copy.ts apps/scanner/src/lib/copy-scan-scope.test.ts apps/scanner/src/lib/run-scan.ts apps/scanner/src/app/api/scan/route.ts apps/scanner/src/components/scan/types.ts apps/scanner/src/components/scan/ScanScopeLine.tsx apps/scanner/src/components/scan/Results.tsx
+git add apps/scanner/src/lib/copy.ts apps/scanner/src/lib/copy-scan-scope.test.ts apps/scanner/src/lib/run-scan.ts apps/scanner/src/app/api/scan/route.ts apps/scanner/src/components/scan/types.ts apps/scanner/src/components/scan/ScanScopeLine.tsx apps/scanner/src/components/scan/Results.tsx apps/scanner/src/lib/report-email.ts apps/scanner/src/lib/report-email.test.ts
 git commit -m "feat(scanner): state how many products had barcodes read"
 ```
 
