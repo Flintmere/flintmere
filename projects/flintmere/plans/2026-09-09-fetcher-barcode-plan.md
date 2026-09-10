@@ -588,7 +588,9 @@ describe('fetchCatalog — barcode budget', () => {
 - [ ] **Step 2: Run it**
 
 Run: `pnpm -F scanner exec vitest run src/lib/shopify-fetcher.test.ts`
-Expected: PASS, 10 tests. If it reads 10 instead of 3, `readBarcodes` is missing its `Date.now() > deadline` guard. If the run hangs, the fake clock is firing the 55s pipeline `setTimeout` — check the advance total stays under 55,000ms.
+Expected: PASS, 17 tests (16 after Task 3, 1 added here). If it reads 10 instead of 3, `readBarcodes` is missing its `Date.now() > deadline` guard.
+
+**Interaction with Task 2's fix round:** each `.js` request now opens its own 5s `AbortController` (`BARCODE_REQUEST_TIMEOUT_MS`). Advancing the fake clock 8s inside the mocked `fetch` fires that local timeout mid-request. The mock does not honour the signal, so it still returns its `Response` and the read still succeeds — but if this test behaves unexpectedly, that interaction is the first place to look, not the deadline guard. The file already contains a fake-timer test from Task 2's fix round (`bounds a single stalled .js request to its own timeout`); give this one a distinct name. If the run hangs, the fake clock is firing the 55s pipeline `setTimeout` — check the advance total stays under 55,000ms.
 
 - [ ] **Step 3: Commit**
 
