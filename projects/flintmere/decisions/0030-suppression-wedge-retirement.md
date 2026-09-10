@@ -11,6 +11,7 @@
 - **Existing customers:** none. Unchanged from ADR 0029 — Flintmere has never taken a payment from a third party.
 - **Amendment 1 (2026-09-10, same day):** §2 as first ratified kept the signal counting on the stated grounds that the three signals feed the Identifiers, Attributes and Mapping pillars. Implementation disproved it. The pillars compute those signals themselves — `identifiers.ts` does its own barcode and `isValidGtin` counting, `mapping.ts` its own GMC coverage via `googleProductCategoryByProduct`, `attributes.ts` its own allergen metafield checks. `estimateSuppression` had exactly two consumers, `estimateAov` and `SuppressionLede`, both retired by this ADR. Keeping the counting would have left roughly 600 lines computing on every scan with nothing reading the result. §2 is restated below; the original rationale is preserved here as the record of what was believed at ratification.
 
+- **Amendment 3 (2026-09-10, same day):** §4's open question — the FounderStrip replacement figure's source — is closed. Operator chose to drop to two panels rather than restate the figure. §4 is restated below with the scroll-mechanic consequence that follows from it (composition rule 4 forces a #5 → #7 downgrade at two panels).
 - **Amendment 2 (2026-09-10, same day):** implementation found the wedge on two surfaces this ADR's original `Affects` list did not name, both broken rather than merely off-canon. (a) `methodology-data.ts` ships live on `flintmere.com/methodology` claiming "a missing or invalid identifier is the most common reason a product is suppressed from a feed" — which contradicts ADR 0029 premise 2 (missing GTIN yields `Limited`, relaxed from disapproval 2023-12-21; only an *incorrect* GTIN disapproves) and carries an unsourced superlative. `EvidenceFigure.tsx` quotes the same prose. (b) `outreach/template.ts` sends merchants to the scan URL promising "the full breakdown including an estimated suppressed-revenue band" — a band the scanner no longer produces, so the email would promise output that cannot appear. Both are corrected in the implementation and added to `Affects`.
 
 ## Context
@@ -81,9 +82,26 @@ What survives is the pillar scoring, untouched: a merchant still learns how many
 
 Both fields are removed from `/api/scan` (`route.ts:150-151`). This is a breaking change to a public, unauthenticated contract, taken deliberately: leaving a retired model's output in a public response is worse than the break. No third-party consumer is known to exist.
 
-### 4. FounderStrip keeps three panels; the recovery figure changes basis
+### 4. FounderStrip drops to two panels
 
-The proof ledger keeps its three-beat structure and its "Representative examples. Actual results vary per merchant" disclaimer, which Legal Council signed off and which is not at issue. The "£3,240/mo suppressed listings recovered" panel changes basis, because it illustrates a mechanism that no longer holds. The replacement figure's source is an open question below.
+*(Resolved 2026-09-10 — see Amendment 3. This section originally kept three panels and changed the recovery figure's basis, leaving the replacement source open.)*
+
+The "£3,240/mo suppressed listings recovered" panel is removed outright rather than restated. No third-party engagement exists, so any replacement figure would be modelled — and modelling on a retired mechanism is what this ADR retires. Two panels that are true beat three where one is invented.
+
+The ledger keeps the score-lift and deliverable beats, and keeps its "Representative examples. Actual results vary per merchant" disclaimer, which Legal Council signed off and which was never at issue.
+
+**Consequence: the section's scroll mechanic changes.** `scroll-choreographies.md` §Composition rules, rule 4: "#4 and #5 each need ≥2 viewport heights of scroll runway minimum. Below that, downgrade to #7 cascade." Measured at 1440x900, panels at `min-height: clamp(360px, 60vh, 560px)` = 540px, gap `clamp(48px, 6vh, 96px)` = 54px:
+
+| Panels | Runway | Rule 4 |
+|---|---|---|
+| 3 (before) | 3x540 + 2x54 = 1728px = **1.92vh** | marginal pass |
+| 2 (after) | 2x540 + 1x54 = 1134px = **1.26vh** | **fails** |
+
+So FounderStrip downgrades from **#5 dual-column pin** to **#7 cascade fade-in**, per the rule's own remedy. The sticky pin on the left column goes, and with it the `min-height` on the panels, which existed only to give that pin something to scroll past — which also settles the empty-card chain the 2026-05-02 and 2026-06-21 mobile passes were fighting. The two-column grid is layout, not mechanic, and is retained.
+
+Note for the record: the component header claimed the #5 runway was "3 panels x ~100vh = 300vh". That was wrong — the panels were capped at 560px and were never 100vh. The section was already at 1.92vh, marginal against rule 4, before this change.
+
+The homepage variety budget is unaffected: #7 is the documented default mechanic and does not count against the 3–5 distinct-mechanic target.
 
 ### 5. ADR 0029's `llms.txt` clause is corrected
 
@@ -119,5 +137,4 @@ With the wedge gone, the pillar names carry more of the surface. The homepage la
 
 - **What replaces the acquisition hook.** A readiness score is a measurement, not a reason to act. ADR 0029's answer is passage through a retailer product-data gate, but the Booths diagnostic that would make that concrete is spec P1b and unbuilt. `/scan` is therefore interim by construction.
 - **Whether the seven-pillar model survives the pivot at all.** ADR 0029 §Decision 1 sells knowledge of an unpublished retailer schema. The pillar model measures agent-readiness, which is a different thing. Leading `/scan` on the pillar score may be a bridge rather than a destination. Do not re-anchor the marketing site on the pillars until this is settled.
-- **The FounderStrip replacement figure's source.** No third-party engagement exists. Any figure is necessarily modelled, and modelling is what this ADR just retired. The honest options are a non-monetary proof beat or dropping to two panels; both were considered and neither was chosen, so this returns to the operator.
 - **Whether `llms.txt` remains a scored check at reduced weight or is removed outright.** Crawlability's five checks total 100 points; `llms.txt` holds 40 of them. Removing it either drops the pillar's maximum to 60 or redistributes those 40 across the surviving three (`aiAgentsAllowed` 30, `sitemapPresent` 20, `sitemapReferenced` 10). The two produce different scores for the same catalog, so the choice is not cosmetic.

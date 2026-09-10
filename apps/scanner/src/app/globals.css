@@ -1246,54 +1246,23 @@
   }
 }
 
-/* Chapter 3 (FounderStrip) uses mechanic #5 dual-column pin + scrollable
-   companion (per memory/design/scroll-choreographies.md, redesigned
-   2026-04-29 after #2 sticky-top scroll-over was downgraded for content
-   overflow). The LEFT column (founder voice) pins via the
-   .flintmere-founder-pinned class below; the RIGHT column (three proof
-   panels) scrolls naturally past it. */
-.flintmere-main .flintmere-founder-sticky {
-  /* Section is content-driven height — no positioning at section level.
-     Pin is on the LEFT column only via .flintmere-founder-pinned. */
-}
+/* Chapter 3 (FounderStrip) uses mechanic #7 cascade fade-in, downgraded
+   from #5 dual-column pin on 2026-09-10 (ADR 0030 §4 dropped the section
+   from three proof panels to two). Composition rule 4 in
+   memory/design/scroll-choreographies.md requires ≥2 viewport heights of
+   runway for #5; two panels measure ~1.26vh at 1440x900, so the rule's own
+   remedy applies — downgrade to #7. The pin and the runway min-height that
+   fed it are both gone; the two-column grid is layout, not mechanic, and
+   is retained. Panels stagger via [data-reveal] + --reveal-delay, observed
+   by the page-level ViewportReveal.
 
-/* Founder voice — pinned LEFT column (#5 dual-column pin).
-   Sticky kicks in at ≥lg breakpoint only; below lg the columns stack
-   and the pin would be meaningless. The top offset gives breathing room
-   below any future fixed nav and matches the visual rhythm of the
-   pinned wheel above. */
-.flintmere-founder-pinned {
-  position: relative;
-}
-@media (min-width: 1024px) {
-  .flintmere-main .flintmere-founder-pinned {
-    position: sticky;
-    top: clamp(48px, 8vh, 96px);
-    align-self: start;
-    height: fit-content;
-  }
-}
-
-/* Founder proof panels — three stat cards in the RIGHT column. The
-   `min-height: clamp(360px, 60vh, 560px)` that drove the desktop pin
-   runway also applied on mobile, where no pin is engaged — so on phones
-   the section read as a 1080px+ vertical chain of repetitive giant
-   cards (operator caught 2026-05-02). On mobile the panels size to
-   content with a soft minimum; on desktop they keep the original
-   runway so the LEFT pin has something to scroll past. */
+   Removed with the pin: .flintmere-founder-pinned (sticky LEFT column) and
+   the ≥lg `min-height: clamp(360px, 60vh, 560px)` on .flintmere-founder-panel,
+   which existed only to give that pin something to scroll past. Panels are
+   content-driven at every breakpoint now, which also settles the empty-card
+   chain the 2026-05-02 and 2026-06-21 mobile passes were fighting. */
 .flintmere-founder-panel {
-  /* Mobile: size to content. The min-height existed only to give the
-     desktop LEFT-column pin something to scroll past; on phones (no pin)
-     it forced ~300px of empty space per card — three stacked cards read
-     as a ~900px void chain. Content-driven height is tighter and calmer
-     (mobile-pass 2026-06-21, frontend-design + Magic-inspired compact
-     ledger). Desktop keeps the runway below. */
   min-height: 0;
-}
-@media (min-width: 1024px) {
-  .flintmere-founder-panel {
-    min-height: clamp(360px, 60vh, 560px);
-  }
 }
 
 /* Curtain-pair wrapper retained for editorial grouping (chapters 3 + 4
