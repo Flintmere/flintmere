@@ -26,6 +26,7 @@ import {
   pillarLabelCustomerFacing,
   verdictHeader,
 } from '@/lib/copy';
+import { pillarPercent } from '@flintmere/scoring';
 import type { PillarId } from '@flintmere/scoring';
 import { CatalogSummary } from './CatalogSummary';
 import { ScanScopeLine } from './ScanScopeLine';
@@ -231,6 +232,10 @@ export function Results({ result }: { result: ScanResult }) {
             pillarLabelCustomerFacing[p.pillar as PillarId] ?? p.pillar;
           const explanation =
             pillarExplanationCustomerFacing[p.pillar as PillarId] ?? '';
+          // Percentage of what the pillar could assess, never the raw
+          // score: `identifiers` returns maxScore 25 when no barcode was
+          // read, and a raw 25 would read as a near-zero grade.
+          const pct = pillarPercent(p);
           return (
             <div
               key={p.pillar}
@@ -240,7 +245,7 @@ export function Results({ result }: { result: ScanResult }) {
                 <span style={{ fontSize: 18, letterSpacing: '-0.01em' }}>
                   {label}
                 </span>
-                <span className="eyebrow">{Math.round(p.score)}%</span>
+                <span className="eyebrow">{pct}%</span>
               </div>
               <div
                 className="mt-3 h-[4px]"
@@ -249,7 +254,7 @@ export function Results({ result }: { result: ScanResult }) {
               >
                 <div
                   style={{
-                    width: `${p.score}%`,
+                    width: `${pct}%`,
                     height: '100%',
                     background: 'var(--color-ink)',
                   }}

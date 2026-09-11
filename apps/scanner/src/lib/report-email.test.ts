@@ -117,6 +117,47 @@ describe('buildReportEmail', () => {
     expect(email.text).toContain('https://audit.flintmere.com/api/unsubscribe/abc');
   });
 
+  // Regression guard: both pillar tables printed `Math.round(p.score)`,
+  // which is only the percentage while `maxScore` is 100. `scoreIdentifiers`
+  // drops the 75 barcode points out of its denominator when the barcode pass
+  // read too little to speak, so a store perfect on its 25 assessable points
+  // was emailed "Product IDs 25%" while /score/[shop] showed it 100%.
+  const renormalisedPillars: CompositeScore['pillars'] = [
+    { pillar: 'identifiers', weight: 20, score: 20, maxScore: 25, locked: false, issues: [] },
+  ];
+
+  it('renders the pillar percentage against maxScore in the HTML body', () => {
+    const email = buildReportEmail({
+      score: makeScore({ pillars: renormalisedPillars }),
+      ...baseInput,
+    });
+    expect(email.html).toContain('>80%<');
+    expect(email.html).not.toContain('>20%<');
+  });
+
+  it('renders the same renormalised percentage in the text body', () => {
+    const email = buildReportEmail({
+      score: makeScore({ pillars: renormalisedPillars }),
+      ...baseInput,
+    });
+    expect(email.text).toMatch(/Product IDs\s+80%/);
+    expect(email.text).not.toMatch(/Product IDs\s+20%/);
+  });
+
+  it('emails 0%, never NaN%, when a pillar assessed nothing at all', () => {
+    const email = buildReportEmail({
+      score: makeScore({
+        pillars: [
+          { pillar: 'identifiers', weight: 20, score: 0, maxScore: 0, locked: false, issues: [] },
+        ],
+      }),
+      ...baseInput,
+    });
+    expect(email.html).toContain('>0%<');
+    expect(email.html).not.toContain('NaN');
+    expect(email.text).not.toContain('NaN');
+  });
+
   it('includes the GTIN non-affiliation disclaimer', () => {
     const email = buildReportEmail({ score: makeScore(), ...baseInput });
     expect(email.html).toContain('not affiliated with GS1');

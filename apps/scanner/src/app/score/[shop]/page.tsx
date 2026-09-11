@@ -10,6 +10,7 @@ import {
 import { scanScopeLine } from '@/lib/copy-scan-scope';
 import { badgeUrl, scoreUrl, validateDomainSegment } from '@/lib/badge-url';
 import { publishedScanQuery } from '@/lib/public-score';
+import { pillarPercent } from '@flintmere/scoring';
 import type { CompositeScore, PillarId } from '@flintmere/scoring';
 import type { GmcGroundTruth } from '@/lib/gmc/types';
 import { GmcPanel } from '@/components/scan/GmcPanel';
@@ -225,7 +226,7 @@ export default async function ScorePage({ params }: PageProps) {
                 pillarLabelCustomerFacing[p.pillar as PillarId] ?? p.pillar;
               const explanation =
                 pillarExplanationCustomerFacing[p.pillar as PillarId] ?? '';
-              const pct = p.maxScore > 0 ? Math.round((p.score / p.maxScore) * 100) : 0;
+              const pct = pillarPercent(p);
               return (
                 <li
                   key={p.pillar}

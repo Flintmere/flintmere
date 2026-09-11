@@ -126,3 +126,42 @@ describe('/score/[shop] scan-scope disclosure', () => {
     );
   });
 });
+
+/**
+ * The pillar percentages themselves. This page always divided by `maxScore`
+ * (`pillarPercent`, since consolidated onto the shared helper); Results.tsx
+ * and report-email.ts printed the raw score, so the same persisted scan was
+ * reported "Product IDs 80%" here and "25%" in the merchant's email. The
+ * fixture's `{ score: 20, maxScore: 25 }` is the shape that only exists
+ * because the barcode pass read too little to speak.
+ */
+describe('/score/[shop] pillar percentages', () => {
+  afterEach(() => {
+    vi.resetModules();
+    vi.doUnmock('@/lib/db');
+  });
+
+  it('renders the percentage of what the pillar could assess, not the raw score', async () => {
+    const texts = await renderScorePage(
+      baseScan({ productCount: 120, pillars: onePillar() }),
+    );
+
+    expect(texts).toContain('Product IDs');
+    expect(texts).toContain('80');
+    expect(texts).not.toContain('20');
+  });
+
+  it('renders 0, never NaN, when the pillar assessed nothing', async () => {
+    const texts = await renderScorePage(
+      baseScan({
+        productCount: 120,
+        pillars: [
+          { pillar: 'identifiers', score: 0, maxScore: 0, locked: false, lockedReason: null },
+        ],
+      }),
+    );
+
+    expect(texts).toContain('0');
+    expect(texts.some((t) => t.includes('NaN'))).toBe(false);
+  });
+});

@@ -1,3 +1,4 @@
+import { pillarPercent } from '@flintmere/scoring';
 import type { CompositeScore, PillarId } from '@flintmere/scoring';
 import {
   AUTHORITY_LINE,
@@ -169,7 +170,7 @@ function renderHtml(input: ReportEmailInput): string {
       (p) =>
         `<tr>
           <td style="padding:10px 0;border-top:1px solid #D5D2C8;font-size:14px;color:#0A0A0B;">${esc(pillarLabelFor(p.pillar))}</td>
-          <td style="padding:10px 0;border-top:1px solid #D5D2C8;font-family:ui-monospace,Menlo,monospace;font-size:12px;text-align:right;color:#0A0A0B;">${Math.round(p.score)}%</td>
+          <td style="padding:10px 0;border-top:1px solid #D5D2C8;font-family:ui-monospace,Menlo,monospace;font-size:12px;text-align:right;color:#0A0A0B;">${pillarPercent(p)}%</td>
         </tr>`,
     )
     .join('');
@@ -438,7 +439,7 @@ function renderText(input: ReportEmailInput): string {
     .filter((p) => !p.locked)
     .map(
       (p) =>
-        `  - ${pillarLabelFor(p.pillar).padEnd(32, ' ')} ${Math.round(p.score)}%`,
+        `  - ${pillarLabelFor(p.pillar).padEnd(32, ' ')} ${pillarPercent(p)}%`,
     )
     .join('\n');
 
