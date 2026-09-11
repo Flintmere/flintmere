@@ -1,3 +1,4 @@
+import { readFileSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   BANNED_JARGON,
@@ -154,5 +155,82 @@ describe('pillar labels + definitions claim no agent behaviour', () => {
   it.each(explanations)('%s: definition is one line, ≤ 20 words', (_p, text) => {
     expect(text).not.toContain('\n');
     expect(words(text)).toBeLessThanOrEqual(20);
+  });
+});
+
+// Every issue code packages/scoring can emit needs an entry in
+// issueCodeToFounderSpeak, or the scanner falls through to the raw
+// `issue.description` (Results.tsx and report-email.ts both spell that
+// fallback `?? issue.description`). Nothing enforced that, and eight codes
+// have no entry — all eight carry the retired agent-behaviour language the
+// FounderSpeak rule above exists to keep away from merchants.
+//
+// They are LATENT, not live: all three owning pillars (mapping, attributes,
+// checkout-eligibility) are install-gated, and no production caller passes
+// an admin context, so none of the eight can reach a merchant today. The
+// moment one does — an admin context, or a pillar ungated — its raw
+// description ships. Rewriting those eight strings is its own PR; this
+// guard exists so a NINTH cannot be added silently.
+//
+// The code set is read out of the scoring source rather than hand-listed:
+// a hand-list drifts exactly the way the eight below did.
+const SCORING_SRC = new URL(
+  '../../../../packages/scoring/src',
+  import.meta.url,
+).pathname;
+
+function emittedIssueCodes(): string[] {
+  const files = readdirSync(SCORING_SRC, { recursive: true, encoding: 'utf8' })
+    .filter((f) => f.endsWith('.ts'))
+    .map((f) => `${SCORING_SRC}/${f}`);
+  const codes = new Set<string>();
+  for (const file of files) {
+    for (const m of readFileSync(file, 'utf8').matchAll(/\bcode: '([a-z0-9-]+)'/g)) {
+      codes.add(m[1]!);
+    }
+  }
+  return [...codes].sort();
+}
+
+// The eight known gaps, as of 2026-09-11. Shrink this list — never grow it.
+// Adding a code here is adding a merchant-facing string nobody wrote.
+const FOUNDER_SPEAK_GAPS: readonly string[] = [
+  // mapping.ts
+  'missing-gmc-category',
+  'gmc-too-shallow',
+  'no-standard-taxonomy',
+  // attributes.ts
+  'missing-structured-attributes',
+  'low-attribute-depth',
+  // checkout.ts
+  'legacy-customer-accounts',
+  'missing-inventory-signals',
+  'incoherent-pricing',
+];
+
+describe('issueCodeToFounderSpeak covers every code the scorer emits', () => {
+  const emitted = emittedIssueCodes();
+
+  it('reads the scoring source at all (guard is not vacuous)', () => {
+    expect(emitted.length).toBeGreaterThan(20);
+    expect(emitted).toContain('missing-gtin');
+  });
+
+  it('has an entry for every emitted code except the documented gaps', () => {
+    const uncovered = emitted.filter(
+      (code) =>
+        !(code in issueCodeToFounderSpeak) &&
+        !FOUNDER_SPEAK_GAPS.includes(code),
+    );
+    expect(uncovered).toEqual([]);
+  });
+
+  it('keeps the gap list honest — every entry is still emitted and still uncovered', () => {
+    // Fails when someone writes one of the eight strings without deleting
+    // its line here, and when a pillar stops emitting a code on the list.
+    const stale = FOUNDER_SPEAK_GAPS.filter(
+      (code) => code in issueCodeToFounderSpeak || !emitted.includes(code),
+    );
+    expect(stale).toEqual([]);
   });
 });
