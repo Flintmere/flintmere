@@ -13,6 +13,24 @@ const CHECKS = {
 /** The two sub-checks that need a barcode to mean anything. */
 const BARCODE_CHECKS = CHECKS.barcodePresence + CHECKS.gtinChecksum;
 
+/**
+ * How many products a sampled scan must have read a barcode for before those
+ * two sub-checks are allowed to speak for the catalog.
+ *
+ * Ten, because: the public fetcher aims at 50 (`barcodeSampleSize`), so
+ * finishing under ten means the pass aborted early — a failed read, not a
+ * sample; and at n = 10 a single product moves barcode coverage by at most
+ * 10 percentage points (7.5 of the 75 points), against 100 at n = 1. Below
+ * the floor the barcode points leave the denominator and `barcodes-not-read`
+ * fires, exactly as they do when nothing was read at all.
+ *
+ * Issues stay scoped to the products we DID read, floor or no floor:
+ * "3 of the products we read carry no barcode" is a true statement about
+ * three specific products, and `scanScopeLine` states how many were read.
+ * What the floor withholds is the grade, not the finding.
+ */
+export const MIN_SAMPLED_READS = 10;
+
 export function scoreIdentifiers(input: CatalogInput): PillarResult {
   const productCount = input.products.length;
   const allVariants = input.products.flatMap((p) =>
@@ -33,7 +51,21 @@ export function scoreIdentifiers(input: CatalogInput): PillarResult {
   const readVariants = allVariants.filter(
     ({ product }) => product.barcodeRead !== false,
   );
-  const barcodesAssessable = readVariants.length > 0;
+  // A sample only speaks for the catalog above a floor. `readVariants.length
+  // > 0` alone let ONE product carry barcodePresence + gtinChecksum = 75 of
+  // this pillar's 100 points, and that is reachable in production: one
+  // success followed by three consecutive non-404 failures trips the
+  // fetcher's BARCODE_FAILURE_CEILING (apps/scanner/src/lib/shopify-fetcher.ts)
+  // and ends the pass at barcodesRead === 1 — on a catalog of any size.
+  //
+  // The floor is absolute, and applies ONLY when some product went unread.
+  // Reading every product is a census, not a sample: a five-product store
+  // read in full is 100% coverage and must keep its barcode grade, which a
+  // proportional floor or an unconditional absolute one would take away.
+  const sampled = readProducts.length < productCount;
+  const barcodesAssessable =
+    readVariants.length > 0 &&
+    (!sampled || readProducts.length >= MIN_SAMPLED_READS);
 
   // --- Sub-check 1: barcode presence on variants we actually read ---
   const variantsWithBarcode = readVariants.filter(
@@ -93,9 +125,9 @@ export function scoreIdentifiers(input: CatalogInput): PillarResult {
       pillar: 'identifiers' as const,
       code: 'barcodes-not-read',
       severity: 'low' as const,
-      title: 'Barcodes were not read',
+      title: 'Not enough barcodes were read',
       description:
-        'We could not read barcodes on this scan, so it says nothing about your GTINs either way. The brand and SKU checks ran as normal.',
+        'This scan did not read enough of your products’ barcodes to judge your GTIN coverage either way. The brand and SKU checks ran as normal.',
       affectedCount: 0,
       affectedProductIds: [],
       revenueImpactScore: 0,

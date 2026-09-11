@@ -188,9 +188,9 @@ export const issueCodeToFounderSpeak: Record<string, FounderSpeak> = {
       'Google Merchant Center disapproves a listing whose GTIN is invalid, so the product stops showing in Shopping.',
   },
   'barcodes-not-read': {
-    title: 'Barcodes were not read',
+    title: 'Not enough barcodes were read',
     consequence:
-      'We could not read barcodes on this scan, so it says nothing about your GTINs either way.',
+      'This scan did not read enough of your products’ barcodes to judge your GTIN coverage either way.',
   },
   'missing-brand': {
     title: 'Products have no brand name',
