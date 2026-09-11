@@ -85,7 +85,7 @@ guess what it costs you.*
 | 4 | Manifesto close | `ManifestoChord.tsx:454-456` | `// this is a product, read as data.` / `// yours, checked to the last digit.` |
 | 5 | `/scan` H1 + lede | `scan/page.tsx:111-129` | H1 identical to slot 1. Lede = slot 2a alone; drop 2b (the form is directly beneath). |
 | 6 | OG headline | `opengraph-image.tsx:74` | One wrong [ digit ]. Disapproved. |
-| 7 | Results verdict header | `copy.ts:280` `verdictHeader()` (was `:261-268`; pushed down by `isStrongGrade`, which this branch added) | Branching template — §2.2 |
+| 7 | Results verdict header | `copy.ts:280` `verdictHeader()` (was `:261-268`; pushed down by `isStrongGrade`, which `fix/fetcher-barcode-read` added) | Branching template — §2.2 |
 | 8 | Report email subject | `report-email.ts:84` | Branching template — §2.3 |
 
 The bracket noun is **digit**. `memory/VOICE.md:32` requires a noun; "suppressed" was
@@ -95,14 +95,24 @@ a participle. ≤1 bracket per section holds.
 
 Inputs (public-scan payload only, unscaled — never `scaledSuppressionEstimate`):
 
-- `{checked}` = `barcodesRead ?? 0` — how many products had a barcode read.
-  `barcodesRead` is optional on both `FetchedCatalog` and `ScanResult`: a cached scan,
-  a scan persisted before this field existed, or an envelope where the barcode pass
-  never ran can carry `undefined`. The `?? 0` default routes all three cases into
-  `{checked} === 0`, the same branch a genuine zero takes — never into `undefined`
-  appearing in rendered copy. When `{checked} === 0`, branch 1 fires (it is itself a
-  barcode branch, not an absence of one): the header says *We could not read barcodes
-  from your storefront.* and the subhead carries the product-type sentence alone.
+- `{checked}` = `barcodesRead` — how many products had a barcode read. Kept as the
+  TRI-STATE it is: **absent / `0` / a number**, never defaulted. `barcodesRead` is
+  optional on both `FetchedCatalog` and `ScanResult`, so a cached scan, a scan
+  persisted before the field existed, or an envelope where the barcode pass never ran
+  carries `undefined`.
+  - **absent** — nobody looked. → **branch 0.**
+  - **`0`** — we looked and read none. → **branch 1.**
+  - **a number** — we read that many. → branches 2–5.
+
+  An earlier revision of this section defined `{checked}` as `barcodesRead ?? 0` and
+  routed absent into branch 1, which renders *We could not read barcodes from your
+  storefront.* For a legacy persisted scan that is **false** — nobody tried — and it
+  contradicts the shipped `copy-scan-scope.ts`, which correctly says nothing at all
+  about barcodes when the field is absent. The two would disagree on the same page and
+  in the same email: `verdictHeader` is reached from persisted `scoreJson` via
+  `lead/route.ts`, so the contradiction is production-reachable, not theoretical.
+  Defaulting the input IS the hole — it collapses "never tried" onto "tried and found
+  none", the exact conflation `fix/fetcher-barcode-read` exists to prevent.
 - `{invalidGtin}` = `issues['invalid-gtin-checksum'].affectedCount ?? 0`
 - `{missingBarcode}` = `issues['missing-gtin'].affectedCount ?? 0`
 - `{missingOnly}` = products in `missing-gtin.affectedProductIds` not in `invalid-gtin-checksum.affectedProductIds` (`identifiers.ts:86,105`)
@@ -111,17 +121,28 @@ Inputs (public-scan payload only, unscaled — never `scaledSuppressionEstimate`
 
 **Headline** (first match wins):
 
+0. `{checked} === undefined` → **omit every barcode sentence.** Render the shipped
+   affected-count header and subhead unchanged (`verdictHeader()`'s current template:
+   *Your catalog data is in good shape.* / *No product carries a critical gap.* /
+   *Most of your catalog data is incomplete.* / *At least {affected} of your {total}
+   products carry a data gap.*) and append no barcode line. This branch is FIRST and
+   unconditional: it fires even when `{invalidGtin} > 0`, because every barcode
+   sentence below is a claim about a pass that never demonstrably ran. The finding
+   itself is not lost — the issue list and the pillar breakdown still carry it. This
+   is exactly what `copy-scan-scope.ts` already does with `barcodesRead == null`.
 1. `{checked} === 0` → *We could not read barcodes from your storefront.*
 2. `{invalidGtin} > 0` → *{invalidGtin} of the {checked} products we read carry a barcode that fails its check digit.*
 3. `{missingBarcode} == {checked}` → *None of the {checked} products we checked carries a barcode.*
 4. `{missingBarcode} > 0` → *Every barcode we read passes its check digit. {missingBarcode} of {checked} products have none on at least one variant.*
 5. else → *Every barcode on the {checked} products we checked passes its check digit.*
 
-**Subhead** (join every sentence whose condition holds, in order):
+**Subhead** (join every sentence whose condition holds, in order). Under branch 0 the
+first three are unreachable — they are barcode sentences — and only `{noType}` and the
+`gmcGroundTruth` line may join the shipped subhead:
 
 - `{invalidGtin} > 0` → *Google Shopping disapproves a listing whose GTIN is invalid.*
 - `{invalidGtin} > 0 && {missingOnly} > 0` → *{missingOnly} others have no barcode on at least one variant, which can limit where Google shows them.*
-- `{invalidGtin} == 0 && {missingBarcode} > 0` → *A missing GTIN can limit where Google shows a product; it does not get it disapproved.*
+- `{invalidGtin} == 0 && {missingBarcode} > 0` → *Google Merchant Center requires a GTIN where the manufacturer assigned one; without it a listing can be limited or disapproved.* (Was *"…it does not get it disapproved."* — retired on `fix/fetcher-barcode-read` as unsupportable in both directions: reading a public storefront cannot establish whether a manufacturer assigned a GTIN. Matches the shipped `copy.ts` and `identifiers.ts` strings verbatim.)
 - `{noType} > 0` → *{noType} products have no product type set.*
 - `gmcGroundTruth === null` → *Read from your public storefront. We can't see what Merchant Center did with any of them.*
 - `gmcGroundTruth !== null` → omit that line; the GMC panel speaks.
@@ -134,6 +155,15 @@ with the caveat *"products containing none of the 14 regulated allergens need no
 statement."* When `truncated`, the header's denominator stays `{checked}` — never
 `{total}`, which this section no longer defines; `ScanScopeLine` states
 catalog-truncation scope separately.
+
+**Branch exclusivity.** Exactly one headline branch fires for every input, first match
+wins. `undefined` is caught by branch 0 before any `=== 0` or `> 0` test runs (and note
+`0 == undefined` is `false` in JS, so no later branch could catch it either); a genuine
+`0` is caught by branch 1 before branch 3's `{missingBarcode} == {checked}`, which would
+otherwise fire on `0 == 0`; `{missingBarcode} == {checked}` with `{invalidGtin} > 0`
+yields branch 2, which is correct — the worse fact leads, and the subhead's second line
+carries the `{missingOnly}` remainder. `{missingBarcode} == 0` with `{invalidGtin} == 0`
+falls to branch 5, the clean branch.
 
 ### 2.3 Report email subject — template
 
@@ -202,7 +232,8 @@ this PR — it shipped on `fix/fetcher-barcode-read` (§2.3 already describes th
 Reconciled against the shipped `copy.ts` and `report-email.ts` on
 `fix/fetcher-barcode-read` (2026-09-10). Task 6 of that branch already did two of the
 items below; both are marked **DONE**. Three more carry corrected line references —
-this branch's own edits to `copy.ts` and `app/score/[shop]/page.tsx` pushed the
+`fix/fetcher-barcode-read`'s own edits to `copy.ts` and `app/score/[shop]/page.tsx`
+pushed the
 originally-cited lines down. Everything else is unchanged and still owed to the
 homepage PR.
 
@@ -220,8 +251,10 @@ homepage PR.
   (`robots-blocks-ai-agents`, `missing-llms-txt`, `malformed-llms-txt`) — still
   present verbatim; rewrite to crawlability without llms.txt as originally specified.
 - `methodology-data.ts:32` → *An invalid identifier gets a product disapproved; a missing one limits where it shows.* `:46` — remove the "invisible to a query" line.
-- `app/score/[shop]/page.tsx:65,154` (was `:64,135` — drifted when this branch's
-  Task 8 added the scan-scope line to this page) — drop "the seven checks AI shopping
+- `app/score/[shop]/page.tsx:65,154` (was `:64,135` — drifted when
+  `fix/fetcher-barcode-read`'s Task 7 fix round added the scan-scope line to this
+  page, commit `f89af6b`; an earlier revision of this line credited Task 8, which
+  was the catalog-sample work) — drop "the seven checks AI shopping
   agents use" and the llms.txt mention.
 - `app/about/page.tsx:144-145` — the company purpose statement; rewrite to the §2 thesis register.
 - `app/pricing/page.tsx:52` "Fake barcodes get listings suppressed" → *disapproved* (a fake GTIN is an incorrect one).
@@ -244,7 +277,7 @@ Reconciled against the shipped test files on `fix/fetcher-barcode-read` (2026-09
 
 - `lib/copy-revenue-lede.test.ts:23-25,38,48` — asserts the "annual demand at risk while these stay suppressed" string. Confirmed accurate, unchanged.
 - **DONE / MOOT** — `lib/report-email.test.ts:88` — this line no longer asserts
-  "invisible to AI agents". Task 6 of this branch (commits `6892573`, `51ef8d8`,
+  "invisible to AI agents". Task 6 of `fix/fetcher-barcode-read` (commits `6892573`, `51ef8d8`,
   `b07a7b5`) replaced the barcode-specific subject branching with the generic
   `affectedCountFor`/`isStrongGrade` template (§2.3); line 88 now reads
   `expect(email.subject).toContain('412');` — a plain affected-count assertion with
