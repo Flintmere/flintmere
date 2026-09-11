@@ -124,7 +124,7 @@ export default function Dashboard() {
               tone="warning"
             >
               <p>
-                Your last scan ran before AI Agent Access (crawlability)
+                Your last scan ran before Crawler Access (crawlability)
                 became part of the score. Click <em>Re-scan catalog</em> to
                 refresh.
               </p>
