@@ -87,12 +87,23 @@ export function scoreCrawlability(input: CrawlabilityInput): PillarResult {
   if (!llmsPresent) {
     // Severity dropped high -> low 2026-09-10. ADR 0029 retired llms.txt as
     // a scored pillar (Google, 2026-06-02: "none of the AI systems use it"),
-    // and report-email.ts filters the email body to critical | high — so a
-    // merchant was emailed a high-priority finding whose own merchant-facing
-    // consequence says no search engine or AI company has confirmed reading
-    // the file. revenueImpactScore matched down to its malformed-llms-txt
-    // sibling: same file, same unconfirmed consequence. The CHECKS weights
-    // are untouched — retiring those 40 points moves every store's score and
+    // so a merchant was emailed a top-three finding whose own
+    // merchant-facing consequence says no search engine or AI company has
+    // confirmed reading the file.
+    //
+    // What the drop actually does is change the RANKING. The email body is
+    // `score.issues.slice(0, 3)` with no severity filter at all — the
+    // critical|high filter in report-email.ts feeds `affectedCountFor()`
+    // and nothing else. score.ts sorts the issue list on
+    // severityWeight × revenueImpactScore, so this issue went from
+    // 3 × 70 = 210 to 1 × 20 = 20 and stopped clearing the top three.
+    // (An earlier version of this comment credited an email-body severity
+    // filter that does not exist; copy-integrity.test.ts has always stated
+    // the real behaviour.)
+    //
+    // revenueImpactScore matched down to its malformed-llms-txt sibling:
+    // same file, same unconfirmed consequence. The CHECKS weights are
+    // untouched — retiring those 40 points moves every store's score and
     // belongs in its own PR.
     issues.push({
       pillar: 'crawlability',

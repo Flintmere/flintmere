@@ -64,7 +64,14 @@ export interface FetchedCatalog {
   actualProductCount: number | null;
   /**
    * How many products we actually read a barcode field for. Optional so
-   * existing mocks of this module keep type-checking; treat absent as 0.
+   * existing mocks of this module keep type-checking.
+   *
+   * Absent is NOT zero. `run-scan.ts` normalises absent to `null`, and the
+   * two are load-bearing apart downstream: `copy-scan-scope.ts` renders 0
+   * as "barcodes not read" and null as nothing at all, because nobody
+   * looked and there is nothing to report. A consumer that defaults absent
+   * to 0 collapses "never tried" onto "tried and found none" — the exact
+   * conflation this tri-state exists to prevent.
    */
   barcodesRead?: number;
 }
