@@ -64,7 +64,7 @@ function makeScore(overrides: Partial<CompositeScore> = {}): CompositeScore {
         severity: 'high',
         title: 'Missing GTINs on 412 products',
         description:
-          'A product with no GTIN can be limited in where Google Merchant Center shows it. It is not disapproved for that alone.',
+          'Google Merchant Center requires a GTIN where the manufacturer assigned one; without it a listing can be limited or disapproved.',
         affectedCount: 412,
         affectedProductIds: [],
         revenueImpactScore: 80,
@@ -332,13 +332,20 @@ describe('buildReportEmail — GTIN consequences match Google behaviour', () => 
     });
     expect(checksum.text).toContain('disapproves');
 
-    // The other half of "reserves": the missing-gtin case must NOT claim
-    // a disapproval. Google limits where it shows a GTIN-less product; it
-    // does not disapprove the listing for that alone. makeScore()'s
-    // default issue list is the missing-gtin one.
+    // The other half of "reserves": the missing-gtin case must not state a
+    // flat outcome in EITHER direction. It used to read "It is not
+    // disapproved for that." — which Google's own product data spec
+    // contradicts: `gtin` is required for a product the manufacturer
+    // assigned one to, and a missing value is a disapproval in several
+    // categories and target countries. Reading a public storefront cannot
+    // tell us whether a manufacturer assigned one, so the copy carries the
+    // condition instead of guessing which side of it a merchant is on.
+    // makeScore()'s default issue list is the missing-gtin one.
     const missing = buildReportEmail({ score: makeScore(), ...baseInput });
-    expect(missing.text).not.toContain('disapproves');
-    expect(missing.text).toContain('It is not disapproved for that.');
+    expect(missing.text).not.toContain('not disapproved');
+    expect(missing.text).toContain(
+      'requires a GTIN where the manufacturer assigned one',
+    );
   });
 });
 

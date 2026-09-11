@@ -180,7 +180,7 @@ export const issueCodeToFounderSpeak: Record<string, FounderSpeak> = {
   'missing-gtin': {
     title: 'Products have no barcode',
     consequence:
-      'Google Merchant Center can limit where it shows a product with no GTIN. It is not disapproved for that.',
+      'Google Merchant Center requires a GTIN where the manufacturer assigned one; without it a listing can be limited or disapproved.',
   },
   'invalid-gtin-checksum': {
     title: 'Barcode numbers fail the check digit',

@@ -144,7 +144,7 @@ export function scoreIdentifiers(input: CatalogInput): PillarResult {
       severity: 'high' as const,
       title: `Missing GTINs on ${missingBarcodeProducts.length} products`,
       description:
-        'A product with no GTIN can be limited in where Google Merchant Center shows it. It is not disapproved for that alone.',
+        'Google Merchant Center requires a GTIN where the manufacturer assigned one; without it a listing can be limited or disapproved.',
       affectedCount: missingBarcodeProducts.length,
       affectedProductIds: missingBarcodeProducts.map((p) => p.id),
       revenueImpactScore: 80,
