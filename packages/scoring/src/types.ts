@@ -35,6 +35,13 @@ export const ProductInputSchema = z.object({
   images: z.array(ProductImageSchema).default([]),
   brandMetafield: z.string().nullable().optional(),
   mpnMetafield: z.string().nullable().optional(),
+  /**
+   * False when the fetcher did not read this product's barcode field — it
+   * fell outside the sample, or the storefront did not serve the endpoint
+   * that carries barcodes. Absent means the source carries barcodes
+   * natively (Admin API, fixtures), so absent reads as "read".
+   */
+  barcodeRead: z.boolean().optional(),
 });
 
 export const CatalogInputSchema = z.object({

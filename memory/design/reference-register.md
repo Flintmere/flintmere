@@ -133,6 +133,23 @@
 ### Manual Creative (manual.is)
 **Borrow:** agency portfolio that uses asymmetry without chaos — case-study spreads with one wild compositional move per page. Reference for case-study format.
 
+
+### Added 2026-09-09 — world-class design sweep (six angles, 7 agents)
+
+Pulled for the "One wrong [ digit ]. Disapproved." hero. §G's quarterly review had lapsed since 2026-04-28; this is the overdue pull.
+
+### Sharplink (Studio Freight) — Awwwards SOTD Aug 2026
+**Borrow:** the council reference for "warm paper + near-black + one accent + mono labels" being what an award-winning data site looks like in 2026 — body rgb(247,247,245) is one unit off `--paper`, H1 Archivo 88px/400/−0.03em, zero animations running at load. Use when the operator wonders whether the canon is too plain. Nothing to build. Awards sweep 2026-09-09.
+
+### Oxide Computer — mono label spending rule
+**Borrow:** every nav item and secondary CTA in GT America Mono 11–12px uppercase at 0.055em in a mute grey, and the one accent spent on exactly one label ('CONTACT SALES'). Apply to SiteHeader: all nav Geist Mono 11px --mute-2, the single amber CTA the only colour above the fold. The dark canvas does not transfer. Awards sweep 2026-09-09.
+
+### Better Stack — the number is the headline
+**Borrow:** '30x cheaper than Datadog' in the subhead and two monthly bills side by side in 28px/700 tabular figures that render static — no count-up — so they read as facts. Put the number in the lede, never in the H1; keep ADR 0021's count-up for live figures only. Awards sweep 2026-09-09.
+
+### Axiom — Aug 2026 redesign ("A new look for the modern machine data platform")
+**Borrow:** the hero is the product rendered as live DOM (a real query editor), H1 72px/500/−1.8px in Geist — Flintmere's own h1 spec — exactly one animation on load (a ping on a live dot), and a redesign essay that deleted its animated ASCII arrows as noise; its three principles ('honest density', 'calm confidence', 'legible at every altitude') are the acceptance test for 'honest, precise, quiet'. Dev-tools sweep 2026-09-09.
+
 ---
 
 ## Section C — Photography-led commerce
@@ -212,6 +229,86 @@ These are not full-site references; each is ONE specific moment on a specific pa
 - **Frank Chimero's Shape of Design** — long-form essay published as a website with one display moment per chapter. Borrow for any future longform.
 - **Maison Margiela's product pages** (maisonmargiela.com) — anti-stylization product photography with mono captions. Borrow for the picker-driven content block when food imagery is unavailable.
 
+
+### Added 2026-09-09 — world-class design sweep (six angles, 7 agents)
+
+Pulled for the "One wrong [ digit ]. Disapproved." hero. §G's quarterly review had lapsed since 2026-04-28; this is the overdue pull.
+
+### Increase — Products bento digit odometer (increase.com)
+**Borrow:** the CSS-only digit roll — each character a 34px overflow:hidden cell holding a roll column, value change = translateY(±1 cell) over 0.42s ease-out-quint, tiles enter 5px, and reduced motion is a real kill switch (`[data-products-bento] * {animation:none!important}`). Model for the hero check-digit roll. Dev-tools sweep 2026-09-09.
+
+### animations.dev — course hero H1 (Emil Kowalski)
+**Borrow:** per-word mask rise — inline-block words inside overflow:hidden lines, translateY(150%) → 0 on expo-out (.19,1,.22,1), animation-delay calc(30ms * var(--index)), backwards fill; text-wrap: balance on headings. The display-headline form of scroll-choreography #7. Note: ships no reduce gate itself — ours must. Solo-craft sweep 2026-09-09.
+
+### Jeton — split-text clip recipe (Awwwards SOTD Jan 2025)
+**Borrow:** `[data-clip="chars"] .c { overflow:hidden; margin-bottom:-0.15em; padding-bottom:0.15em; vertical-align:bottom }` with words as `white-space:pre` — descender-safe character/word masks that never shear a g or p and never re-wrap mid-animation. Skip its scale(2) pinned h2. Awards sweep 2026-09-09.
+
+### Microsoft AI — `<split-text>` line-mask wrapper (Awwwards SOTD Nov 2025)
+**Borrow:** the accessible split-heading scaffold — real heading in `.sr-only[data-split-original]`, aria-hidden visual copy in `.line-wrapper { clip-path: inset(-0.25em 0) }` indexed by --line-index. Use clip-path inset with slack rather than overflow:hidden where a bracket hairline or under-tick must not clip. Do not borrow the Bradford serif. Awards sweep 2026-09-09.
+
+### Geist specimen — metric chips (vercel.com/font)
+**Borrow:** the word drawn on a 1px hairline grid with Geist Mono metric chips (710 cap height, 530 x-height, 0 baseline, −150 descender) fading up 200ms each at 150ms intervals after the letterforms. Model for annotating the GTIN (GS1 prefix · item reference · check digit). Also the source for verifying Geist's tnum/ss feature settings before shipping tabular figures. Kinetic-type + single-detail sweeps 2026-09-09.
+
+### Shopify Editions Winter '26 — SVG line-draw ornaments (Awwwards SOTM Feb 2026)
+**Borrow:** one hairline, not 270 — stroke-dashoffset draw on cubic-bezier(0.34,0.22,0.47,0.84), single instance per page, collapsed to the drawn end state under reduce (Editions ships no reduce rule and 43 concurrent draws; it is the anti-example of "seen by every merchant, unusable with motion off"). Leave the WebGL paintings, Lenis and 176px titles. Awards sweep 2026-09-09.
+
+### PlanetScale — ASCII architecture figures
+**Borrow:** zero keyframes, system fonts, the architecture drawn as box-drawing ASCII in a `<pre>` that grows 2 → 3 → 6 shards to show scale, and a one-sentence caption under every figure with a link to the method page. Model for the mod-10 check-digit ledger as a Geist Mono figure captioned to /methodology. Dev-tools sweep 2026-09-09.
+
+### Terminal Industries — inline Yard Efficiency Calculator (Awwwards SOTM Sep 2025)
+**Borrow:** a B2B page carrying a live two-input number ("$641,626 Est. Savings: 23%") without a dashboard; Geist Mono 11px/0.14em eyebrows and '01 FAST START' indices at 0.18em — Flintmere's eyebrow spec verbatim; per-character H1 with sr-only original and a real reduce block. Model for a later 'SKUs × price' figure; not for the hero. Awards sweep 2026-09-09.
+
+### Paco Coursey — `--stagger` entrance
+**Borrow:** `[data-animate]{animation:.6s both enter; animation-delay:calc(var(--stagger)*var(--delay))}` with --stagger set inline per block and the rule declared only inside `@media (prefers-reduced-motion: no-preference)` — index-driven stagger that is still-by-default under reduce. Replaces hand-typed ms --reveal-delay values. Solo-craft sweep 2026-09-09.
+
+### Emil Kowalski — two-tone bleed-hover rows
+**Borrow:** no entrance motion; list rows as `-mx-3 px-3 hover:bg-[#F5F4F4] transition-colors` at 150ms so the hover pad bleeds past the text column without the type moving; ink title over grey one-line description; font-feature-settings set once on body. Sharp corners for Flintmere. Model for the proof strip and pricing rows. Solo-craft sweep 2026-09-09.
+
+### Guillermo Rauch — Geist post list
+**Borrow:** proof that Geist Sans at 15px with a 12px grey meta column and a 42rem measure reads finished with no ornament; year in a fixed gutter, right-aligned counts. Fix his miss — set tabular-nums on the figure column. Model for the three-row proof strip with `[ 01 ]` in the gutter. Solo-craft sweep 2026-09-09.
+
+### Devouring Details (Rauno Freiberg) — self-drawing signature
+**Borrow:** `path { stroke-dasharray:1; stroke-dashoffset:1; animation: drawPath .4s ease-out forwards }` with pathLength=1 and per-path 80ms delays from a 300ms base — the recipe for the 180ms amber under-tick draw and for line-art bars. Do NOT borrow the blur(2–6px) entrances (filter animation is outside the opacity+transform rule). Solo-craft sweep 2026-09-09.
+
+### Maxime Heckel — cross-document View Transitions
+**Borrow:** `::view-transition-old(root){animation: fade-out .18s}` / `::view-transition-new(root){animation: fade-in .24s}` — exit faster than enter, four lines, for flintmere.com → /catalog-letter → catalog.flintmere.com. Mandatory addition: an explicit `::view-transition-*{animation:none}` reduce rule, because the global `*` block does not reach these pseudo-elements. Solo-craft sweep 2026-09-09.
+
+### GS1 check-digit calculator + GS1 UK worked example
+**Borrow:** not the design (an undesigned Drupal form) but the content — the five-step worked example on 501234567000C → C = 3 → 5012345670003 is the canonical authority for the four-word H1 and the only number the hero should ever show. Render it as typography; nobody has. Diagnostic-tools sweep 2026-09-09.
+
+### SecurityHeaders.com — one-glyph verdict on a GET-addressable page
+**Borrow:** the verdict as a single large glyph beside a two-line mono summary and a plain table; every result a plain URL (`/?q=domain`), so scans are shareable and crawlable. Model for a server-rendered `/check/{gtin}` page whose glyph is the wrong digit itself. The grade rainbow does not transfer. Diagnostic-tools sweep 2026-09-09.
+
+### Treo Site Speed — tabular cells and dashed hairline guides
+**Borrow:** `font-variant-numeric: tabular-nums` inside fixed-basis inline-flex cells (`flex: 0 0 4.2rem; justify-content:flex-end`) so columns never jitter as data streams; inline-SVG distributions with `stroke-dasharray="2 2"` guides at 0.25 opacity; the result page H1 is the thing checked, not a title. Diagnostic-tools sweep 2026-09-09.
+
+### Website Carbon Calculator — verdict as a sentence with one counted number
+**Borrow:** "cleaner than [97]% of all web pages" then the abstract figure translated into felt equivalents; permanent result slugs; an honest H2 "This result is an approximation". Cap its 3s count-up at --duration-signature and add the reduce branch it lacks. Diagnostic-tools sweep 2026-09-09.
+
+### Have I Been Pwned — the input moment
+**Borrow:** `<input autofocus autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off">` so the page opens with the caret in the field, a verb on the one button, and verdict copy that puts the feeling before the noun. For the GTIN field: `autofocus inputmode="numeric" maxlength="14"`, button 'Check the digit'. Living totals only once true — never fabricate. Diagnostic-tools sweep 2026-09-09.
+
+### Shopify UK homepage — hero word slot
+**Borrow:** the fixed stem + one moving slot grammar ('Be the next [ … ]') at 96px/300/−0.02em, crossing 450ms cubic-bezier(0.5,0,0.5,1), gated by Tailwind motion-safe: so under reduce the slot freezes on the first noun with zero running animations — the audience's own platform, so the grammar is familiar. Flintmere's slot changes exactly once and holds (ADR 0021 §4 forbids rotation). Kinetic-type sweep 2026-09-09.
+
+### Stripe Dot Dev — `[ Fig. N ]` figure system
+**Borrow:** every figure labelled `[ Fig. 1 ]` in 8px mono uppercase, one word of the sans H1 switched to a different glyph mode — the single-word register switch that is exactly Flintmere's bracket move. Bracketed mono figure labels for the scanner's evidence. Do not borrow the typing marquee or the pixel-glyph assembly. Kinetic-type sweep 2026-09-09.
+
+### The Pudding — 'In pursuit of democracy' (and /2026/02/womens-sizing)
+**Borrow:** editorial scrollytelling where the token is the hero: a sticky dot-plot with stepped quotations in JetBrains Mono, one word lit and the rest dimmed, mono date-line citations above the figure, a mono callout chip with a 1px border. Model for a three-step (not 47-step) stepper lighting GS1 prefix → item reference → check digit on a pinned barcode. Kinetic-type sweep 2026-09-09.
+
+### Anthropic homepage — SplitText H1 arrival
+**Borrow:** the timing and the markup, not the shuffle — 800ms expo-out (.16,1,.3,1) per word, visible split aria-hidden with a u-sr-only span carrying the sentence and its links intact; 21 → 1 animations under reduce. Words must land in reading order for Flintmere; implement on [data-reveal], not GSAP (31.7KB gz). Kinetic-type sweep 2026-09-09.
+
+### Bun — benchmark proof bars
+**Borrow:** horizontal bars that grow via transform: scaleX(0→1) from the left, 0.9s, per-bar --bar-delay; a page-wide --reveal-delay: calc(var(--i) * 70ms) CSS stagger; every figure versioned and unit-labelled with 54 tabular-nums declarations. Model for a dated, sampled proof strip ('n = 412 SKUs, scanned 2026-09-09'). Dev-tools sweep 2026-09-09.
+
+### BaseHub — sine-distributed stagger in pure CSS
+**Borrow:** `animation-delay: calc(sin(var(--index) / var(--total) * 90deg) * var(--animation-duration))` — a stagger that accelerates across the word with no JS. Use it so the 13 GTIN cells light mute → ink like a scanner passing over the code and stalling on the last digit. Not the rotateX flip, not the 10s breathing loop. Dev-tools sweep 2026-09-09.
+
+### Sonner — state as CSS variables (the shipped styles.css)
+**Borrow:** `[data-sonner-toast]{--y:translateY(100%); transition: transform 400ms, opacity 400ms}` with mounted / front / removed states expressed as attribute-driven --y and --scale, and `@media (prefers-reduced-motion){ transition:none!important; animation:none!important }` — reduce means none, not faster. Model for scanner result-row state and for the hero's kill switch. Single-detail + solo-craft sweeps 2026-09-09.
+
 ---
 
 ## Section F — Anti-references (NEVER borrow)
@@ -222,6 +319,23 @@ These are not full-site references; each is ONE specific moment on a specific pa
 - **shadcn/ui defaults** — the shadows, the radii, the colour palette read as "AI generator did this." Built-from-scratch tokens beat shadcn-imported tokens for brand cohesion.
 - **Any site with auto-playing video** — banned per `memory/design/motion.md`.
 - **Any site that puts the wordmark inside a hero text block** — Flintmere wordmark `Flintmere]` lives in SiteHeader only. Hero text doesn't repeat the mark.
+
+
+### Added 2026-09-09 — world-class design sweep (six angles, 7 agents)
+
+Pulled for the "One wrong [ digit ]. Disapproved." hero. §G's quarterly review had lapsed since 2026-04-28; this is the overdue pull.
+
+### Oryzo AI (Lusion) — Awwwards SOTM Apr 2026
+A fixed 1920×1350 WebGL canvas behind 49,463px of scroll, no reduce rule, a product that states it does not exist. The calibration point for what 'beautiful' costs (£50k+ and a shader engineer) and the definition of a showreel with viewers, not users. Only the joke's mechanism transfers — a spec sheet of precise mono numbers — and Flintmere's version is true (the mod-10 arithmetic).
+
+### Lando Norris (OFF+BRAND) — Awwwards Site of the Year 2025
+21 WebGL canvases, Lenis, 12,856px of scroll, no reduce rule, celebrity fanbase audience. Its one disciplined move (a strict two-colour palette) Flintmere already has. Nothing else transfers; every other technique needs a WebGL engineer and a month.
+
+### Mat Voyce — kinetic type artist (GSAP Site of the Year)
+Variable-axis stretch-and-snap on scroll, 10s looping background transforms, zero reduce rules. What 'kinetic type' means to Awwwards in 2026 and the opposite of a page that has to be honest, precise and quiet. Only the `0123456789` strip as a CSS digit-roll fallback survives.
+
+### PostHog — mascot register
+hogfather-jump, questGlow, wobble loops, RoundHog display face, 18 sticky elements. The copy honesty VOICE.md already demands; none of the motion. Logged as the anti-reference for tone drift toward cuteness.
 
 ---
 
@@ -269,6 +383,13 @@ When the council adds a reference from a curation source:
 
 If a site from a curation engine is loud, motion-heavy, gradient-led, or template-shaped — it goes into §F anti-references, not §A–E.
 
+
+### Added 2026-09-09 — world-class design sweep (six angles, 7 agents)
+
+Pulled for the "One wrong [ digit ]. Disapproved." hero. §G's quarterly review had lapsed since 2026-04-28; this is the overdue pull.
+
+**Status note 2026-09-09:** godly.website now redirects to recent.design, which rendered no external site links in a headless pass and contributed nothing this quarter; FWA's list renders only as JS-loaded case links and added no product site the Awwwards sweep missed. Two links proposed in the solo-craft brief are dead and must not enter §A–E as live URLs: cmdk.paco.me (307 → github.com/dip/cmdk) and ui.rauno.me (DEPLOYMENT_NOT_FOUND). The §G quarterly Awwwards review lapsed after 2026-04-28; this six-angle sweep is the first pull since.
+
 ---
 
 ## Per-dispatch reference-selection process (binding from 2026-04-28)
@@ -290,6 +411,7 @@ If the council can't name 3 references for a surface, the surface isn't ready fo
 - **Quarterly review** by operator + Claude — pull 2-4 fresh Awwwards SOTDs, log per-site borrow notes.
 - **Per-dispatch additions** — when a skill dispatch surfaces a useful reference mid-work, log it here at session-end.
 - **Removals** — when a reference becomes generic / saturated, move to §Anti-references.
+- **2026-09-09:** quarterly §G review run after a four-month lapse (last: 2026-04-28). 34 references added across §B, §E, §F, §G. Operator calibration pass still pending on all of them.
 
 ---
 

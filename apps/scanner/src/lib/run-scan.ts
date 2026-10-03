@@ -55,6 +55,12 @@ interface RunScanCompleteResult {
   gtinlessCeiling: number | null;
   truncated: boolean;
   actualProductCount: number | null;
+  /**
+   * How many products had a barcode field read. Optional field on the
+   * catalog fetch (existing mocks omit it); normalised to null here rather
+   * than left undefined so downstream consumers get an explicit signal.
+   */
+  barcodesRead: number | null;
   catalogSummary: ReturnType<typeof summarizeCatalog>;
   gmcGroundTruth: GmcGroundTruth | null;
   pillars: Array<{
@@ -99,7 +105,7 @@ export async function runScanForShop(input: RunScanInput): Promise<RunScanResult
 
   try {
     const fetched = await fetchCatalog(input.shopUrl, { maxPages: 4 });
-    const { catalog, truncated, actualProductCount } = fetched;
+    const { catalog, truncated, actualProductCount, barcodesRead = null } = fetched;
     // Per ADR 0023: GMC ground-truth fetch runs in parallel with the
     // remaining catalog work so its 30s budget overlaps scoring rather
     // than stacking onto user-facing scan latency. Returns null when no
@@ -123,6 +129,7 @@ export async function runScanForShop(input: RunScanInput): Promise<RunScanResult
       issues: enrichedIssues,
       truncated,
       actualProductCount,
+      barcodesRead,
       catalogSummary,
       gmcGroundTruth,
     };
@@ -152,6 +159,7 @@ export async function runScanForShop(input: RunScanInput): Promise<RunScanResult
       gtinlessCeiling: score.gtinlessCeiling,
       truncated,
       actualProductCount,
+      barcodesRead,
       catalogSummary,
       gmcGroundTruth,
       pillars: score.pillars.map((p) => ({

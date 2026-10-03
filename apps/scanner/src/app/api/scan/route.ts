@@ -146,6 +146,7 @@ export async function POST(req: NextRequest) {
       // is the merchant's true catalog total (null when /products/count.json blocked).
       truncated: result.truncated,
       actualProductCount: result.actualProductCount,
+      barcodesRead: result.barcodesRead,
       catalogSummary: result.catalogSummary,
       pillars: result.pillars,
       issues: result.issues.slice(0, 10),

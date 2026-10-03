@@ -9,25 +9,27 @@
  * for the 600-line ceiling).
  */
 
-import { scanScopeLine } from '@/lib/copy';
+import { scanScopeLine } from '@/lib/copy-scan-scope';
 
 export interface ScanScopeLineProps {
   sampledCount: number;
   actualProductCount: number | null;
   truncated: boolean;
+  barcodesRead?: number | null;
 }
 
 export function ScanScopeLine({
   sampledCount,
   actualProductCount,
   truncated,
+  barcodesRead,
 }: ScanScopeLineProps) {
   return (
     <p
       className="eyebrow mb-6 text-[color:var(--color-mute)]"
       style={{ letterSpacing: '0.12em' }}
     >
-      {scanScopeLine({ sampledCount, actualProductCount, truncated })}
+      {scanScopeLine({ sampledCount, actualProductCount, truncated, barcodesRead })}
     </p>
   );
 }

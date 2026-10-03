@@ -80,7 +80,7 @@ Buying signals, most reliable first:
 
 - Publicly announced a new retail listing in the last 90 days
 - Exhibiting or pitching at a Meet the Buyer event
-- In a retailer accelerator cohort (Ocado Roots, Tesco Accelerator, The Apiary,
+- In a retailer accelerator cohort (Tesco Accelerator, The Apiary,
   BrandsNew, Brands on Ice)
 - Newly GS1 UK-registered
 
@@ -228,6 +228,7 @@ Verified 2026-09-06. Partner routes, best first:
 | Target | Route in | Cost | Note |
 |---|---|---|---|
 | **GS1 UK** | Partner programme, 3-stage approval | not published | Public partner finder, 58,000+ UK businesses. Sits on the standards layer. Also powers Bread & Jam. Highest leverage. |
+| **Ocado Roots** | Programme team referral | free | ~140 brands, onboarding constantly. Per ADR 0029 Amendment 1, Roots does the commercial side and leaves the data work to the brand — so its population *is* the buyer, and the team has an aligned incentive to see them unstuck. **Gated on a case study:** one introduction, spend it loaded. |
 | **YF (Young Foodies)** | Preferred Suppliers directory | free to brands | ~1,500-brand network. **Reviewed quarterly** — timing matters. Community membership explicitly excludes service providers; the supplier list is the only door. |
 | **Bread & Jam** | Partnership enquiry | "suit your budget" | >50% of attending brands £250K+, >25% £1M+, 85% decision-makers. Festival at Business Design Centre, Islington. |
 | **Scotland Food & Drink** | Affiliate membership | **£720/yr** (≤£1M) | 25+ provider directory, named service-provider contact. |
@@ -237,8 +238,8 @@ Verified 2026-09-06. Partner routes, best first:
 **Adjacent, at the same moment:** EDI providers (XEDI — Stockport, publishes
 pricing, has Ocado and Sainsbury's pages; Transalis — Portsmouth, strongest
 grocery logos), category consultants (May Insight — explicitly serves start-ups
-securing listings), retailer accelerators (Ocado Roots, Tesco Accelerator, The
-Apiary, BrandsNew, Brands on Ice).
+securing listings), retailer accelerators (Tesco Accelerator, The
+Apiary, BrandsNew, Brands on Ice; Ocado Roots promoted to the table above).
 
 **Do not pursue: pack-shot studios.** Nine were checked; none mentions Ocado,
 Brandbank, NielsenIQ or GS1. Brandbank runs 100+ photographers across 15 in-house
@@ -269,8 +270,10 @@ Two unknowns must close before magnitudes are set:
 
 1. **Brandbank subscription pricing.** Unpublished; NielsenIQ has withdrawn
    supplier-facing commercial pages. It sets the reference price for the gate.
-2. **What Ocado Roots actually covers.** If Roots does the data work free for
-   exactly this segment, the first gate is contested.
+2. ~~**What Ocado Roots actually covers.**~~ **Closed 2026-09-10** — ADR 0029
+   Amendment 1. Roots is commercial support only; the data work stays with the
+   brand. No free competitor at this gate, so magnitudes are unblocked on this
+   count.
 
 ---
 
@@ -291,7 +294,8 @@ Enumerated so it stays decided:
 
 ## 9. Open questions
 
-- Ocado Roots' actual scope — blocks pricing.
+- ~~Ocado Roots' actual scope~~ — **closed 2026-09-10**, ADR 0029 Amendment 1.
+  Commercial support only; the data work stays with the brand.
 - Brandbank subscription pricing — blocks pricing.
 - Amazon UK's data gate — never verified; unknown, not absent.
 - Whether the Booths checklist is representative enough of the other gates for a

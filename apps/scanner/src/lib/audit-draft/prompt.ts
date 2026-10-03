@@ -184,7 +184,7 @@ export function buildSystemPrompt(
     'Voice example (acceptable):',
     '  "23 products lack a structured allergen field. Three of these',
     '   reference allergens in the body copy only — readable to humans,',
-    '   absent from the fields a feed validator reads."',
+    '   absent from the feed."',
     '',
     'Voice example (banned shape — do not write):',
     '  "We\'re really excited to share that your store has a great',
@@ -318,6 +318,9 @@ export function buildUserPrompt(input: BuildUserPromptInput): string {
   )
   lines.push(
     'Format per line: title | vendor | type | tags | variants | price-range | images | barcode | alt-text',
+  )
+  lines.push(
+    'barcode is barcode:y (present), barcode:n (checked, none found), or barcode:unread (this scan did not check — do not treat as absent).',
   )
   lines.push('')
   lines.push(input.catalogSampleText)

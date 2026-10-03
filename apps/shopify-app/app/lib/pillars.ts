@@ -2,8 +2,17 @@ import { PILLAR_WEIGHTS, type PillarId, type PillarResult } from '@flintmere/sco
 import { z } from 'zod';
 
 // Single source of truth for pillar display in the embedded app.
-// Labels mirror apps/scanner/src/lib/copy.ts §pillarLabelCustomerFacing
-// so a merchant sees identical wording across scanner + app.
+//
+// These labels are a HAND-MAINTAINED COPY of
+// apps/scanner/src/lib/copy.ts §pillarLabelCustomerFacing — the embedded
+// app is a separate deployable and cannot import from apps/scanner, so
+// nothing enforces the match. A merchant sees both surfaces, so the copy
+// has to be updated in the same PR as the original: on 2026-09-10 the
+// scanner renamed "Agent Checkout Readiness" -> "Checkout Readiness" and
+// "AI Agent Access" -> "Crawler Access" (we measure access, not agent
+// behaviour) and this table kept the old names for a day while asserting
+// it mirrored them. Grep the app for the old string too — the legacy-shape
+// banner in routes/app._index spells one of these out by hand.
 export interface PillarMeta {
   id: PillarId;
   numeral: string;
@@ -27,8 +36,8 @@ const NAMES: Record<PillarId, string> = {
   titles: 'Title & Description Quality',
   mapping: 'Google Category Match',
   consistency: 'Data Consistency',
-  'checkout-eligibility': 'Agent Checkout Readiness',
-  crawlability: 'AI Agent Access',
+  'checkout-eligibility': 'Checkout Readiness',
+  crawlability: 'Crawler Access',
 };
 
 export const PILLAR_META: readonly PillarMeta[] = PILLAR_ORDER.map((id, i) => ({

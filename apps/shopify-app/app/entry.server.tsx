@@ -7,7 +7,7 @@ import { isbot } from 'isbot';
 import { renderToPipeableStream } from 'react-dom/server';
 import { addDocumentResponseHeaders } from './shopify.server';
 
-export const handleError = Sentry.wrapHandleErrorWithSentry((error, { request }) => {
+export const handleError = Sentry.wrapHandleErrorWithSentry((_error, _context) => {
   // Custom handleError implementation
 });
 

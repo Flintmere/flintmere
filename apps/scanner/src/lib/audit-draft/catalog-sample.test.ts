@@ -1,6 +1,38 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { ProductInput } from '@flintmere/scoring'
-import { summariseProductsForLLM } from './catalog-sample'
+
+vi.mock('../shopify-fetcher', () => ({
+  fetchCatalog: vi.fn(async () => ({
+    catalog: {
+      shopDomain: 'example.com',
+      scoredAt: '2026-09-09T00:00:00Z',
+      products: [
+        {
+          id: 'gid://product/1',
+          handle: 'sample-product',
+          title: 'Sample Product',
+          tags: [],
+          variants: [{ id: 'v1', sku: 'SKU-1', barcode: '5012345678900', price: '14.50' }],
+          images: [],
+          barcodeRead: true,
+        },
+      ],
+    },
+    truncated: false,
+    actualProductCount: 1,
+    barcodesRead: 1,
+  })),
+  ShopifyFetchError: class ShopifyFetchError extends Error {
+    code: string
+    constructor(code: string, message: string) {
+      super(message)
+      this.code = code
+    }
+  },
+}))
+
+import { SAMPLE_SIZE, getCatalogSampleForDraft, summariseProductsForLLM } from './catalog-sample'
+import { fetchCatalog } from '../shopify-fetcher'
 
 function buildProduct(overrides: Partial<ProductInput> = {}): ProductInput {
   return {
@@ -88,6 +120,20 @@ describe('summariseProductsForLLM', () => {
     expect(out).toContain('barcode:n')
   })
 
+  it('marks barcode:y when barcodeRead is undefined and a barcode is present (Admin-API/fixture default)', () => {
+    const product = buildProduct({ barcodeRead: undefined })
+    const out = summariseProductsForLLM([product])
+    expect(out).toContain('barcode:y')
+  })
+
+  it('marks barcode:unread when barcodeRead is explicitly false, even if a barcode value is present', () => {
+    const product = buildProduct({ barcodeRead: false })
+    const out = summariseProductsForLLM([product])
+    expect(out).toContain('barcode:unread')
+    expect(out).not.toContain('barcode:n')
+    expect(out).not.toContain('barcode:y')
+  })
+
   it('marks alt:n when no image carries alt text', () => {
     const product = buildProduct({
       images: [
@@ -134,5 +180,18 @@ describe('summariseProductsForLLM', () => {
     const fields = out.split(' | ')
     expect(fields[1]).toBe('—')
     expect(fields[2]).toBe('—')
+  })
+})
+
+describe('getCatalogSampleForDraft', () => {
+  it('asks the fetcher for a barcode on every product it will summarise', async () => {
+    await getCatalogSampleForDraft('example.com')
+    // Pinned against the SAMPLE_SIZE identity, not the literal 50 — a
+    // hardcoded literal in the source that happens to equal SAMPLE_SIZE
+    // today would still fail this assertion once the two drift apart.
+    expect(fetchCatalog).toHaveBeenCalledWith('example.com', {
+      maxPages: 1,
+      barcodeSampleSize: SAMPLE_SIZE,
+    })
   })
 })

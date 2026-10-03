@@ -27,7 +27,7 @@ const MISTAKES: Mistake[] = [
     n: '02',
     title: 'robots.txt blocks AI agents by default',
     symptom:
-      'A well-meaning SEO audit added `User-agent: GPTBot Disallow: /` in 2024. It never got revisited. No GPT-powered shopping surface is permitted to fetch it.',
+      'A well-meaning SEO audit added `User-agent: GPTBot Disallow: /` in 2024. It never got revisited. GPTBot is told to stay out of your catalog, so it stays out.',
     pillar: 'Agent crawlability',
     fix: 'We parse robots.txt for blanket disallows and explicit blocks on GPTBot, ClaudeBot, Google-Extended, PerplexityBot, Applebot-Extended, cohere-ai, Bytespider, CCBot, OAI-SearchBot, ChatGPT-User.',
   },

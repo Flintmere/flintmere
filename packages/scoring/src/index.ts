@@ -9,6 +9,7 @@ export { scoreCheckout } from './pillars/checkout.js';
 export { summarizeCatalog } from './catalog-summary.js';
 export { enrichIssuesWithExamples } from './enrich-issues.js';
 export { isValidGtin, gtinLength } from './utils/gtin.js';
+export { pillarPercent } from './utils/percent.js';
 export { detectFluff } from './utils/fluff.js';
 export {
   stripHtml,
