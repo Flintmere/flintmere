@@ -332,6 +332,67 @@ yet (per STATUS.md as of 2026-05-09). Phase 4 publication is gated.
 Don't cite `standards.flintmere.com/food/v1` as live before Q3 2026 —
 write `[OPERATOR_VERIFY: standard clause once v1 publishes]` instead.
 
+### A16. Crawler / robots.txt / AI-agent access claims
+Files in scope: any copy stating what a crawler can or cannot do. The
+Crawlability pillar's issue consequences in
+`apps/scanner/src/lib/copy.ts` (`robots-blocks-all`,
+`robots-blocks-ai-agents`, `missing-llms-txt`, `malformed-llms-txt`,
+`missing-sitemap`, `sitemap-not-referenced`),
+`packages/scoring/src/pillars/crawlability.ts`, the `/for/*` vertical
+pages, methodology copy, and any marketing claim about AI shopping
+agents reading a catalog.
+
+Read first:
+- **Google — Introduction to robots.txt** —
+  https://developers.google.com/search/docs/crawling-indexing/robots/intro
+- **Google — How Google interprets the robots.txt specification** —
+  https://developers.google.com/crawling/docs/robots-txt/robots-txt-spec
+- **Google — Overview of Google crawlers and fetchers (user agents)** —
+  https://developers.google.com/crawling/docs/crawlers-fetchers/overview-google-crawlers
+- **Google — Block Search indexing with `noindex`** —
+  https://developers.google.com/search/docs/crawling-indexing/block-indexing
+- **RFC 9309 — Robots Exclusion Protocol** —
+  https://www.rfc-editor.org/rfc/rfc9309.html
+- **OpenAI — Overview of OpenAI Crawlers** (GPTBot, OAI-SearchBot,
+  ChatGPT-User) — https://developers.openai.com/api/docs/bots
+- **Perplexity — Perplexity Crawlers** —
+  https://docs.perplexity.ai/docs/resources/perplexity-crawlers
+- **sitemaps.org — Sitemaps XML format** —
+  https://www.sitemaps.org/protocol.html
+- **llmstxt.org — The /llms.txt file** — https://llmstxt.org/
+
+All nine verified reachable 2026-10-03. Google's crawler-overview and
+robots-spec pages have moved off `/search/docs/` to `/crawling/docs/`,
+and OpenAI's bots page off `platform.openai.com` to
+`developers.openai.com`; the URLs above are the post-redirect ones.
+
+Standing rules — each of these caught a real drafting error:
+
+1. **robots.txt governs fetching, not indexing.** A disallowed URL can
+   still be indexed when another page links to it; only `noindex`
+   prevents indexing, and `noindex` cannot be seen on a page that
+   robots.txt forbids fetching. Never write "cannot be indexed" as the
+   consequence of a robots.txt block. Write that the crawler is not
+   permitted to fetch.
+2. **Name the crawler, not the company.** `Googlebot`, `GPTBot`,
+   `PerplexityBot` are user-agent tokens with defined behaviour;
+   "Google", "ChatGPT", "Perplexity" are companies running several
+   agents each. A `Disallow` naming one token does not bind the others
+   — OpenAI alone runs GPTBot (training), OAI-SearchBot (search index)
+   and ChatGPT-User (user-triggered fetch), and blocking one leaves the
+   rest free. Never generalise a single-token rule to "no AI agent can
+   reach you".
+3. **robots.txt is advisory, not access control.** Well-behaved
+   crawlers honour it. It blocks nobody who chooses to ignore it, so
+   never describe it as preventing or stopping a fetch.
+4. **llms.txt is unratified.** No search engine or AI company has
+   confirmed it reads one, and the spec is on v2. Keep every llms.txt
+   consequence hedged; do not imply a scoring benefit we can evidence.
+
+Add to this list only via `canon-audit` review. Claims about a named
+crawler's behaviour cite that crawler's own operator documentation,
+never a third-party summary.
+
 ---
 
 ## Section B — Cross-cutting canon (read on every dispatch)
@@ -361,6 +422,10 @@ Update triggers:
   cross-reference
 - Brand-voice shift ratified → update Section A8 + cross-cutting B
 - Pillar / weight change → update A9 (rare; flag to council)
+- Crawler-operator doc moves or a crawler changes behaviour → re-verify
+  A16's URLs and standing rules. Four of its nine links had already
+  moved when the section was written, and these are third-party docs we
+  do not control.
 
 Audit cadence: monthly read-through to catch drift between this register
 and the actual canonical sources. The `docs-coherence-audit` skill can
