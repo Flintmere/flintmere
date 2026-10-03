@@ -9,7 +9,28 @@
  * Zod validation rejects malformed output. The auto-apply path requires
  * confidence='high' AND email-domain matches the shop_domain.
  *
- * Cost: ~2K input tokens × 117 targets ≈ negligible on Gemini Flash.
+ * Cost — read this before re-enabling the cron. An earlier version of
+ * this comment claimed "~2K input tokens x 117 targets ~ negligible".
+ * Both halves were wrong, and the error cost GBP 31.48 in September 2026:
+ *
+ *   Prompt size. The LLM pass sends the combined page HTML sliced to
+ *   MAX_HTML_FOR_LLM (50,000 chars) — roughly 12.5K input tokens per
+ *   target, not 2K.
+ *
+ *   Call count. The cron's 24h re-attempt window (see route.ts) stops an
+ *   hourly re-fetch, NOT a daily one. OutreachTarget carries no attempt
+ *   counter, so a target whose site yields no email never leaves the
+ *   pending pool — it is re-fetched and re-sent to Gemini every day,
+ *   indefinitely. "117 targets" is not a total; it is a daily floor.
+ *
+ *   Thinking tokens. Gemini 2.5 Flash thinks by default and no
+ *   thinkingConfig is set below, so every call also bills thinking
+ *   output that a temperature-0, schema-constrained extraction of an
+ *   email and a first name does not need.
+ *
+ * Measured: ~119M input tokens in September 2026 before the Coolify
+ * scheduled task was removed. Before re-enabling, cap re-attempts,
+ * shrink MAX_HTML_FOR_LLM, and set thinkingConfig.thinkingBudget = 0.
  *
  * Politeness: per-target sequential fetch with 1s spacing inside this
  * function; cron schedules its own per-batch rate-limit on top.
@@ -21,7 +42,12 @@ import type { CompletionOpts } from '@flintmere/llm';
 
 const FETCH_TIMEOUT_MS = 5_000;
 const MAX_BODY_BYTES = 200_000;
-const MAX_HTML_FOR_LLM = 50_000;
+// Combined, noise-stripped HTML budget for the LLM pass. Was 50_000,
+// which billed ~12.5K input tokens per target; see the cost note above.
+// The extraction targets an email and a first name, both of which sit in
+// contact/about copy that survives this budget comfortably. Input tokens
+// are ~83% of this file's spend, so this constant is the main dial.
+const MAX_HTML_FOR_LLM = 12_000;
 
 const CANDIDATE_PATHS = [
   '/contact',
@@ -255,6 +281,11 @@ async function callLlm(
     temperature: 0,
     responseMimeType: 'application/json',
     responseSchema: RESPONSE_SCHEMA,
+    // Gemini 2.5 Flash thinks by default and bills those tokens as
+    // output. A temperature-0 extraction constrained by RESPONSE_SCHEMA
+    // has nothing to reason about, so the budget is zero rather than
+    // merely hidden — includeThoughts:false would still pay for them.
+    thinkingConfig: { thinkingBudget: 0 },
     tag,
   };
   const result = await vertex.complete(opts);
