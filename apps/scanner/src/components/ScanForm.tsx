@@ -51,7 +51,7 @@ export function ScanForm({
       website: '',
       dwellMs: 0,
     };
-    track('scan_started', { domain: trimmed, hero_variant: 'dead_inventory_v1' });
+    track('scan_started', { domain: trimmed, hero_variant: 'catalog_readiness_v1' });
     onSubmit(trimmed, turnstileInput?.value ?? '', antiBot);
   };
 

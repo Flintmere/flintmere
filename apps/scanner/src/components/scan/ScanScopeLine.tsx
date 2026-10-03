@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Scope row above SuppressionLede — gives merchant calibration on the
+ * Scope row above the score block — gives merchant calibration on the
  * sample BEFORE the £-figure lands. Per BUSINESS.md:19 council ruling
  * 2026-04-27 #3: trust-anchor sits ahead of the headline.
  *

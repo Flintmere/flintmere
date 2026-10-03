@@ -29,7 +29,7 @@ export const PILLARS: Pillar[] = [
     weight: 20,
     measures:
       'Whether your variants carry valid GTINs (with checksum verification), brand names, MPNs, and unique SKUs. Sub-checks: barcode presence on every variant (45% of pillar), GTIN checksum validity (30%), brand presence (10%), SKU presence and uniqueness (15%).',
-    why: 'Google Shopping, Amazon Fresh, Ocado, and emerging AI shopping channels all verify against GS1’s database. A missing or invalid identifier is the most common reason a product is suppressed from a feed.',
+    why: 'Google Shopping, Amazon Fresh, Ocado, and emerging AI shopping channels all verify against GS1’s database. An incorrect GTIN gets a product disapproved. A missing one leaves it eligible but limited — Google relaxed missing-identifier disapproval in December 2023.',
     sources:
       'GS1 General Specifications (gs1.org), GTIN-13/GTIN-14 checksum algorithm (Mod-10).',
     installGated: false,
