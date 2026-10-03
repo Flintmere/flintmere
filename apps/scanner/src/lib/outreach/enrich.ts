@@ -42,7 +42,12 @@ import type { CompletionOpts } from '@flintmere/llm';
 
 const FETCH_TIMEOUT_MS = 5_000;
 const MAX_BODY_BYTES = 200_000;
-const MAX_HTML_FOR_LLM = 50_000;
+// Combined, noise-stripped HTML budget for the LLM pass. Was 50_000,
+// which billed ~12.5K input tokens per target; see the cost note above.
+// The extraction targets an email and a first name, both of which sit in
+// contact/about copy that survives this budget comfortably. Input tokens
+// are ~83% of this file's spend, so this constant is the main dial.
+const MAX_HTML_FOR_LLM = 12_000;
 
 const CANDIDATE_PATHS = [
   '/contact',
@@ -276,6 +281,11 @@ async function callLlm(
     temperature: 0,
     responseMimeType: 'application/json',
     responseSchema: RESPONSE_SCHEMA,
+    // Gemini 2.5 Flash thinks by default and bills those tokens as
+    // output. A temperature-0 extraction constrained by RESPONSE_SCHEMA
+    // has nothing to reason about, so the budget is zero rather than
+    // merely hidden — includeThoughts:false would still pay for them.
+    thinkingConfig: { thinkingBudget: 0 },
     tag,
   };
   const result = await vertex.complete(opts);

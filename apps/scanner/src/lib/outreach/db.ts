@@ -5,7 +5,7 @@
  */
 
 import { prisma } from '../db';
-import type { OutreachTarget } from '../../generated/prisma';
+import type { OutreachTarget, Prisma } from '../../generated/prisma';
 
 export type { OutreachTarget };
 
@@ -22,6 +22,43 @@ export const OUTREACH_STATUS = {
   bounced: 'bounced',
   dropped: 'dropped',
 } as const;
+
+/** How long the enrichment cron waits before retrying one target. */
+export const ENRICHMENT_RE_ATTEMPT_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Hard stop on enrichment retries. The re-attempt window alone bounds
+ * how OFTEN a target is retried, not how MANY times: a merchant site
+ * that never yields an email stayed `pending` with a null
+ * recipientEmail forever and was re-sent to Gemini every single day.
+ * That unbounded recycle billed ~119M input tokens in September 2026.
+ * OutreachTarget has no attempt counter, so age stands in for one.
+ */
+export const ENRICHMENT_GIVE_UP_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * Which targets the enrichment cron may process on this run. A pure
+ * builder so both bounds can be asserted without a database: one spaces
+ * retries out, one ends them. Losing either is invisible in review and
+ * shows up on an invoice, so both are pinned by the sibling test.
+ */
+export function enrichmentCandidateWhere(
+  now: Date,
+): Prisma.OutreachTargetWhereInput {
+  return {
+    status: OUTREACH_STATUS.pending,
+    recipientEmail: null,
+    createdAt: { gt: new Date(now.getTime() - ENRICHMENT_GIVE_UP_AFTER_MS) },
+    OR: [
+      { enrichmentAttemptedAt: null },
+      {
+        enrichmentAttemptedAt: {
+          lt: new Date(now.getTime() - ENRICHMENT_RE_ATTEMPT_WINDOW_MS),
+        },
+      },
+    ],
+  };
+}
 
 export type OutreachStatus = (typeof OUTREACH_STATUS)[keyof typeof OUTREACH_STATUS];
 
