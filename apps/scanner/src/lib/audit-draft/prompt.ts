@@ -319,6 +319,9 @@ export function buildUserPrompt(input: BuildUserPromptInput): string {
   lines.push(
     'Format per line: title | vendor | type | tags | variants | price-range | images | barcode | alt-text',
   )
+  lines.push(
+    'barcode is barcode:y (present), barcode:n (checked, none found), or barcode:unread (this scan did not check — do not treat as absent).',
+  )
   lines.push('')
   lines.push(input.catalogSampleText)
   lines.push('')

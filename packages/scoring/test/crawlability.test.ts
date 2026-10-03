@@ -43,13 +43,17 @@ describe('scoreCrawlability', () => {
     expect(result.issues).toHaveLength(0);
   });
 
-  it('flags missing llms.txt as high severity', () => {
+  it('flags missing llms.txt as low severity', () => {
     const result = scoreCrawlability(
       makeInput({ robotsTxt: openRobots, sitemapXml: validSitemap }),
     );
     const missing = result.issues.find((i) => i.code === 'missing-llms-txt');
     expect(missing).toBeDefined();
-    expect(missing?.severity).toBe('high');
+    expect(missing?.severity).toBe('low');
+    // The severity drop (2026-09-10) moves ranking and the report email's
+    // critical|high filter — never the score. The pillar score comes from
+    // CHECKS alone: 0 llms + 30 aiAllowed + 20 sitemap + 10 referenced.
+    expect(result.score).toBe(60);
   });
 
   it('emits critical when robots.txt disallows all', () => {
