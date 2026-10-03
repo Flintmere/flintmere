@@ -35,7 +35,7 @@ describe('scoreConsistency', () => {
     const catalog = makeCatalog([
       {
         ...cleanProduct,
-        images: [{ src: 'ftp://bad-url.com/img.jpg' as any, altText: 'img' }],
+        images: [{ src: 'ftp://bad-url.com/img.jpg', altText: 'img' }],
       },
     ]);
     const result = scoreConsistency(catalog);

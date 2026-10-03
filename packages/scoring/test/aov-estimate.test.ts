@@ -264,23 +264,55 @@ describe('estimateAov', () => {
     ).toBe('medium');
   });
 
-  it('latency: 5,000 SKU catalog completes in <50ms', () => {
-    const products: ProductInput[] = [];
-    // 5,000 food products, each with 1 variant — 5,000 priced variants.
-    for (let i = 0; i < 5000; i++) {
-      products.push(
-        productOf({
-          id: `f-${i}`,
-          price: (5 + (i % 95)).toFixed(2),
-          food: true,
-        }),
-      );
-    }
-    const t0 = performance.now();
-    const result = estimateAov(makeCatalog(products), moderateSuppression);
-    const elapsed = performance.now() - t0;
-    expect(result).not.toBeNull();
-    expect(elapsed).toBeLessThan(50);
+  // Deterministic work measurement. Each product is wrapped in a Proxy that
+  // tallies every property read the engine performs against it, so "how much
+  // work per SKU" is a counted integer rather than a wall-clock figure.
+  //
+  // This replaces a `performance.now() < 50ms` assertion that measured CPU
+  // contention from vitest's parallel workers, not `estimateAov`: the full
+  // suite failed 2 of 4 runs at ~76ms (pre-existing — it reproduced on a
+  // clean tree) while the file run alone passed 17/17 every time. The 50ms
+  // figure was local invention; the only documented budget is the API p95
+  // of 500ms in `memory/product-engineering/performance-budget.md`.
+  function countReads(size: number): number {
+    const counter = { reads: 0 };
+    const products = Array.from(
+      { length: size },
+      (_, i) =>
+        new Proxy(
+          productOf({
+            id: `f-${i}`,
+            price: (5 + (i % 95)).toFixed(2),
+            food: true,
+          }),
+          {
+            get(target, prop, receiver) {
+              counter.reads++;
+              return Reflect.get(target, prop, receiver);
+            },
+          },
+        ),
+    );
+    expect(
+      estimateAov(makeCatalog(products), moderateSuppression),
+    ).not.toBeNull();
+    return counter.reads;
+  }
+
+  it('complexity: 5,000 SKU catalog stays linear, not quadratic', () => {
+    const small = countReads(500);
+    const large = countReads(5000);
+
+    // A 10x catalog costs 10x the work while the engine stays linear — it
+    // makes a fixed number of passes over `products` (the non-food veto, the
+    // food-ratio count, the variant-price gather). The 20x ceiling leaves
+    // room for an added n log n pass; a quadratic implementation lands
+    // at ~100x.
+    expect(large / small).toBeLessThan(20);
+
+    // ...and per-SKU cost is a constant number of passes, not one that grows
+    // with catalog size.
+    expect(large / 5000).toBeLessThan(20);
   });
 
   it('median correctness: odd vs even product count uses lower-median', () => {

@@ -9,8 +9,12 @@
  * in ~12 hours. Per-target work: fetch up to 3 public pages of merchant
  * site → regex pass for emails → Gemini Flash extraction for first-name.
  *
- * Re-attempt window: 24h. Targets whose last attempt failed naturally
- * retry the next day without thrashing the merchant's site.
+ * Re-attempt window: 24h, and targets stop being eligible a week after
+ * they were created (see enrichmentCandidateWhere in lib/outreach/db).
+ * A failed target retries the next day without thrashing the merchant's
+ * site, and gives up after roughly seven tries rather than recycling
+ * forever — the unbounded version billed ~119M Gemini input tokens in
+ * September 2026. Re-staging a stale target is an operator decision.
  *
  * Auto-apply: ON by default. Two safety gates inside `canAutoApply`:
  * confidence='high' AND email-domain matches the merchant's apex (e.g.,
@@ -30,6 +34,7 @@ import { NextResponse } from 'next/server'
 import { verifyCronSecret } from '@/lib/cron-auth'
 import { prisma } from '@/lib/db'
 import { enrichTarget, canAutoApply } from '@/lib/outreach/enrich'
+import { enrichmentCandidateWhere } from '@/lib/outreach/db'
 import type { Prisma } from '@/generated/prisma'
 
 export const dynamic = 'force-dynamic'
@@ -37,7 +42,6 @@ export const revalidate = 0
 export const maxDuration = 300
 
 const DEFAULT_BATCH_SIZE = 10
-const RE_ATTEMPT_WINDOW_MS = 24 * 60 * 60 * 1000
 
 interface RunSummary {
   attempted: number
@@ -71,16 +75,8 @@ export async function POST() {
   // failure mode conservative even with auto-apply enabled.
   const autoApplyEnabled = process.env.OUTREACH_AUTO_APPLY_ENRICHMENT !== 'false'
 
-  const cutoff = new Date(Date.now() - RE_ATTEMPT_WINDOW_MS)
   const targets = await prisma.outreachTarget.findMany({
-    where: {
-      status: 'pending',
-      recipientEmail: null,
-      OR: [
-        { enrichmentAttemptedAt: null },
-        { enrichmentAttemptedAt: { lt: cutoff } },
-      ],
-    },
+    where: enrichmentCandidateWhere(new Date()),
     orderBy: { createdAt: 'asc' },
     take: limit,
   })

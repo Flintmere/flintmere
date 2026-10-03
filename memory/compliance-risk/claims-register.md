@@ -118,9 +118,9 @@ If a claim isn't in this register, it either needs adding or it shouldn't be shi
 - **Surfaces:** marketing numbers strip, scanner stats, email reports.
 - **Source of truth:** `projects/flintmere/SPEC.md` Appendix A; cited from industry reporting (verify exact source before publishing each cycle).
 - **Classification:** performance + AI-outcome
-- **Last verified:** <>
-- **Risk if wrong:** overpromise = ASA / FTC exposure; trust loss. Always qualify "at 99%+ attribute completion" — never as standalone lift.
-- **Status:** active
+- **Last verified:** 2026-09-10 by `claim-review` (suppression-wedge retirement).
+- **Risk if wrong:** overpromise = ASA / FTC exposure; trust loss.
+- **Status:** **RETIRED 2026-09-10 by ADR 0030.** Rests on the same premise ADR 0029 grades **Unmeasurable** (premise 1: no party has published an absolute share of ecommerce sessions from AI surfaces; every figure in circulation is a growth multiple off an undisclosed base). Do not ship this claim, qualified or otherwise. Any replacement visibility-lift claim needs a fresh source and a new register entry.
 
 ### 60-second scan promise
 

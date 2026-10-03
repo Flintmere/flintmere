@@ -6,12 +6,10 @@ import * as React from 'react';
 /**
  * ViewportReveal — toggles `.is-visible` on children when they scroll into view.
  *
- * Two child patterns observed:
- *   - `.text-outlined--reveal` — the hero [ invisible ] outlined-text reveal.
- *   - `[data-reveal]` — generic reveal for sections (Numbers strip, Pillar rows,
- *     Audit-deep figure + deliverables). Pairs with the [data-reveal] CSS
- *     contract in globals.css (opacity + translateY transition with optional
- *     --reveal-delay for stagger).
+ * Child pattern: `[data-reveal]` — generic reveal for sections (Numbers strip,
+ * Pillar rows, Audit-deep figure + deliverables). Pairs with the [data-reveal]
+ * CSS contract in globals.css (opacity + translateY transition with optional
+ * --reveal-delay for stagger).
  *
  * Accessibility: IntersectionObserver only toggles a class; the global
  * @media (prefers-reduced-motion: reduce) block in globals.css scales
@@ -41,9 +39,7 @@ export function ViewportReveal({
     const host = hostRef.current;
     if (!host) return;
 
-    const outlined = host.querySelectorAll<HTMLElement>('.text-outlined--reveal');
-    const generic = host.querySelectorAll<HTMLElement>('[data-reveal]');
-    const targets = [...Array.from(outlined), ...Array.from(generic)];
+    const targets = Array.from(host.querySelectorAll<HTMLElement>('[data-reveal]'));
     if (targets.length === 0) return;
 
     const io = new IntersectionObserver(

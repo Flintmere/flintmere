@@ -431,7 +431,7 @@ function ManifestoHeading() {
         </span>
         .
       </span>
-      <span style={{ display: 'block' }}>Or catalogs nowhere.</span>
+      <span style={{ display: 'block' }}>Or catalogs as prose.</span>
     </h2>
   );
 }
@@ -453,7 +453,7 @@ function ClosingCaption({ opacity }: { opacity: number }) {
     >
       // this is what an AI agent reads on your store.
       <br />
-      // the rest is invisible.
+      // the rest it has to guess.
     </p>
   );
 }

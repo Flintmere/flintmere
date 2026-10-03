@@ -217,7 +217,7 @@ export const issueCodeToFounderSpeak: Record<string, FounderSpeak> = {
   'robots-blocks-all': {
     title: 'Your site blocks every crawler',
     consequence:
-      'Your robots.txt tells every crawler to stay out, including Googlebot, so your pages cannot be indexed.',
+      'No crawler — not ChatGPT, not Perplexity, not Google — is permitted to fetch your catalog.',
   },
   'robots-blocks-ai-agents': {
     title: 'Your robots.txt blocks AI crawlers by name',
