@@ -76,7 +76,6 @@ export function LimitationsChapter() {
           Things we cannot yet measure but are tracked as next-quarter targets:
         </p>
         <ul className="methodology-list">
-          <DashLi>Real-time GMC suppression status (requires merchant authentication; on roadmap).</DashLi>
           <DashLi>Amazon Fresh listing status (no public API; partnership track).</DashLi>
           <DashLi>AI-shopping-channel inclusion (channels not standardised across providers).</DashLi>
         </ul>
