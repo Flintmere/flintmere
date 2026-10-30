@@ -98,6 +98,38 @@ Each becomes a log entry when shipped.
 - Result: queued — **not yet posted** as of 2026-08-17. **No carousel for the third consecutive week**: `/Users/abuaa/Projects/Maters` is still absent on this machine (same as 2026-07-27 and 2026-08-10), so no visual set and no IG hand-off. Text pipeline unblocked per the standing rule.
 - Related claims: canon-source-register §A9 + `apps/scanner/src/lib/methodology-data.ts` — Attributes 20% install-gated, Mapping 15% install-gated, Checkout eligibility 10% install-gated (Tue/Wed/Thu state these verbatim; the Mapping category example and the Checkout blocker list are lifted from the pillars' own `why` / `measures` text), §"60-second scan promise", §"free scan needs no install" (Fri). No GTIN claim (angle spent, and re-used by the 2026-08-04 run whose GS1 posts fired 10 + 17 Aug); no AI-ranking or sales outcome claimed on any post.
 
+### 2026-10-05 — Week of 6 Oct: five retail-gate posts, HELD not queued (`roots-leaves-the-data` · `nutrition-has-no-home` · `photography-is-solved` · `the-toll-is-unpublished` · `four-formats-one-pack`)
+
+- Channel: none — drafted, deliberately not queued. Third documented hold (7 Sep, 14 Sep, 5 Oct); the 7 Sep operator decision is still unrecorded.
+- Angle: the retail-gate thesis (ADR 0029, Accepted 2026-09-06), five angles unused on any channel. Tue Ocado Roots does the commercial side and leaves the product data with the brand · Wed nutrition has no home (Shopify's taxonomy carries the Big-14 allergens on 94% of food categories but no nutrition fields; Google's live in Manufacturer Center, Canada + US only) · Thu Brandbank absorbs pack-shot photography (100+ photographers, 15 studios) but not the attributes · Fri the toll is unpublished (GS1 UK £130–£450/yr and Erudus free under £2M are published; Brandbank is not, NielsenIQ withdrew its own) · Sat four retailer formats, one pack (WPP · EVOLVE · Olive pro-forma · Whole Foods ingredient screen). Sixth post `limited-not-disapproved` drafted and blocked harder — it corrects Flintmere's own GTIN overclaim and must not fire while the homepage still asserts the claim it corrects.
+- Surface(s): `context/drafts/2026-10-05-social-week-retail-gate-HELD-2.md`. Nothing sent to `POST /api/agent/queue-posts`. All six posts ≤280 chars, one bracket each, linted clean against `VOICE.md`; no CTA link on any post.
+- Result: **HELD — not queued, not posted.** Blocker: ADR 0030 (Accepted 2026-09-10) is unimplemented 25 days on, and the claim it grades false is the live `<h1>` of both `flintmere.com` and `catalog.flintmere.com/scan`, plus all `/scan` metadata and its OG image; `suppress` persists across ~20 files on `origin/main`. `/methodology` (fetched, 200) still serves the seven-pillar model. So a CTA would drive readers onto retired positioning, and the posts carry no link. Separately flagged: two posts queued by the ~29 Sep run fire 6 Oct 10:00 carrying the unregistered "~40% excluded from AI agent recommendations" figure against a mechanism ADR 0029 premise 1 grades Unmeasurable — the agent API is append-only and cannot withdraw them. No carousel (Maters absent again; 27 Jul → 5 Oct). No outreach staged: 5 of 5 sent emails resulted in unsubscribes and a 6th send came back `suppressed`.
+- Related claims: ADR 0029 §Context findings 1–3 + premises 1, 2, 6 + Amendment 1; ADR 0030 §Affects; `plans/2026-09-06-retail-gate-pivot-spec.md` §2 + §4 (partner table, lines 226–251) + §Open questions 1; canon-source-register §A3 + Section B. No GTIN-issuance claim, no AI-ranking or sales outcome claim, no Flintmere price asserted (ADR 0029 §4 defers pricing).
+
+### 2026-10-12 — Week of 13 Oct: retail-gate posts carried forward, HELD again (`roots-leaves-the-data` · `nutrition-has-no-home` · `photography-is-solved` · `the-toll-is-unpublished` · `four-formats-one-pack`)
+
+- Channel: none. Fourth documented hold (7 Sep, 14 Sep, 5 Oct, 12 Oct).
+- Angle: same five retail-gate posts as 2026-10-05 (ADR 0029). They never fired, so no new angle was spent. Re-dated Wed 14 → Sun 18 Oct; counts re-checked.
+- Surface(s): `context/drafts/2026-10-12-social-week-retail-gate-HELD-3.md`. Nothing sent to `POST /api/agent/queue-posts`.
+- Result: **HELD, not queued, not posted.** ADR 0030 is still unimplemented after 32 days: "suppressed" is still the live `<h1>` on `flintmere.com` and `catalog.flintmere.com/scan`, 40 files on `origin/main` still match, and nothing has merged since 3 Oct. An earlier run queued an agency scan post for Tue 13 Oct that drives traffic onto that headline. No carousel (Maters absent). No outreach staged: 1 of 3 sends on 8 Oct came back suppressed, on top of the earlier 5/5 unsubscribes.
+- Related claims: as 2026-10-05 (ADR 0029 findings 1–3 + premise 6; pivot spec §2, §4). No GTIN-issuance, AI-ranking, sales-outcome or Flintmere price claim.
+
+### 2026-10-19 — Week of 20 Oct: retail-gate posts carried forward, HELD again (`roots-leaves-the-data` · `nutrition-has-no-home` · `photography-is-solved` · `the-toll-is-unpublished` · `four-formats-one-pack`)
+
+- Channel: none. Fifth documented hold (7 Sep, 14 Sep, 5 Oct, 12 Oct, 19 Oct).
+- Angle: the same five retail-gate posts as 2026-10-05 (ADR 0029). They have never fired, so no angle is spent. Re-dated Tue 20 → Sat 24 Oct.
+- Surface(s): `context/drafts/2026-10-19-social-week-retail-gate-HELD-4.md`. Nothing sent to `POST /api/agent/queue-posts`.
+- Result: **HELD, not queued, not posted.** ADR 0030 is still unimplemented after 39 days: "suppressed" is still the live `<h1>` on `flintmere.com` and `catalog.flintmere.com/scan`, 36 files under `apps/scanner/src` still match, and nothing has merged since 3 Oct. No carousel (Maters absent). No outreach staged (no ruling on the pause). The Resend key in `.env.local` is now rejected as invalid, so no briefs were read.
+- Related claims: as 2026-10-05 (ADR 0029 findings 1–3 + premise 6; pivot spec §2, §4). No GTIN-issuance, AI-ranking, sales-outcome or Flintmere price claim.
+
+### 2026-10-26 — Week of 27 Oct: retail-gate posts carried forward, HELD again (`roots-leaves-the-data` · `nutrition-has-no-home` · `photography-is-solved` · `the-toll-is-unpublished` · `four-formats-one-pack`)
+
+- Channel: none. Sixth documented hold (7 Sep, 14 Sep, 5 Oct, 12 Oct, 19 Oct, 26 Oct).
+- Angle: the same five retail-gate posts as 2026-10-05 (ADR 0029). Never fired, so no angle is spent. Re-dated Tue 27 → Sat 31 Oct, 10:00 GMT.
+- Surface(s): `context/drafts/2026-10-26-social-week-retail-gate-HELD-5.md`. Nothing sent to `POST /api/agent/queue-posts`.
+- Result: **HELD, not queued, not posted.** ADR 0030 still unimplemented after 46 days: "suppressed" is still the live `<h1>` on `flintmere.com` and `catalog.flintmere.com/scan`, 36 files under `apps/scanner/src` match, nothing merged since 3 Oct. A post queued outside this agent on 20 Oct ("[ reading ]") fired 26 Oct on X + Bluesky. No carousel: the Maters folder now exists but holds an unrelated site audit, not the imagine flow. No outreach staged.
+- Related claims: as 2026-10-05. No GTIN-issuance, AI-ranking, sales-outcome or Flintmere price claim.
+
 ## Changelog
 
 - 2026-04-19: Adapted for Flintmere. Added seven narrative anchors from BUSINESS.md and cornerstone content queue from SPEC §8.3.
