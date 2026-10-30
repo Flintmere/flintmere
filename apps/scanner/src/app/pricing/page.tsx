@@ -49,7 +49,7 @@ const FAQS = [
   },
   {
     q: 'What about fake GTINs from third-party sellers?',
-    a: "Don't. Amazon, Google Shopping, and Shopify Catalog increasingly verify against GS1's database. Fake barcodes get listings suppressed. Buy legitimate GTINs from your local GS1 office — we'll route you to the right one.",
+    a: "Don't. Amazon, Google Shopping, and Shopify Catalog increasingly verify against GS1's database. Google Merchant Center disapproves a listing whose GTIN is invalid, so the product stops showing in Shopping. Buy legitimate GTINs from your local GS1 office — we'll route you to the right one.",
   },
 ];
 
