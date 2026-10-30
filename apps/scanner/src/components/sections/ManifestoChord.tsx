@@ -451,9 +451,9 @@ function ClosingCaption({ opacity }: { opacity: number }) {
         transition: 'opacity var(--duration-short) linear',
       }}
     >
-      // this is what an AI agent reads on your store.
+      // this is a product, read as data.
       <br />
-      // the rest it has to guess.
+      // yours, checked to the last digit.
     </p>
   );
 }

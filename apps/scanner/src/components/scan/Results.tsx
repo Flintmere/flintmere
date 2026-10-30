@@ -23,6 +23,7 @@ import {
   issueCodeToFounderSpeak,
   pillarExplanationCustomerFacing,
   pillarLabelCustomerFacing,
+  verdictBarcodeInputs,
   verdictHeader,
 } from '@/lib/copy';
 import { pillarPercent } from '@flintmere/scoring';
@@ -45,6 +46,11 @@ export function Results({ result }: { result: ScanResult }) {
     grade: result.grade,
     affectedCount,
     totalProducts: result.productCount,
+    ...verdictBarcodeInputs({
+      issues: result.issues,
+      barcodesRead: result.barcodesRead,
+      gmcGroundTruthPresent: Boolean(result.gmcGroundTruth),
+    }),
   });
   const gradeAnchor = gradeBadgeAnchor({ grade: result.grade });
 

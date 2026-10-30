@@ -11,6 +11,7 @@ import {
   isStrongGrade,
   issueCodeToFounderSpeak,
   pillarLabelCustomerFacing,
+  verdictBarcodeInputs,
   verdictHeader,
 } from './copy';
 import { scanScopeLine } from './copy-scan-scope';
@@ -129,6 +130,11 @@ function renderHtml(input: ReportEmailInput): string {
     grade: score.grade,
     affectedCount: affected,
     totalProducts: score.productCount,
+    ...verdictBarcodeInputs({
+      issues: score.issues,
+      barcodesRead: scanScope?.barcodesRead,
+      gmcGroundTruthPresent: Boolean(gmcGroundTruth),
+    }),
   });
   const gradeAnchor = gradeBadgeAnchor({ grade: score.grade });
   const scopeLine = scanScope ? scanScopeLine(scanScope) : null;
@@ -421,6 +427,11 @@ function renderText(input: ReportEmailInput): string {
     grade: score.grade,
     affectedCount: affected,
     totalProducts: score.productCount,
+    ...verdictBarcodeInputs({
+      issues: score.issues,
+      barcodesRead: scanScope?.barcodesRead,
+      gmcGroundTruthPresent: Boolean(gmcGroundTruth),
+    }),
   });
   const scopeLine = scanScope ? scanScopeLine(scanScope) : null;
   const gmcBlock = gmcGroundTruth ? `${renderGmcSectionText(gmcGroundTruth)}\n\n` : '';

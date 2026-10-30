@@ -277,6 +277,47 @@ export function isStrongGrade(grade: string): boolean {
 
 // Verdict templates for the top of the report email and the scan
 // results page. Pick one based on the grade.
+/**
+ * Derives `verdictHeader`'s barcode inputs from a scan's issue list, so the
+ * results page and both email renderers cannot disagree about the same scan.
+ *
+ * `barcodesRead` is passed through UNTOUCHED — the tri-state is the whole
+ * point (see `verdictHeader`), and defaulting it here would reintroduce the
+ * "never tried" / "tried and found none" conflation at every call site.
+ */
+export function verdictBarcodeInputs(args: {
+  issues: ReadonlyArray<{
+    code: string
+    affectedCount: number
+    affectedProductIds?: readonly string[]
+  }>
+  barcodesRead?: number | null
+  gmcGroundTruthPresent?: boolean
+}): {
+  barcodesRead?: number | null
+  invalidGtin: number
+  missingBarcode: number
+  missingOnly: number
+  noType: number
+  gmcGroundTruthPresent: boolean
+} {
+  const find = (code: string) => args.issues.find((i) => i.code === code)
+  const invalid = find('invalid-gtin-checksum')
+  const missing = find('missing-gtin')
+  const invalidIds = new Set(invalid?.affectedProductIds ?? [])
+  const missingIds = missing?.affectedProductIds ?? []
+  return {
+    barcodesRead: args.barcodesRead,
+    invalidGtin: invalid?.affectedCount ?? 0,
+    missingBarcode: missing?.affectedCount ?? 0,
+    // Per-product ids are empty for site-level issues; when they are absent
+    // the difference is unknowable, so it renders as 0 rather than guessing.
+    missingOnly: missingIds.filter((id) => !invalidIds.has(id)).length,
+    noType: find('missing-gmc-category')?.affectedCount ?? 0,
+    gmcGroundTruthPresent: Boolean(args.gmcGroundTruthPresent),
+  }
+}
+
 export function verdictHeader(args: {
   grade: string
   /**
@@ -295,10 +336,67 @@ export function verdictHeader(args: {
    */
   affectedCount: number
   totalProducts: number
+  /**
+   * How many products we actually read a barcode for. A TRI-STATE, never
+   * defaulted (homepage-thesis-spec §2.2):
+   *
+   *   - `null` / absent — nobody looked. Branch 0: omit every barcode
+   *     sentence. A legacy persisted scan, a cached scan, or an envelope
+   *     where the barcode pass never ran carries this, and claiming "we
+   *     could not read barcodes" for it is false.
+   *   - `0` — we looked and read none. Branch 1.
+   *   - a number — we read that many. Branches 2–5.
+   *
+   * Defaulting this to 0 IS the hole: it collapses "never tried" onto
+   * "tried and found none", which is the exact conflation the barcode
+   * pass exists to prevent, and it would contradict `scanScopeLine()` on
+   * the same page and in the same email.
+   *
+   * The spec writes this test as `=== undefined`; the shipped pipeline
+   * normalises absent to `null` in `run-scan.ts`, so both are treated as
+   * "nobody looked" here.
+   */
+  barcodesRead?: number | null
+  /** `invalid-gtin-checksum` affectedCount — products with ≥1 failing variant. */
+  invalidGtin?: number
+  /** `missing-gtin` affectedCount — products with no barcode on ≥1 variant. */
+  missingBarcode?: number
+  /** Products in `missing-gtin` but NOT in `invalid-gtin-checksum`. */
+  missingOnly?: number
+  /**
+   * `missing-gmc-category` affectedCount, from the Mapping pillar. The
+   * spec sourced this from `suppressionEstimate.signals.missingGmcCategory`
+   * "until the model-retirement PR renames the source" — ADR 0030 deleted
+   * that model rather than renaming it, and the Mapping pillar's own issue
+   * is the surviving count of the same signal.
+   */
+  noType?: number
+  /** True when a GMC connection supplied ground truth; the panel then speaks. */
+  gmcGroundTruthPresent?: boolean
 }): { headline: string; subhead: string } {
   const { grade, affectedCount, totalProducts } = args
   const affected = affectedCount.toLocaleString()
   const total = totalProducts.toLocaleString()
+  const checked = args.barcodesRead
+  const invalidGtin = args.invalidGtin ?? 0
+  const missingBarcode = args.missingBarcode ?? 0
+  const missingOnly = args.missingOnly ?? 0
+  const noType = args.noType ?? 0
+
+  // Subhead sentences that are NOT barcode claims, so they may join any
+  // branch including branch 0.
+  const nonBarcodeTail: string[] = []
+  if (noType > 0) {
+    nonBarcodeTail.push(`${noType.toLocaleString()} products have no product type set.`)
+  }
+  if (!args.gmcGroundTruthPresent) {
+    nonBarcodeTail.push(
+      `Read from your public storefront. We can't see what Merchant Center did with any of them.`,
+    )
+  }
+  const join = (...parts: Array<string | null>) =>
+    parts.filter((s): s is string => Boolean(s)).join(' ')
+
   // No percentage is rendered. affectedCount is a floor, so a percentage
   // derived from it is a floor too — but "49% of your catalog" reads as a
   // measured fact, and two disjoint 200-of-412 issues would render 49%
@@ -306,30 +404,81 @@ export function verdictHeader(args: {
   // hedged ratio ("at least 200 of 412"); the percentage restated it less
   // precisely and bought nothing.
 
-  // The headline's quantifier is derived from the SAME count the subhead
-  // renders. Deriving it from the grade instead let the two flatly
-  // contradict each other: a grade-B store with no barcodes at all read
-  // "Most of your catalog data is complete." directly above "412 of 412
-  // products carry a gap." — and a UK food merchant with no barcodes is
-  // exactly the case this product exists to serve.
-  if (affectedCount === 0) {
+  // Branch 0 — nobody looked. FIRST and unconditional: it fires even when
+  // invalidGtin > 0, because every barcode sentence below is a claim about
+  // a pass that never demonstrably ran. The finding is not lost — the
+  // issue list and the pillar breakdown still carry it.
+  if (checked === null || checked === undefined) {
+    // The headline's quantifier is derived from the SAME count the subhead
+    // renders. Deriving it from the grade instead let the two flatly
+    // contradict each other: a grade-B store with no barcodes at all read
+    // "Most of your catalog data is complete." directly above "412 of 412
+    // products carry a gap." — and a UK food merchant with no barcodes is
+    // exactly the case this product exists to serve.
+    if (affectedCount === 0) {
+      return {
+        headline: isStrongGrade(grade)
+          ? `Your catalog data is in good shape.`
+          : `No product carries a critical gap.`,
+        subhead: join(
+          `${total} products checked. No critical or high-priority gap affects a product.`,
+          ...nonBarcodeTail,
+        ),
+      }
+    }
+    // Strict majority — at exactly half, "most" would not be true.
+    if (affectedCount * 2 > totalProducts) {
+      return {
+        headline: `Most of your catalog data is incomplete.`,
+        subhead: join(
+          `At least ${affected} of ${total} products carry a gap. Google Merchant Center can limit where it shows a listing whose data is incomplete.`,
+          ...nonBarcodeTail,
+        ),
+      }
+    }
     return {
-      headline: isStrongGrade(grade)
-        ? `Your catalog data is in good shape.`
-        : `No product carries a critical gap.`,
-      subhead: `${total} products checked. No critical or high-priority gap affects a product.`,
+      headline: `At least ${affected} of your ${total} products carry a data gap.`,
+      subhead: join(
+        `Google Merchant Center can limit where it shows a listing whose data is incomplete.`,
+        ...nonBarcodeTail,
+      ),
     }
   }
-  // Strict majority — at exactly half, "most" would not be true.
-  if (affectedCount * 2 > totalProducts) {
-    return {
-      headline: `Most of your catalog data is incomplete.`,
-      subhead: `At least ${affected} of ${total} products carry a gap. Google Merchant Center can limit where it shows a listing whose data is incomplete.`,
-    }
-  }
+
+  const read = checked.toLocaleString()
+
+  // Never "valid" in a clean branch — a check-digit pass is necessary, not
+  // sufficient; GS1 registration is not tested. Never "N GTINs" — counts
+  // are products with ≥1 failing variant.
+  const headline =
+    // Branch 1 — we looked and read none. Caught before branch 3, whose
+    // `missingBarcode === checked` would otherwise fire on 0 === 0.
+    checked === 0
+      ? `We could not read barcodes from your storefront.`
+      : // Branch 2 — the worse fact leads; the subhead carries the remainder.
+        invalidGtin > 0
+        ? `${invalidGtin.toLocaleString()} of the ${read} products we read carry a barcode that fails its check digit.`
+        : // Branch 3
+          missingBarcode === checked
+          ? `None of the ${read} products we checked carries a barcode.`
+          : // Branch 4
+            missingBarcode > 0
+            ? `Every barcode we read passes its check digit. ${missingBarcode.toLocaleString()} of ${read} products have none on at least one variant.`
+            : // Branch 5 — clean.
+              `Every barcode on the ${read} products we checked passes its check digit.`
+
   return {
-    headline: `At least ${affected} of your ${total} products carry a data gap.`,
-    subhead: `Google Merchant Center can limit where it shows a listing whose data is incomplete.`,
+    headline,
+    subhead: join(
+      invalidGtin > 0 ? `Google Shopping disapproves a listing whose GTIN is invalid.` : null,
+      invalidGtin > 0 && missingOnly > 0
+        ? `${missingOnly.toLocaleString()} others have no barcode on at least one variant, which can limit where Google shows them.`
+        : null,
+      invalidGtin === 0 && missingBarcode > 0
+        ? `Google Merchant Center requires a GTIN where the manufacturer assigned one; without it a listing can be limited or disapproved.`
+        : null,
+      ...nonBarcodeTail,
+    ),
   }
 }
 
