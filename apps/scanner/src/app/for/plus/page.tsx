@@ -19,9 +19,9 @@ const MISTAKES: Mistake[] = [
     n: '01',
     title: 'No llms.txt at the root',
     symptom:
-      'Agents fall back to raw crawling. On a 10,000-SKU storefront that means slower, shallower indexing and a disadvantage against competitors who publish a curated manifest.',
+      'No agent operator has confirmed it reads one, and the spec is on v2, so we claim no indexing or ranking effect. It is a cheap machine-readable manifest of what your catalog holds, and the lowest-weight thing we score.',
     pillar: 'Agent crawlability',
-    fix: 'Flintmere fetches /llms.txt during every scan and scores presence, structure (H1 + at least one H2), and content freshness.',
+    fix: 'Flintmere fetches /llms.txt during every scan and scores presence and structure (H1 plus at least one H2). It sits inside Agent crawlability, which is 5% of the composite.',
   },
   {
     n: '02',
