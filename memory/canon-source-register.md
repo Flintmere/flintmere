@@ -395,6 +395,71 @@ never a third-party summary.
 
 ---
 
+### A17. Google Merchant Center product-status / identifier claims
+
+Files in scope: any copy stating what Google Merchant Center does to a
+listing. The Identifiers pillar `why` in
+`apps/scanner/src/lib/methodology-data.ts`, the `missing-gtin`,
+`invalid-gtin` and `missing-brand` consequences plus `verdictHeader`'s
+Google sentence in `apps/scanner/src/lib/copy.ts`, the `/scan` and
+homepage hero copy, `GmcPanel`, and any marketing claim about Google
+Shopping visibility.
+
+Read first:
+- **Google — About unique product identifiers** —
+  https://support.google.com/merchants/answer/160161
+- **Google — GTIN `[gtin]` attribute specification** —
+  https://support.google.com/merchants/answer/6324461
+
+Both verified reachable 2026-10-30. These two pages are the whole
+source; a third-party SEO summary is not a substitute.
+
+Standing rules — rules 1, 3 and 7 each caught a real drafting error:
+
+1. **Google publishes no rate.** Neither page states how often, or for
+   what share of products, a missing identifier actually limits or
+   removes a listing. No probability, band or percentage is derivable
+   from this source. This is the firmest ground under ADR 0030 §2 —
+   firmer than the premise-2 argument, because a suppression *band* was
+   unsupportable whether the mechanism was limitation or disapproval.
+   Never derive a count, range or share of affected products from
+   Merchant Center documentation.
+2. **Three states, not one.** Google's vocabulary is "limited
+   visibility" and "disapproved". **"Suppressed" is not Google's term
+   and appears nowhere in either page.** Never use it to describe a
+   Merchant Center outcome.
+3. **A missing GTIN carries BOTH registers in Google's own docs.** Four
+   passages say a product with an assigned GTIN submitted without one
+   "may have limited visibility"; one says it "could be disapproved".
+   Never state either as the single consequence. The sanctioned
+   phrasing is already in `copy.ts` — "can be limited or disapproved".
+4. **Only an invented or incorrect GTIN is stated unconditionally.**
+   Google is unhedged that a guessed or approximated value will cause
+   disapproval. A wrong digit is the one identifier claim this source
+   supports without hedging — which is why it, and not absence, can
+   carry a headline.
+5. **A product with no assigned GTIN needs none.** Google directs those
+   to `brand` + `mpn` instead. Never write copy implying every product
+   requires a GTIN.
+6. **Allergen and nutrition data are not Merchant Center fields** (ADR
+   0029 §Context finding 2 — nutrition lives in Manufacturer Center,
+   Canada and US only). Never attribute either to Google's feed
+   requirements, in a pillar `why` or anywhere else.
+7. **Do not cite a relaxation date to this source.** ADR 0030 dates the
+   missing-identifier relaxation to 2023-12-21 and the Identifiers
+   pillar `why` says "December 2023". Neither page carries a changelog
+   or any date, so the claim is unsourced here. Either find the
+   announcement and register it, or drop the date and state the current
+   behaviour only.
+8. **ADR 0030 §Context overstates this source.** It reads "Only an
+   *incorrect* GTIN disapproves"; rule 3 shows Google also names
+   disapproval for a missing-but-assigned GTIN. Correct on the next
+   amendment. The retirement decision itself is unaffected, per rule 1.
+
+Add to this list only via `canon-audit` review.
+
+---
+
 ## Section B — Cross-cutting canon (read on every dispatch)
 
 These three sources are read on EVERY canon-protected dispatch
