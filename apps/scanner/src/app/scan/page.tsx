@@ -5,11 +5,11 @@
  *
  * Orchestrator only. Owns the ScanState state machine + the /api/scan
  * fetch lifecycle. Display sub-components (Results, ScanScopeLine,
- * SuppressionLede, ScanningOverlay, ErrorBlock, PublicPageOptIn,
+ * ScanningOverlay, ErrorBlock, PublicPageOptIn,
  * BenchmarkOptIn, useLiveSample) live in apps/scanner/src/components/scan/.
  *
  * Hero composition (2026-05-01 design-extravagant pass):
- * `[ suppressed ]` lands at Saks scale via Bracket size="saks", carrying
+ * `[ structured ]` lands at Saks scale via Bracket size="saks", carrying
  * the marketing-homepage chord through to the conversion moment. Amber-
  * radial atmosphere blooms behind the chord (per ADR 0021 §3 relaxation
  * — atmospheric gradient permitted). The chord IS the page's brand-mark;
@@ -108,9 +108,8 @@ export default function ScanPage() {
             className="font-medium tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)] max-w-[16ch]"
             style={{ fontSize: 'var(--scale-h1-anchor)' }}
           >
-            Which of your products are{' '}
-            <Bracket size="saks">suppressed</Bracket>
-            {' '}in Google Shopping today?
+            How much of your product data is actually{' '}
+            <Bracket size="saks">structured</Bracket>?
           </h1>
 
           <p
@@ -124,9 +123,9 @@ export default function ScanPage() {
               color: 'var(--color-mute)',
             }}
           >
-            Paste your URL. We measure how much annual demand is leaking to
-            competitors while these products stay demoted — and surface the
-            catalog data costing you the sale.
+            Paste your URL. We read your public catalog and score it against
+            seven pillars of product-data quality, then show you which fields
+            are missing.
           </p>
 
           <div style={{ marginTop: 'clamp(40px, 5vw, 72px)' }}>

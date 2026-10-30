@@ -1,22 +1,41 @@
 /**
- * FounderStrip — chapter 3, #5 dual-column pin + scrollable companion
- * (2026-04-29 redesign per design-scroll-choreography skill).
+ * FounderStrip — chapter 3, #7 cascade fade-in (downgraded from #5
+ * dual-column pin on 2026-09-10; see the mechanic note below).
  *
- * The founder voice (LEFT column) pins at viewport top while three proof
- * panels (RIGHT column) scroll past in sequence:
+ * The founder voice (LEFT column) sits beside two proof panels (RIGHT
+ * column) that cascade in on viewport entry:
  *   1. Score lift — 47 → 89 catalog readiness
- *   2. Recovery — £3,240/mo suppressed listings recovered
- *   3. Deliverable — 1 letter + 1 CSV per product
+ *   2. Deliverable — 1 letter + 1 CSV per product
  *
- * Reads as: editorial spread. *"Stay-and-see."* The voice persists; the
- * proof beats advance.
+ * Reads as: editorial spread, everyday motion. The voice and the proof
+ * land together rather than the voice persisting across a long runway.
+ *
+ * Mechanic note (2026-09-10, ADR 0030 §4). The recovery panel — "£3,240/mo
+ * suppressed listings recovered" — was retired with the suppression wedge:
+ * it illustrated a mechanism ADR 0029 premise 2 grades false. Operator
+ * chose to drop to two panels rather than restate the figure, because no
+ * third-party engagement exists and any replacement would be modelled,
+ * which is what ADR 0030 retires.
+ *
+ * That drop breaks composition rule 4 (scroll-choreographies.md §Composition
+ * rules): "#4 and #5 each need ≥2 viewport heights of scroll runway minimum.
+ * Below that, downgrade to #7 cascade." Measured at 1440x900 with panels at
+ * min-height clamp(360px, 60vh, 560px) = 540px and gap clamp(48px, 6vh, 96px)
+ * = 54px:
+ *   - 3 panels: 3x540 + 2x54 = 1728px = 1.92vh (already marginal; the
+ *     original header's "3 panels x ~100vh = 300vh" was wrong — the panels
+ *     were never 100vh)
+ *   - 2 panels: 2x540 + 1x54 = 1134px = 1.26vh — fails the rule
+ * So the pin is removed and the section downgrades to #7 per the rule. The
+ * two-column grid is layout, not mechanic, and is retained.
  *
  * Mechanic chosen per skill workflow:
- *   - Decision matrix: persistent voice + varying companion → #5
- *   - Composition rule check: ≥2 viewport heights of right-col runway
- *     (3 panels × ~100vh ≈ 300vh) — passes
- *   - Mobile: pin disabled below lg breakpoint via @media in globals.css;
- *     columns stack, content reads top-to-bottom naturally
+ *   - Composition rule 4: runway below 2vh → #7 cascade
+ *   - Homepage variety budget unaffected: #7 is the default mechanic and
+ *     does not count against the 3-5 distinct-mechanic target
+ *   - Panels stagger via [data-reveal] + --reveal-delay on the canonical
+ *     grammar (240ms first list item, +80ms each subsequent); the page-level
+ *     ViewportReveal (page.tsx:161) already observes descendants
  *
  * Mobile pass (2026-06-21, frontend-design skill + Magic-inspired compact
  * ledger). On phones every size was inherited from the desktop scroll-pin
@@ -24,8 +43,9 @@
  * section padding, plus the .flintmere-founder-panel min-height (fixed in
  * globals.css) — which stacked into a ~2.4-screen chain. Sizing is now
  * mobile-compact at the base and restored to the original desktop values
- * at `lg:`. The pin, the copy, the amber-second-fragment pattern and the
- * legal disclaimer are unchanged.
+ * at `lg:`. The copy, the amber-second-fragment pattern and the legal
+ * disclaimer are unchanged. The desktop panel min-height existed only as
+ * pin runway and went with the pin (2026-09-10).
  *
  * Council pre-flight (per binding 2026-04-28):
  *   - References: A24 Films (a24films.com — ink-slab "moment of arrival",
@@ -37,12 +57,11 @@
  *   - Yann #6 (signature): bracketed [ Built in London ]-style nouns
  *     could anchor proof captions if needed; signature otherwise lives
  *     on the headline weight-shift
- *   - Noor #8 (a11y, VETO): all panels keyboard-reachable; pin is
- *     structural CSS, no animation; mobile reflow stacks at <lg; AAA
- *     contrast paper-on-ink throughout
- *   - Marie #12 (motion): pin is content-revelation, not gratuitous;
- *     reduced-motion users get the same structural pin (it's CSS, no
- *     animation involvement)
+ *   - Noor #8 (a11y, VETO): all panels keyboard-reachable; mobile reflow
+ *     stacks at <lg; AAA contrast paper-on-ink throughout
+ *   - Marie #12 (motion): cascade is the default everyday motion; the
+ *     global prefers-reduced-motion block in globals.css scales the
+ *     transition to 0.01ms, so reduced-motion users land on the end-state
  *   - #9+#23+#24 Legal Council: figures marked "Representative example,
  *     actual results vary per merchant" — claim-review compliance
  */
@@ -64,12 +83,6 @@ const PROOF_PANELS: ProofPanel[] = [
     sub: 'Three-working-day turnaround · representative example',
   },
   {
-    metric: '£3,240',
-    metricAccent: '/mo',
-    label: 'Suppressed listings recovered',
-    sub: 'to Google Shopping + Merchant Center',
-  },
-  {
     metric: '1 letter · 1 CSV',
     label: 'Per-product write-up + structured data file',
     sub: 'Yours to keep, on day three',
@@ -80,7 +93,6 @@ export function FounderStrip() {
   return (
     <section
       aria-labelledby="different-heading"
-      className="flintmere-founder-sticky"
       style={{
         background: 'var(--color-ink)',
         color: 'var(--color-paper-on-ink)',
@@ -90,9 +102,9 @@ export function FounderStrip() {
       {/* Padding + gap are mobile-compact at the base and restored to the
           original desktop clamps at lg: (mobile pass 2026-06-21). */}
       <div className="mx-auto w-full max-w-[1280px] grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-12 px-6 py-16 lg:gap-[clamp(48px,6vw,96px)] lg:px-[clamp(24px,4vw,48px)] lg:py-[clamp(96px,14vh,200px)]">
-        {/* LEFT — founder voice. Pinned via .flintmere-founder-pinned at
-            ≥lg viewports (CSS in globals.css §Founder pinned column). */}
-        <div className="flintmere-founder-pinned">
+        {/* LEFT — founder voice. Static column since the #5 → #7 downgrade
+            (2026-09-10); the grid is layout, the pin was the mechanic. */}
+        <div>
           <p
             className="eyebrow"
             style={{
@@ -177,11 +189,9 @@ export function FounderStrip() {
           </div>
         </div>
 
-        {/* RIGHT — proof panels. On desktop each is ~80–100vh tall so the
-            LEFT column has scroll runway to be pinned against; on mobile the
-            min-height is released (globals.css) and the gap + metric scale
-            are compressed so the three read as a tight ledger, not a void
-            chain. */}
+        {/* RIGHT — proof panels. Content-driven height at every breakpoint
+            since the pin runway went (2026-09-10); the gap + metric scale stay
+            compressed on mobile so the pair reads as a tight ledger. */}
         <ol
           aria-label="Catalog letter outcomes — representative examples"
           className="flex flex-col list-none m-0 p-0 gap-6 lg:gap-[clamp(48px,6vh,96px)]"
@@ -189,8 +199,12 @@ export function FounderStrip() {
           {PROOF_PANELS.map((panel, i) => (
             <li
               key={i}
+              data-reveal
               className="font-mono flintmere-founder-panel"
               style={{
+                // Canonical delay grammar (globals.css §viewport reveal):
+                // 240ms first list item, +80ms each subsequent.
+                ['--reveal-delay' as string]: `${240 + i * 80}ms`,
                 border: '1px solid var(--color-line-dark)',
                 padding: 'clamp(20px, 3.5vw, 48px)',
                 color: 'var(--color-paper-on-ink)',
