@@ -6,10 +6,10 @@
  * existing register.
  *
  * Why this is the right "imagery proves" move (per CLAUDE.md §canon shift
- * 2026-04-26): the prose claims "a missing or invalid identifier is the
- * most common reason a product is suppressed." Here is what that looks
- * like in actual catalog data, with the rule that fired and the score
- * impact on the right side. Type leads, evidence proves.
+ * 2026-04-26): the prose claims an incorrect GTIN gets a product
+ * disapproved while a missing one leaves it limited. Here is what that
+ * looks like in actual catalog data, with the rule that fired and the
+ * score impact on the right side. Type leads, evidence proves.
  *
  * Why NOT Runware/Flux for this figure: it needs perfect text rendering
  * (mono labels, GTIN strings, structured-data keys) and pixel-precise
