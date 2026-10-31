@@ -79,10 +79,31 @@ describe('generateCode', () => {
   })
 
   it('returns distinct values across calls (entropy sanity)', () => {
-    const set = new Set<string>()
-    for (let i = 0; i < 100; i++) set.add(generateCode())
-    // 100 from 1M space — duplicates astronomically rare
-    expect(set.size).toBe(100)
+    const codes = Array.from({ length: 100 }, () => generateCode())
+    const set = new Set(codes)
+
+    // The previous assertion was `toBe(100)` with the note "100 from 1M
+    // space — duplicates astronomically rare". That reasons per CODE
+    // (1-in-a-million) when the risk is per PAIR: 100 draws make
+    // C(100,2) = 4,950 pairs, so collisions are Poisson with
+    // lambda = 4950 / 1e6 = 0.00495 and
+    //   P(at least one duplicate) = 1 - e^-lambda ~= 0.494%.
+    // That is one red run in roughly 202 — the birthday paradox, not
+    // astronomy. It went red during the 2026-10-31 scoring work and
+    // passed on every re-run, which is exactly how this wastes time.
+    //
+    // 98 tolerates up to two collisions: P(>=3) ~= lambda^3/6 ~= 2e-8,
+    // about one run in 49 million. A constant or tiny-space generator
+    // still fails outright.
+    expect(set.size).toBeGreaterThanOrEqual(98)
+
+    // Catches what a distinctness count alone cannot: a generator stuck
+    // in a narrow band. Values below 100,000 zero-pad, so a 5-digit
+    // generator would put '0' in front of every code while still
+    // returning 100 distinct values. Over 100 uniform draws, missing two
+    // or more leading digits has probability ~ C(10,2) * 0.8^100 ~= 9e-9.
+    const leadingDigits = new Set(codes.map((c) => c[0]))
+    expect(leadingDigits.size).toBeGreaterThanOrEqual(8)
   })
 })
 
