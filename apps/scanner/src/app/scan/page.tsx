@@ -9,7 +9,7 @@
  * BenchmarkOptIn, useLiveSample) live in apps/scanner/src/components/scan/.
  *
  * Hero composition (2026-05-01 design-extravagant pass):
- * `[ structured ]` lands at Saks scale via Bracket size="saks", carrying
+ * `[ digit ]` lands at Saks scale via Bracket size="saks", carrying
  * the marketing-homepage chord through to the conversion moment. Amber-
  * radial atmosphere blooms behind the chord (per ADR 0021 §3 relaxation
  * — atmospheric gradient permitted). The chord IS the page's brand-mark;
@@ -108,8 +108,8 @@ export default function ScanPage() {
             className="font-medium tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)] max-w-[16ch]"
             style={{ fontSize: 'var(--scale-h1-anchor)' }}
           >
-            How much of your product data is actually{' '}
-            <Bracket size="saks">structured</Bracket>?
+            One wrong{' '}
+            <Bracket size="saks">digit</Bracket>. Disapproved.
           </h1>
 
           <p
@@ -123,9 +123,9 @@ export default function ScanPage() {
               color: 'var(--color-mute)',
             }}
           >
-            Paste your URL. We read your public catalog and score it against
-            seven pillars of product-data quality, then show you which fields
-            are missing.
+            Paste your URL. We test the check digit on the barcodes (GTINs)
+            your store publishes; Google Shopping disapproves the wrong ones.
+            Free, no install.
           </p>
 
           <div style={{ marginTop: 'clamp(40px, 5vw, 72px)' }}>

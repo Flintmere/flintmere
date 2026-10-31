@@ -16,7 +16,7 @@ import { SCANNER_HOST } from '@/lib/host-routing';
 // with globals.css @theme if those tokens change.
 
 export const alt =
-  'How much of your product data is actually structured? Flintmere — free 60-second catalog scan.';
+  'One wrong digit. Disapproved. Flintmere — free 60-second catalog scan.';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -78,15 +78,13 @@ export default async function OG() {
             flexDirection: 'column',
             fontFamily: 'Geist',
             fontWeight: 700,
-            fontSize: 96,
+            fontSize: 112,
             lineHeight: 0.95,
             letterSpacing: -4,
           }}
         >
-          <span>How much of your</span>
-          <span>product data is</span>
           <span style={{ display: 'flex', alignItems: 'baseline' }}>
-            actually&nbsp;
+            One wrong&nbsp;
             <span
               style={{
                 fontFamily: 'GeistMono',
@@ -96,7 +94,7 @@ export default async function OG() {
             >
               [
             </span>
-            structured
+            digit
             <span
               style={{
                 fontFamily: 'GeistMono',
@@ -106,8 +104,9 @@ export default async function OG() {
             >
               ]
             </span>
-            ?
+            .
           </span>
+          <span>Disapproved.</span>
         </div>
 
         {/* footer — wordmark + URL (matches root card) */}

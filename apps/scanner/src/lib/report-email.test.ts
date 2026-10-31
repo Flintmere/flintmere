@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { CompositeScore } from '@flintmere/scoring';
 import { buildReportEmail } from './report-email';
-import { verdictHeader } from './copy';
+import { verdictBarcodeInputs, verdictHeader } from './copy';
 import type { GmcGroundTruth } from './gmc/types';
 
 function makeGmcGroundTruth(
@@ -489,5 +489,150 @@ describe('verdictHeader — every branch is true for every reachable input', () 
     });
     expect(headline).toBe('No product carries a critical gap.');
     expect(subhead).toContain('0 products checked');
+  });
+});
+
+// homepage-thesis-spec §2.2 — the barcode branching. Exactly one headline
+// branch fires for every input, first match wins. The cases below are the
+// spec's own "Branch exclusivity" paragraph turned into assertions.
+describe('verdictHeader — barcode branches (spec §2.2)', () => {
+  const base = { grade: 'C', affectedCount: 200, totalProducts: 412 };
+
+  it('branch 0: barcodesRead absent → no barcode sentence, shipped template kept', () => {
+    const { headline, subhead } = verdictHeader({ ...base, invalidGtin: 7 });
+    expect(headline).toBe('At least 200 of your 412 products carry a data gap.');
+    expect(subhead).not.toMatch(/check digit|barcode/i);
+  });
+
+  it('branch 0 fires for null too, and even when invalidGtin > 0', () => {
+    const { headline, subhead } = verdictHeader({
+      ...base,
+      barcodesRead: null,
+      invalidGtin: 7,
+      missingBarcode: 3,
+    });
+    expect(headline).toBe('At least 200 of your 412 products carry a data gap.');
+    expect(subhead).not.toMatch(/check digit/i);
+  });
+
+  it('branch 1: barcodesRead === 0 → we could not read, not "none carries one"', () => {
+    const { headline } = verdictHeader({ ...base, barcodesRead: 0, missingBarcode: 0 });
+    expect(headline).toBe('We could not read barcodes from your storefront.');
+  });
+
+  it('branch 2: invalid digits lead, and the subhead carries the missing remainder', () => {
+    const { headline, subhead } = verdictHeader({
+      ...base,
+      barcodesRead: 50,
+      invalidGtin: 8,
+      missingBarcode: 30,
+      missingOnly: 22,
+    });
+    expect(headline).toBe(
+      '8 of the 50 products we read carry a barcode that fails its check digit.',
+    );
+    expect(subhead).toContain('Google Shopping disapproves a listing whose GTIN is invalid.');
+    expect(subhead).toContain('22 others have no barcode on at least one variant');
+  });
+
+  it('branch 2 wins over branch 3 when every read product also lacks a barcode', () => {
+    const { headline } = verdictHeader({
+      ...base,
+      barcodesRead: 50,
+      invalidGtin: 1,
+      missingBarcode: 50,
+    });
+    expect(headline).toMatch(/fails its check digit/);
+  });
+
+  it('branch 3: every read product lacks a barcode', () => {
+    const { headline, subhead } = verdictHeader({
+      ...base,
+      barcodesRead: 50,
+      missingBarcode: 50,
+    });
+    expect(headline).toBe('None of the 50 products we checked carries a barcode.');
+    expect(subhead).toContain('can be limited or disapproved');
+  });
+
+  it('branch 4: all read digits pass, some products have none', () => {
+    const { headline } = verdictHeader({ ...base, barcodesRead: 50, missingBarcode: 12 });
+    expect(headline).toBe(
+      'Every barcode we read passes its check digit. 12 of 50 products have none on at least one variant.',
+    );
+  });
+
+  it('branch 5: clean — and never says "valid"', () => {
+    const { headline, subhead } = verdictHeader({ ...base, barcodesRead: 50 });
+    expect(headline).toBe('Every barcode on the 50 products we checked passes its check digit.');
+    expect(headline).not.toMatch(/\bvalid\b/);
+    expect(subhead).not.toMatch(/disapproves/);
+  });
+
+  it('never renders "N GTINs" — counts are products', () => {
+    for (const barcodesRead of [0, 50]) {
+      const { headline } = verdictHeader({
+        ...base,
+        barcodesRead,
+        invalidGtin: 3,
+        missingBarcode: 4,
+      });
+      expect(headline).not.toMatch(/GTINs/);
+    }
+  });
+
+  it('product-type and storefront-only sentences join branch 0 as well', () => {
+    const { subhead } = verdictHeader({ ...base, noType: 9 });
+    expect(subhead).toContain('9 products have no product type set.');
+    expect(subhead).toContain("We can't see what Merchant Center did with any of them.");
+  });
+
+  it('the storefront-only sentence is dropped when GMC ground truth exists', () => {
+    const { subhead } = verdictHeader({
+      ...base,
+      barcodesRead: 50,
+      gmcGroundTruthPresent: true,
+    });
+    expect(subhead).not.toMatch(/can't see what Merchant Center/);
+  });
+
+  it('four-figure counts render grouped', () => {
+    const { headline } = verdictHeader({
+      ...base,
+      barcodesRead: 1076,
+      invalidGtin: 1200,
+      totalProducts: 2000,
+    });
+    expect(headline).toContain('1,200 of the 1,076');
+  });
+});
+
+describe('verdictBarcodeInputs', () => {
+  it('passes barcodesRead through untouched, including absent', () => {
+    expect(verdictBarcodeInputs({ issues: [] }).barcodesRead).toBeUndefined();
+    expect(verdictBarcodeInputs({ issues: [], barcodesRead: null }).barcodesRead).toBeNull();
+    expect(verdictBarcodeInputs({ issues: [], barcodesRead: 0 }).barcodesRead).toBe(0);
+  });
+
+  it('derives missingOnly as a set difference on product ids', () => {
+    const got = verdictBarcodeInputs({
+      barcodesRead: 50,
+      issues: [
+        { code: 'invalid-gtin-checksum', affectedCount: 2, affectedProductIds: ['a', 'b'] },
+        { code: 'missing-gtin', affectedCount: 4, affectedProductIds: ['b', 'c', 'd', 'e'] },
+        { code: 'missing-gmc-category', affectedCount: 9 },
+      ],
+    });
+    expect(got).toMatchObject({ invalidGtin: 2, missingBarcode: 4, missingOnly: 3, noType: 9 });
+  });
+
+  it('renders missingOnly as 0 when a site-level issue carries no product ids', () => {
+    const got = verdictBarcodeInputs({
+      issues: [
+        { code: 'invalid-gtin-checksum', affectedCount: 1 },
+        { code: 'missing-gtin', affectedCount: 5 },
+      ],
+    });
+    expect(got.missingOnly).toBe(0);
   });
 });

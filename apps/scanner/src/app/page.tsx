@@ -288,8 +288,8 @@ export default function MarketingHome() {
               className="font-sans tracking-[-0.04em] leading-[0.88] max-w-[14ch] text-[color:var(--color-ink)] max-lg:text-[color:var(--color-paper-on-ink)]"
               style={{ fontSize: 'var(--scale-h1-anchor)', fontWeight: 700 }}
             >
-              How much of your product data is actually{' '}
-              <Bracket size="saks">structured</Bracket>?
+              One wrong{' '}
+              <Bracket size="saks">digit</Bracket>. Disapproved.
             </h1>
           </ViewportReveal>
 
@@ -306,11 +306,14 @@ export default function MarketingHome() {
               fontWeight: 400,
             }}
           >
-            Paste your URL. We read your public catalog and score it against
-            seven pillars of product-data quality.{' '}
+            Paste your URL. We test the check digit on the barcodes (GTINs)
+            your store publishes; Google Shopping disapproves the wrong ones.
+            Free, no install.{' '}
             <span className="max-lg:hidden">
-              Most gaps are food-specific: a wrong GTIN, a missing allergen, a
-              field no channel can read off your description.
+              A price that isn&rsquo;t VAT-inclusive, or no unit price on food
+              sold by weight or volume, disapproves a listing too. We
+              can&rsquo;t see your feed or Merchant Center, so we don&rsquo;t
+              guess what any of it costs you.
             </span>
           </p>
 
@@ -541,7 +544,7 @@ export default function MarketingHome() {
           curtain-pair and the sticky footer reveal. */}
       <ScanCallout
         eyebrow="// now yours"
-        headline="See what's missing on your store."
+        headline="Find the wrong digits on your store."
       />
 
       {/* Chapter 5 — Footer (sticky-reveal mechanic; Batch B 2026-04-29).
