@@ -47,7 +47,7 @@ const MISTAKES: Mistake[] = [
     n: '03',
     title: 'Volume encoded as free text, not structured ml / fl oz',
     symptom:
-      "Your variants say 'Travel Size', 'Standard', 'Value Size'. Shoppers know what those mean. Agents don't. The structured size_volume metafield sits empty on 94% of variants, so price-per-ml queries — which agents run constantly — skip your entire catalog.",
+      "Your variants say 'Travel Size', 'Standard', 'Value Size'. Shoppers know what those mean. Agents don't. The structured size_volume metafield sits empty on 94% of variants, so there is no field to compute a price per ml from.",
     pillar: 'Structured attributes',
     fix: "Flintmere flags free-text volume variants and offers a regex to extract numeric ml / oz values from existing variant titles — so you can bulk-populate the structured field without retyping each SKU.",
   },

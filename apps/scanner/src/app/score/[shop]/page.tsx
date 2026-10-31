@@ -336,7 +336,7 @@ export default async function ScorePage({ params }: PageProps) {
             style={{ fontSize: 17, lineHeight: 1.5, opacity: 0.85 }}
           >
             Free scan. 60 seconds. No signup, no credit card. The same seven
-            checks an AI shopping agent runs.
+            pillars we scored this store on.
           </p>
           <p style={{ marginTop: 32 }}>
             <Link href="/scan" className="btn btn-accent">

@@ -239,3 +239,69 @@ describe('issueCodeToFounderSpeak covers every code the scorer emits', () => {
     expect(stale).toEqual([]);
   });
 });
+
+// Regression guard — AI-agent MECHANISM claims in customer-facing source.
+//
+// ADR 0029 premise 1 grades "what an AI agent does with your catalog"
+// Unmeasurable, and memory/VOICE.md §AI-agent outcome claims bans asserting
+// it. The claim kept coming back in new places: #112 and #121 cleared the
+// surfaces ADR 0030 §Affects listed, #122 cleared the ones the 2026-09-09
+// spec §4.2 listed, and FIVE more survived both — including
+// `score/[shop]/page.tsx`'s bottom CTA, which neither list named, and
+// `research/BodyTop.tsx:228`, which §4.2 did name and an audit keyed on the
+// wrong search terms still missed.
+//
+// A list of line numbers cannot catch the next one. This can.
+//
+// Deliberately NARROW: it matches the specific banned constructions, not
+// every sentence containing "agent". Describing what OUR crawler reads
+// ("FlintmereBot reads the JSON-LD block"), naming the Crawlability pillar,
+// or stating that a field is machine-readable are all legitimate and must
+// keep passing — a guard that fires on those gets disabled, and then guards
+// nothing.
+describe('no AI-agent mechanism claims in customer-facing copy', () => {
+  const BANNED_CLAIM_PATTERNS: ReadonlyArray<readonly [RegExp, string]> = [
+    [/checks?\s+(an?\s+)?AI\s+shopping\s+agents?\s+(runs?|uses?)/i, 'asserts agents run our checks'],
+    [/AI\s+shopping\s+agents?\s+(run|use)\b/i, 'asserts what AI shopping agents run or use'],
+    [/agents?\s+run\s+constantly/i, 'unevidenced frequency claim about agents'],
+    [/before\s+(it|they)\s+recommends?\b/i, 'asserts an agent recommendation gate'],
+    [/skips?\s+your\s+entire\s+catalog/i, 'unmeasurable exclusion outcome'],
+    [/invisible\s+to\s+(every\s+)?(AI|GPT|agent)/i, 'retired "invisible" claim (ADR 0029 §5)'],
+  ];
+
+  // Customer-facing only. Admin console, API internals and tests are out of
+  // scope — they are not read by a merchant.
+  const ROOTS = ['src/app', 'src/components'];
+  const EXCLUDE = /(\.test\.|\/admin\/|\/api\/|__tests__)/;
+
+  function customerFacingFiles(): string[] {
+    const out: string[] = [];
+    for (const root of ROOTS) {
+      for (const f of readdirSync(root, { recursive: true, encoding: 'utf8' })) {
+        const p = `${root}/${f}`;
+        if (!/\.tsx?$/.test(p) || EXCLUDE.test(p)) continue;
+        out.push(p);
+      }
+    }
+    return out;
+  }
+
+  it('finds files to check (guards against a silently empty sweep)', () => {
+    expect(customerFacingFiles().length).toBeGreaterThan(50);
+  });
+
+  it.each(BANNED_CLAIM_PATTERNS.map(([re, why]) => ({ re, why })))(
+    'no customer-facing file $why',
+    ({ re }) => {
+      const hits: string[] = [];
+      for (const file of customerFacingFiles()) {
+        readFileSync(file, 'utf8')
+          .split('\n')
+          .forEach((line, i) => {
+            if (re.test(line)) hits.push(`${file}:${i + 1} ${line.trim().slice(0, 100)}`);
+          });
+      }
+      expect(hits).toEqual([]);
+    },
+  );
+});
