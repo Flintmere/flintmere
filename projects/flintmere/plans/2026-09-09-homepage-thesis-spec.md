@@ -16,10 +16,41 @@ parity_note: >
   The deliverable-parity surfaces (catalog-letter/page.tsx, catalog-letter/success/page.tsx,
   concierge-email.ts) are NOT touched — this spec changes the scanner, homepage and scan-report
   surfaces, not the Catalog Letter deliverable. report-email.ts (the free scan report) IS in scope.
-status: approved by operator 2026-09-09 — design ratified; implementation gated on §3
+status: EXECUTED 2026-10-31 — design ratified 2026-09-09; §3 gate met by #114; §2.1 shipped in #123; §4.2 cleared by #122, #124 and #125. See §0 for what was not executed and why.
 ---
 
 # Homepage thesis — replacing the suppression wedge
+
+## 0. Executed state (added 2026-10-31)
+
+**This spec is done. Do not re-plan it.** It sat ratified and unexecuted for
+51 days because its §3 gate was met by #114 without anyone reopening the spec.
+
+- **§2.1, the eight slots** — shipped in #123. Slot 8 needed no change: §2.3
+  already described the shipped `buildSubject()`.
+- **§4.2, the same-PR contradictions** — cleared by #122, then #124 and #125
+  for the items §4.2 missed or named without anyone acting on them.
+- **§3, the fetcher gate** — met by #114 (`41ff201`).
+
+Three deliberate divergences, each argued in the merging PR:
+
+1. **Slot 2a's "every barcode (GTIN) your store publishes"** ships without
+   "every". `shopify-fetcher.ts` samples 50; `ScanScopeLine` states coverage
+   on the result. Still exactly 24 words.
+2. **`for/plus`'s llms.txt entry was hedged, not removed** as §4.2 directs.
+   ADR 0030 §Open questions leaves whether `llms.txt` stays a scored check,
+   and at what weight, unresolved — and notes the options "produce different
+   scores for the same catalog". Removing the copy would have pre-empted an
+   operator decision. **This remains the one open item touching this spec.**
+3. **`research/BodyBottom.tsx:431` was left as written.** §4.2 marks it for
+   rewrite, but it lists `llms.txt` among the files each scan fetches, inside
+   the FlintmereBot transparency disclosure, and it is true. Removing it
+   there would make the disclosure inaccurate.
+
+§7's accepted 320px risk did not materialise: measured at 320, the longest
+inline box is 285px and the h1's right edge is 296px inside a 320px viewport,
+so nothing clips and there is no horizontal page scroll.
+
 
 Executes ADR 0029 §5 ("what is retired") on the public surfaces. Ratified after a
 12-unit audit, a 4-thesis adversarial panel (three refuters per draft) and a judge
