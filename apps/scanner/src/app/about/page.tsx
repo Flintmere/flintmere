@@ -141,10 +141,12 @@ export default function About() {
               lineHeight: 1.7,
             }}
           >
-            Flintmere scores Shopify catalogs for how AI shopping agents —
-            ChatGPT, Perplexity, Gemini, Apple Intelligence — read product
-            data. We tell merchants which fields are dragging them down, fix
-            what is safe to fix automatically, and guide the rest.
+            The errors that disapprove a UK food listing are boring — a wrong
+            barcode, a price that isn’t VAT-inclusive, no unit price on food
+            sold by weight. Flintmere reads the catalog a Shopify store
+            publishes and tells merchants what it found. What is safe to fix,
+            we fix; the rest we guide. We cannot see your Merchant Center, so
+            we do not guess what any of it costs you.
           </p>
           <p
             className="text-[color:var(--color-ink-2)] max-w-[64ch]"

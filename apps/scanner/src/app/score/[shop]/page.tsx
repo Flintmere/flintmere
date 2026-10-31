@@ -63,7 +63,7 @@ export async function generateMetadata({
   }
 
   const title = `${domain} · ${scan.score}/100 · catalog data score`;
-  const description = `${domain} scored ${scan.score}/100 (grade ${scan.grade}) on Flintmere's catalog letter checks — the seven checks AI shopping agents use before recommending a product.`;
+  const description = `${domain} scored ${scan.score}/100 (grade ${scan.grade}) on Flintmere's seven pillars of product-data quality, measured from the catalog the store publishes.`;
   return {
     title,
     description,
@@ -149,11 +149,10 @@ export default async function ScorePage({ params }: PageProps) {
           className="mt-8 max-w-[52ch] text-[color:var(--color-ink-2)]"
           style={{ fontSize: 18, lineHeight: 1.5 }}
         >
-          This is the store&rsquo;s score on the seven checks AI shopping
-          agents run before they&rsquo;ll recommend a product &mdash;
-          Shopify product data, GS1 UK barcodes, Google Merchant Center
-          specs, crawler rules, llms.txt, sitemap, and agent checkout
-          readiness.
+          This is the store&rsquo;s score across Flintmere&rsquo;s seven
+          pillars of product-data quality &mdash; identifiers, attributes,
+          titles, mapping, consistency, checkout eligibility, and
+          crawlability. Every check reads data the store publishes.
         </p>
       </section>
 
@@ -218,7 +217,7 @@ export default async function ScorePage({ params }: PageProps) {
         <section className="bg-[color:var(--color-paper)] mx-auto max-w-[1280px] px-8 py-24">
           <p className="eyebrow mb-6">Pillar breakdown</p>
           <h2 className="max-w-[24ch] mb-12">
-            How the score breaks down across the seven checks.
+            How the score breaks down across the seven pillars.
           </h2>
           <ol className="list-none p-0 m-0 divide-y divide-[color:var(--color-line)] border-y border-[color:var(--color-line)]">
             {runPillars.map((p) => {

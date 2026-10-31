@@ -41,7 +41,7 @@ import { ScopeCredits } from '@/app/catalog-letter/connect/_shared/ScopeCredits'
 // reason strings are real GMC disapproval-reason types. The card is
 // labelled "Illustrative example" so it never reads as live account data.
 const EXAMPLE_ROWS: ReadonlyArray<{ product: string; reason: string }> = [
-  { product: 'Sea Salt Dukkah 90g', reason: 'Missing GTIN' },
+  { product: 'Sea Salt Dukkah 90g', reason: 'Invalid GTIN' },
   { product: 'Cold Brew Concentrate 1L', reason: 'Image too small' },
 ];
 

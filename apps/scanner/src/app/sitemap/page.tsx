@@ -236,8 +236,8 @@ export default function Sitemap() {
           >
             One platform, three subdomains. Marketing lives on{' '}
             <strong>flintmere.com</strong>. The public scanner lives on{' '}
-            <strong>{SCANNER_HOST}</strong>. The food regulatory standard
-            (Phase 2, June 2026) will live on{' '}
+            <strong>{SCANNER_HOST}</strong>. The published food regulatory
+            standard lives on{' '}
             <strong>standards.flintmere.com</strong>. The Shopify embedded app
             at <strong>app.flintmere.com</strong> is private — it lives behind
             your Shopify admin and isn&rsquo;t indexable.
@@ -269,7 +269,7 @@ export default function Sitemap() {
           <HostSection
             hostname={STANDARDS_HOST}
             role="Standards"
-            description="The proprietary food regulatory taxonomy. Phase 1 holds the page; Phase 2 (post-ingestion-engine, June 2026) lands the actual standard."
+            description="The food regulatory taxonomy — published, quotable and citable. Food is live; other verticals are not yet published."
             links={STANDARDS_LINKS}
             headingId="host-standards"
           />
