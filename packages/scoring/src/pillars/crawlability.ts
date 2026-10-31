@@ -4,12 +4,34 @@ import type {
   PillarResult,
 } from '../types.js';
 
+// Weights sum to 100. The llms.txt checks fell 40 → 10 on 2026-10-31,
+// closing ADR 0030 §Open questions #4. Three independent reasons, none of
+// them "llms.txt is unratified":
+//
+//   1. Shopify auto-generates /llms.txt for every store. Measured 2026-10-31:
+//      9 of 9 public Shopify storefronts returned identical platform
+//      boilerplate ("# Agent Instructions — <Store>", linking shop.com's
+//      Shop skill and UCP). The only sites without one were not public
+//      Shopify at all. Within this scanner's population the check is close
+//      to a constant, so at 40 points it awarded 2 points of composite to
+//      every merchant for a file Shopify wrote.
+//   2. The 90-day log study already recorded in types.ts puts
+//      llms.txt-adjacent traffic at 0.1% of AI bot traffic.
+//   3. types.ts records the standing strategic intent to de-emphasise this
+//      signal; the 15 → 5 pillar cut on 2026-04-26 was the interim step.
+//
+// Kept rather than deleted, at operator's decision: a storefront that is
+// NOT on the Shopify default — headless, or the feature disabled — is still
+// a real signal, and 10 points prices it as the edge case it is. The freed
+// 30 went to the surviving three in their existing 3:2:1 proportion, so the
+// pillar stays a 0–100 measure and the checks that actually vary between
+// stores carry the weight.
 const CHECKS = {
-  llmsTxtPresent: 30,
-  aiAgentsAllowed: 30,
-  sitemapPresent: 20,
-  sitemapReferenced: 10,
-  llmsTxtWellFormed: 10,
+  aiAgentsAllowed: 45,
+  sitemapPresent: 30,
+  sitemapReferenced: 15,
+  llmsTxtPresent: 8,
+  llmsTxtWellFormed: 2,
 } as const;
 
 const AI_AGENTS = [

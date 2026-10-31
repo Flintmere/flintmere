@@ -43,6 +43,34 @@ describe('scoreCrawlability', () => {
     expect(result.issues).toHaveLength(0);
   });
 
+  // The weights are published on flintmere.com/methodology, so a silent
+  // drift between the engine and the page is a canon break, not a bug.
+  // A perfect store scoring 100 is the invariant that catches it.
+  it('a store passing every check scores exactly 100', () => {
+    const result = scoreCrawlability(
+      makeInput({
+        robotsTxt: `${openRobots}\nSitemap: https://example.com/sitemap.xml`,
+        llmsTxt: wellFormedLlms,
+        sitemapXml: validSitemap,
+      }),
+    );
+    expect(result.score).toBe(100);
+  });
+
+  // llms.txt is worth 10 of 100 since 2026-10-31, down from 40. Shopify
+  // generates the file for every store, so this check is close to a
+  // constant within the scanned population; the weight prices it as the
+  // edge case it is. Raising it again needs a new ADR, not a tweak.
+  it('missing llms.txt costs 10, not 40', () => {
+    const base = {
+      robotsTxt: `${openRobots}\nSitemap: https://example.com/sitemap.xml`,
+      sitemapXml: validSitemap,
+    };
+    const withLlms = scoreCrawlability(makeInput({ ...base, llmsTxt: wellFormedLlms }));
+    const without = scoreCrawlability(makeInput(base));
+    expect(withLlms.score - without.score).toBe(10);
+  });
+
   it('flags missing llms.txt as low severity', () => {
     const result = scoreCrawlability(
       makeInput({ robotsTxt: openRobots, sitemapXml: validSitemap }),
@@ -52,8 +80,13 @@ describe('scoreCrawlability', () => {
     expect(missing?.severity).toBe('low');
     // The severity drop (2026-09-10) moves ranking and the report email's
     // critical|high filter — never the score. The pillar score comes from
-    // CHECKS alone: 0 llms + 30 aiAllowed + 20 sitemap + 10 referenced.
-    expect(result.score).toBe(60);
+    // CHECKS alone: 0 llms + 45 aiAllowed + 30 sitemap + 15 referenced.
+    //
+    // 60 → 90 on 2026-10-31 when the llms.txt checks fell 40 → 10 (ADR 0030
+    // §Open questions #4). A store missing llms.txt now forfeits 10, not 40:
+    // Shopify generates the file for every store, so the check was close to
+    // a constant and 40 points priced an edge case as a third of the pillar.
+    expect(result.score).toBe(90);
   });
 
   it('emits critical when robots.txt disallows all', () => {
