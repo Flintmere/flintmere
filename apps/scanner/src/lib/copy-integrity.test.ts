@@ -271,7 +271,11 @@ describe('no AI-agent mechanism claims in customer-facing copy', () => {
 
   // Customer-facing only. Admin console, API internals and tests are out of
   // scope — they are not read by a merchant.
-  const ROOTS = ['src/app', 'src/components'];
+  // src/lib joined on 2026-10-31: methodology-data.ts lives here, ships
+  // straight onto flintmere.com/methodology, and was carrying "the agents
+  // that aren't allowed to crawl your store can't recommend your products"
+  // the whole time this guard was green.
+  const ROOTS = ['src/app', 'src/components', 'src/lib'];
   const EXCLUDE = /(\.test\.|\/admin\/|\/api\/|__tests__)/;
 
   function customerFacingFiles(): string[] {
@@ -298,7 +302,12 @@ describe('no AI-agent mechanism claims in customer-facing copy', () => {
         readFileSync(file, 'utf8')
           .split('\n')
           .forEach((line, i) => {
-            if (re.test(line)) hits.push(`${file}:${i + 1} ${line.trim().slice(0, 100)}`);
+            // Comments are not customer-facing, and several of them quote a
+            // retired claim precisely to record why it went. Guarding those
+            // would force us to stop documenting our own corrections.
+            const t = line.trim();
+            if (t.startsWith('//') || t.startsWith('*') || t.startsWith('/*')) return;
+            if (re.test(line)) hits.push(`${file}:${i + 1} ${t.slice(0, 100)}`);
           });
       }
       expect(hits).toEqual([]);

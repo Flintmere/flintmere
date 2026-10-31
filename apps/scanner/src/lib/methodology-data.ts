@@ -112,8 +112,8 @@ export const PILLARS: Pillar[] = [
     name: 'Crawlability',
     weight: 5,
     measures:
-      'Whether your robots.txt allows the AI agents that increasingly arbitrate product discovery (GPTBot, ClaudeBot, PerplexityBot, etc.), whether your sitemap is present and references product URLs, and whether you publish an llms.txt artefact for AI-agent guidance.',
-    why: 'Discovery is shifting from search engines to AI agents. The agents that aren’t allowed to crawl your store can’t recommend your products. The crawlability pillar measures whether you’re ready for that.',
+      'Whether your robots.txt permits the named AI crawlers (GPTBot, ClaudeBot, PerplexityBot and others), whether your sitemap is present and declared in robots.txt, and whether you publish an llms.txt. Sub-checks: AI-crawler access (45% of pillar), sitemap present (30%), sitemap declared in robots.txt (15%), llms.txt present (8%), llms.txt well-formed (2%).',
+    why: 'Discovery is shifting toward AI assistants. A well-behaved crawler your robots.txt does not permit will not fetch your catalog, and llms.txt is a proposed convention no operator has confirmed reading — which is why it carries 10 points, not 40. We measure access, because access is checkable. What any assistant then does with your catalog, we do not claim to know.',
     sources:
       'IETF robots.txt specification, Schema.org sitemap conventions, llms.txt proposed convention (llmstxt.org).',
     installGated: false,
