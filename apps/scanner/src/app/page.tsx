@@ -507,7 +507,7 @@ export default function MarketingHome() {
           z:1 (matching the curtain-pair). */}
       <ScanCallout
         eyebrow="// your turn"
-        headline="Run the seven checks on your store."
+        headline="Score your store against all seven pillars."
       />
 
       {/* Chapter 2.9 — Ground truth (Merchant Center connection). Added
