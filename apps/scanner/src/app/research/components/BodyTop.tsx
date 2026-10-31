@@ -109,9 +109,8 @@ export function BodyTop({ data }: { data: Published }) {
             }}
           >
             FlintmereBot scans Shopify stores against the{' '}
-            <Bracket>seven checks</Bracket> AI shopping agents run — drawn
-            from published Shopify, GS1 UK, and Google Merchant Center
-            specs. We publish the aggregate numbers (score, grade
+            <Bracket>seven pillars</Bracket> — drawn from published Shopify,
+            GS1 UK, and Google Merchant Center specs. We publish the aggregate numbers (score, grade
             distribution, per-vertical gaps) and nothing else. No
             individual store is ever named.
             {data.available && !data.preview
@@ -225,7 +224,7 @@ export function BodyTop({ data }: { data: Published }) {
               >
                 <span className="sr-only">
                   {data.available && !data.preview
-                    ? 'Most Shopify catalogs fail half the checks an AI shopping agent runs before it recommends a store.'
+                    ? 'Most Shopify catalogs fail half of the seven pillars we score.'
                     : data.available
                       ? 'Early signal — the first Shopify catalogs are landing, and the gap between visible and structured data is already loud.'
                       : 'The headline number appears once the first bot scans complete.'}
@@ -233,7 +232,7 @@ export function BodyTop({ data }: { data: Published }) {
                 {(() => {
                   const sentence =
                     data.available && !data.preview
-                      ? 'Most Shopify catalogs fail half the checks an AI shopping agent runs before it recommends a store.'
+                      ? 'Most Shopify catalogs fail half of the seven pillars we score.'
                       : data.available
                         ? 'Early signal — the first Shopify catalogs are landing, and the gap between visible and structured data is already loud.'
                         : 'The headline number appears once the first bot scans complete.';
