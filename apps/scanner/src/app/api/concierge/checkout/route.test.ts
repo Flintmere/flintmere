@@ -262,4 +262,57 @@ describe('concierge checkout route', () => {
 
     vi.doUnmock('@/lib/stripe');
   });
+
+  // Gate A (2026-11-07) — the browser never names the price.
+  //
+  // /catalog-letter gained a real band picker on this date. Until then
+  // the band could only be changed by deep-link, so nothing in the UI
+  // posted a user-chosen band at all. Now something does, and the
+  // question "what if the page sends an amount too?" stops being
+  // hypothetical. The route must take the slug and nothing else:
+  // `amount`, `pricePence` and `priceDisplay` in the body are ignored,
+  // and the charge still comes from AUDIT_BANDS.
+  it('ignores an amount supplied by the client and charges the band price', async () => {
+    vi.resetModules();
+    process.env.STRIPE_SECRET_KEY = 'sk_test_dummy';
+
+    const create = vi.fn().mockResolvedValue({
+      id: 'pi_test_forged',
+      client_secret: 'pi_test_forged_secret',
+    });
+    vi.doMock('@/lib/stripe', () => ({
+      getStripe: () => ({
+        paymentIntents: { create },
+      }),
+    }));
+
+    const { POST } = await import('./route');
+
+    const res = await POST(
+      new Request('http://localhost/api/concierge/checkout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          email: 'merchant@store.com',
+          shopUrl: 'meridian-coffee.myshopify.com',
+          bandSlug: 'band-2',
+          // Everything below is the forgery: a Band 2 purchase at 1p.
+          amount: 1,
+          pricePence: 1,
+          priceDisplay: '£0.01',
+          currency: 'usd',
+        }),
+      }) as unknown as import('next/server').NextRequest,
+    );
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.amountPence).toBe(39700);
+
+    const args = create.mock.calls[0]![0] as Record<string, unknown>;
+    expect(args.amount).toBe(39700);
+    expect(args.currency).toBe('gbp');
+
+    vi.doUnmock('@/lib/stripe');
+  });
 });
