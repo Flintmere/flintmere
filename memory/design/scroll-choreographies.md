@@ -1,14 +1,14 @@
-# Scroll choreographies — the canonical seven
+# Scroll choreographies — the canonical eight
 
 > Editorial pages live or die by **rhythm**. A page that uses one motion register everywhere falls into a single key — readers tune out. A page that uses seven different mechanics with no logic is chaos. The goal is *one chord per chapter, no two adjacent chapters in the same key*.
 >
 > This document is the canonical reference. The `design-scroll-choreography` skill draws from it when choosing a mechanic for a new surface.
 
-**Last reviewed:** 2026-04-29 — added to canon after Apple iPhone 17 Pro reference walkthrough. **2026-04-29 update:** added #8 Live cascade highlight after chapter 4 (ManifestoChord) review surfaced a token-level reveal pattern not covered by the original seven.
+**Last reviewed:** 2026-11-07. **2026-04-29:** added to canon after Apple iPhone 17 Pro reference walkthrough, and added #8 Live cascade highlight after chapter 4 (ManifestoChord) review surfaced a token-level reveal pattern not covered by the original seven. **2026-11-07:** title and headings corrected from "seven" to "eight" — #8 was added in April and the count was never updated, so a document naming seven mechanics has been describing eight for six months. #8's recipe amended from a wall-clock stagger to a continuous scroll binding; see that entry.
 
 ---
 
-## The seven mechanics
+## The eight mechanics
 
 Each entry contains: **what**, **reads as**, **when to use**, **when not to use**, **implementation recipe**, **accessibility contract**, **performance note**, **canonical reference**.
 
@@ -425,7 +425,43 @@ const segments: Segment[] = [
 ];
 ```
 
-Render via `motion.span` per token with cascading delay:
+**Amended 2026-11-07.** The recipe below previously specified a wall-clock
+stagger — 350ms per token, fired once on entry, "no continuous scroll listener
+required." That is scroll-as-*trigger*, and it is the single mechanical reason
+Flintmere did not read as a motion site. A reference pass over five motion-led
+sites (The Pudding, Shopify Editions, Microsoft AI, BaseHub, Devouring Details)
+found all five share one method and Flintmere shared it with none of them:
+**they spend scroll distance as the animation's duration.** Each reserves a
+runway, then computes the animated property as a continuous function of the
+scroll offset inside it, recomputed every frame and reversible on scroll-back.
+Flintmere had 111 `[data-reveal]` boolean trips against four sticky positions.
+
+The cascade is therefore **a continuous function of scroll offset**, not a
+timed sequence. Write the progress to a CSS custom property on the section and
+let CSS consume it:
+
+```tsx
+// In an rAF-throttled scroll listener. NEVER React state — update() runs every
+// frame, and setState here rebuilds every segment span per frame (measured
+// 2026-11-07 at 4.02ms/frame against the 2ms budget; 1.91ms once removed).
+const progress = clamp01(-rect.top / (rect.height - window.innerHeight));
+section.style.setProperty('--prose-fade', String(localFade));
+```
+
+```css
+.prose-segment { opacity: calc(1 - var(--prose-fade, 0)); transition: opacity 0.05s linear; }
+```
+
+The 50ms transition is sub-perceptual smoothing between rAF samples on slow
+devices, not a duration — scroll offset remains the only thing deciding where
+the fade sits. The fallback value is the settled state, so a surface that never
+writes the property (reduced motion, or a non-JS path) renders correctly.
+
+Mobile translation: the runway can be a horizontal scroll-snap track rather
+than a pinned vertical one — swipe distance is then the duration. See
+`ManifestoMobileCascade`.
+
+The superseded wall-clock recipe, retained only to be recognised and replaced:
 
 ```tsx
 {segments.map((segment, i) => {
@@ -446,7 +482,7 @@ Render via `motion.span` per token with cascading delay:
 })}
 ```
 
-Stagger constants: **350ms per token** (canonical), **600ms initial delay** before first token (lets the prose settle). Total cascade time = `600 + tokens × 350`ms. For 4 tokens: ~2 seconds.
+~~Stagger constants: **350ms per token** (canonical), **600ms initial delay** before first token (lets the prose settle). Total cascade time = `600 + tokens × 350`ms. For 4 tokens: ~2 seconds.~~ **Retired 2026-11-07** — there are no timing constants in a scroll-bound cascade. The runway length is the duration. Budget runway, not milliseconds.
 
 Pair with #4 if multiple examples: pin the section, scroll progress drives example index, cascade re-fires on each index change via `key={index}` on the `motion.div` parent (forces remount).
 
@@ -460,8 +496,8 @@ Pair with #4 if multiple examples: pin the section, scroll progress drives examp
 **Performance:**
 - Per-token `motion.span` for the active example only (other examples not in DOM if combined with #4 + AnimatePresence)
 - Mount cost: ~4–6 motion components per cascade (typical token count)
-- Cascade fires on entry (or on state change in #4 hybrid); no continuous scroll listener required
-- Reduced-motion path skips the motion components entirely (cheaper render)
+- ~~Cascade fires on entry (or on state change in #4 hybrid); no continuous scroll listener required~~ — **retired 2026-11-07.** A continuous driver IS required; that is the mechanic. What is not required is React state: write the progress straight onto the node. Measured cost of getting this wrong, on the canonical implementation: 4.02ms/frame against a 2ms budget, halved to 1.91ms by removing the per-frame `setState`.
+- Reduced-motion path writes no property at all, so the CSS fallback renders the settled state. Prefer this "still by default" shape over relying on the global duration-scaling block — it is what the two reference sites that honour reduced motion best (The Pudding, Microsoft AI) do, and it cannot be defeated by a property the global block does not know how to scale.
 
 **Canonical reference:** Flintmere chapter 4 (ManifestoChord) — `apps/scanner/src/components/sections/ManifestoChord.tsx`. Demonstrates the cascade across three rotating product examples (Hadlow Hill / Camellia & Co. / Castelli Bros.), each with 4 token highlights staggered 350ms apart.
 
