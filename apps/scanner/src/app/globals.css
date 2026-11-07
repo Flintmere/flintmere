@@ -663,8 +663,16 @@
      uses its own .flintmere-footer-wordmark class with this pattern; this
      modifier is here for parity / future ink-surface anchors).
 
-   prefers-reduced-motion: inherits the global block at line 115 — animation
-   duration scales to 0.01ms so reduced-motion users get the still outline. */
+   The sweep is driven by SCROLL, not by a clock (2026-11-07) — see the
+   footer wordmark rule for the full rationale. Short version: `5s infinite`
+   is banned outright by motion.md §Bans, and the two shimmers together cost
+   ~0.18ms of CPU every frame forever (0.25ms/frame idle with them on against
+   0.07ms with them off, measured 2026-11-07).
+
+   prefers-reduced-motion: still by default — the animation is applied only
+   inside `no-preference`, so reduced-motion users get the resting outline
+   rather than a duration scaled to 0.01ms. Browsers without scroll-driven
+   animation support get the same resting outline. */
 .flintmere-outline-shimmer {
   color: transparent;
   paint-order: stroke fill;
@@ -684,7 +692,28 @@
   background-clip: text;
   -webkit-background-clip: text;
 
-  animation: flintmere-outline-shimmer-sweep 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  /* Resting state — highlight parked off the letterforms. */
+  background-position: 220% 0;
+}
+
+/* One sweep, on mount — NOT a scroll timeline. This mark is above the fold
+   (measured 2026-11-07: docTop 355 on the homepage at 1440), so it never
+   "enters" the scrollport and a view() timeline has already passed its entry
+   phase at scroll 0. Bound to view() it froze at 93% progress and stayed
+   there at every offset from 0 to 1400 — a sweep that existed and never moved.
+
+   motion.md §Bans forbids infinite animations, not finite ones: "every motion
+   has a trigger (mount, scroll-into-view, hover, focus, state change)". Mount
+   is the right trigger for an above-the-fold mark, and it is what the two
+   reference sites that do above-fold word reveals use (Microsoft AI,
+   Devouring Details — 2026-11-07 reference pass). It runs once and stops.
+
+   Still by default: applied only inside `no-preference`, so reduced-motion
+   users get the resting outline rather than a duration scaled to 0.01ms. */
+@media (prefers-reduced-motion: no-preference) {
+  .flintmere-outline-shimmer {
+    animation: flintmere-outline-shimmer-sweep 5s cubic-bezier(0.4, 0, 0.2, 1) 1 both;
+  }
 }
 
 .flintmere-outline-shimmer.on-ink {
@@ -780,12 +809,28 @@
 
    Outline: amber text-stroke at clamp(2-3px) for visibility at 80-160px text.
    Fill: linear-gradient highlight (warm amber tinted whitish at peak) clipped
-   to the letterforms via background-clip: text. Animates background-position
-   so the highlight sweeps diagonally through the wordmark every 5s.
+   to the letterforms via background-clip: text.
 
-   prefers-reduced-motion: the global block at line 115 scales animation-
-   duration to 0.01ms — the wordmark snaps to its still state (outline
-   visible, no sweep). */
+   The sweep is driven by SCROLL, not by a clock (2026-11-07). It was
+   `5s ... infinite`, which motion.md §Bans forbids outright ("No infinite
+   animations") and which cost ~0.18ms of CPU every frame, on every one of
+   the 28 pages that render the footer, forever — measured 2026-11-07 as
+   0.25ms/frame idle with both shimmers on against 0.07ms with them off.
+   Nothing triggered it and nothing ended it.
+
+   Now the highlight's position is a function of the footer's own transit
+   through the viewport, via animation-timeline: view(). No duration, no
+   iteration count, nothing running while the footer is off-screen, and
+   scrolling back sweeps it back. Same technique already shipping in
+   components/methodology/styles.ts.
+
+   Still by default: the animation is applied only inside
+   `prefers-reduced-motion: no-preference`, so reduced-motion users get the
+   resting state rather than a duration scaled to 0.01ms. That is the pattern
+   the 2026-11-07 reference pass found on the two sites that pin content and
+   still honour reduced motion best (The Pudding, Microsoft AI). Browsers
+   without scroll-driven animation support get the same resting state: a flat
+   amber outline, which is the canon mark anyway. */
 .flintmere-footer-wordmark {
   color: transparent;
   -webkit-text-stroke: clamp(2px, 0.18vw, 3px) var(--color-accent);
@@ -804,7 +849,29 @@
   background-clip: text;
   -webkit-background-clip: text;
 
-  animation: flintmere-footer-wordmark-shimmer 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  /* Resting state — highlight parked off the letterforms. */
+  background-position: 220% 0;
+}
+
+/* The footer uses the ROOT scroller, not view(). view() measures an element's
+   transit through the scrollport using its LAYOUT box — and this wordmark
+   lives in a position:sticky footer whose layout box sits at the very end of
+   the document, so view() reported the animation already complete at 80%,
+   93% and 100% of the page (measured 2026-11-07: background-position stuck at
+   -120% throughout). The sweep existed and was never visible.
+
+   Tying it to the last fifth of the page scroll gives the closing chord its
+   actual cue: the mark lights up as the reader arrives at the end. This also
+   behaves identically on the 27 pages where the footer is an ordinary block
+   and the one (the homepage) where it is the curtain. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .flintmere-footer-wordmark {
+      animation: flintmere-footer-wordmark-shimmer linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 80% 100%;
+    }
+  }
 }
 
 @keyframes flintmere-footer-wordmark-shimmer {
