@@ -34,6 +34,38 @@ function buildCookieStub(value?: string) {
   })
 }
 
+// Tamper by flipping the FIRST character, never the last.
+//
+// Both assertions below used to do `slice(0, -1) + 'A'`, which reds CI on
+// 6.29% of runs — about 1 in 16, measured over 20,000 signings. The obvious
+// reading is "appending 'A' is a no-op when the value already ends in 'A'",
+// and that is true, but it is not the whole defect.
+//
+// The real reason is that the LAST character of a base64url HMAC carries
+// almost no information. HMAC-SHA256 is 32 bytes = 256 bits, which encodes
+// as 43 base64url characters = 258 bits. The final character therefore holds
+// only 4 significant bits; its low 2 bits are padding that the decoder
+// discards. So ANY edit confined to that character can leave the decoded
+// bytes identical — the string differs, the HMAC does not, and
+// verifySession correctly returns a session.
+//
+// That is a trap: replacing 'A' with 'B' there (index 0 -> index 1) changes
+// only a discarded bit and fails in precisely the same 1-in-16 case. The
+// first character has all 6 bits significant, so flipping it always changes
+// the decoded bytes.
+//
+// Measured on the old code: the HMAC's last character takes 16 distinct
+// values and is 'A' 6.29% of the time. The payload's last character takes
+// exactly ONE value across 20,000 signings and is never 'A' — so the payload
+// assertion never actually failed. It was latently wrong, and would have
+// started failing the day the payload's length changed.
+//
+// Same family as the OTP entropy check fixed in #128 (04ca7b4): an assertion
+// whose input is only usually what it claims to be.
+function tamperFirstChar(value: string): string {
+  return (value.startsWith('A') ? 'B' : 'A') + value.slice(1)
+}
+
 describe('signSession + verifySession', () => {
   it('round-trips a payload', () => {
     const payload = fixedPayload()
@@ -46,14 +78,16 @@ describe('signSession + verifySession', () => {
     const cookie = signSession(fixedPayload(), SECRET)
     const [payloadB64, hmac] = cookie.split('.')
     // Flip one char of the payload — HMAC should no longer match.
-    const tampered = `${payloadB64!.slice(0, -1)}A.${hmac}`
+    const tampered = `${tamperFirstChar(payloadB64!)}.${hmac}`
+    expect(tampered).not.toBe(cookie)
     expect(verifySession(tampered, SECRET)).toBeNull()
   })
 
   it('rejects a tampered HMAC', () => {
     const cookie = signSession(fixedPayload(), SECRET)
     const [payload, hmac] = cookie.split('.')
-    const tampered = `${payload}.${hmac!.slice(0, -1)}A`
+    const tampered = `${payload}.${tamperFirstChar(hmac!)}`
+    expect(tampered).not.toBe(cookie)
     expect(verifySession(tampered, SECRET)).toBeNull()
   })
 
