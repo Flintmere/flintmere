@@ -15,11 +15,16 @@ import type { Example } from './ManifestoChord';
  * hold) while the amber data-tokens stay lit ("only structured data
  * registers"). The swipe is the advance the desktop got from scroll.
  *
- * IntersectionObserver (root = the track) marks the most-visible card active;
- * the CSS (.manifesto-mobile-card.is-active) drives the prose fade. Under
- * reduced-motion the fade is skipped (prose stays readable) but the snap
- * carousel — being structural — remains. An sr-only prose copy per card keeps
- * the content narrated regardless of fade state.
+ * IntersectionObserver (root = the track) marks the most-visible card active,
+ * which drives the dots, the counter and aria-current. The prose fade is
+ * separate and continuous: --prose-fade is a function of each card's distance
+ * from the centre of the track, so swipe distance is the duration and a
+ * half-swipe shows half-faded prose (2026-11-07 — was a boolean .is-active
+ * class plus a 700ms transition the gesture did not control). Under
+ * reduced-motion the property is never written and the fallback keeps the
+ * prose fully readable, while the snap carousel — being structural —
+ * remains. An sr-only prose copy per card keeps the content narrated
+ * regardless of fade state.
  *
  * Containment: the track lives inside .flintmere-curtain-pair, whose
  * relative/isolate context lets a scroll container's overflow leak page width;
@@ -64,6 +69,63 @@ export function ManifestoMobileCascade({
     return () => io.disconnect();
   }, []);
 
+  // Continuous swipe binding (2026-11-07). The observer above still picks
+  // `active` for the dots, the counter and aria-current — a discrete value
+  // that changes three times across the track, which is the right job for
+  // React state. The prose fade is not that job. It is a continuous function
+  // of how near a card sits to the centre of the track, written straight onto
+  // each card element so the gesture drives it frame by frame and reverses
+  // when you swipe back. Never React state: that would re-render three cards
+  // and all 24 segment spans per frame, which is what the desktop chapter was
+  // measured doing at 4.02ms/frame before 2026-11-07.
+  //
+  // Replaces `.is-active` + a 700ms transition with a 480ms delay. That made
+  // the swipe a boolean trigger for a wall-clock animation the gesture no
+  // longer controlled — scroll-as-trigger rather than scroll-as-duration, the
+  // inversion that kept Flintmere from reading as a motion site.
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || reducedMotion) return;
+    const cards = Array.from(track.querySelectorAll<HTMLElement>('[data-card]'));
+    if (cards.length === 0) return;
+
+    const update = () => {
+      const trackRect = track.getBoundingClientRect();
+      const mid = trackRect.left + trackRect.width / 2;
+      // Read every rect before writing any property — interleaving them
+      // forces a reflow per card.
+      const fades = cards.map((card) => {
+        const r = card.getBoundingClientRect();
+        const centre = r.left + r.width / 2;
+        // Reach = one card width, so a single swipe spends exactly one card
+        // of distance: fully faded at the centre, fully restored a card away.
+        const reach = r.width || trackRect.width || 1;
+        return Math.max(0, Math.min(1, 1 - Math.abs(centre - mid) / reach));
+      });
+      cards.forEach((card, i) => {
+        card.style.setProperty('--prose-fade', String(fades[i]));
+      });
+    };
+
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        update();
+      });
+    };
+
+    update();
+    track.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    return () => {
+      track.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [reducedMotion]);
+
   const goTo = (i: number) => {
     const card = trackRef.current?.querySelector<HTMLElement>(
       `[data-index="${i}"]`,
@@ -89,9 +151,7 @@ export function ManifestoMobileCascade({
             key={i}
             data-card
             data-index={i}
-            className={`manifesto-mobile-card${
-              !reducedMotion && i === active ? ' is-active' : ''
-            }`}
+            className="manifesto-mobile-card"
             aria-roledescription="slide"
             aria-label={`${i + 1} of ${examples.length} — ${ex.category}`}
           >
