@@ -20,10 +20,13 @@
  * Implementation:
  *   - Plain rAF-throttled scroll listener (proven pattern from chapter 2
  *     pillar wheel). No Framer Motion timing dependencies.
- *   - Single CSS custom property `--prose-fade` on the section drives
- *     prose opacity via the `.manifesto-prose-segment` rule in globals.css
- *   - Paragraph re-mounts on key={exampleIndex} with a CSS entrance
- *     animation (manifesto-paragraph-enter)
+ *   - Three CSS custom properties — `--prose-fade`, `--local`, `--overall` —
+ *     written straight onto the section node each frame (never React state;
+ *     that rebuilt all 24 segment spans per frame). Read by
+ *     `.manifesto-prose-segment`, `.manifesto-paragraph` and the closing
+ *     caption in globals.css.
+ *   - Paragraph entrance is a function of `--local`, not a keyframe, so it
+ *     reverses on scroll-back instead of replaying a timer
  *   - Tokens use <strong> for semantic emphasis to assistive tech
  *
  * Accessibility:
@@ -148,9 +151,8 @@ function renderSegments(ex: Example): ReactNode {
 
 export function ManifestoChord() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const [exampleIndex, setExampleIndex] = useState(0);
-  const [fade, setFade] = useState(0);
-  const [overall, setOverall] = useState(0);
   const reducedMotion = useReducedMotion() ?? false;
   // Small-viewport detection (added 2026-05-11 after operator caught the
   // scroll-driven cascade rendering as a fragmented wall of multi-line
@@ -177,14 +179,19 @@ export function ManifestoChord() {
   const useStaticLayout = reducedMotion || isSmallViewport;
 
   useEffect(() => {
-    if (useStaticLayout) {
-      setFade(1);
-      setOverall(1);
-      return;
-    }
+    if (useStaticLayout) return;
+    // Scroll drives three custom properties written straight onto the sticky
+    // node. Deliberately NOT React state: update() runs every frame, and
+    // setState here re-rendered the section and rebuilt all 24 segment spans
+    // per frame — measured 2026-11-07 at 10.78ms/frame at 1440, joint-worst
+    // region on the homepage against a 2ms budget. The properties are read by
+    // .manifesto-prose-segment and .manifesto-paragraph in globals.css, so the
+    // value only ever needed to reach CSS. exampleIndex stays in React: it
+    // changes three times across 400vh, not sixty times a second.
     const update = () => {
       const node = containerRef.current;
-      if (!node) return;
+      const section = sectionRef.current;
+      if (!node || !section) return;
       const rect = node.getBoundingClientRect();
       const range = rect.height - window.innerHeight;
       if (range <= 0) return;
@@ -198,9 +205,10 @@ export function ManifestoChord() {
       // to absorb the end-state before the example swaps.
       const localFade = Math.min(1, localProgress / 0.7);
 
-      setExampleIndex(ei);
-      setFade(localFade);
-      setOverall(progress);
+      section.style.setProperty('--prose-fade', String(localFade));
+      section.style.setProperty('--overall', String(progress));
+      section.style.setProperty('--local', String(localProgress));
+      setExampleIndex((prev) => (prev === ei ? prev : ei));
     };
 
     let raf = 0;
@@ -255,7 +263,7 @@ export function ManifestoChord() {
               renderSegments={renderSegments}
               reducedMotion={reducedMotion}
             />
-            <ClosingCaption opacity={1} />
+            <ClosingCaption />
           </div>
         </section>
       );
@@ -315,7 +323,7 @@ export function ManifestoChord() {
               </li>
             ))}
           </ol>
-          <ClosingCaption opacity={1} />
+          <ClosingCaption />
         </div>
       </section>
     );
@@ -330,6 +338,7 @@ export function ManifestoChord() {
       }}
     >
       <section
+        ref={sectionRef}
         id="manifesto"
         aria-labelledby="manifesto-heading"
         style={{
@@ -346,7 +355,10 @@ export function ManifestoChord() {
           paddingTop: 'clamp(56px, 8vh, 112px)',
           paddingBottom: 'clamp(56px, 8vh, 112px)',
           overflow: 'hidden',
-          ['--prose-fade' as string]: fade,
+          // --prose-fade / --overall / --local are set imperatively in the
+          // rAF above. They are deliberately absent from this style object:
+          // React would reset them to their initial value on every
+          // exampleIndex re-render, flashing the cascade at each boundary.
         }}
       >
         <div className="mx-auto w-full max-w-[1100px]">
@@ -369,11 +381,14 @@ export function ManifestoChord() {
             // {example.numeral} of {String(EXAMPLES.length).padStart(2, '0')} — {example.category}
           </p>
 
-          {/* The paragraph — re-mounted per example via key={exampleIndex}.
-              Prose spans fade via --prose-fade; tokens remain. Entrance
-              animation defined in globals.css §manifesto-paragraph-enter. */}
+          {/* The paragraph — prose spans fade via --prose-fade; tokens stay
+              lit. Entrance is bound to --local in globals.css. */}
+          {/* No key={exampleIndex}: remounting restarted a 360ms wall-clock
+              keyframe, the one discontinuity in an otherwise scroll-bound
+              chapter — scrolling back across a boundary replayed a timed
+              entrance instead of reversing. The entrance is now a function of
+              --local (see .manifesto-paragraph in globals.css). */}
           <p
-            key={exampleIndex}
             className="font-sans manifesto-paragraph"
             aria-live="polite"
             style={{
@@ -393,7 +408,7 @@ export function ManifestoChord() {
           {/* Closing caption — opacity rises with overall progress, so it
               gains presence as the cascade plays out three times. By the
               end of the runway, it's fully resolved. */}
-          <ClosingCaption opacity={Math.max(0.3, overall)} />
+          <ClosingCaption />
         </div>
       </section>
     </div>
@@ -436,7 +451,12 @@ function ManifestoHeading() {
   );
 }
 
-function ClosingCaption({ opacity }: { opacity: number }) {
+// Opacity rises with --overall, which scroll sets directly. Previously this
+// took a React prop and carried `transition: opacity var(--duration-short)`,
+// i.e. a wall-clock ease layered on a value scroll already controlled — the
+// two smoothings fought each other on fast scrolls. --overall defaults to 1
+// so the static and mobile branches, which never set it, render fully lit.
+function ClosingCaption() {
   return (
     <p
       className="font-mono uppercase"
@@ -447,8 +467,7 @@ function ClosingCaption({ opacity }: { opacity: number }) {
         color: 'var(--color-ink)',
         fontWeight: 700,
         lineHeight: 1.6,
-        opacity,
-        transition: 'opacity var(--duration-short) linear',
+        opacity: 'max(0.3, var(--overall, 1))',
       }}
     >
       // this is a product, read as data.

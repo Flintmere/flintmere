@@ -1368,25 +1368,32 @@
    "[ catalogs as data ]. Or catalogs as prose." — structured tokens
    register; marketing prose does not.
    Three sequential cascades (one per example) play across the section's
-   300vh runway. --prose-fade is set on the section via inline style;
-   React updates it from the rAF-throttled scroll listener. Inherited by
-   descendants. See apps/scanner/src/components/sections/ManifestoChord.tsx
-   for the full council rationale + reduced-motion contract. */
+   300vh runway. --prose-fade is written straight onto the section node from
+   the rAF-throttled scroll listener — NOT via React state, which re-rendered
+   all 24 segment spans every frame. Inherited by descendants. See
+   apps/scanner/src/components/sections/ManifestoChord.tsx for the full
+   council rationale + reduced-motion contract.
+   The 50ms transition stays: it smooths between rAF samples on slow devices,
+   where frames land 16–30ms apart and raw per-frame opacity steps are
+   visible. It is sub-perceptual smoothing, not a wall-clock duration — the
+   scroll offset remains the only thing that decides where the fade sits. */
 .manifesto-prose-segment {
   opacity: calc(1 - var(--prose-fade, 0));
   transition: opacity 0.05s linear;
 }
 
-/* Paragraph entrance — when exampleIndex changes, the paragraph re-mounts
-   via key, and this animation plays. Gives a soft fade-in at the boundary
-   between examples so the new paragraph doesn't snap into existence.
-   Reduced-motion users skip the cascade entirely (rendered statically). */
+/* Paragraph entrance — a function of --local (0→1 within the current
+   example's 100vh slice), not a wall-clock keyframe. Was a 360ms
+   manifesto-paragraph-enter animation restarted by key={exampleIndex}: it
+   replayed on every boundary crossing, including backwards, which was the
+   one discontinuity in an otherwise scroll-bound chapter. The paragraph now
+   settles over the first 12% of its slice and un-settles on scroll-back.
+   --local defaults to 1, so the mobile carousel and the reduced-motion
+   static branch — neither of which sets it — render fully settled. */
 .manifesto-paragraph {
-  animation: manifesto-paragraph-enter 360ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-@keyframes manifesto-paragraph-enter {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  --enter: min(1, max(0, calc(var(--local, 1) / 0.12)));
+  opacity: var(--enter);
+  transform: translateY(calc((1 - var(--enter)) * 12px));
 }
 
 /* --- Manifesto mobile cascade — swipe-snap carousel (2026-06-21) ---
