@@ -34,6 +34,15 @@ export interface AuditBand {
   pricePence: number | null
   /** Display string ("£197" / "£397" / "From £597 — bespoke quote"). */
   priceDisplay: string
+  /**
+   * Short display string for narrow controls — the band picker's price
+   * column at 375px, where `priceDisplay`'s bespoke form wraps to three
+   * lines. Added 2026-11-07 with the /catalog-letter band picker, so
+   * that control derives its price here rather than hardcoding a
+   * shorter literal of its own. Any surface tight on width uses this;
+   * nothing invents a third form.
+   */
+  priceDisplayShort: string
   /** Operator-time estimate per audit. */
   hoursEstimate: string
   /** Deliverable shape. */
@@ -59,6 +68,7 @@ export const AUDIT_BANDS: AuditBand[] = [
     skuUpperBound: 1500,
     pricePence: 19700,
     priceDisplay: '£197',
+    priceDisplayShort: '£197',
     hoursEstimate: '3–5 hours',
     deliverable: {
       auditScope: 'full',
@@ -74,6 +84,7 @@ export const AUDIT_BANDS: AuditBand[] = [
     skuUpperBound: 5000,
     pricePence: 39700,
     priceDisplay: '£397',
+    priceDisplayShort: '£397',
     hoursEstimate: '5–7 hours',
     deliverable: {
       auditScope: 'full',
@@ -89,6 +100,7 @@ export const AUDIT_BANDS: AuditBand[] = [
     skuUpperBound: null,
     pricePence: null,
     priceDisplay: 'From £597 — bespoke quote',
+    priceDisplayShort: 'From £597',
     hoursEstimate: '7+ hours',
     deliverable: {
       auditScope: 'representative-sample',

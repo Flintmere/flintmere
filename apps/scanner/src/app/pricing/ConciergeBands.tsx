@@ -32,8 +32,8 @@ export function ConciergeBands() {
         style={{
           paddingLeft: 'clamp(24px, 4vw, 64px)',
           paddingRight: 'clamp(24px, 4vw, 64px)',
-          paddingTop: 'clamp(64px, 8vw, 112px)',
-          paddingBottom: 'clamp(64px, 8vw, 112px)',
+          paddingTop: 'clamp(32px, 8vw, 112px)',
+          paddingBottom: 'clamp(48px, 8vw, 112px)',
         }}
       >
         <p className="eyebrow mb-6">The Catalog Letter · Available now · One-off</p>
@@ -47,7 +47,7 @@ export function ConciergeBands() {
         <p
           className="text-[color:var(--color-ink-2)]"
           style={{
-            marginTop: 'clamp(20px, 2.5vw, 32px)',
+            marginTop: 'clamp(14px, 2.5vw, 32px)',
             maxWidth: '60ch',
             fontSize: 16,
             lineHeight: 1.55,
@@ -73,7 +73,7 @@ export function ConciergeBands() {
         <ViewportReveal>
           <div
             className="grid grid-cols-1 md:grid-cols-3 gap-6"
-            style={{ marginTop: 'clamp(40px, 5vw, 64px)' }}
+            style={{ marginTop: 'clamp(24px, 5vw, 64px)' }}
           >
             {AUDIT_BANDS.map((band, i) => (
               <BandCard key={band.slug} band={band} revealDelay={i * 120} />
@@ -99,9 +99,8 @@ function BandCard({ band, revealDelay }: { band: AuditBand; revealDelay: number 
     <article
       data-reveal
       data-hover-lift
-      className="border border-[color:var(--color-line)] bg-[color:var(--color-paper)] p-6 flex flex-col"
+      className="border border-[color:var(--color-line)] bg-[color:var(--color-paper)] p-6 flex flex-col md:min-h-[360px]"
       style={{
-        minHeight: 360,
         ['--reveal-delay' as string]: `${revealDelay}ms`,
       }}
       aria-labelledby={`concierge-${band.slug}-name`}
@@ -130,7 +129,7 @@ function BandCard({ band, revealDelay }: { band: AuditBand; revealDelay: number 
         {band.skuRangeLabel}
       </p>
       <ul
-        className="mt-6 list-none p-0 m-0 space-y-2 text-[color:var(--color-ink-2)]"
+        className="order-2 md:order-none mt-6 list-none p-0 m-0 space-y-2 text-[color:var(--color-ink-2)]"
         style={{ fontSize: 13, lineHeight: 1.5 }}
       >
         <li className="flex gap-3">
@@ -158,8 +157,7 @@ function BandCard({ band, revealDelay }: { band: AuditBand; revealDelay: number 
       </ul>
       <Link
         href={ctaHref}
-        className="btn btn-accent mt-auto"
-        style={{ marginTop: 'auto' }}
+        className="btn btn-accent order-1 md:order-none mt-5 md:mt-auto"
       >
         {ctaLabel}
       </Link>

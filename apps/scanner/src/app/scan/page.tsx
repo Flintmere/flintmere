@@ -16,10 +16,13 @@
  * the running text orbits it.
  */
 
+import Link from 'next/link';
 import { useState } from 'react';
 import { Bracket, SiteFooter } from '@flintmere/ui';
 import { EmailGate } from '@/components/EmailGate';
 import { ScanForm } from '@/components/ScanForm';
+import { bandPriceLine } from '@/lib/audit-pricing';
+import { AUDIT_URL } from '@/lib/host-routing';
 import { BenchmarkOptIn } from '@/components/scan/BenchmarkOptIn';
 import { ErrorBlock } from '@/components/scan/ErrorBlock';
 import { PublicPageOptIn } from '@/components/scan/PublicPageOptIn';
@@ -134,6 +137,44 @@ export default function ScanPage() {
               isSubmitting={state.phase === 'scanning'}
             />
           </div>
+
+          {/* What comes after the free read. Measured 2026-11-07: the only
+              "£" on this page at 375x812 was the footer link, 1.09 screens
+              down — so the acquisition surface named no price for the thing
+              it acquires people for. Deliberately BELOW the form, not beside
+              it: the scan is free, and a price next to a free button reads
+              as the price of the free button. Price comes from
+              `bandPriceLine`, never a literal, so the band ladder stays one
+              source of truth (ADR 0022). "Three working days" matches
+              `lib/concierge-deliverable.ts`, the canonical string. */}
+          {state.phase !== 'complete' ? (
+            <p
+              className="font-sans"
+              style={{
+                marginTop: 'clamp(28px, 3vw, 40px)',
+                maxWidth: '52ch',
+                fontSize: 15,
+                lineHeight: 1.6,
+                color: 'var(--color-mute)',
+              }}
+            >
+              Free scan, free result. If you want the fixes written for you,
+              the{' '}
+              <Link
+                href={AUDIT_URL}
+                prefetch={false}
+                className="underline text-[color:var(--color-ink)]"
+                style={{
+                  textDecorationColor: 'var(--color-accent)',
+                  textUnderlineOffset: 4,
+                }}
+              >
+                Catalog Letter
+              </Link>{' '}
+              starts at {bandPriceLine('band-1')} &mdash; we read your catalog
+              product by product and send it in three working days.
+            </p>
+          ) : null}
         </div>
       </section>
 

@@ -81,3 +81,50 @@ describe('bandPriceLine', () => {
     expect(bandPriceLine('band-3')).toBe('From £597 — bespoke quote')
   })
 })
+
+// Gate C (2026-11-07) — every price a merchant reads comes from this
+// module. The /catalog-letter band picker and the /scan follow-on line
+// were the two surfaces added with the conversion-floor work, and both
+// are one careless edit away from a literal "£197" that keeps reading
+// correctly after `pricePence` moves. These assertions turn that edit
+// red: the displayed pounds must be the charged pence.
+describe('display strings agree with the charged amount', () => {
+  function poundsFrom(display: string): number | null {
+    const m = display.match(/£([\d,]+)/)
+    return m ? Number(m[1]!.replace(/,/g, '')) : null
+  }
+
+  it('priceDisplay and priceDisplayShort both match pricePence', () => {
+    for (const band of AUDIT_BANDS) {
+      const long = poundsFrom(band.priceDisplay)
+      const short = poundsFrom(band.priceDisplayShort)
+      expect(long, `${band.slug} priceDisplay has no £ amount`).not.toBeNull()
+      expect(short, `${band.slug} priceDisplayShort has no £ amount`).not.toBeNull()
+      // Both forms quote the same number as each other...
+      expect(short).toBe(long)
+      // ...and, where Stripe is charged, the same number as the charge.
+      if (band.pricePence !== null) {
+        expect(long! * 100).toBe(band.pricePence)
+      }
+    }
+  })
+
+  it('the short form stays short enough for a 375px price column', () => {
+    for (const band of AUDIT_BANDS) {
+      // "From £597" is 9 characters; the long bespoke form is 25 and
+      // wraps to three lines in the picker's right-hand lane. 14 is the
+      // ceiling that fits beside the longest SKU-range label.
+      expect(
+        band.priceDisplayShort.length,
+        `${band.slug} short form is too long for the band picker`,
+      ).toBeLessThanOrEqual(14)
+    }
+  })
+
+  it('the bespoke band never quotes a flat price', () => {
+    const bespoke = AUDIT_BANDS.find((b) => b.isBespoke)!
+    expect(bespoke.priceDisplay.toLowerCase()).toContain('from')
+    expect(bespoke.priceDisplayShort.toLowerCase()).toContain('from')
+    expect(bespoke.pricePence).toBeNull()
+  })
+})

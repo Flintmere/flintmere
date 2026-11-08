@@ -80,11 +80,11 @@ export default function Pricing() {
           style={{
             paddingLeft: 'clamp(24px, 4vw, 64px)',
             paddingRight: 'clamp(24px, 4vw, 64px)',
-            paddingTop: 'clamp(72px, 9vw, 128px)',
-            paddingBottom: 'clamp(48px, 6vw, 96px)',
+            paddingTop: 'clamp(36px, 9vw, 128px)',
+            paddingBottom: 'clamp(28px, 6vw, 96px)',
           }}
         >
-          <p className="eyebrow mb-10">Pricing</p>
+          <p className="eyebrow mb-5 md:mb-10">Pricing</p>
           <h1
             id="pricing-heading"
             className="font-sans tracking-[-0.04em] leading-[0.92] text-[color:var(--color-ink)] max-w-[18ch]"
@@ -97,7 +97,7 @@ export default function Pricing() {
           <p
             className="font-sans"
             style={{
-              marginTop: 'clamp(32px, 4vw, 56px)',
+              marginTop: 'clamp(18px, 4vw, 56px)',
               maxWidth: '58ch',
               fontSize: 'clamp(15px, 1.1vw, 17px)',
               lineHeight: 1.55,
@@ -283,12 +283,16 @@ export default function Pricing() {
             <p className="mt-4">
               <Link
                 href="/methodology"
-                className="underline"
+                className="underline inline-flex items-center"
                 style={{
                   fontSize: 14,
                   color: 'var(--color-paper-on-ink)',
                   opacity: 0.7,
                   textUnderlineOffset: 4,
+                  // WCAG 2.5.8: a link standing alone in a column is a
+                  // target, not prose. 18px tall measured at 375x812 on
+                  // 2026-11-07 — the only one left on this page.
+                  minHeight: 24,
                 }}
               >
                 Read how we maintain it →

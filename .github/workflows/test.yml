@@ -1,0 +1,90 @@
+# Typecheck + unit tests.
+#
+# Added 2026-11-07. Until now CI ran two jobs — `lint` and the Playwright
+# `mobile-reflow` suite — and neither executed `tsc` or vitest. 1,240 unit
+# tests across five packages ran only on whoever's laptop remembered to
+# run them, so a test could sit red on main indefinitely and every PR
+# would still go green. Found while adding the band-picker gate tests
+# (PR #131): two of the three gates written that day were vitest tests
+# CI would never have run, which makes them notes to self rather than
+# gates.
+#
+# Two jobs rather than extra steps on `lint`, so a red check names which
+# thing broke. `cache: pnpm` is already warm from the lint workflow, so
+# the second install is cheap.
+
+name: test
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages
+        run: pnpm -r --filter "@flintmere/*" build
+
+      # scanner imports `@/generated/prisma` for its types; without this
+      # step tsc fails on the missing module rather than on real errors.
+      - name: Generate Prisma client
+        run: pnpm --filter scanner prisma:generate
+
+      # shopify-app is EXCLUDED, and this is a known debt, not an
+      # oversight. It fails with TS2786 "'Link' cannot be used as a JSX
+      # component" because two @types/react versions resolve in the same
+      # tree — Remix pulls 18.3.28 while the workspace root is on
+      # 19.2.14, and `bigint` in React 19's ReactNode makes the two
+      # structurally incompatible. That is a dependency-resolution fix
+      # (a pnpm override, or aligning Remix's React), not a type error
+      # in anybody's code, and it predates this workflow. Running it
+      # here would ship a job that is red on arrival, which teaches
+      # people to ignore the check. Drop the filter once the override
+      # lands; its own tests DO run in the `test` job below.
+      - name: Typecheck
+        run: pnpm -r --filter '!shopify-app' typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages
+        run: pnpm -r --filter "@flintmere/*" build
+
+      - name: Generate Prisma client
+        run: pnpm --filter scanner prisma:generate
+
+      # All five packages, shopify-app included — its 28 tests pass; only
+      # its typecheck is blocked. 1,240 tests at the time of writing.
+      - name: Unit tests
+        run: pnpm -r test

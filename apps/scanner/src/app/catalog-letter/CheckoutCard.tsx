@@ -45,6 +45,7 @@ import {
   type AuditBand,
   type AuditBandSlug,
 } from '@/lib/audit-pricing';
+import { BandPicker } from './BandPicker';
 
 const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
@@ -64,7 +65,7 @@ type CardState =
 interface CheckoutCardProps {
   /** Selected band slug — controlled by the BandTriptych above. */
   bandSlug: AuditBandSlug;
-  /** Lift selection back up — bespoke-fork advisory uses this hint. */
+  /** Lift selection back up — the BandPicker below calls this. */
   onBandChange: (slug: AuditBandSlug) => void;
 }
 
@@ -128,7 +129,7 @@ const APPEARANCE: Appearance = {
   },
 };
 
-export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: CheckoutCardProps) {
+export function CheckoutCard({ bandSlug, onBandChange }: CheckoutCardProps) {
   const [email, setEmail] = useState('');
   const [shopUrl, setShopUrl] = useState('');
   const [state, setState] = useState<CardState>({ kind: 'collect' });
@@ -313,6 +314,7 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
   if (selectedBand?.isBespoke) {
     return (
       <CardShell>
+        <BandPicker bandSlug={bandSlug} onBandChange={onBandChange} />
         <div style={{ padding: '28px 32px 32px 32px' }}>
           <p
             className="font-mono uppercase"
@@ -366,6 +368,7 @@ export function CheckoutCard({ bandSlug, onBandChange: _onBandChange }: Checkout
 
   return (
     <CardShell>
+      <BandPicker bandSlug={bandSlug} onBandChange={onBandChange} />
       <form ref={formRef} onSubmit={handleStart} style={{ padding: '28px 32px 32px 32px' }}>
         <div style={{ display: 'grid', gap: 18 }}>
           <div>

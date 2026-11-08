@@ -70,15 +70,19 @@ export function BandTriptych() {
 
   const selected = AUDIT_BANDS.find((b) => b.slug === bandSlug)!;
 
+  // `track` stays out of the state updater. React invokes updaters
+  // twice under StrictMode, so an analytics call inside one double-
+  // counts in development. Harmless while nothing called this — the
+  // handler was passed to CheckoutCard and dropped, so `band_switched`
+  // had never fired at all. The BandPicker (2026-11-07) calls it for
+  // real, so the side effect moves out to the event.
   const handleBandChange = useCallback(
     (next: AuditBandSlug) => {
-      setBandSlug((prev) => {
-        if (prev === next) return prev;
-        track('band_switched', { from: prev, to: next });
-        return next;
-      });
+      if (next === bandSlug) return;
+      track('band_switched', { from: bandSlug, to: next });
+      setBandSlug(next);
     },
-    [],
+    [bandSlug],
   );
 
   // Selected band drives the heroic price chord + the value-prop
