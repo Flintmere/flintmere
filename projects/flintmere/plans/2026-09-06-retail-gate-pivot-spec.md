@@ -318,5 +318,15 @@ are not lost:
 - `memory/marketing/audiences.md` — the SKU/revenue contradiction resolved in §2,
   plus the stale £399 Agency price and "Enterprise" naming already flagged in its
   own changelog.
-- `memory/canon-source-register.md` — cites nine `feedback_*.md` files that do not
-  exist, so the CLAUDE.md binding degrades silently on every dispatch.
+- ~~`memory/canon-source-register.md` — cites nine `feedback_*.md` files that do not
+  exist, so the CLAUDE.md binding degrades silently on every dispatch.~~
+  **Closed 2026-11-08, and the finding was wrong twice over.** The count was
+  fifteen citations across thirteen filenames, not nine. And the files are not
+  missing: they are operator memory in
+  `~/.claude/projects/-Users-abuaa-Projects-Flintmere/memory/`, which the register
+  cited by bare filename with no directory, so a repo-wide search found nothing.
+  Eleven resolved unchanged once the directory was declared; two were cited under a
+  `feedback_` prefix when the files carry `project_`. None is lost, and git history
+  holds no `feedback_*` path in any tree because none was ever a repo file. The
+  register now declares the directory and carries a dated repair note. The binding
+  did read a shorter list than it specifies for six months — that part stands.
