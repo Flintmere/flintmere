@@ -42,10 +42,20 @@ jobs:
       - name: Build workspace packages
         run: pnpm -r --filter "@flintmere/*" build
 
-      # scanner imports `@/generated/prisma` for its types; without this
-      # step tsc fails on the missing module rather than on real errors.
-      - name: Generate Prisma client
-        run: pnpm --filter scanner prisma:generate
+      # BOTH apps generate a Prisma client, and both are gitignored, so a
+      # fresh checkout has neither. scanner imports `@/generated/prisma`;
+      # shopify-app's `app/db.server.ts` imports `./generated/prisma`
+      # (schema.prisma sets a per-app `output` so the two clients can
+      # coexist in pnpm's hoisted node_modules). Without this step tsc
+      # and vitest fail on the missing module rather than on real errors.
+      #
+      # This was `--filter scanner` on the first push and reddened `test`:
+      # shopify-app's brand-from-vendor.test.ts pulls in db.server.ts, so
+      # that suite failed to load (22 of 28 tests ran). It passed locally
+      # only because both generated directories were already on disk —
+      # precisely the class of defect CI exists to catch.
+      - name: Generate Prisma clients
+        run: pnpm -r prisma:generate
 
       # shopify-app is EXCLUDED, and this is a known debt, not an
       # oversight. It fails with TS2786 "'Link' cannot be used as a JSX
@@ -81,8 +91,9 @@ jobs:
       - name: Build workspace packages
         run: pnpm -r --filter "@flintmere/*" build
 
-      - name: Generate Prisma client
-        run: pnpm --filter scanner prisma:generate
+      # Both clients — see the longer note in the typecheck job above.
+      - name: Generate Prisma clients
+        run: pnpm -r prisma:generate
 
       # All five packages, shopify-app included — its 28 tests pass; only
       # its typecheck is blocked. 1,240 tests at the time of writing.
