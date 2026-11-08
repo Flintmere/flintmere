@@ -97,7 +97,9 @@ The scanner is therefore the whole public surface, and it is interim by construc
 
 The register itself is repaired as of 2026-11-08: the directory is declared, the two prefixes are corrected, and the maintenance trigger now demands an existence check. The pivot spec §10, which flagged nine of these as reconciliation owed, is closed against the verified counts.
 
-**What is not fixed, and is an operator call:** the binding's sources are machine-local. They sit outside the repository, outside review and outside any other machine, which means a canonical source can be cited in a shipped artifact and never seen by anyone reviewing it. Either they stay as operator memory and the register keeps saying so, or the canon-bearing subset is promoted into `memory/` where it is versioned. This ADR does not choose.
+**The residual risk, and the operator's decision on it.** The binding's sources are machine-local. They sit outside the repository, outside review and outside any other machine, which means a canonical source can be cited in a shipped artifact and never be seen by anyone reviewing it.
+
+**Decided 2026-11-08: they stay as operator memory.** The canon-bearing subset is not promoted into `memory/`, on the register's own reasoning — a repo copy would be a second copy that silently goes stale while the memory system keeps writing the original, which is the failure the register exists to prevent. The mitigation stands in place of promotion, and it is already in force on the register: **never let one of these files be the only source under a customer-facing claim.** Pair it with a repo path or a published URL. A dispatch that cannot reach the directory reports the source as unread rather than treating an empty repository search as proof the rule does not exist.
 
 ### Professional indemnity cover is a hard blocker, and its status is unknown
 
