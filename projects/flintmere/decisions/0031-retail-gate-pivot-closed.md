@@ -9,6 +9,7 @@
 - **Closes:** the pivot-spec gate clock. **G1 pass, late.** **G2 fail, forfeited.** G3, P3 and P4 never reached. Also closes **ADR 0024's Gate 2 as Fail**, retrospectively dated 2026-08-10 — first recorded in ADR 0029 §Context premise 5, logged in `STATUS.md` on 2026-11-08, never formally closed until now.
 - **Does not supersede:** ADR 0029. Its eight-premise re-test, its three surviving findings and its reading of the gate stand as written, and one of them is strengthened below. This ADR closes the *programme*, not the analysis.
 - **Affects:** `projects/flintmere/STATUS.md` §Adoption check log, `plans/2026-09-06-retail-gate-pivot-spec.md` (gate clock closed, not edited). **No code and no customer-facing surface changes under this ADR.**
+- **Amendment 1 (2026-11-08, same day):** §Consequences claimed the register's cited `feedback_*.md` files did not exist and that the 2026-05-09 binding had been "degrading silently since May". **The files exist.** They are operator memory under `~/.claude/projects/-Users-abuaa-Projects-Flintmere/memory/`, outside the repository, and a git-history sweep confirms they were never repository files, so none was lost. The original claim came from searching the repository — which is itself the defect, because the register cites them by bare filename with no directory. The verified count is **16 citations over 14 distinct names** — 15 over 13 in the `feedback_*` form the register uses, plus one `project_*` citation in §A6 carrying the same defect — of which 12 resolve exactly as cited and 2 are miscited under a `feedback_` prefix where the file is `project_*`. The section is restated below, and the claim as ratified is preserved here as the record of what was believed. **This corrects the finding, not the decision:** §1 through §6 are unaffected, and the governance defect is real in a narrower form.
 - **Existing customers:** none. Unchanged since ADR 0029. Flintmere has never taken a payment from a third party; the three `ConciergeAudit` rows marked `paid` remain operator test transactions.
 
 ## Context
@@ -86,11 +87,17 @@ Stated plainly, because the alternative is a document that reads as a pause. The
 
 The scanner is therefore the whole public surface, and it is interim by construction. Do not re-anchor the marketing site on the pillars.
 
-### The canon binding has been degrading silently since May
+### The canon binding cites sources no dispatch can find in the repository
 
-Found during this ADR's own pre-flight and during the verdict document's canon-audit. `memory/canon-source-register.md` cites **twelve** `feedback_*.md` files and **none of them exists in the repository.** The CLAUDE.md §Binding 2026-05-09 instructs every dispatch to read them, so every dispatch since May has been reading a shorter list than the binding specifies and reporting a complete pre-flight. The pivot spec §10 flagged nine of them as reconciliation owed; the real count is twelve.
+*(Restated per Amendment 1. The frontmatter carries what this section said at ratification and why it changed.)*
 
-This is not fixed here. It is a defect in the governance layer, it affects every artifact drafted since May, and it needs either the files restored or the register corrected to cite what exists.
+`memory/canon-source-register.md` carries **16 citations across 14 distinct filenames**, and **none of them is lost.** (The register's own repair note counts 15 over 13, which is the `feedback_*` subset; the fourteenth is a `project_*` citation in §A6 with the identical defect. The two counts agree.) All fourteen exist as operator memory under `~/.claude/projects/-Users-abuaa-Projects-Flintmere/memory/`. Twelve resolve exactly as cited; two carry a wrong `feedback_` prefix where the real files are `project_companies_house_13205428.md` and `project_ico_registration_position.md`. A git-history sweep — `--diff-filter=A` on `*feedback_*`, `-S` on the citation string, and a full `rev-list | ls-tree` pass — finds these paths in no commit at any point, so they were never repository files and nothing needed restoring.
+
+**The defect is locatability, not loss.** The register names no directory, so a dispatch told to read `feedback_always_team_voice.md` searches the repository and finds nothing. Two dispatches did exactly that on 2026-11-08 — this ADR's own council pre-flight and the verdict document's canon-audit — and both concluded the files did not exist while reporting a complete pre-flight. The `remember` plugin that wrote them is disabled, so nothing puts them into a dispatch's context automatically either. How many of the dispatches since May failed the same way is not established and is not claimed here.
+
+The register itself is repaired as of 2026-11-08: the directory is declared, the two prefixes are corrected, and the maintenance trigger now demands an existence check. The pivot spec §10, which flagged nine of these as reconciliation owed, is closed against the verified counts.
+
+**What is not fixed, and is an operator call:** the binding's sources are machine-local. They sit outside the repository, outside review and outside any other machine, which means a canonical source can be cited in a shipped artifact and never seen by anyone reviewing it. Either they stay as operator memory and the register keeps saying so, or the canon-bearing subset is promoted into `memory/` where it is versioned. This ADR does not choose.
 
 ### Professional indemnity cover is a hard blocker, and its status is unknown
 

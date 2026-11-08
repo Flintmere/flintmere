@@ -22,6 +22,28 @@
 > vs what we don't" framing. Most artifacts in the trigger list need to
 > read it first. When in doubt, read methodology.
 
+> **Repair 2026-11-08 — every citation on this register resolves again.**
+> A canon-audit on 2026-11-08 reported that the `feedback_*.md` files
+> this register cites do not exist in the repository, and concluded the
+> 2026-05-09 binding had been degrading silently on every dispatch since
+> May. The files exist. They are operator memory under
+> `~/.claude/projects/-Users-abuaa-Projects-Flintmere/memory/`, not repo
+> files, and this register cited them by bare filename with no directory
+> — against its own citation rule below — so a dispatch that searched
+> the repository found nothing and reported a complete pre-flight anyway.
+> Fifteen citations across thirteen filenames: **eleven resolve unchanged**
+> once the directory is named, **two were miscited** under a `feedback_`
+> prefix when the files carry a `project_` one
+> (`project_companies_house_13205428.md`,
+> `project_ico_registration_position.md`, both corrected in A4, which
+> also now cites `project_registered_office.md` — the third entry in the
+> same legal footer), and **none is lost**. Git history holds no
+> `feedback_*` path in any tree, because these were never repo files.
+> The same bare-filename defect applied to
+> `project_stripe_descriptor_card_deprecation_2026_05_05.md` in A6; it
+> resolves in the same directory. The directory, and its one real
+> weakness, is declared in §How to use this file.
+
 ---
 
 ## How to use this file
@@ -36,6 +58,17 @@
 - **Cite by URL or file path on every reference.** "It says it on the
   methodology page" is not a citation; `flintmere.com/methodology
   §Pillars` is.
+- **Bare filenames on this register are operator memory, and they
+  resolve in `~/.claude/projects/-Users-abuaa-Projects-Flintmere/memory/`.**
+  Every `feedback_*.md` and `project_*.md` reference below is a file in
+  that directory — Claude project memory for this project, not a repo
+  file. Read it there; a repo-wide search will not find it. Two caveats.
+  The directory is machine-local to the operator's Mac, so never let one
+  of these files be the only source under a customer-facing claim —
+  pair it with a repo path or a published URL. And the memory system
+  writes that directory, so the file there is canon: copying one into
+  the repo would create a second copy that silently goes stale, which is
+  the failure this register exists to prevent.
 - **The published page beats the internal doc when they disagree** —
   flintmere.com is what the merchant sees. If `BUSINESS.md` and
   `flintmere.com/pricing` diverge, the published page is canon and
@@ -145,8 +178,13 @@ Read first:
 - `memory/CONSTRAINTS.md` — PECR / GDPR / opt-out posture.
 - `feedback_no_mailto_links_anywhere.md` — every public route to a
   Flintmere inbox goes through the contact form.
-- `feedback_companies_house_13205428.md` + `feedback_ico_registration_position.md`
-  — the legal footer entries.
+- `project_companies_house_13205428.md`
+  + `project_ico_registration_position.md`
+  + `project_registered_office.md` — the three legal footer entries
+  (Eazy Access Ltd · Companies House 13205428 · ICO data-controller
+  registration ZC137268 · registered office 71–75 Shelton Street,
+  Covent Garden, London, WC2H 9JQ). Prefixes corrected 2026-11-08: the
+  first two were cited as `feedback_*` and no such files exist.
 
 ### A5. Email templates (Resend HTML + text bodies)
 Files in scope: `apps/scanner/src/lib/resend.ts`,
@@ -483,8 +521,12 @@ Update triggers:
 - New canonical source published on flintmere.com → add to relevant
   artifact-type block
 - ADR ratified → add to relevant blocks
-- New `feedback_*.md` memory that touches a canon artifact type →
-  cross-reference
+- New `feedback_*.md` / `project_*.md` memory that touches a canon
+  artifact type → cross-reference, writing the filename exactly,
+  prefix included, and confirming it exists in the directory named in
+  §How to use this file. The 2026-11-08 repair was two wrong prefixes
+  and one undeclared directory, and it cost six months of pre-flights
+  that read a shorter list than the binding specifies.
 - Brand-voice shift ratified → update Section A8 + cross-cutting B
 - Pillar / weight change → update A9 (rare; flag to council)
 - Crawler-operator doc moves or a crawler changes behaviour → re-verify

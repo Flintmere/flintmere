@@ -385,12 +385,20 @@ These are the ones that matter, and no amount of reading touches them.
    above is survivable.
 5. **Whether the Good Food Group already does this quietly** for 11 retailers. One
    enquiry settles it.
-6. **Whether the canon binding still works.** `memory/canon-source-register.md` cites
-   **12** `feedback_*.md` files and **none of them exists** in the repository. The
-   CLAUDE.md §2026-05-09 binding instructs every dispatch to read them, so it has been
-   degrading silently on every dispatch since. The pivot spec §10 flagged nine of them
-   as reconciliation owed; the real count is twelve. Found during this document's own
-   canon-audit.
+6. ~~**Whether the canon binding still works.** `memory/canon-source-register.md` cites
+   **12** `feedback_*.md` files and **none of them exists** in the repository.~~
+   **Corrected 2026-11-08, same day — this gap was wrong in its central claim.** The
+   files exist. They are operator memory under
+   `~/.claude/projects/-Users-abuaa-Projects-Flintmere/memory/`, outside the repository,
+   and a git-history sweep shows they were never repository files, so nothing was lost.
+   Verified count: **16 citations over 14 distinct names**, 12 resolving as cited and 2
+   miscited under a `feedback_` prefix where the file is `project_*`. What survives is
+   narrower and still real: the register names no directory, so a dispatch searching the
+   repository finds nothing — which is precisely how this document's own canon-audit
+   reached the wrong conclusion. The register is repaired and the pivot spec §10 count is
+   closed. The residual risk is that these sources are machine-local and unreviewable,
+   which is an operator decision recorded in ADR 0031 §Consequences, not a gap a buyer
+   closes.
 7. **Whether Flintmere holds professional indemnity cover.** Not a market question — an
    operator fact this document does not know, and a hard blocker on delivering anything
    touching an allergen declaration, free or paid.

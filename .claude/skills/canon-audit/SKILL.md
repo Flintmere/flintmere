@@ -70,8 +70,10 @@ Claims in the artifact that contradict canonical sources.
 - Pillar names, weights, public/install-gated split (canon: `flintmere.com/methodology`)
 - Pricing numbers, band ladders, tier names (canon: `flintmere.com/pricing` + `flintmere.com/audit` + `apps/scanner/src/lib/pricing.ts` + `apps/scanner/src/lib/audit-pricing.ts` + ADRs 0016 + 0022)
 - Strategic positioning, vertical focus (canon: `BUSINESS.md` + ADRs 0015 + 0019 + 0020)
-- Founder / team framing (canon: feedback memory `feedback_always_team_voice.md` — never single-named-individual on customer-facing surfaces)
-- Legal entity, registered office, ICO / Companies House numbers (canon: `feedback_companies_house_13205428.md` + `feedback_registered_office.md`)
+- Founder / team framing (canon: operator memory `feedback_always_team_voice.md` — never single-named-individual on customer-facing surfaces)
+- Legal entity, registered office, ICO / Companies House numbers (canon: `project_companies_house_13205428.md` + `project_registered_office.md` + `project_ico_registration_position.md`)
+
+**Where these files are** (corrected 2026-11-08): operator memory under `~/.claude/projects/-Users-abuaa-Projects-Flintmere/memory/`, **not** in the repository — searching the repo for them returns nothing and is not evidence that the rule does not exist. Three names on this page were previously written with a `feedback_` prefix where the real file carries `project_`; check the prefix against a directory listing before reporting a source as missing. Because these files are machine-local and unreviewable, never let one be the sole support for a customer-facing claim: name a repo-versioned or published source alongside it.
 
 For each drift hit: cite the artifact line + the canonical source URL/path + the recommended fix (declarative, not equivocating).
 
