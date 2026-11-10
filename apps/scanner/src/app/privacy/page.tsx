@@ -18,7 +18,7 @@ export default function Privacy() {
       eyebrow="Privacy"
       title="How we handle your data."
       summary="We collect only what we need to score and fix your product catalog. We do not sell data, ever. We host in the UK/EU, we delete tokens within 60 seconds of uninstall, our free one-time-secret tool at /secret encrypts in your browser so we never hold the key, and if you connect your Google Merchant Center we hold a single read-only refresh token encrypted at rest until you disconnect — full Limited Use attestation in clause 11. You can ask us to delete everything else at any time by sending a message via our contact form (Privacy topic)."
-      lastUpdated="2026-05-10"
+      lastUpdated="2026-11-09"
       anchorNumeral="01"
     >
       <Clause n="01" heading="Who we are">
@@ -245,8 +245,9 @@ export default function Privacy() {
             data).
           </li>
           <li>
-            <strong>Digital Ocean</strong> (UK) + <strong>Coolify</strong> —
-            infrastructure.
+            <strong>Hetzner Online GmbH</strong> (Germany — Nuremberg,
+            region <code>NBG1</code>) + <strong>Coolify</strong> —
+            infrastructure and hosting.
           </li>
           <li>
             <strong>GS1 GEPIR</strong> (optional, rate-limited) — GTIN

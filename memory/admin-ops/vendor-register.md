@@ -30,18 +30,18 @@ Single source of truth for vendor relationships. `vendor-review` reads this; `fi
 
 ## Hosting + infra
 
-### DigitalOcean
-- Service: Droplet (Basic 2 vCPU / 8GB / 160GB) + Spaces (backups)
-- Plan: Basic (upgrade trigger: Premium 4 vCPU / 8GB at ~30 paying merchants)
-- Monthly cost: ~£38 (droplet) + ~£4 (Spaces) ≈ £42
+### Hetzner Online GmbH
+- Service: Cloud server **CCX33** (8 dedicated vCPU / 32GB), `flintmere-prod` + Hetzner object storage (off-site Postgres backups)
+- Plan: CCX33, dedicated vCPU. No resize trigger carried over — 32GB retires the RAM ceiling that drove the old Basic → Premium trigger
+- Monthly cost: **not recorded — operator to confirm.** Left blank deliberately rather than estimated; Hetzner's price table is client-side and the figure was not supplied (ADR 0032 §Decision)
 - Renewal: monthly
 - Lock-in level: **low** — standard VMs; docker images portable
-- Data processor: yes (all operational data)
-- DPA in place: yes (DO DPA)
-- Sub-processors: DO's own infra
-- Alternatives: Hetzner, Vultr, AWS Lightsail
-- Last reviewed: 2026-04-19
-- Notes: region LON1 primary. See `decisions/0002-coolify-on-do.md`.
+- Data processor: yes (all operational data, and the off-site backup copy)
+- DPA in place: **NO — open gap as of 2026-11-09.** Hetzner's AV-Vertrag is self-serve in the Cloud console under Legal and has not been signed. `/dpa` Clause 07 promises a written agreement with every sub-processor and UK GDPR Art 28(4) requires one. **Operator action.**
+- Sub-processors: Hetzner's own infra
+- Alternatives: DigitalOcean (the predecessor), Vultr, AWS Lightsail
+- Last reviewed: 2026-11-09
+- Notes: region **NBG1** (Nuremberg, Germany), `178.105.38.117`, server `#129742542`. **Flintmere-only** — no shared tenancy, unlike the droplet it replaced. Transfer basis UK → EEA under the UK's adequacy decision; no SCCs needed. Replaced the DigitalOcean droplet + Spaces entry — see `decisions/0032-hosting-migration-hetzner.md`. The step-5 merchant notification below was never evaluated for this change; owed to nobody, as there are no third-party merchants, but not assessed either.
 
 ### Coolify
 - Service: Self-hosted PaaS (open source) — deploys + Traefik + SSL + backups
@@ -51,7 +51,7 @@ Single source of truth for vendor relationships. `vendor-review` reads this; `fi
 - Data processor: N/A (runs on our droplet)
 - Notes: version pinned; security updates tracked
 
-## Database + queue (on droplet)
+## Database + queue (on the server)
 
 ### Postgres 16 (Coolify-provisioned)
 - Service: primary database
@@ -201,7 +201,7 @@ Single source of truth for vendor relationships. `vendor-review` reads this; `fi
 
 - **DeepSeek (V3 + VL)** — rejected 2026-04-19. Legal Council veto: China hosting fails GDPR cross-border test. See `decisions/0005`.
 - **Qwen direct API** — rejected on same grounds.
-- **Vercel + Fly.io + Neon** (managed stack) — rejected 2026-04-19. Coolify + DO chosen per `decisions/0002`. Revisit if CPU variability hurts.
+- **Vercel + Fly.io + Neon** (managed stack) — rejected 2026-04-19. Coolify + DO chosen per `decisions/0002`; the Coolify half held and the DO half did not — hosting moved to Hetzner per `decisions/0032`. Revisit if CPU variability hurts (largely moot: CCX33 is dedicated vCPU).
 - **Drizzle (ORM)** — rejected in favour of Prisma. See `decisions/0004`.
 
 ## Renewal calendar
@@ -220,4 +220,5 @@ The DPA at `apps/*/app/dpa/` (when built) lists sub-processors. Adding a vendor 
 
 ## Changelog
 
+- 2026-11-09: **DigitalOcean entry replaced by Hetzner Online GmbH.** Hosting and off-site backups both moved to a Hetzner CCX33 in Nuremberg (`NBG1`), Flintmere-only; DigitalOcean is no longer a sub-processor. The migration itself happened earlier in infrastructure and was recorded nowhere — surfaced 2026-11-09 because `/privacy` and `/security` still named DigitalOcean. Two gaps logged against this entry: **no Hetzner AV-Vertrag**, and the DPA Clause 07 30-day replaced-sub-processor notice was never evaluated. Cost line left blank rather than guessed. See `decisions/0032-hosting-migration-hetzner.md`.
 - 2026-04-19: Rewritten for Flintmere. Replaced allowanceguard vendor list (Vercel, Neon, Cloudflare, Coinbase Commerce) with Flintmere list (DigitalOcean + Coolify, Vertex AI + Azure OpenAI, Stripe + Shopify Managed Pricing, Resend, Sentry, PostHog, BetterStack, GitHub). Added rejected-vendors audit trail.

@@ -36,9 +36,9 @@ Users (merchants + scanner leads) in these jurisdictions are material to traffic
 
 ## Data residency
 
-- **Operational data** (shops, scoring, fixes, leads) — Postgres on Coolify/DigitalOcean droplet. Region: **LON1 (London)** pinned by default; failover region **AMS3 (Amsterdam)** if droplet upsize requires migration.
+- **Operational data** (shops, scoring, fixes, leads) — Postgres on Coolify, on a Hetzner Cloud **CCX33** (`flintmere-prod`, `178.105.38.117`). Region: **NBG1 (Nuremberg, Germany)**. No failover region configured. Transfer basis: UK → EEA under the UK's adequacy decision (see below) — no SCCs needed for this leg. Per ADR 0032; the former **LON1 (London)** DigitalOcean droplet is retired.
 - **LLM inference** — Google Vertex AI `europe-west1` (Belgium) + `europe-west4` (Netherlands) failover. Azure OpenAI `swedencentral` or `francecentral` for fallback.
-- **Backups** — DO Spaces, region pinned to match primary droplet (LON1).
+- **Backups** — Hetzner object storage, same account and region as the server (NBG1, Germany). Per ADR 0032. **Concentration note:** host and off-site copy now share one vendor and one account, so the "off-site" leg of the 3-2-1 posture no longer means a second custodian.
 - **Logs + error tracking** — Sentry EU region; PostHog self-hosted on droplet.
 - **Cross-border transfers** — UK → EU covered by UK's adequacy decision for EEA. UK → US (for Azure, Stripe, Resend, Sentry) via SCCs + supplementary measures or each vendor's own adequacy posture.
 

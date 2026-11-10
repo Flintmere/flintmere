@@ -19,7 +19,7 @@ import { lookup } from 'node:dns/promises';
  * Residual risk: classic DNS rebinding (TTL-zero record flips between
  * resolve-time and fetch-time). The proper fix is to fetch by resolved IP
  * with a Host header and pinned TLS — out of scope here. Acceptable for
- * our threat model on a single droplet; revisit if we run a public preview
+ * our threat model on a single server; revisit if we run a public preview
  * service or move to multi-tenant background fetching.
  */
 

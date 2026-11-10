@@ -171,8 +171,36 @@ Files in scope: `data/recruitment/cold-email-template-*.md`, any
 outreach script in `data/recruitment/`.
 
 Read first:
-- **`data/recruitment/cold-email-template-2026-05-09.md`** — the
-  canonical template; new outreach must trace its DNA.
+- **`context/outreach/2026-11-08-buyer-side-probe.md`** — the live
+  outbound artifact, and the current pattern: enquiry sends that ask a
+  question rather than selling. Trace this.
+- **`data/recruitment/cold-email-template-2026-05-09.md`** — **RETIRED
+  2026-11-09 as to its body.** Trace only its legal footer (reuse
+  verbatim) and its operational rules: British calm register, 50–125
+  words of body, operator reply-to not a shared inbox, max 30 sends per
+  mailbox per day, one follow-up at +5 days, never a third touch. Its
+  sales body sells the withdrawn £349/month retainer, the retired
+  suppression wedge, and the renamed host and route — the file's own
+  §"Why the body is retired" tabulates each against its ADR. Do **not**
+  trace its DNA, which is what this entry asked for until 2026-11-09.
+- `data/recruitment/2026-05-10-message-variants.md` — **RETIRED
+  2026-11-09.** All three variants carry the same withdrawn claims. One
+  thing survives and is worth reusing: its GMC identifier wording. Google
+  disapproves products with an *incorrect* GTIN and gives *limited
+  visibility* to those shipped *without* one.
+- **Any new sales template needs a forward offer first.** ADR 0031
+  records that there is none and §5 bars putting a new claim on a
+  customer-facing surface. Decide the offer, then write the copy.
+- **Locatability warning, found 2026-11-09.** `data/recruitment/*` is
+  gitignored (`.gitignore:102`) and `context/` is too (`.gitignore:81`),
+  so every file this block cites except `data/recruitment/README.md`
+  lives only on the operator's machine. A dispatch that cannot find them
+  reports the source as unread — it does not conclude they were deleted,
+  and it does not treat an empty repository search as proof the rule
+  does not exist. This is the same defect ADR 0031 Amendment 1 found in
+  the operator-memory citations, in a second place, and the same
+  mitigation applies: never let one of these be the only source under a
+  customer-facing claim. Pair it with a repo path or a published URL.
 - `memory/VOICE.md`.
 - `memory/marketing/MEMORY.md` — outreach guides.
 - `memory/CONSTRAINTS.md` — PECR / GDPR / opt-out posture.
@@ -527,6 +555,15 @@ Update triggers:
   §How to use this file. The 2026-11-08 repair was two wrong prefixes
   and one undeclared directory, and it cost six months of pre-flights
   that read a shorter list than the binding specifies.
+- **ADR retires an offer, price, claim, host or route → sweep the
+  artifacts that *sell* it, not only the code that serves it.** Grep
+  `data/recruitment/`, `context/outreach/` and every email or DM
+  template for the retired price, phrase, host and path, in the same
+  change. Existence checks do not catch staleness: the 2026-11-09 sweep
+  found the §A4 canonical template and the message variants carrying
+  four retired claims six months after the first ADR withdrew them,
+  with the variants still marked `status: ready to send`. See
+  `memory/CORRECTIONS.md` 2026-11-09.
 - Brand-voice shift ratified → update Section A8 + cross-cutting B
 - Pillar / weight change → update A9 (rare; flag to council)
 - Crawler-operator doc moves or a crawler changes behaviour → re-verify

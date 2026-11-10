@@ -213,7 +213,7 @@ If you encounter any of these in code or copy, they are retired — migrate or d
 
 ## Deployment
 
-Single DigitalOcean droplet with Coolify. Three subdomains routed via Traefik. See `projects/flintmere/decisions/0002-coolify-on-do.md` and `projects/flintmere/PROJECT.md` §Deployment.
+Single Hetzner Cloud server with Coolify, Nuremberg (`NBG1`), Germany. Three subdomains routed via Traefik. See `projects/flintmere/decisions/0032-hosting-migration-hetzner.md` — which supersedes `0002-coolify-on-do.md` on the hosting vendor — and `projects/flintmere/PROJECT.md` §Deployment.
 
 ## LLM stack
 

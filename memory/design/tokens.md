@@ -203,7 +203,7 @@ The line-art-only imagery mandate is **retired** (carried over from AllowanceGua
 - Hero photoreal: **≤ 100KB** AVIF/WebP, with a low-weight blur placeholder.
 - Product screenshots: **≤ 40KB** each, AVIF/WebP, max 5 per page.
 - All images served via `next/image` with explicit width/height to prevent CLS.
-- LCP must remain **≤ 2.5s** on Coolify (current scanner droplet baseline).
+- LCP must remain **≤ 2.5s** on Coolify (current scanner server baseline — Hetzner CCX33, ADR 0032).
 
 ### Bracket co-occurrence rule (Noor's veto, #8 + Hina #1)
 

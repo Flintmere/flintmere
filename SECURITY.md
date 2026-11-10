@@ -29,7 +29,7 @@ For sensitive reports, use PGP. Key fingerprint: *(publish here once generated)*
 - Rate-limit findings on the public scanner that fall within our published limits (10/hr per IP on `/api/scan`).
 - Social-engineering attacks against operators or merchants.
 - Denial-of-service attacks.
-- Findings on third-party services (Shopify, Google Cloud, Azure, Stripe, Coolify, DigitalOcean, Resend, Sentry). Please report those to the respective vendors.
+- Findings on third-party services (Shopify, Google Cloud, Azure, Stripe, Coolify, Hetzner, Resend, Sentry). Please report those to the respective vendors.
 
 ## Our response
 

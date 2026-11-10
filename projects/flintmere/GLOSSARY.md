@@ -126,9 +126,11 @@ Canonical definitions of terms used across Flintmere. Extended from `SPEC.md` Ap
 
 ## Deployment + infrastructure
 
-**Coolify** — The self-hosted PaaS running on the DigitalOcean droplet. Handles Docker deploys, reverse proxy (Traefik), SSL, backups.
+**Coolify** — The self-hosted PaaS running on the Hetzner Cloud server. Handles Docker deploys, reverse proxy (Traefik), SSL, backups.
 
-**Droplet** — The DigitalOcean VM. Starts at Basic 2 vCPU / 8GB; upgrade trigger at ~30 paying merchants.
+**Server** — The Hetzner Cloud VM that runs every Flintmere surface: a **CCX33** (8 dedicated vCPU / 32 GB), named `flintmere-prod`, in Nuremberg (`NBG1`). Flintmere-only — no other project shares it. Per ADR 0032.
+
+**Droplet** — *Retired term.* The DigitalOcean VM that hosted Flintmere until the 2026-11 Hetzner migration (ADR 0032). It appears in `STATUS.md` changelog entries and in ADRs 0002 and 0013, where it correctly describes what was true at the time. In any current-state context, read **Server**.
 
 **BullMQ** — The Redis-backed job queue. Handles bulk sync, scoring, Tier 2 enrichment, drift re-score.
 

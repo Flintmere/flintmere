@@ -48,11 +48,11 @@ Sections are ordered roughly by **when you need them**. Do Stage 1 first; Stage 
 ### Domain + DNS
 
 - [ ] Verify ownership of **flintmere.com** (SPEC says owned — confirm in your registrar)
-- [ ] Point these subdomains at your DigitalOcean droplet IP (A records):
-  - [ ] `flintmere.com` → droplet IP (or leave for marketing-site setup later)
-  - [ ] `audit.flintmere.com` → droplet IP
-  - [ ] `app.flintmere.com` → droplet IP
-  - [ ] `status.flintmere.com` → droplet IP (for BetterStack Uptime)
+- [ ] Point these subdomains at your Hetzner server IP — `178.105.38.117` (A records). *(Was the DigitalOcean droplet IP; see ADR 0032. The live records already point here.)*
+  - [ ] `flintmere.com` → server IP (or leave for marketing-site setup later)
+  - [ ] `audit.flintmere.com` → server IP
+  - [ ] `app.flintmere.com` → server IP
+  - [ ] `status.flintmere.com` → server IP (for BetterStack Uptime)
   - [ ] (optional) `audit-staging.flintmere.com` + `app-staging.flintmere.com` for preview environments
 
 ### Shopify Partner account
@@ -158,9 +158,9 @@ Sections are ordered roughly by **when you need them**. Do Stage 1 first; Stage 
 
 ### PostHog
 
-- [ ] Decide: self-hosted on droplet (recommended; matches data-residency story) or cloud free tier
-- [ ] If self-hosted: defer until Coolify is set up; provision via docker-compose add-on
-- [ ] If cloud: create account at [posthog.com](https://posthog.com), select EU region
+- [x] **Decided: PostHog Cloud EU** (ADR 0025). Self-hosting was rejected on resource grounds (ADR 0013 Amendment 1) and the droplet it would have run on is retired (ADR 0032). The two sub-items below are kept only to show what was weighed.
+  - ~~If self-hosted: defer until Coolify is set up; provision via docker-compose add-on~~
+  - [x] If cloud: create account at [posthog.com](https://posthog.com), select EU region
 
 ### GS1 (deferred — when you first hit GTIN guidance needs)
 
@@ -171,7 +171,7 @@ Sections are ordered roughly by **when you need them**. Do Stage 1 first; Stage 
 
 ## Stage 3 — Coolify + deployment
 
-Assumes the droplet already has Coolify installed (you said it does).
+Assumes the server already has Coolify installed (you said it does). Since ADR 0032 that server is the Hetzner CCX33 `flintmere-prod`, not the DigitalOcean droplet.
 
 ### Coolify setup
 
@@ -235,8 +235,8 @@ Assumes the droplet already has Coolify installed (you said it does).
 
 ### Backups
 
-- [ ] **DO Spaces bucket** in region `lon1`: `flintmere-backups`
-- [ ] Coolify → Backups → schedule nightly Postgres backup to Spaces
+- [ ] **Hetzner object-storage bucket** in the server's region (`NBG1`). *(Was a DO Spaces bucket `flintmere-backups` in `lon1`; see ADR 0032. Already live — bucket name not re-recorded, confirm it in Coolify → S3 Storages.)*
+- [ ] Coolify → Backups → schedule nightly Postgres backup to object storage
 - [ ] Retention: 30 days hot, 13 months cold
 
 ---
@@ -418,7 +418,7 @@ these, and **step 1 gates every other step**. Sequenced deliberately.
       unchanged, and *Authorized domains* takes eTLD+1 (`flintmere.com`),
       which already covers the new subdomain. Miss this and every GMC
       connect fails `redirect_uri_mismatch`.
-- [ ] **2. DNS** — `catalog.flintmere.com` A-record → `134.122.102.159`
+- [ ] **2. DNS** — `catalog.flintmere.com` A-record → `178.105.38.117` *(Hetzner server per ADR 0032; was `134.122.102.159`)*
       (Namecheap). Leave the `audit.` record in place permanently.
 - [ ] **3. Coolify / Traefik** — add the router and Let's Encrypt cert for
       the new host on the `flintmere-scanner` resource. Keep the `audit.`

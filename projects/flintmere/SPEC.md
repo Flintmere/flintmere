@@ -13,7 +13,7 @@
 > | § in SPEC | Supersedes |
 > |---|---|
 > | §5.1, §10.2 (LLM: Claude Haiku / Sonnet) | **ADR 0005** (Gemini 2.5 Flash primary + GPT-4o-mini fallback) + **ADR 0006** (Gemini 2.5 Pro hard-case lock) |
-> | §6.1 (Hosting: Fly.io / Render) | **ADR 0002** (Coolify on DigitalOcean) |
+> | §6.1 (Hosting: Fly.io / Render) | **ADR 0002** (Coolify on DigitalOcean) → **ADR 0032** (Coolify on Hetzner, Nuremberg) |
 > | §6.1 (ORM decision implicit) | **ADR 0004** (Prisma over Drizzle) |
 > | §6.1 (monorepo topology) | **ADR 0001** (single-repo monorepo: `apps/` + `packages/`) |
 > | §12.4 (Fraunces + warm palette) | **ADR 0003** (neutral-bold hybrid + legibility bracket + Geist Sans/Mono) |
@@ -337,7 +337,7 @@ Things that fundamentally require merchant action:
 
 ### 6.1 Stack
 
-> **Superseded in part** — LLM row by ADRs 0005 + 0006 (Gemini Flash/Pro + Azure fallback); Hosting row by ADR 0002 (Coolify on DigitalOcean); ORM decision by ADR 0004 (Prisma). Current stack of record: `projects/flintmere/PROJECT.md` §Stack.
+> **Superseded in part** — LLM row by ADRs 0005 + 0006 (Gemini Flash/Pro + Azure fallback); Hosting row by ADR 0002 (Coolify on DigitalOcean), itself superseded on vendor and region by ADR 0032 (Coolify on Hetzner, Nuremberg `NBG1`); ORM decision by ADR 0004 (Prisma). Current stack of record: `projects/flintmere/PROJECT.md` §Stack.
 
 | Component | Choice | Rationale |
 |---|---|---|
@@ -346,9 +346,9 @@ Things that fundamentally require merchant action:
 | Database | Postgres | Well-understood, Prisma works well with Remix |
 | Queue | BullMQ on Redis | Audit jobs run async for stores with 500+ SKUs |
 | LLM | ~~Anthropic Claude~~ → **Gemini 2.5 Flash primary, Gemini 2.5 Pro hard cases, GPT-4o-mini fallback** (ADRs 0005, 0006) | EU data residency via Vertex `europe-west1`; ~40% cost reduction vs Claude at comparable quality on our task shapes |
-| Hosting | ~~Fly.io or Render~~ → **Coolify on existing DigitalOcean droplet** (ADR 0002) | Sunk cost on droplet; UK/EU residency; single-droplet routing via Traefik |
+| Hosting | ~~Fly.io or Render~~ → ~~Coolify on existing DigitalOcean droplet (ADR 0002)~~ → **Coolify on a Hetzner Cloud CCX33, Nuremberg `NBG1`** (ADR 0032) | Originally sunk cost on the droplet; now dedicated vCPU, Flintmere-only, EU residency; single-server routing via Traefik |
 | Admin UI | Shopify Polaris + App Bridge | Required for "Built for Shopify" badge |
-| Analytics | PostHog | Self-hostable, good cohort analysis |
+| Analytics | ~~PostHog (self-hosted)~~ → **PostHog Cloud EU** (ADR 0025) | Cookieless, EU residency; self-hosting was rejected on resource grounds (ADR 0013 Amendment 1) |
 | Error tracking | Sentry | Standard |
 
 ### 6.2 Shopify API integration points
