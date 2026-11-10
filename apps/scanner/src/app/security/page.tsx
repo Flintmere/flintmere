@@ -18,7 +18,7 @@ export default function Security() {
       eyebrow="Security"
       title="What we do to protect your store."
       summary="Shopify access tokens are encrypted at rest with a key stored outside the database. Every webhook is HMAC-verified. Everything on the wire uses TLS 1.2 or better. We scan dependencies automatically and have a written incident-response runbook. If you find a vulnerability, email security@flintmere.com and we&rsquo;ll respond within 24 hours."
-      lastUpdated="2026-05-10"
+      lastUpdated="2026-11-09"
       anchorNumeral="03"
     >
       <Clause n="01" heading="Encryption at rest">
@@ -109,8 +109,9 @@ export default function Security() {
 
       <Clause n="08" heading="Infrastructure and backups">
         <p>
-          Flintmere runs on <strong>DigitalOcean</strong> (UK region) managed
-          via <strong>Coolify</strong>. Postgres is backed up nightly with
+          Flintmere runs on <strong>Hetzner Online GmbH</strong> (Germany —
+          Nuremberg, region <code>NBG1</code>) managed via{' '}
+          <strong>Coolify</strong>. Postgres is backed up nightly with
           point-in-time recovery retained for 14 days. Backups are encrypted.
           We do not use cross-region replication outside the UK/EU.
         </p>

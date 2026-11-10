@@ -75,7 +75,7 @@ North-star
 
 | Metric | Decision it informs | Owner |
 |---|---|---|
-| `scan_success_rate_24h` | Scanner reliability; droplet CPU variability signal | #35 + #34 |
+| `scan_success_rate_24h` | Scanner reliability signal. *(Was "droplet CPU variability signal" — the server has dedicated vCPU since ADR 0032, so a dip here points at our code or an upstream, not at a noisy neighbour.)* | #35 + #34 |
 | `webhook_delivery_success_rate` | Shopify deregisters slow webhooks — protecting platform relationship | #35 + #33 + #4 |
 | `bulk_sync_sla_adherence` | SLA compliance per tier; Scale + Plus promises | #35 + #17 + #33 |
 | `mttr_p0_90d` | On-call / runbook quality | #35 + #10 |

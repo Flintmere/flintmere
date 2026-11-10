@@ -112,7 +112,7 @@ The web image (`Dockerfile`) serves HTTP on port 3000 and runs `prisma migrate d
 - `https://app.flintmere.com/healthz` returns 200 from the public internet.
 - The web service's Sentry project receives the test event from `instrumentation.server.mjs` startup.
 - The worker logs show all five BullMQ queues registered and the connection to Redis is alive.
-- Both services hold for 24 hours without crash-loop. **Coolify's free-tier droplet has variable I/O and the build container competes for the same CPU as the running app — a clean 24-hour soak rules out marginal-resource crashes that show up only after the deploy excitement fades.**
+- Both services hold for 24 hours without crash-loop. **Keep the soak, but note the rationale changed (ADR 0032):** the original reason was a shared-CPU droplet whose build container competed with the running app. The server now has 8 dedicated vCPU and 32GB and builds happen in GitHub Actions, so a crash in the soak window is a real defect — a leak, a migration fault or an unbounded parse — not marginal resources.
 
 # Phase C — Production OAuth install + GDPR compliance verification
 
@@ -263,7 +263,7 @@ These are the calls only the operator can make. Surface them in this order befor
 2. **Plus tier listing posture.** Default per ADR 0017: not listed. Confirm.
 3. **Wedge engineering before or after submission.** The dead-inventory suppression-estimate is a 3–4 week scanner-side project (not embedded-app-side). It does not block the embedded app's submission. But the listing copy that mentions "suppression in Google Shopping" cannot ship until the wedge does. Decide: submit a generic "catalog readiness scoring" listing first and revise after the wedge, or hold submission until the wedge is live and ship one listing with the stronger conversion message.
 4. **Sentry project and BetterStack monitor budget.** Per OPERATOR-TASKS, both are pending for the shopify-app. Sentry's free tier covers two projects; BetterStack's free tier covers ten monitors. Confirm there's headroom or budget the upgrade.
-5. **Worker scaling posture.** Default concurrency in `worker.server.ts` (sync=2, score=4, drift=8, fixTier1=2, gdpr=1) is sized for a single-droplet single-worker deployment. If install volume exceeds ~20 stores in the first month, the worker becomes the bottleneck. Pre-decide whether to vertical-scale the droplet or run a second worker container.
+5. **Worker scaling posture.** Default concurrency in `worker.server.ts` (sync=2, score=4, drift=8, fixTier1=2, gdpr=1) is sized for a single-server single-worker deployment. If install volume exceeds ~20 stores in the first month, the worker becomes the bottleneck. Pre-decide whether to vertical-scale the server or run a second worker container — with 8 dedicated vCPU / 32GB (ADR 0032) a second worker container is now the cheaper first move.
 
 ---
 

@@ -1,7 +1,8 @@
 # 0002 — Coolify on existing DigitalOcean droplet as deployment layer
 
-- **Status:** Accepted
+- **Status:** Accepted — *superseded 2026-11-09 by [0032](./0032-hosting-migration-hetzner.md) on the hosting vendor, region, server spec and backup target only.*
 - **Date:** 2026-04-19
+- **Superseded by:** [0032](./0032-hosting-migration-hetzner.md) — production moved to a Hetzner Cloud **CCX33** in Nuremberg (`NBG1`), Flintmere-only, with off-site backups on Hetzner object storage. **What still stands from this ADR:** the single-server Coolify posture, the Docker + Traefik + Let's Encrypt layer, the "build images in GitHub Actions, never on the box" rule, and the `prisma migrate deploy`-at-container-start consequence. **What does not:** every DigitalOcean, droplet-size, `LON1`/`AMS3` and DO Spaces reference below, and the cost table — all of which are kept as written because they record the decision as it was made on 2026-04-19.
 
 ## Context
 

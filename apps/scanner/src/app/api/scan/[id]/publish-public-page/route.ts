@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 //
 // Per-IP rate limit added 2026-05-10 (P1-G pre-launch audit) — sustained
 // ID enumeration without a bucket would exhaust DB connections on the
-// single-droplet deployment.
+// single-server deployment.
 function readIp(req: NextRequest): string | null {
   return (
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||

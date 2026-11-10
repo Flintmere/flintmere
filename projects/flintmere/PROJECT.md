@@ -15,12 +15,12 @@ Entry-point doc. Every skill reads this on tasks that need repo layout, stack, e
 - **ORM:** Prisma (per-app schema under `apps/<app>/prisma/`)
 - **Queue:** BullMQ on Redis
 - **LLM:** Gemini 2.5 Flash (primary bulk) + Gemini 2.5 Pro (hard cases) via Vertex AI EU; GPT-4o-mini on Azure OpenAI EU as fallback. See `decisions/0005-llm-provider-strategy.md` + `0006-hardcase-llm-lock-gemini-pro.md`.
-- **Hosting:** Coolify on DigitalOcean droplet. See `decisions/0002-coolify-on-do.md`.
+- **Hosting:** Coolify on a Hetzner Cloud server, Nuremberg (`NBG1`), Germany. See `decisions/0032-hosting-migration-hetzner.md`; `decisions/0002-coolify-on-do.md` is the superseded original.
 - **Payments:** Shopify Managed Pricing for Growth + Scale tiers; Stripe direct for Agency + Plus + the Concierge audit band ladder.
 - **Auth (app only):** Shopify OAuth via the official Remix helper. Access tokens encrypted at rest.
 - **Email:** Resend (scanner full-report delivery, app alerts).
 - **Error tracking:** Sentry.
-- **Analytics:** PostHog (self-hosted on droplet) for product; GA4 on marketing site for acquisition funnel.
+- **Analytics:** **PostHog Cloud EU** (ADR 0025 — cookieless, first-party `/ingest` proxy; *not* self-hosted) for product; GA4 on marketing site for acquisition funnel.
 
 ## Repo layout
 
@@ -47,7 +47,7 @@ flintmere/
 - `catalog.flintmere.com` — public scanner (Next.js); legacy `audit.flintmere.com` 301s here
 - `app.flintmere.com` — Shopify embedded app (Remix)
 
-Subdomain routing handled by Coolify / Traefik reverse proxy on the single droplet. Let's Encrypt SSL per subdomain.
+Subdomain routing handled by Coolify / Traefik reverse proxy on the single server. Let's Encrypt SSL per subdomain.
 
 ## Commands
 

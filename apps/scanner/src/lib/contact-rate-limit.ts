@@ -3,7 +3,7 @@ import { hashIp } from './hash';
 /**
  * In-memory rate limiter for /api/contact.
  *
- * Mirrors the token-bucket pattern from `rate-limit.ts` (single-droplet
+ * Mirrors the token-bucket pattern from `rate-limit.ts` (single-server
  * per ADR 0002, swap for Redis if/when scanner runs multi-node) but uses
  * separate state so a scan flood can't starve the contact form and vice
  * versa.

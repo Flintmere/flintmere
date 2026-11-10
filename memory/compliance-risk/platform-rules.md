@@ -15,7 +15,7 @@ External platform policy constraints. These rules belong to the platforms we dep
 | **Stripe** | Agency + Plus direct invoicing + Concierge audit band ladder | Restricted Businesses list, Terms of Service |
 | **Google Ads** | Possible paid acquisition (not day-one) | B2B SaaS advertising policies, editorial quality |
 | **LinkedIn Ads** | Possible B2B acquisition channel | Professional content standards |
-| **DigitalOcean + Coolify** | Hosting | AUP — prohibited content, abuse handling, uptime terms |
+| **Hetzner + Coolify** | Hosting | AUP / Hetzner TOS — prohibited content, abuse handling, uptime terms |
 | **Resend** | Transactional email | Anti-spam policy, sender reputation, bounce handling |
 | **Sentry** | Error tracking | Data processing terms, PII scrubbing |
 | **GitHub** | Code hosting + CI | Community guidelines, export control |

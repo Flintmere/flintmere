@@ -24,14 +24,14 @@ Operator owns this file. Skills propose additions; operator commits.
 
 Populated from `vendor-register.md`.
 
-### DigitalOcean (droplet + Spaces)
+### Hetzner (Cloud server + object storage)
 - Type: vendor renewal
 - Cadence: monthly
 - Next occurrence: rolling
 - Lead time: N/A auto-renew; annual review at month 11
 - Owner: operator + #36
 - Owning skill: `vendor-review`
-- Notes: upgrade trigger at ~30 paying merchants (Basic → Premium 4 vCPU)
+- Notes: CCX33 (8 dedicated vCPU / 32 GB), `flintmere-prod`, Nuremberg `NBG1`. Per ADR 0032 — replaced the DigitalOcean droplet + Spaces entry. No resize trigger carried over: 32 GB retires the RAM ceiling that drove the old Basic → Premium trigger. **Open:** Hetzner AV-Vertrag not signed as of 2026-11-09; monthly cost not yet recorded.
 
 ### Google Cloud — Gemini Enterprise Agent Platform (formerly Vertex AI)
 - Type: vendor renewal
