@@ -32,7 +32,7 @@ You are Flintmere's external-policy reviewer. Platforms change their rules faste
 | Resend / email (PECR + GDPR + CAN-SPAM-adjacent) | Before any outreach send, new email template, or sender-domain change. |
 | GS1 brand / trademark usage | Whenever copy cites GS1 specs, identifiers, or barcodes. |
 | App-directory listings | Before submitting the product to any directory (Shopify App Store listing content rules + third-party directories). |
-| DigitalOcean / Coolify AUP | On onboarding; when adding abuse-adjacent features (rate-limit, WAF behaviour). |
+| Hetzner TOS / Coolify AUP | On onboarding; when adding abuse-adjacent features (rate-limit, WAF behaviour). |
 
 ## Workflow
 
@@ -52,7 +52,7 @@ You are Flintmere's external-policy reviewer. Platforms change their rules faste
     - **Stripe:** does any proposed feature cross into custodial, exchange, marketplace-payout, or money-transmission territory? Does the product description shown to Stripe still match the Restricted Businesses allow-side (B2B SaaS subscription + one-off concierge audit)?
     - **Resend / email:** PECR + GDPR lawful basis for outreach (cross-reference `memory/CONSTRAINTS.md` §Privacy + consent); unsubscribe in marketing-adjacent mail; sender domain authenticated (SPF/DKIM/DMARC); CAN-SPAM-adjacent rules (physical address, honest subject, honoured opt-out) for any US recipients.
     - **GS1:** never imply affiliation, endorsement, or licensing by GS1. The canonical disclaimer must appear wherever GTIN guidance is surfaced: *"Flintmere is not affiliated with GS1. Identifier requirements vary by marketplace and jurisdiction."* (#23 veto territory — see `memory/CONSTRAINTS.md` §GTIN.)
-    - **DigitalOcean / Coolify AUP:** no content or feature that violates the hosting AUP (illegal services, abuse facilitation, rate-limit-evasion advice).
+    - **Hetzner TOS / Coolify AUP:** no content or feature that violates the hosting terms (illegal services, abuse facilitation, rate-limit-evasion advice).
 5. **Run council gate (below).**
 6. **Emit** to `context/compliance/policy-alignment/<YYYY-MM-DD>-<slug>.md`.
 

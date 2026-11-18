@@ -57,9 +57,9 @@ Flintmere can be integrated **outbound** (partner embeds Flintmere scores / insi
 - **Agreement:** Sentry standard ToS + DPA (PII-scrubbed).
 
 ### PostHog
-- **Shape:** inbound infrastructure (self-hosted analytics).
-- **Surface:** product analytics; runs on the Coolify droplet.
-- **Agreement:** self-hosted open source; no data leaves our droplet.
+- **Shape:** inbound infrastructure (hosted analytics).
+- **Surface:** product analytics; **PostHog Cloud EU** behind a first-party `/ingest` proxy. *(Corrected 2026-11-09: this block said "self-hosted … runs on the Coolify droplet — no data leaves our droplet". Both halves were false — ADR 0025 moved PostHog to Cloud EU, and ADR 0032 retired the droplet. Do not reuse the old line in partnership or security copy.)*
+- **Agreement:** PostHog's own DPA; data hosted in the EU (AWS Frankfurt). Cookieless, anonymous events only.
 
 ### GS1 GEPIR (optional)
 - **Shape:** inbound reference data.

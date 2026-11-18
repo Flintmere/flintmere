@@ -220,6 +220,24 @@ Each becomes a log entry when shipped.
   canon-source-register §A17 (Merchant Center sources, registered today).
   No GTIN-issuance, AI-ranking, sales-outcome or Flintmere price claim.
 
+### 2026-11-02 — Week of 3 Nov: hold ended, five posts queued (`roots-leaves-the-data` · `check-digit-arithmetic` · `nutrition-has-no-home` · `no-gtin-needs-none` · `four-formats-one-pack`)
+
+- Channel: x · bluesky (cross-post, `channel` omitted; 5 posts → 10 rows). No fresh CreditsDepleted failure in the 26 Oct–2 Nov briefs.
+- Angle: three retail-gate posts carried from 2026-10-05 (Ocado Roots leaves the data · nutrition has no home · four formats, one pack), plus two new posts on the live homepage thesis: Wed the check digit is arithmetic, and a wrong GTIN is disapproved · Fri a product with no assigned GTIN needs none (brand + MPN), assigned ones are bought from GS1 UK. The 2026-10-05 posts `photography-is-solved` and `the-toll-is-unpublished` stay unspent. `limited-not-disapproved` is retired: its "only a wrong GTIN disapproves" line is false per canon-source-register §A17 rule 3 / ADR 0030 Amendment 4.
+- Surface(s): prod social queue via `POST /api/agent/queue-posts` (HTTP 200, `queued: 10`). Fire times 10:00 GMT Tue 3 → Sat 7 Nov. Only Wed carries a link: `catalog.flintmere.com/scan`. Payload in the session scratchpad, not committed. Lengths 176–265; one bracket each; banned-list clean; slopmonster 5/5.
+- Result: queued, **not yet posted** as of 2026-11-02. The hold ended because the blocker is gone in prod: the live `<h1>` on `flintmere.com` and `catalog.flintmere.com/scan` reads "One wrong [ digit ]. Disapproved.", and "suppress" appears 0× on the homepage. No carousel: `/Users/abuaa/Projects/Maters` still holds an unrelated site audit, with no imagine flow and no Flintmere brand contract.
+- Related claims: canon-source-register §A17 rule 4 (a wrong GTIN is the one unhedged disapproval claim; Wed), rule 5 (no assigned GTIN → brand + MPN; Fri), rule 6 (nutrition is not a Merchant Center field; Thu); ADR 0029 findings 1–3 + pivot spec §2, §4 (Tue, Thu, Sat). Fri says GTINs are bought from GS1 UK. No AI-ranking, sales-outcome or Flintmere price claim.
+- Outreach: not staged. The staging script targets `enriched` Shopify merchants, which is the ICP ADR 0029 §2 replaces. There is still no ruling on the pause, and nothing has sent since 8 Oct.
+
+### 2026-11-09 — Week of 10 Nov: identifier hygiene, three posts queued (`one-size-one-gtin` · `spreadsheet-ate-the-barcode` · `reseller-barcodes`)
+
+- Channel: x · bluesky (cross-post, `channel` omitted; 3 posts → 6 rows). The 6–9 Nov briefs show no CreditsDepleted failure.
+- Angle: retail-gate topics dropped. ADR 0031 (2026-11-08) parked that programme, and last week already ran three of them. This week stays on what the scanner can see from `products.json` (ADR 0031 §6): Tue each net quantity needs its own GTIN, and a reused one is incorrect · Thu Excel turns a 13-digit barcode into `5.01235E+12` and CSV saves the shorthand · Sat reseller barcodes are often licensed to another company, and Amazon checks against GS1, so buy from GS1 UK. The `photography-is-solved` and `the-toll-is-unpublished` drafts are retired with the programme.
+- Surface(s): prod social queue via `POST /api/agent/queue-posts` (HTTP 200, `queued: 6`). Fire times are 10:00 GMT on Tue 10, Thu 12 and Sat 14 Nov. Tue and Thu link to `catalog.flintmere.com/scan`; Sat has no link. Lengths are 265, 272 and 267. One bracket each, the banned list is clean, and slopmonster scored 5/5. The payload is in the session scratchpad and is not committed.
+- Result: queued, not yet posted. No carousel: `/Users/abuaa/Projects/Maters` still holds an unrelated site audit, with no CLAUDE.md, no imagine flow and no Flintmere brand contract.
+- Related claims: canon-source-register §A17 rule 4 (an incorrect GTIN is the unhedged disapproval claim; Tue); the GS1 allocation rule that net-quantity changes take a new GTIN (Tue); GTINs are bought from GS1 UK (Sat). There are no AI-ranking, sales-outcome or Flintmere price claims, and no regulatory-field claims (ADR 0031 §6). Sat's Amazon GS1-database check is third-party behaviour that `claim-review` has not covered.
+- Outreach: not staged. ADR 0031 §1 parks the programme, and the script still targets the retired `enriched` merchant ICP.
+
 ## Changelog
 
 - 2026-04-19: Adapted for Flintmere. Added seven narrative anchors from BUSINESS.md and cornerstone content queue from SPEC §8.3.

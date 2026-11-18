@@ -170,7 +170,7 @@ Enforcement: `apps/shopify-app/src/lib/tier.ts`. Canonical tier data comes from 
 - **Resend** — transactional email (scanner full reports, app alerts)
 - **Stripe** — Agency + Enterprise direct invoicing, £97 concierge audit one-offs
 - **Sentry** — error tracking across both apps
-- **PostHog** — product analytics (self-hosted on droplet)
+- **PostHog** — product analytics (**PostHog Cloud EU**, per ADR 0025 — not self-hosted; first-party `/ingest` proxy, cookieless)
 - **BetterStack Uptime** — external monitoring on `flintmere.com`, `catalog.flintmere.com`, `app.flintmere.com`, and the OAuth callback
 - **GS1 GEPIR** (optional, paid per-call) — real-time GTIN verification at a rate-limited cadence
 

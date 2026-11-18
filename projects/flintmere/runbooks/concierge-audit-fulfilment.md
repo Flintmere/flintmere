@@ -244,7 +244,7 @@ Read the Coolify task log in this order:
 2. **`curl: (7) Failed to connect to localhost…`** — you're using a localhost URL but the task runs in a different container. Switch to the public HTTPS URL: `https://catalog.flintmere.com/api/cron/concierge-sla`.
 3. **`curl: (22) The requested URL returned error: 403`** — the `CRON_SECRET` env var doesn't match what the route expects. Re-paste it into Coolify scanner env vars, redeploy, retry.
 4. **`curl: (22) The requested URL returned error: 503`** — `CRON_SECRET` is unset or shorter than 32 chars. Generate a new one with `openssl rand -hex 32` and paste.
-5. **`curl: (6) Could not resolve host: catalog.flintmere.com`** — DNS issue, or you're using a typo on the URL. Verify the domain resolves on the droplet (`nslookup catalog.flintmere.com` from inside the container).
+5. **`curl: (6) Could not resolve host: catalog.flintmere.com`** — DNS issue, or you're using a typo on the URL. Verify the domain resolves on the server (`nslookup catalog.flintmere.com` from inside the container).
 6. **JSON response with `"alertSent":false`, no `alertReason`** — healthy idle. No late audits, no email expected.
 7. **JSON response with `"alertSent":true`, `"lateCount":N`** — alert was sent. Check Resend dashboard for delivery status.
 8. **JSON response with `"alertSent":false`, `"alertReason":"…"`** — Resend is misconfigured. Check `RESEND_API_KEY` in Coolify scanner env.
@@ -255,7 +255,7 @@ The `audit:sla-monitor` package script is for **local manual runs only** on the 
 
 ### G. The operator's clock is wrong / cron fires at unexpected time
 
-Coolify uses the droplet's UTC clock. UK BST is UTC+1 in summer. `0 9 * * 1-5` runs 09:00 UTC = 10:00 London May–Oct. Adjust the cron expression if you want the monitor to fire at a different local time.
+Coolify uses the server's UTC clock. UK BST is UTC+1 in summer. `0 9 * * 1-5` runs 09:00 UTC = 10:00 London May–Oct. Adjust the cron expression if you want the monitor to fire at a different local time.
 
 ---
 

@@ -8,7 +8,7 @@ Owned by **#24 Data protection (veto)** on user-facing language, with **#23 Regu
 
 - A personal data breach under UK GDPR / EU GDPR: "a breach of security leading to accidental or unlawful destruction, loss, alteration, unauthorised disclosure of, or access to, personal data."
 - A security incident affecting user trust even if not legally a "breach" (credential stuffing against Flintmere auth, Shopify access-token exposure, mass scanner abuse that exposes catalog patterns, agency-seat misuse across client stores).
-- A downstream incident at a processor (Google Cloud / Vertex AI, Azure OpenAI, Shopify, Stripe, Coolify, DigitalOcean, Resend, Sentry) that affects our merchants.
+- A downstream incident at a processor (Google Cloud / Vertex AI, Azure OpenAI, Shopify, Stripe, Coolify, Hetzner, Resend, Sentry) that affects our merchants.
 - A Shopify merchant catalog data leak via any channel.
 
 Not in scope: pure availability outages with no data implication (engineering-only, tracked in `incident-history.md`).
@@ -102,7 +102,7 @@ Known processors and their incident channels:
 - **Google Cloud / Vertex AI** — Cloud Status page + account team
 - **Azure OpenAI** — Service Health + support ticket
 - **Stripe** — Status page + account manager
-- **Coolify / DigitalOcean** — Cloud Status + support ticket
+- **Coolify / Hetzner** — Hetzner Status + support ticket
 - **Resend, Sentry, Cloudflare** — their status pages
 
 ## Incident timeline template

@@ -152,7 +152,7 @@ If CANCEL:
 
 ## Product truth
 
-- DigitalOcean (droplet) + Coolify (deploy/orchestration) + PostgreSQL are the **infra triad** — switching any one is a significant engineering commitment.
+- Hetzner (server) + Coolify (deploy/orchestration) + PostgreSQL are the **infra triad** — switching any one is a significant engineering commitment.
 - Stripe is **high lock-in** — customer IDs, subscription history all live there. Switching is a major project.
 - Anthropic (Claude API + Claude Code) is **medium lock-in for the API**, **high lock-in for the skill framework** — pilots 1–6 are Claude Code-native.
 - Email vendor switching is **low cost** but disruptive to deliverability — schedule warmup.

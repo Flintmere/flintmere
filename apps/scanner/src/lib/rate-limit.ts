@@ -3,7 +3,9 @@ import { hashIp } from './hash';
 /**
  * In-memory rate limiter.
  *
- * Single-droplet deployment per `decisions/0002-coolify-on-do.md` — a Map
+ * Single-server deployment per `decisions/0032-hosting-migration-hetzner.md`
+ * (supersedes `0002-coolify-on-do.md` on vendor; the single-instance premise
+ * this relies on is unchanged) — a Map
  * is sufficient. If the scanner ever runs more than one node, swap the
  * store for Redis (or move to Upstash @upstash/ratelimit) without changing
  * the call sites.

@@ -134,7 +134,7 @@ You are Flintmere's post-mortem author. #36 Operations leads the process; #10 De
 
 ## Product truth
 
-- Flintmere's failure modes by system: **scan / scrape failures** (Shopify feed fetch, sitemap, JSON-LD parse), **ingestion-engine failures** (LLM extraction via Vertex AI / OpenAI fallback), **sync failures** (Shopify bulk ops, metafield writes), **payment failures** (Stripe webhooks — subscriptions + concierge audit), **auth failures** (Shopify OAuth, session cookies), **infra incidents** (DigitalOcean droplet / Coolify / Traefik / PostgreSQL).
+- Flintmere's failure modes by system: **scan / scrape failures** (Shopify feed fetch, sitemap, JSON-LD parse), **ingestion-engine failures** (LLM extraction via Vertex AI / OpenAI fallback), **sync failures** (Shopify bulk ops, metafield writes), **payment failures** (Stripe webhooks — subscriptions + concierge audit), **auth failures** (Shopify OAuth, session cookies), **infra incidents** (Hetzner server / Coolify / Traefik / PostgreSQL).
 - Shopify webhook + Stripe webhook delivery failures must be handled with a `webhook-review` action item — webhooks are score-drift- and payment-load-bearing.
 - Cookie-consent rejection is **observed, not optimised** — incidents that "fix" this metric are themselves a problem.
 - Flintmere's incident posture is documented in `SECURITY.md`; post-mortem disclosure aligns with that policy.

@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 //
 // Two layers of defense added 2026-05-10 (P1-H pre-launch audit):
 // 1. Per-IP rate limit — prevents ID-enumeration floods + DB-connection
-//    exhaustion on the single-droplet deployment.
+//    exhaustion on the single-server deployment.
 // 2. Response is restricted to display-safe fields. `scoreJson` and
 //    `errorMessage` are NOT returned by this public GET — they contain
 //    merchant-specific diagnostic detail that was never consented for

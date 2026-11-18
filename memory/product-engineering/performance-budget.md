@@ -2,7 +2,7 @@
 
 Core Web Vitals, bundle budgets, and perf anti-patterns. **#17 Performance** owns this file. Thane (Design Council) holds the bundle veto on marketing surfaces.
 
-Flintmere runs on a single Coolify droplet at launch (shared CPU — build variability is real). Budgets reflect that environment.
+Flintmere runs on a single Coolify server — a Hetzner CCX33, 8 **dedicated** vCPU / 32GB, Nuremberg `NBG1` (ADR 0032). Budgets reflect that environment.
 
 ## Core Web Vitals targets
 
@@ -63,14 +63,25 @@ Measure before you ship: `pnpm build` and read the per-route JS size. Regression
 - Raw `<img>` in `apps/scanner/src/app/**`.
 - Any Google Fonts CDN reference — self-host or drop.
 
-## Coolify / droplet variability
+## Coolify / server capacity
 
-The launch deployment is a Basic 2 vCPU / 8GB droplet — shared CPU. Build times can vary 2× between identical deploys. Rules:
+**Revised 2026-11-09 (ADR 0032).** The old version of this section was built on a Basic 2 vCPU / 8GB
+**shared-CPU** droplet where build times varied 2× between identical deploys. That premise is gone:
+the server is a CCX33 with 8 **dedicated** vCPU and 32GB, and it is Flintmere-only — no other
+project competes for the box. Treat CPU variability as a fault to investigate, not a background
+condition to design around. Rules:
 
-- Pre-build Docker images in GitHub Actions where possible; Coolify pulls, not builds.
+- Pre-build Docker images in GitHub Actions; Coolify pulls, never builds. The original reason
+  (CPU starvation) is gone, but the rule stands on reproducibility — and a failed build never
+  touches production.
 - Prisma `migrate deploy` runs on container start, never during build (build container can't reach the DB).
-- Heavy enrichment is BullMQ work, not sync request processing. If a request needs >500ms of CPU, it's a queue candidate.
-- Resize trigger: ~30 active paying merchants → Premium 4 vCPU / 8GB droplet (~$84/mo). Don't wait for outages.
+- Heavy enrichment is BullMQ work, not sync request processing. If a request needs >500ms of CPU,
+  it's a queue candidate. Unchanged — this was never about the box.
+- **No standing resize trigger.** The old ~30-paying-merchant trigger existed to escape shared CPU.
+  Rescale on measured pressure (sustained CPU, RAM headroom under 20%, queue backlog above SLA),
+  not on merchant count. See `.claude/skills/coolify-deploy/SKILL.md` §Server rescale workflow.
+- **A perf regression is now more likely to be our code than our neighbours'**, which was not true
+  before 2026-11. Do not reach for "shared CPU" as an explanation; it no longer exists.
 
 ## When perf regresses
 
