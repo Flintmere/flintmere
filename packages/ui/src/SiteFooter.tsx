@@ -203,8 +203,14 @@ export function SiteFooter() {
               .
             </p>
             <p>
-              © 2026 Flintmere · a trading name of Eazy Access Ltd · England &amp;
-              Wales · UK
+              © 2026 Flintmere · a trading name of{' '}
+              <a
+                href="https://eazyaccess.org"
+                className="hover:text-[color:var(--color-paper-on-ink)] transition-colors duration-[var(--duration-instant)]"
+              >
+                Eazy Access Ltd
+              </a>{' '}
+              · England &amp; Wales · UK
             </p>
 
             {/* Social profiles. Inherit caption mute-inv → paper-on-ink on
